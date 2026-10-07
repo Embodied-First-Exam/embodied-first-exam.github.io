@@ -162,15 +162,23 @@ function scoreGroup(group, tasks, view) {
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 
-/** One dumbbell: the closed-book (teal) and open-book (terracotta) marks on a 0–100% scale, the line between them what is
- *  lost without the simulator. `pv` and `sv` are [solved, sat]; a mode not sat has no dot. `mini`: no labels. */
+/** One dumbbell: the open-book mark (a hollow ring) and the closed-book mark (a solid dot) on a 0–100% scale, with an arrow
+ *  from the first to the second: what is lost without the simulator. `pv` and `sv` are [solved, sat]; a mode not sat has no
+ *  mark. Each number sits on the outer side of its mark. `mini`: no numbers. */
 function dbTrack(pv, sv, mini = false) {
   const p = pctOf(pv), q = pctOf(sv);
   const parts = [];
-  if (p != null && q != null) parts.push(`<span class="db-line" style="--lo:${Math.min(p, q).toFixed(1)}%;--w:${Math.abs(p - q).toFixed(1)}%"></span>`);
-  if (q != null) parts.push(`<span class="db-dot s" style="--x:${q.toFixed(1)}%" title="Closed book: ${sv[0]} of ${sv[1]}">${mini ? '' : `<em>${Math.round(q)}%</em>`}</span>`);
-  if (p != null) parts.push(`<span class="db-dot p" style="--x:${p.toFixed(1)}%" title="Open book: ${pv[0]} of ${pv[1]}">${mini ? '' : `<em>${Math.round(p)}%</em>`}</span>`);
-  return `<span class="db-track${mini ? ' mini' : ''}">${parts.join('')}</span>`;
+  const both = p != null && q != null;
+  const close = both && Math.abs(p - q) < 3;                // too close for an arrow: the dot sits inside the ring
+  if (both && !close) {
+    const lo = Math.min(p, q), w = Math.abs(p - q);
+    parts.push(`<span class="db-arrow ${q < p ? 'l' : 'r'}" style="--lo:${lo.toFixed(1)}%;--w:${w.toFixed(1)}%"></span>`);
+  }
+  // the closed-book number goes on the side away from the open-book mark, and the other way round
+  const side = (self, other) => (other == null ? (self > 88 ? 'l' : 'r') : self <= other ? 'l' : 'r');
+  if (p != null) parts.push(`<span class="db-dot p${close ? ' ring' : ''}" style="--x:${p.toFixed(1)}%" title="Open book: ${pv[0]} of ${pv[1]}">${mini ? '' : `<em class="${close ? 'r' : side(p, q)}">${Math.round(p)}%</em>`}</span>`);
+  if (q != null) parts.push(`<span class="db-dot s" style="--x:${q.toFixed(1)}%" title="Closed book: ${sv[0]} of ${sv[1]}">${mini ? '' : `<em class="${close ? 'l' : side(q, p)}">${Math.round(q)}%</em>`}</span>`);
+  return `<span class="db-track${mini ? ' mini' : ''}"><span class="db-scale">${parts.join('')}</span></span>`;
 }
 
 function dbGap(pv, sv) {
