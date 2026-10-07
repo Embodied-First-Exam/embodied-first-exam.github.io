@@ -3,9 +3,10 @@
 The website of the **Embodied First Exam**: the first exam for code agents in the physical world. It shows the exam's
 questions, its leaderboard, the benchmark suites it is made of, how a question is marked, and how to contribute.
 
-Published at <https://embodied-first-exam.ai/> by GitHub Pages, straight from `main` (the `CNAME` file holds the custom
-domain; <https://embodied-first-exam.github.io/> redirects there). There is no build step: the pages are static HTML,
-one stylesheet and one script, and everything they show comes from two data files.
+Published at <https://www.embodied-first-exam.ai/> by GitHub Pages, straight from `main` (the `CNAME` file holds the
+custom domain; <https://embodied-first-exam.ai/> and <https://embodied-first-exam.github.io/> redirect there). There is
+no build step: the pages are static HTML, one stylesheet and one script, and everything they show comes from two data
+files.
 
 ```
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
@@ -13,7 +14,7 @@ assets/exam.css, assets/app.js                                        the look a
 data/exam.json, data/tasks.json                                       suites, results, the label map; every question
 media/<suite>/                                                        pictures and demo videos
 scripts/                                                              export.py, stamp.py, check.py
-CNAME                                                                 the custom domain, embodied-first-exam.ai
+CNAME                                                                 the custom domain, www.embodied-first-exam.ai
 ```
 
 ## Working on it
