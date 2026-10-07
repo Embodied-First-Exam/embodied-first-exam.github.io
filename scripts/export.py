@@ -30,8 +30,12 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 MEDIA = ROOT / "media"
 
-# data keys that hold addresses on other sites; dropped wherever they occur
-DROP_KEYS = {"pages", "page", "log", "overview"}
+# data keys that hold addresses on other sites, or the private repository's task directory names; dropped wherever
+# they occur
+DROP_KEYS = {"pages", "page", "log", "overview", "dirs"}
+# suites shown here under another id (owner, 2026-10-07: RoboPaint is the strict version only, under the plain name);
+# the source leaves the old RoboPaint out of the exam (its exclude_suites)
+SUITE_IDS = {"robopaint-strict": "robopaint"}
 # the contribution page's links into the source repository, which is private: left out until public ones exist
 PRIVATE_CONTRIBUTE = ("repository", "proposal_issue", "protocol_issue", "docs")
 # sentences reworded for this site (they mention the other site)
@@ -40,6 +44,8 @@ NOTE_TEXT = {
 }
 # the source repository is private: in text shown on this site it is "the exam", and its name is not a link anywhere
 REWORD = [
+    ("RoboPaint-strict", "RoboPaint"),
+    ("robopaint_strict_", "robopaint_"),
     (" (robot_coding_bench @ ", " (exam @ "),
     ("(robot_coding_bench @ ", "(exam @ "),
     ("The example task of robot_coding_bench:", "The exam's example task:"),
@@ -47,11 +53,14 @@ REWORD = [
 
 
 def reword(node):
+    """Rename the suites in SUITE_IDS (as keys and as whole values) and reword the text (REWORD)."""
     if isinstance(node, dict):
-        return {k: reword(v) for k, v in node.items()}
+        return {SUITE_IDS.get(k, k): reword(v) for k, v in node.items()}
     if isinstance(node, list):
         return [reword(v) for v in node]
     if isinstance(node, str):
+        if node in SUITE_IDS:
+            return SUITE_IDS[node]
         for a, b in REWORD:
             node = node.replace(a, b)
     return node
@@ -66,7 +75,7 @@ def media_path(src: str) -> str:
     if src.startswith("exam/media/"):
         out = "media/" + "/".join(parts[2:])
     elif parts[0] == "assets" and len(parts) >= 4:        # assets/<suite>/<demos|scenes>/<file>
-        suite, kind, rest = parts[1], parts[2], "/".join(parts[3:])
+        suite, kind, rest = SUITE_IDS.get(parts[1], parts[1]), parts[2], "/".join(parts[3:])
         out = f"media/{suite}/{rest}" if kind == "demos" else f"media/{suite}/{kind}/{rest}"
     else:
         raise SystemExit(f"unexpected media path: {src}")
@@ -132,6 +141,9 @@ def main() -> int:
 
     rw = Rewriter()
     exam, tasks = reword(rw.walk(exam)), reword(rw.walk(tasks))
+    ids = [x["id"] for x in exam.get("suites") or []]
+    if len(ids) != len(set(ids)):
+        raise SystemExit(f"two suites share an id after renaming: {sorted(i for i in ids if ids.count(i) > 1)}")
     (exam.get("task_set") or {}).pop("repository", None)
     (exam.get("task_set") or {}).pop("ref", None)
     for k in PRIVATE_CONTRIBUTE:

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REF = re.compile(r'(?:href|src)="([^"]+)"')
 # addresses this site must never carry: the internal review and log site, private repositories, log pages
 FORBIDDEN = ["embodied-agent-interface", "runs/overview", "/runs/", "benchmarks/", "reference/capabilities", "github.com/JamesKrW",
-             "robot_coding_bench", "internal preview", "log.json"]
+             "robot_coding_bench", "internal preview", "log.json", "RoboPaint-strict", "robopaint-strict"]
 SKIP = ("http://", "https://", "mailto:", "#", "data:", "javascript:")
 
 

@@ -316,7 +316,7 @@ function lbRules(el, ex) {
 /* ---------------------------------------------------------------------------------------------- suites */
 
 function suiteCard(ex, s) {
-  const cover = s.preview?.find((p) => !p.still) || s.preview?.[0];
+  const cover = s.preview?.find((p) => p.cover) || s.preview?.find((p) => !p.still) || s.preview?.[0];
   const robot = s.robots?.[0]?.name || '';
   const more = (s.robots?.length || 0) > 1 ? ` and ${s.robots.length - 1} more` : '';
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
@@ -337,10 +337,10 @@ function incomingCard(x) {
 }
 
 // suites whose scenes look alike, kept apart on the home page's wall as if they were one
-const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1': 'kitchen', robopaint: 'paint', 'robopaint-strict': 'paint' };
+const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1': 'kitchen' };
 
 // multi-camera posters: show the top-left camera only (the grid's layout per suite)
-const CROPS = { 'robotwin-2': 'crop-3x2 col2', dextoolbench: 'crop-2x2', 'mujoco-playground': 'crop-2x2', robopaint: 'crop-2x2 col2' };
+const CROPS = { 'robotwin-2': 'crop-3x2 col2', dextoolbench: 'crop-2x2', 'mujoco-playground': 'crop-2x2' };
 
 function suitesGrid(el, ex, filter = {}) {
   const runs = runMap(ex);
@@ -909,7 +909,7 @@ function dumbbell(el, ex) {
 function gallery(el, ex) {
   if (!el) return;
   const items = ranked(ex).map((s) => {
-    const cover = s.preview?.find((p) => !p.still) || s.preview?.[0];
+    const cover = s.preview?.find((p) => p.cover) || s.preview?.find((p) => !p.still) || s.preview?.[0];
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${CROPS[s.id] ? ` class="${CROPS[s.id]}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}</div><b>${esc(s.name)}</b>
       <span>${int(s.instances)} scenes · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
@@ -965,7 +965,7 @@ async function suitePage(ex) {
   const s = ex._suites[Q.get('id')] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
   const runs = runMap(ex);
-  const cover = s.preview?.find((p) => p.video) || s.preview?.[0];
+  const cover = s.preview?.find((p) => p.cover) || s.preview?.find((p) => p.video) || s.preview?.[0];
   const crop = CROPS[s.id];
   const linkLabels = { paper: 'Paper', project_page: 'Project page', repository: 'Code', dataset: 'Dataset', documentation: 'Docs', challenge: 'Challenge', leaderboard: 'Upstream leaderboard', project: 'Project page', site: 'Project site' };
   const ext = Object.entries(s.links || {}).filter(([k, v]) => v && linkLabels[k]).map(([k, v]) => `<a class="btn small" href="${esc(v)}">${linkLabels[k]} ↗</a>`).join('');
