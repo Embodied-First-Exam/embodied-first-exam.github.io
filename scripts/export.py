@@ -86,7 +86,18 @@ def source_file(src_root: Path, path: str) -> Path:
     return src_root / "docs" / path
 
 
-VIDEO_MAX = 1_200_000          # bytes: videos above this are re-encoded for the web; smaller ones are kept as they are
+VIDEO_MAX = 1_200_000          # bytes: smaller videos are kept as they are
+WEB_HEIGHT, WEB_RATE = 720, 3_200_000   # a larger video at most this tall and this many bits per second is kept too
+
+
+def web_sized(src: Path) -> bool:
+    """Whether a video is already a web copy (the suites' masters arrive as 720p web copies made from them)."""
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height:format=bit_rate",
+                          "-of", "json", str(src)], capture_output=True, text=True)
+    d = json.loads(out.stdout or "{}")
+    height = int(((d.get("streams") or [{}])[0]).get("height") or 0)
+    rate = int((d.get("format") or {}).get("bit_rate") or 0)
+    return 0 < height <= WEB_HEIGHT and 0 < rate <= WEB_RATE
 
 
 def bring(src: Path, dest: Path) -> None:
@@ -96,10 +107,10 @@ def bring(src: Path, dest: Path) -> None:
     if src.suffix.lower() == ".png" and dest.suffix == ".jpg":
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", "scale='min(1280,iw)':-2", "-q:v", "3",
                         "-f", "image2", str(tmp)], check=True)
-    elif src.suffix.lower() == ".mp4" and src.stat().st_size > VIDEO_MAX:
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "30",
-                        "-maxrate", "900k", "-bufsize", "1800k", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-                        "-f", "mp4", str(tmp)], check=True)
+    elif src.suffix.lower() == ".mp4" and src.stat().st_size > VIDEO_MAX and not web_sized(src):
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({WEB_HEIGHT},ih)'",
+                        "-c:v", "libx264", "-preset", "slow", "-crf", "26", "-maxrate", "2500k", "-bufsize", "5000k",
+                        "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-f", "mp4", str(tmp)], check=True)
         if tmp.stat().st_size >= src.stat().st_size:      # never larger than the original
             shutil.copy2(src, tmp)
     else:
