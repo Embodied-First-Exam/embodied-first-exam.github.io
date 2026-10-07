@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Suites · Embodied First Exam</title>
+<meta name="description" content="The benchmark suites of the Embodied First Exam, the suites on their way in, and what the exam covers.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/exam.css?v=52be5b32">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../assets/app.js?v=3ae4d893"></script>
+</head>
+<body data-page="suites">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head">
+    <p class="kicker">Suites</p>
+    <h1>Suites</h1>
+    <p class="lead"><span id="n-suites"></span> benchmark suites under one protocol, and <span id="n-incoming"></span> on the way.</p>
+  </header>
+
+  <section class="section tight">
+    <div class="filters" id="suite-filter" role="group" aria-label="Filter suites"></div>
+    <div id="suites"></div>
+  </section>
+
+  <section class="section band" id="on-the-way">
+    <div class="sec-head reveal">
+      <div class="sec-index">01</div>
+      <div class="sec-title">
+        <h2>On the way in</h2>
+        <p>Suites being brought into the exam now. Their sizes are planned and can still change.</p>
+      </div>
+      <div class="sec-aside"><a class="btn small" href="../contribute/#propose">Propose a suite <span class="arr">→</span></a></div>
+    </div>
+    <div class="incoming reveal" id="incoming"></div>
+  </section>
+
+  <section class="section">
+    <div class="head reveal">
+      <h2>Coverage</h2>
+      <p>What each suite tests. A dot’s size is the share of the suite’s scenes that carry the label; click it for those scenes.</p>
+    </div>
+    <div class="covmap reveal" id="coverage"></div>
+  </section>
+
+</main>
+<div id="footer"></div>
+</body>
+</html>

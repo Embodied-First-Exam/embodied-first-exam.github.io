@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Contribute · Embodied First Exam</title>
+<meta name="description" content="How to bring a suite, tasks, a review, an exploit report or an evaluation run to the Embodied First Exam.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/exam.css?v=52be5b32">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../assets/app.js?v=3ae4d893"></script>
+</head>
+<body data-page="contribute">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head">
+    <p class="kicker">Contribute</p>
+    <h1>Add to the exam</h1>
+    <p class="lead">Bring the benchmark you know best. Every accepted suite is credited to the people who brought it.</p>
+  </header>
+
+  <section class="section numbers">
+    <dl class="bignums reveal" id="c-figures"></dl>
+  </section>
+
+  <section class="section" id="roles">
+    <div class="head reveal">
+      <h2>Five ways in</h2>
+      <p>From a whole suite to a single bug report.</p>
+    </div>
+    <div class="ways reveal">
+      <a class="way" href="#propose"><span class="ic" data-icon="layers" aria-hidden="true"></span><b>Propose a suite</b><p>Bring a benchmark under the protocol, in both modes.</p><span class="go">Fill in the proposal ↓</span></a>
+      <a class="way" data-doc="CONTRIBUTING.md" href="#process"><span class="ic" data-icon="doc" aria-hidden="true"></span><b>Add tasks</b><p>A new family or more scenes for a suite already in.</p><span class="go">Kinds of pull requests ↗</span></a>
+      <a class="way" data-doc="docs/REVIEWING.md" href="#process"><span class="ic" data-icon="review" aria-hidden="true"></span><b>Review a family</b><p>Check a family that has no full reference solution.</p><span class="go">The review checklist ↗</span></a>
+      <a class="way" data-doc="CONTRIBUTING.md" href="#rules"><span class="ic" data-icon="cheat" aria-hidden="true"></span><b>Break a task</b><p>Pass a verifier without doing the task, then help fix it.</p><span class="go">Task fixes ↗</span></a>
+      <a class="way" data-doc="docs/SHARING_RUNS.md" href="#faq"><span class="ic" data-icon="terminal" aria-hidden="true"></span><b>Run batches</b><p>Run assigned batches on your GPUs and send the logs back.</p><span class="go">Sending back runs ↗</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="criteria">
+    <div class="head reveal">
+      <h2>What a suite needs</h2>
+      <p>Six things every proposal shows.</p>
+    </div>
+    <ul class="needs reveal">
+      <li><span class="ic" data-icon="shield" aria-hidden="true"></span><b>Verifiable</b><span>A program decides success, with no learned judge.</span></li>
+      <li><span class="ic" data-icon="target" aria-hidden="true"></span><b>Solvable</b><span>For every family, one answer the verifier marks 1.</span></li>
+      <li><span class="ic" data-icon="podium" aria-hidden="true"></span><b>Difficult</b><span>Hard for today’s code agents, for a robotic reason.</span></li>
+      <li><span class="ic" data-icon="replay" aria-hidden="true"></span><b>Reproducible</b><span>A frozen scene that replays bit for bit.</span></li>
+      <li><span class="ic" data-icon="sandbox" aria-hidden="true"></span><b>Isolatable</b><span>Marked in its own sandbox from the answer alone.</span></li>
+      <li><span class="ic" data-icon="nokey" aria-hidden="true"></span><b>Scrubbable</b><span>Reference solutions kept out of the agent’s reach.</span></li>
+    </ul>
+  </section>
+
+  <section class="section" id="process">
+    <div class="head reveal">
+      <h2>From proposal to leaderboard</h2>
+      <p>Six steps. <a class="link" data-doc="docs/PROTOCOL.md" href="#rules">The protocol ↗</a> has every detail.</p>
+    </div>
+    <ol class="journey reveal">
+      <li><b>Propose</b><span>Open an issue, or fill in the form below.</span><span class="chips"><i>proposal-approved</i></span></li>
+      <li><b>Build</b><span>Two task folders per frozen scene, from a generator.</span><span class="chips"><i>-privileged</i><i>-standard</i></span></li>
+      <li><b>Self-check</b><span>Run the checks the reviewers will run.</span><span class="chips"><i>run_all.sh</i><i>oracle = 1</i><i>nop = 0</i><i>2 replays</i></span></li>
+      <li><b>Review</b><span>A maintainer, a cheat trial and a model trial.</span><span class="chips"><i>cheat trial</i><i>human review</i></span></li>
+      <li><b>Merge</b><span>Base images published, the suite added to the site.</span><span class="chips"><i>eai-&lt;name&gt;</i></span></li>
+      <li><b>On the board</b><span>Its questions join the exam’s evaluations.</span><span class="chips"><i>both modes</i><i>every log</i></span></li>
+    </ol>
+  </section>
+
+  <section class="section band" id="propose">
+    <div class="head reveal">
+      <h2>Propose a suite</h2>
+      <p>Fill in the fields of a proposal and copy it as Markdown. Nothing is sent from this page.</p>
+    </div>
+    <form class="form frame reveal" id="proposal" autocomplete="on">
+      <label><span>Your name</span><input name="name" autocomplete="name"></label>
+      <label><span>Affiliation</span><input name="affiliation" autocomplete="organization"></label>
+      <label><span>E-mail</span><input name="email" type="email" autocomplete="email"></label>
+      <label><span>Benchmark <em>*</em></span><input name="benchmark" placeholder="the suite’s name"></label>
+      <label class="full"><span>Upstream benchmark and version <em>*</em></span><input name="upstream" placeholder="name, URL, commit or release"></label>
+      <label class="full"><span>Scope <em>*</em></span><textarea name="scope" placeholder="Simulator, robot, task families, number of instances, modes (privileged / standard)."></textarea></label>
+      <label><span>Oracle <em>*</em></span><textarea name="oracle" placeholder="Source (upstream expert, planner, policy, none) and expected level: full / partial / none."></textarea></label>
+      <label><span>Verification and determinism <em>*</em></span><textarea name="verification" placeholder="Success predicate, how it is replayed in a fresh process, and the hardware determinism was checked on."></textarea></label>
+      <label><span>Why it is hard <em>*</em></span><textarea name="difficulty" placeholder="Why strong coding agents fail today; a trial run if you have one."></textarea></label>
+      <label><span>Images and resources <em>*</em></span><textarea name="images" placeholder="Base image size, GPU / VRAM, whether the image can be published (licences, data), expected wall time of an oracle run."></textarea></label>
+      <label class="full"><span>Expected pull request size</span><input name="size" placeholder="number of task directories, MB"></label>
+      <div class="actions">
+        <button type="button" class="btn primary" data-act="issue">Open the issue on GitHub ↗</button>
+        <button type="button" class="btn" data-act="copy">Copy as Markdown</button>
+        <button type="button" class="btn" data-act="form">Send through the public form ↗</button>
+        <span class="msg" role="status"></span>
+      </div>
+    </form>
+    <p class="board-foot" id="contact"></p>
+  </section>
+
+  <section class="section" id="thin-sec">
+    <div class="head reveal">
+      <h2>Where a new suite helps most</h2>
+      <p>Labels and robot bodies with room for more questions.</p>
+    </div>
+    <div class="thin reveal" id="thin"></div>
+  </section>
+
+  <section class="section" id="credit">
+    <div class="head reveal">
+      <h2>Credit</h2>
+      <p>How contributions could count toward authorship of the exam’s paper.</p>
+    </div>
+    <div class="credit-card reveal" id="recognition"></div>
+  </section>
+
+  <section class="section" id="rules">
+    <div class="head reveal">
+      <h2>House rules</h2>
+      <p>From the contributing guide and the protocol.</p>
+    </div>
+    <ul class="hrules reveal">
+      <li><span class="ic" data-icon="snow" aria-hidden="true"></span><span>A published task never changes. Fixing a scene makes a new task.</span></li>
+      <li><span class="ic" data-icon="lock" aria-hidden="true"></span><span>Everything is pinned, and marking needs no network.</span></li>
+      <li><span class="ic" data-icon="sandbox" aria-hidden="true"></span><span>The agent is root in its container, so marking runs in another.</span></li>
+      <li><span class="ic" data-icon="nokey" aria-hidden="true"></span><span>Reference solutions live only under <code>solution/</code>.</span></li>
+      <li><span class="ic" data-icon="shield" aria-hidden="true"></span><span>No credentials, personal paths, large binaries or results in the repository.</span></li>
+      <li><span class="ic" data-icon="layers" aria-hidden="true"></span><span>One benchmark per pull request; shared files and protocol changes go apart.</span></li>
+      <li><span class="ic" data-icon="cube" aria-hidden="true"></span><span>An image that cannot be shared stays build-only, with build steps.</span></li>
+      <li><span class="ic" data-icon="terminal" aria-hidden="true"></span><span>Official runs use Harbor’s native agents, with web search off.</span></li>
+    </ul>
+  </section>
+
+  <section class="section band" id="faq">
+    <div class="head reveal">
+      <h2>Questions</h2>
+    </div>
+    <div class="faq reveal">
+      <details><summary>How do I send a proposal?</summary>
+        <p>Fill in the form above and copy it as Markdown, then send it to a maintainer you know. The exam’s repository is not public yet; access for the pull request is arranged once a proposal is approved.</p></details>
+      <details><summary>My benchmark has no scripted expert. Can it still come in?</summary>
+        <p>Yes. A family without a full reference solution needs a positive example (a successful model trial, an upstream policy rollout or a hand-built trajectory) and a human review. Its results are reported apart from the tasks with a verified solution until it has one.</p></details>
+      <details><summary>Does my suite need both modes?</summary>
+        <p>Each frozen scene is offered as a privileged and a standard task. Standard mode needs a service that runs the simulator behind the standard protocol (eai-standard/2.x); the services of the suites already in are the templates.</p></details>
+      <details><summary>Which simulators are accepted?</summary>
+        <p>Any that runs headless in a pinned Docker image and replays a frozen scene deterministically on the reference hardware, an RTX 4090. The exam already runs MuJoCo, Isaac Sim, SAPIEN and Genesis, among others.</p></details>
+      <details><summary>What if the simulator or its assets cannot be redistributed?</summary>
+        <p>The image is marked build-only and comes with build instructions (licences, data). It is never published, though the maintainers may keep a private package for the team.</p></details>
+      <details><summary>Can I get my own agent on the leaderboard?</summary>
+        <p>Official results come from Harbor’s native agents (Codex, Claude Code and others) under the protocol’s budgets, run with our runner. Helpers with GPU hosts run assigned batches and send the job directories back; ask the maintainers for an assignment.</p></details>
+      <details><summary>How is a suite credited?</summary>
+        <p>Every task names its author, and every adapted suite credits its upstream benchmark on its suite page and in its documentation.</p></details>
+    </div>
+    </section>
+
+</main>
+<div id="footer"></div>
+</body>
+</html>

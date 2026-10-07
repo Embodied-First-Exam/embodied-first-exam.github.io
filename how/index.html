@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>How a question is marked · Embodied First Exam</title>
+<meta name="description" content="How a question of the Embodied First Exam is set, sat, answered, marked and recorded, and what keeps the marks honest.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/exam.css?v=52be5b32">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../assets/app.js?v=3ae4d893"></script>
+</head>
+<body data-page="how">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head">
+    <p class="kicker">The rules</p>
+    <h1>How a question is marked</h1>
+    <p class="lead">Every question in every suite goes through the same five stages under one protocol, so one agent can sit all of them under the same rules.</p>
+  </header>
+
+  <section class="section tight">
+    <figure class="flowfig" id="flowfig"></figure>
+  </section>
+
+  <section class="section tight" id="how">
+    <ol class="pipeline reveal">
+      <li><b>The question</b><p>A frozen simulation scene, rebuilt bit for bit and checked against its starting state, and a goal written for a person. It states every convention the agent cannot guess, such as frames, units and the action layout, and never the solution.</p></li>
+      <li><b>The sitting</b><p>A code agent such as Codex or Claude Code works alone in a container: an hour for most questions, at most 100M input and 10M output tokens, and no web search.</p></li>
+      <li><b>The answer</b><p>Open book, a trajectory and the script that wrote it. Closed book, the episode itself: every action the agent sent to the robot, recorded as it ran.</p></li>
+      <li><b>The marking</b><p>The answer is replayed from the frozen start in a fresh simulator, twice. A verifier in its own sandbox marks it 1 or 0 by the suite’s rule, and only if the replays agree.</p></li>
+      <li><b>The record</b><p>Every attempt keeps its full log: what the agent did step by step, its tokens and cost, and the replay.</p></li>
+    </ol>
+
+    <div class="sub-head reveal">
+      <h3>Two ways to sit the same question</h3>
+      <p>Each question exists twice, on the same frozen scene. The two marks are always reported apart.</p>
+    </div>
+    <div class="compare reveal">
+      <table>
+        <thead><tr><th scope="col"><span class="sr">Aspect</span></th><th scope="col" class="p"><span class="pill p">privileged</span><b>Open book</b></th><th scope="col" class="s"><span class="pill s">standard</span><b>Closed book</b></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">The simulator</th><td data-mode="Open book">Runs in the agent’s own container</td><td data-mode="Closed book">Runs in a separate service the agent cannot open</td></tr>
+          <tr><th scope="row">What the agent sees</th><td data-mode="Open book">The true state of the scene, the simulator’s API and planning tools</td><td data-mode="Closed book">Camera images and the robot’s own state; no object poses, no segmentation, no success check</td></tr>
+          <tr><th scope="row">Trying again</th><td data-mode="Open book">Reset and replay as often as it likes</td><td data-mode="Closed book">One episode, no reset; the clock is the only limit</td></tr>
+          <tr><th scope="row">What it hands in</th><td data-mode="Open book">A trajectory, and the script that wrote it</td><td data-mode="Closed book">The episode, recorded action by action</td></tr>
+          <tr><th scope="row">How it is marked</th><td data-mode="Open book">Replayed open loop from the frozen start; two replays must end in the same state</td><td data-mode="Closed book">The recorded episode is replayed; it passes only if the replay succeeds and is deterministic</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head reveal">
+      <h3>What keeps the marks honest</h3>
+      <p>The checks every suite passes before its questions count.</p>
+    </div>
+    <ul class="honest reveal">
+      <li><b>A separate marker</b><p>The verifier runs in its own sandbox, without network, and sees only what the agent declared as its answer.</p></li>
+      <li><b>No answer key in reach</b><p>Reference solutions never enter the agent’s container, and upstream experts are removed from the images.</p></li>
+      <li><b>Controls</b><p>Doing nothing must score 0, and a full reference solution must score 1.</p></li>
+      <li><b>A cheat trial</b><p>Before a suite comes in, an agent is told to pass the verifier without doing the task. Any success blocks the suite until the verifier is fixed.</p></li>
+      <li><b>Human review</b><p>A question without a full reference solution is checked by a reviewer who did not write it.</p></li>
+      <li><b>Frozen questions</b><p>A published question never changes. Fixing a scene makes a new question.</p></li>
+    </ul>
+  </section>
+
+</main>
+<div id="footer"></div>
+</body>
+</html>
