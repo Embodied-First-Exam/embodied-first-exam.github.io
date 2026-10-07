@@ -477,12 +477,15 @@ main { min-height: 70vh; }
 .db-track { position: relative; display: block; height: 56px; }
 .db-scale { position: absolute; inset: 0 var(--db-r) 0 var(--db-l); background-image: linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 25% 100%; box-shadow: inset -1px 0 0 var(--line); }
-/* the arrow from the open-book ring to the closed-book dot, stopping short of both marks; its head at the closed-book end */
-.db-arrow { position: absolute; top: 50%; left: calc(var(--lo) + 13px); width: max(0px, calc(var(--w) - 26px)); height: 2px; margin-top: -1px;
-  background: var(--ink-3); transition: left 1s cubic-bezier(.2, .8, .2, 1), width 1s cubic-bezier(.2, .8, .2, 1), opacity .5s .6s; }
-.db-arrow::before { content: ""; position: absolute; top: -4px; border: 5px solid transparent; }
-.db-arrow.l::before { left: -7px; border-right: 8px solid var(--ink-3); border-left: 0; }
-.db-arrow.r::before { right: -7px; border-left: 8px solid var(--ink-3); border-right: 0; }
+/* the arrow from the open-book ring to the closed-book dot. Its head lies inside its own box and stops 5px short of the dot,
+   so the dot never covers the tip; when the two marks are too close for a whole arrow, the box clips it away. */
+.db-arrow { position: absolute; top: 50%; left: calc(var(--lo) + 13px); width: max(0px, calc(var(--w) - 28px)); height: 10px; margin-top: -5px;
+  overflow: hidden; background: linear-gradient(var(--ink-3), var(--ink-3)) no-repeat left center / calc(100% - 6px) 2px;
+  transition: left 1s cubic-bezier(.2, .8, .2, 1), width 1s cubic-bezier(.2, .8, .2, 1), opacity .5s .6s; }
+.db-arrow.l { left: calc(var(--lo) + 15px); background-position: right center; }
+.db-arrow::before { content: ""; position: absolute; top: 0; border: 5px solid transparent; }
+.db-arrow.l::before { left: 0; border-right: 8px solid var(--ink-3); border-left: 0; }
+.db-arrow.r::before { right: 0; border-left: 8px solid var(--ink-3); border-right: 0; }
 .db-dot { position: absolute; top: 50%; left: var(--x); width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%;
   transition: left 1s cubic-bezier(.2, .8, .2, 1); }
 .db-dot.p { background: var(--surface); border: 3px solid var(--priv); }                        /* open book: hollow */
@@ -538,9 +541,11 @@ main { min-height: 70vh; }
 .db-track.mini .db-scale { inset: 0; }
 .db-track.mini .db-dot { width: 12px; height: 12px; margin: -6px 0 0 -6px; border-width: 2px; }
 .db-track.mini .db-dot.p.ring { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
-.db-track.mini .db-arrow { left: calc(var(--lo) + 9px); width: max(0px, calc(var(--w) - 18px)); height: 1.5px; margin-top: -.75px; }
-.db-track.mini .db-arrow::before { top: -3px; border-width: 3.75px; }
-.db-track.mini .db-arrow.l::before { left: -5px; border-right-width: 6px; } .db-track.mini .db-arrow.r::before { right: -5px; border-left-width: 6px; }
+.db-track.mini .db-arrow { left: calc(var(--lo) + 9px); width: max(0px, calc(var(--w) - 19px)); height: 8px; margin-top: -4px;
+  background-size: calc(100% - 4px) 1.5px; }
+.db-track.mini .db-arrow.l { left: calc(var(--lo) + 10px); }
+.db-track.mini .db-arrow::before { border-width: 4px; }
+.db-track.mini .db-arrow.l::before { border-right-width: 6px; border-left-width: 0; } .db-track.mini .db-arrow.r::before { border-left-width: 6px; border-right-width: 0; }
 .db-foot { margin: 10px 24px 0 8px; font-size: 13px; color: var(--ink-3); }
 .db-group { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 18px 0 14px; border-top: 1px solid var(--line-2); font-size: 13.5px; color: var(--ink-3); }
 .sdots { padding: 22px 26px 16px; border-radius: 24px; border: 1px solid var(--line); background: var(--surface); }
