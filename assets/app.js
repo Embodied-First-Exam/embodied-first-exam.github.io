@@ -644,15 +644,33 @@ function heroWall(ex) {
   const cols = Array.from({ length: n }, () => []);
   const shown = new Map();
   const uses = (c) => new Set((cols[c] || []).map(groupOf));
-  for (let c = 0; c < n; c++) {
-    const near = [uses(c - 1), uses(c - 2), uses(c - 3)];
+  // The open part of the hero, right of the title, is dealt first, so the suites that lead the order (hero.order: our
+  // own, with every task replayed) are the first thing people see; then the columns further from it.
+  const frontOrder = (ex.hero?.front || []).map((s) => LOOKALIKE[s] || s);
+  const front = new Set(frontOrder);
+  const wr = wall.getBoundingClientRect();
+  const focus = phone ? innerWidth / 2 : innerWidth * 0.72;
+  const seq = [...cols.keys()].sort((a, b) => Math.abs(wr.left + a * (tw + gap) + tw / 2 - focus) - Math.abs(wr.left + b * (tw + gap) + tw / 2 - focus));
+  for (const c of seq) {
+    const near = [1, 2, 3].map((d) => new Set([...uses(c - d), ...uses(c + d)]));
     for (let r = 0; r < per; r++) {
       const here = uses(c);
       let left = groups.filter((g) => pools.get(g).length);
+      // the two columns people see first lead with the front suites (hero.front), one scene of each
+      const fr = c === seq[0] || c === seq[1] ? left.filter((g) => front.has(g) && !here.has(g)) : [];
+      if (fr.length) {
+        // the first front suite sits second in the block, where the screen's window catches it best
+        const mid = [frontOrder[1], frontOrder[0], ...frontOrder.slice(2)];
+        const g = fr.sort((a, b) => mid.indexOf(a) - mid.indexOf(b))[0];
+        cols[c].push(pools.get(g).shift());
+        shown.set(g, (shown.get(g) || 0) + 1);
+        continue;
+      }
       if (!left.length) { tiles.forEach((t) => pools.get(groupOf(t)).push(t)); left = groups; }   // a screen too large for the pool
-      // every group gets its turn: the fewer times a group is on the wall so far, the sooner it comes next
+      // every group gets its turn: the fewer times a group is on the wall so far, the sooner it comes next; ties go to the
+      // group that leads the order
       const cost = (g) => (here.has(g) ? 1000 : 0) + (near[0].has(g) ? 60 : 0) + (near[1].has(g) ? 36 : 0) + (near[2].has(g) ? 14 : 0)
-        + (shown.get(g) || 0) * 25 + ((groups.indexOf(g) - c * 5 - r * 3) % groups.length + groups.length) % groups.length / 1000;
+        + (shown.get(g) || 0) * 25 + groups.indexOf(g) / 1000;
       const g = left.reduce((a, b) => (cost(b) < cost(a) ? b : a));
       cols[c].push(pools.get(g).shift());
       shown.set(g, (shown.get(g) || 0) + 1);
@@ -667,24 +685,86 @@ function heroWall(ex) {
       <span class="tag">${esc(s?.code || '')}</span><span class="ttl">${esc(s?.name || '')} · ${esc(t.title)}</span></a>`;
   };
   const durs = [92, 76, 100, 84, 108, 72, 96, 80];
-  wall.innerHTML = cols.map((c, i) => {
-    const html = c.map(tile).join('');
-    const dur = durs[i % durs.length];
-    return `<div class="wall-col${i % 2 ? ' down' : ''}" style="--dur:${dur}s;--delay:-${((i * 37) % 100) / 100 * dur}s">${html}${html}</div>`;
-  }).join('');
+  let lead = new Set([seq[0], seq[1]]);
+  const render = () => {
+    wall.innerHTML = cols.map((c, i) => {
+      const html = c.map(tile).join('');
+      const dur = durs[i % durs.length];
+      // the front columns start at their top, where the front suites' scenes are
+      const delay = lead.has(i) ? 0 : ((i * 37) % 100) / 100 * dur;
+      return `<div class="wall-col${i % 2 ? ' down' : ''}" style="--dur:${dur}s;--delay:-${delay}s">${html}${html}</div>`;
+    }).join('');
+  };
+  render();
+  // The wall is tilted, so where a column shows on screen is measured rather than computed: the front columns move to
+  // the two places nearest the open part of the hero.
+  if (front.size && !phone) {
+    const shownX = (el) => {
+      const xs = [...el.querySelectorAll('.wt')].map((t) => t.getBoundingClientRect())
+        .filter((r) => r.bottom > 0 && r.top < innerHeight).map((r) => r.left + r.width / 2);
+      return xs.length ? xs.reduce((a, b) => a + b) / xs.length : Infinity;
+    };
+    const xs = $$('.wall-col', wall).map(shownX);
+    const best = [...cols.keys()].sort((a, b) => Math.abs(xs[a] - focus) - Math.abs(xs[b] - focus)).slice(0, 2);
+    const from = [seq[0], seq[1]];
+    if (best.join() !== from.join()) {
+      const moved = from.map((i) => cols[i]);
+      const freed = best.filter((i) => !from.includes(i)).map((i) => cols[i]);
+      from.filter((i) => !best.includes(i)).forEach((i, k) => { cols[i] = freed[k]; });
+      best.forEach((i, k) => { cols[i] = moved[k]; });
+      lead = new Set(best);
+      render();
+    }
+    // Start each front column where its front scenes sit in the open part of the hero: try phases and keep the best.
+    // The second column favours the front suites the first does not show, and the first front suite counts a little more.
+    const order = ex.hero?.front || [];
+    const frontEl = (el) => front.has(LOOKALIKE[el.dataset.suite] || el.dataset.suite);
+    const inView = (el) => {
+      const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      return x > innerWidth * 0.5 && x < innerWidth && y > innerHeight * 0.1 && y < innerHeight * 0.9;
+    };
+    const seen = new Set();
+    [...lead].forEach((i) => {
+      const col = $$('.wall-col', wall)[i];
+      const dur = durs[i % durs.length];
+      let bestD = 0, bestN = -1;
+      for (let k = 0; k < 32; k++) {
+        const d = (k / 32) * dur;
+        col.style.setProperty('--delay', `-${d}s`);
+        const n = $$('.wt', col).filter((el) => frontEl(el) && inView(el))
+          .reduce((a, el) => a + (seen.has(el.dataset.suite) ? 1 : 2) + (el.dataset.suite === order[0] && !seen.has(el.dataset.suite) ? 1.5 : 0), 0);
+        if (n > bestN) { bestN = n; bestD = d; }
+      }
+      col.style.setProperty('--delay', `-${bestD}s`);
+      $$('.wt', col).filter((el) => frontEl(el) && inView(el)).forEach((el) => seen.add(el.dataset.suite));
+    });
+  }
   if (!phone && !still) {
     // play the tiles in the open right part of the wall (the left part sits under the title's veil)
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
+    const isFront = (el) => front.has(LOOKALIKE[el.dataset.suite] || el.dataset.suite);
+    const onSee = (es) => es.sort((a, b) => isFront(b.target) - isFront(a.target)).forEach((e) => {
       const v = $('video', e.target);
-      if (e.isIntersecting && $$('.wt.playing', wall).length < 6) {
+      // a front suite's tile in view takes a slot from another suite's when all six are playing
+      const busy = $$('.wt.playing', wall);
+      if (e.isIntersecting && busy.length >= 6 && isFront(e.target)) {
+        const other = busy.find((t) => !isFront(t));
+        if (other) { $('video', other).pause(); other.classList.remove('playing'); }
+      }
+      // one video per suite at a time, so the six that play are six different suites
+      const twin = $$('.wt.playing', wall).some((t) => t !== e.target && t.dataset.suite === e.target.dataset.suite);
+      if (e.isIntersecting && !twin && $$('.wt.playing', wall).length < 6) {
         if (!v.src) v.src = v.dataset.src;
-        v.play().then(() => e.target.classList.add('playing')).catch(() => {});
+        e.target.classList.add('playing');      // counted at once, so the same batch cannot start a twin
+        v.play().catch(() => e.target.classList.remove('playing'));
       } else if (!e.isIntersecting) {
         v.pause();
         e.target.classList.remove('playing');
       }
-    }), { rootMargin: '0px 0px 0px -46%', threshold: 0.7 });
-    $$('.wt', wall).forEach((t) => { if ($('video', t)) io.observe(t); });
+    });
+    // the front suites' tiles start playing once a third of them is in the open part; the others at seven tenths
+    const io = new IntersectionObserver(onSee, { rootMargin: '0px 0px 0px -46%', threshold: 0.7 });
+    const ioFront = new IntersectionObserver(onSee, { rootMargin: '0px 0px 0px -46%', threshold: 0.35 });
+    $$('.wt', wall).forEach((t) => { if ($('video', t)) (isFront(t) ? ioFront : io).observe(t); });
   }
   // stop the drift while the first screen is out of sight
   new IntersectionObserver(([e]) => wall.classList.toggle('paused', !e.isIntersecting)).observe($('.hero-wall'));
