@@ -570,6 +570,32 @@ main { min-height: 70vh; }
 .g i { display: block; width: var(--d); height: var(--d); border-radius: 50%; }
 .g.p i { background: var(--priv); } .g.s i { background: var(--std); }
 .g.na { box-shadow: inset 0 0 0 1px var(--line); background: repeating-linear-gradient(135deg, transparent 0 3px, var(--line) 3px 4px), var(--surface); }
+/* suite by suite: a table of numbers, each cell tinted by its value in the mode's colour */
+.sx-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 18px; }
+.sx-bar .seg button .dot { border-radius: 50%; }
+.sx-bar .seg button .dot.p { background: transparent; box-shadow: inset 0 0 0 2px var(--priv); }
+.sx-bar .seg button .dot.s { background: var(--std); }
+.sx-bar .seg button .arr { position: relative; display: inline-block; width: 16px; height: 2px; margin: 0 8px 0 3px; vertical-align: 3px; background: currentColor; opacity: .7; }
+.sx-bar .seg button .arr::before { content: ""; position: absolute; top: -3px; left: -4px; border: 4px solid transparent; border-right: 5px solid currentColor; border-left: 0; }
+.sx-note { font-size: 13px; color: var(--ink-3); }
+.sx-grid { --c: var(--std); display: grid; grid-template-columns: minmax(170px, 230px) repeat(var(--n), minmax(76px, 1fr)); gap: 6px 8px;
+  min-width: calc(190px + var(--n) * 84px); }
+.sx-grid.sx-privileged { --c: var(--priv); }
+.sx-grid.sx-drop { --c: var(--ink-2); }
+.sx-row { display: contents; }
+.sx-head .sx-col { padding-bottom: 8px; text-align: center; }
+.sx-head .sx-col b { display: block; font: 650 14px/1.2 var(--display); }
+.sx-head .sx-col small { font: 500 11px/1.4 var(--mono); color: var(--ink-3); }
+.sx-row .sd-name { height: 40px; }
+.sx-cell { position: relative; display: flex; align-items: center; justify-content: center; height: 40px; border-radius: 10px;
+  background: color-mix(in srgb, var(--c) var(--t), var(--surface)); color: var(--ink); font: 500 15px/1 var(--mono); }
+.sx-cell small { margin-left: 1px; font-size: 11px; opacity: .65; }
+.sx-cell.best { font-weight: 700; }
+a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0 0 0 1.5px var(--ink-2); }
+.sx-cell.best::after { content: ""; position: absolute; left: 50%; bottom: 7px; width: 22px; height: 2px; margin-left: -11px; border-radius: 1px; background: var(--ink); }
+.sx-cell.zero { color: var(--ink-3); font-size: 12.5px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.sx-cell.na { color: var(--ink-3); font-weight: 500;
+  background: repeating-linear-gradient(135deg, transparent 0 4px, var(--line) 4px 5px), var(--surface); }
 .rules6 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .rule6 { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); }
 .rule6 b { font: 650 18px/1.25 var(--display); letter-spacing: -.01em; }
