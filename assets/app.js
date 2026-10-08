@@ -9,7 +9,10 @@ const Q = new URLSearchParams(location.search);
 const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's' };
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
-const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'hand', 'musculoskeletal'];
+const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal'];
+// difficulty labels, easiest first (RoboTangle's tiers add very_easy and easier)
+const DIFF_ORDER = ['very_easy', 'easier', 'easy', 'medium', 'hard', 'extreme'];
+const diffName = (d) => String(d || '').replace(/_/g, ' ');
 const GRADED = new Set(['S', 'F', 'E']);
 /** A trial's state code for scoring; undefined for a standard trial that ran with resets allowed (reported apart). */
 const scored = (c) => (c && !c.r ? c.s : undefined);
@@ -374,7 +377,9 @@ function incomingCard(x) {
 const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1': 'kitchen' };
 
 // multi-camera posters: show the top-left camera only (the grid's layout per suite)
-const CROPS = { 'robotwin-2': 'crop-3x2 col2', dextoolbench: 'crop-2x2', 'mujoco-playground': 'crop-2x2' };
+// suites whose demos are still multi-view grids: the crop shows one view. A suite leaves the list once its demos are
+// re-rendered as one view (MuJoCo Playground, 2026-10-08: the old crop showed the sky above its new renders).
+const CROPS = { 'robotwin-2': 'crop-3x2 col2', dextoolbench: 'crop-2x2' };
 
 function suitesGrid(el, ex, filter = {}) {
   const runs = runMap(ex);
@@ -468,7 +473,7 @@ function taskCard(ex, t, runs) {
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
     <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}</div>
     <div class="body"><h4>${esc(t.title)}</h4><p>${esc(t.sentence || '')}</p>
-      <div class="res">${runs.length ? dots(ex, t, runs) : ''}<span class="label" style="margin-left:auto">${esc(t.difficulty || '')}</span></div></div></button>`;
+      <div class="res">${runs.length ? dots(ex, t, runs) : ''}<span class="label" style="margin-left:auto">${esc(diffName(t.difficulty))}</span></div></div></button>`;
 }
 
 function openTask(ex, t, runs) {
@@ -495,7 +500,7 @@ function openTask(ex, t, runs) {
     ['Modes', (t.modes || []).map((x) => `<span class="pill ${MK[x]}">${x}</span>`).join(' ')],
     ['Reference solution', esc({ full: 'Full: the oracle solves it', partial: 'Partial: the oracle reaches part of the goal', none: 'None: solvability shown in human review' }[t.oracle] || '')],
     ['Agent time', t.budget_min ? `${t.budget_min} min per attempt` : ''],
-    ['Difficulty', esc(t.difficulty || '')],
+    ['Difficulty', esc(diffName(t.difficulty))],
     ['Family', `<span class="mono">${esc(t.family || '')}</span>`],
     ['Task directories', (t.dirs || []).map((d) => `<span class="mono" style="font-size:12px">${esc(d)}</span>`).join('<br>')],
     ['Author', esc(t.author || '')],
@@ -546,7 +551,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
       <select data-f="suite" aria-label="Suite"><option value="">All suites</option>${suites.map((s) => `<option value="${s.id}"${s.id === state.suite ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>
       <select data-f="body" aria-label="Robot"><option value="">Any robot</option>${BODY_ORDER.map((b) => `<option value="${b}">${esc(ex.bodies?.[b] || b)}</option>`).join('')}</select>
       <select data-f="tag" aria-label="Capability or domain"><option value="">Any capability or domain</option>${tagOpts}</select>
-      <select data-f="diff" aria-label="Difficulty"><option value="">Any difficulty</option>${['easy', 'medium', 'hard', 'extreme'].map((d) => `<option>${d}</option>`).join('')}</select>
+      <select data-f="diff" aria-label="Difficulty"><option value="">Any difficulty</option>${DIFF_ORDER.filter((d) => tasks.some((t) => t.difficulty === d)).map((d) => `<option value="${d}">${diffName(d)}</option>`).join('')}</select>
       <select data-f="result" aria-label="Results"><option value="">Any result</option><option value="solved">Solved by a model</option><option value="unsolved">Never solved</option><option value="unrun">Not run yet</option></select>
       <span class="tagset" hidden></span><span class="count"></span>`;
     f.addEventListener('input', (e) => { const k = e.target.dataset.f; if (!k) return; state[k] = e.target.value; state.limit = 60; draw(); });
@@ -740,31 +745,29 @@ function heroWall(ex) {
     });
   }
   if (!phone && !still) {
-    // play the tiles in the open right part of the wall (the left part sits under the title's veil)
+    // play every tile in the open right part of the wall (the left part sits under the title's veil): eight to eleven
+    // are there at a time, so all of them move; past twelve, the front suites' tiles go first. Whenever a tile comes or
+    // goes, the set is worked out again, so no tile in the open part stays still waiting for another to leave.
     const isFront = (el) => front.has(LOOKALIKE[el.dataset.suite] || el.dataset.suite);
-    const onSee = (es) => es.sort((a, b) => isFront(b.target) - isFront(a.target)).forEach((e) => {
-      const v = $('video', e.target);
-      // a front suite's tile in view takes a slot from another suite's when all six are playing
-      const busy = $$('.wt.playing', wall);
-      if (e.isIntersecting && busy.length >= 6 && isFront(e.target)) {
-        const other = busy.find((t) => !isFront(t));
-        if (other) { $('video', other).pause(); other.classList.remove('playing'); }
-      }
-      // one video per suite at a time, so the six that play are six different suites
-      const twin = $$('.wt.playing', wall).some((t) => t !== e.target && t.dataset.suite === e.target.dataset.suite);
-      if (e.isIntersecting && !twin && $$('.wt.playing', wall).length < 6) {
+    const inZone = new Set();
+    const schedule = () => {
+      const want = new Set([...inZone].sort((a, b) => isFront(b) - isFront(a)).slice(0, 12));
+      $$('.wt.playing', wall).forEach((t) => { if (!want.has(t)) { $('video', t).pause(); t.classList.remove('playing'); } });
+      want.forEach((t) => {
+        if (t.classList.contains('playing')) return;
+        const v = $('video', t);
         if (!v.src) v.src = v.dataset.src;
-        e.target.classList.add('playing');      // counted at once, so the same batch cannot start a twin
-        v.play().catch(() => e.target.classList.remove('playing'));
-      } else if (!e.isIntersecting) {
-        v.pause();
-        e.target.classList.remove('playing');
-      }
-    });
-    // the front suites' tiles start playing once a third of them is in the open part; the others at seven tenths
-    const io = new IntersectionObserver(onSee, { rootMargin: '0px 0px 0px -46%', threshold: 0.7 });
-    const ioFront = new IntersectionObserver(onSee, { rootMargin: '0px 0px 0px -46%', threshold: 0.35 });
-    $$('.wt', wall).forEach((t) => { if ($('video', t)) (isFront(t) ? ioFront : io).observe(t); });
+        t.classList.add('playing');
+        v.play().catch(() => t.classList.remove('playing'));
+      });
+    };
+    const onSee = (es) => {
+      es.forEach((e) => (e.isIntersecting ? inZone.add(e.target) : inZone.delete(e.target)));
+      schedule();
+    };
+    // a tile plays once a third of it is in the open part
+    const io = new IntersectionObserver(onSee, { rootMargin: '0px 0px 0px -46%', threshold: 0.35 });
+    $$('.wt', wall).forEach((t) => { if ($('video', t)) io.observe(t); });
   }
   // stop the drift while the first screen is out of sight
   new IntersectionObserver(([e]) => wall.classList.toggle('paused', !e.isIntersecting)).observe($('.hero-wall'));
