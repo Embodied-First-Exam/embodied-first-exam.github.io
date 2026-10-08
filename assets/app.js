@@ -162,7 +162,7 @@ function scoreGroup(group, tasks, view) {
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 
-/** One dumbbell: the open-book mark (a hollow ring) and the closed-book mark (a solid dot) on a 0–100% scale, with an arrow
+/** One dumbbell: the privileged mark (a hollow ring) and the standard mark (a solid dot) on a 0–100% scale, with an arrow
  *  from the first to the second: what is lost without the simulator. `pv` and `sv` are [solved, sat]; a mode not sat has no
  *  mark. Each number sits on the outer side of its mark. `mini`: no numbers. */
 function dbTrack(pv, sv, mini = false) {
@@ -174,10 +174,10 @@ function dbTrack(pv, sv, mini = false) {
     const lo = Math.min(p, q), w = Math.abs(p - q);
     parts.push(`<span class="db-arrow ${q < p ? 'l' : 'r'}" style="--lo:${lo.toFixed(1)}%;--w:${w.toFixed(1)}%"></span>`);
   }
-  // the closed-book number goes on the side away from the open-book mark, and the other way round
+  // the standard number goes on the side away from the privileged mark, and the other way round
   const side = (self, other) => (other == null ? (self > 88 ? 'l' : 'r') : self <= other ? 'l' : 'r');
-  if (p != null) parts.push(`<span class="db-dot p${close ? ' ring' : ''}" style="--x:${p.toFixed(1)}%" title="Open book: ${pv[0]} of ${pv[1]}">${mini ? '' : `<em class="${close ? 'r' : side(p, q)}">${Math.round(p)}%</em>`}</span>`);
-  if (q != null) parts.push(`<span class="db-dot s" style="--x:${q.toFixed(1)}%" title="Closed book: ${sv[0]} of ${sv[1]}">${mini ? '' : `<em class="${close ? 'l' : side(q, p)}">${Math.round(q)}%</em>`}</span>`);
+  if (p != null) parts.push(`<span class="db-dot p${close ? ' ring' : ''}" style="--x:${p.toFixed(1)}%" title="Privileged: ${pv[0]} of ${pv[1]}">${mini ? '' : `<em class="${close ? 'r' : side(p, q)}">${Math.round(p)}%</em>`}</span>`);
+  if (q != null) parts.push(`<span class="db-dot s" style="--x:${q.toFixed(1)}%" title="Standard: ${sv[0]} of ${sv[1]}">${mini ? '' : `<em class="${close ? 'l' : side(q, p)}">${Math.round(q)}%</em>`}</span>`);
   return `<span class="db-track${mini ? ' mini' : ''}"><span class="db-scale">${parts.join('')}</span></span>`;
 }
 
@@ -185,10 +185,10 @@ function dbGap(pv, sv) {
   const p = pctOf(pv), q = pctOf(sv);
   if (p == null || q == null) return '<span class="db-gap na">–</span>';
   const g = Math.round(p) - Math.round(q);
-  return `<span class="db-gap" title="${Math.abs(g)} points ${g >= 0 ? 'lower' : 'higher'} closed book">${g >= 0 ? '−' : '+'}${Math.abs(g)}<small>points</small></span>`;
+  return `<span class="db-gap" title="${Math.abs(g)} points ${g >= 0 ? 'lower' : 'higher'} in standard mode">${g >= 0 ? '−' : '+'}${Math.abs(g)}<small>points</small></span>`;
 }
 
-const DB_HEAD = `<div class="db-legend"><span><i class="dot p"></i>Open book · privileged</span><span><i class="dot s"></i>Closed book · standard</span>
+const DB_HEAD = `<div class="db-legend"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>
     <span class="db-key"><i></i>What it loses without the simulator</span></div>
   <div class="db-axis"><span></span><span></span><span class="db-ticks">${[0, 25, 50, 75, 100].map((v) => `<span style="left:${v}%">${v}%</span>`).join('')}</span><span class="db-gap-h">Gap</span></div>`;
 
@@ -200,7 +200,7 @@ function dbDetail(ex, r, sc) {
     const v = sc.suites[s.id];
     const href = `${exam('suite/')}?id=${s.id}`;
     const val = (m) => (v[m] ? `${Math.round(pctOf(v[m]))}%` : '–');
-    return `<a class="db-mini" href="${href}" title="${esc(s.name)}: open book ${v.privileged ? `${v.privileged[0]} of ${v.privileged[1]}` : 'not sat'}, closed book ${v.standard ? `${v.standard[0]} of ${v.standard[1]}` : 'not sat'}">
+    return `<a class="db-mini" href="${href}" title="${esc(s.name)}: privileged ${v.privileged ? `${v.privileged[0]} of ${v.privileged[1]}` : 'not sat'}, standard ${v.standard ? `${v.standard[0]} of ${v.standard[1]}` : 'not sat'}">
       <span class="nm">${codeMark(s)}<span>${esc(s.name)}</span></span>${dbTrack(v.privileged, v.standard, true)}<span class="vals"><b class="p">${val('privileged')}</b><b class="s">${val('standard')}</b></span></a>`;
   }).join('');
   const cost = r.est_n ? `about $${(r.est_usd / r.est_n).toFixed(r.est_usd / r.est_n < 1 ? 2 : 1)} of model use per question at list price` : '';
@@ -221,7 +221,7 @@ function lbBoard(ex, tasks, onDraw) {
     const open = state.open === r.id;
     const total = MODES.reduce((a, m) => a + sc[m][1], 0);
     const meta = `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} questions`;
-    const reset = part && r.standard_reset?.done ? ` · <span class="rs" title="Closed-book attempts with ${r.standard_reset.budget} resets allowed are not counted">+${r.standard_reset.done} with resets, not counted</span>` : '';
+    const reset = part && r.standard_reset?.done ? ` · <span class="rs" title="Standard attempts with ${r.standard_reset.budget} resets allowed are not counted">+${r.standard_reset.done} with resets, not counted</span>` : '';
     return `<div class="db-row x${open ? ' open' : ''}${part ? ' part' : ''}" role="button" tabindex="0" aria-expanded="${open}" data-run="${esc(r.id)}">
         <span class="rank">${part ? '·' : rank}</span><span class="who"><b>${esc(r.model)}</b><small>${whoLine(r)}</small><small class="meta">${meta}${reset}</small></span>
         ${dbTrack(sc.privileged, sc.standard)}${dbGap(sc.privileged, sc.standard)}</div>${open ? dbDetail(ex, r, sc) : ''}`;
@@ -251,7 +251,7 @@ function lbBoard(ex, tasks, onDraw) {
     board.innerHTML = html;
     const n = main.length ? MODES.map((m) => scores[main[0].id][m][1]) : [0, 0];
     $('#lb-note').innerHTML = state.view === 'shared'
-      ? `Head to head: the same ${int(n[0])} open-book and ${int(n[1])} closed-book questions for every ranked model.`
+      ? `Head to head: the same ${int(n[0])} privileged and ${int(n[1])} standard questions for every ranked model.`
       : 'Everything each model sat: the counts differ from row to row, so compare with care.';
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
     $$('.db-row.x', board).forEach((row) => {
@@ -280,10 +280,8 @@ function lbBoard(ex, tasks, onDraw) {
   sync();
 }
 
-/** Suite by suite: per ranked model, two gauge dots per suite (open book, closed book); a dot's area is the share solved,
- *  inside a ring that would be 100%. */
 /** Suite by suite: a table of numbers, one row per suite and one column per model, each cell tinted by its value.
- *  A switch picks the number: closed book, open book, or what is lost without the simulator. The best cell of a row is
+ *  A switch picks the number: standard, privileged, or what is lost without the simulator. The best cell of a row is
  *  underlined. (It replaced bubbles sized by score, which were hard to read.) */
 let SX_MODE = 'standard';
 function lbSuites(el, ex, runs, scores) {
@@ -300,10 +298,10 @@ function lbSuites(el, ex, runs, scores) {
   const cell = (r, s, best) => {
     const v = value(r, s);
     if (v == null) return '<span class="sx-cell na" title="Not sat">–</span>';
-    if (Number.isNaN(v)) return '<span class="sx-cell zero" title="Solved neither open nor closed book">0 · 0</span>';
+    if (Number.isNaN(v)) return '<span class="sx-cell zero" title="Solved in neither mode">0 · 0</span>';
     const sv = scores[r.id].suites[s.id];
     const of = (m) => (sv[m] ? `${sv[m][0]} of ${sv[m][1]}` : 'not sat');
-    const tip = `${s.name} · ${r.model}: open book ${of('privileged')}, closed book ${of('standard')}`;
+    const tip = `${s.name} · ${r.model}: privileged ${of('privileged')}, standard ${of('standard')}`;
     // tints stay light enough for dark text everywhere: up to 60% of the mode colour, 44% of grey for a drop
     const tint = SX_MODE === 'drop' ? Math.round(4 + Math.min(100, Math.abs(v) * 1.4) * 0.4) : Math.round(4 + v * 0.56);
     const text = SX_MODE === 'drop' ? `${v > 0 ? '−' : v < 0 ? '+' : ''}${Math.abs(v)}` : `${Math.round(v)}<small>%</small>`;
@@ -319,10 +317,10 @@ function lbSuites(el, ex, runs, scores) {
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
       ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   }).join('');
-  const modes = [['standard', '<i class="dot s"></i>Closed book'], ['privileged', '<i class="dot p"></i>Open book'], ['drop', '<i class="arr"></i>What it loses']];
-  const note = { standard: 'Share of each suite’s questions solved closed book. The best in each row is underlined.',
-    privileged: 'Share of each suite’s questions solved open book. The best in each row is underlined.',
-    drop: 'Points lost from open book to closed book: where the simulator matters most.' }[SX_MODE];
+  const modes = [['standard', '<i class="dot s"></i>Standard'], ['privileged', '<i class="dot p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
+  const note = { standard: 'Share of each suite’s questions solved in standard mode. The best in each row is underlined.',
+    privileged: 'Share of each suite’s questions solved in privileged mode. The best in each row is underlined.',
+    drop: 'Points lost from privileged to standard: where the simulator matters most.' }[SX_MODE];
   el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div>
     <span class="sx-note">${note}</span></div>
     <div class="sd-scroll"><div class="sx-grid sx-${SX_MODE}" style="--n:${runs.length}">${head}${rows}</div></div>`;
@@ -337,7 +335,7 @@ function lbRules(el, ex) {
   const visual = {
     states: `<div class="rv-states"><span class="lbl">Counted</span><span class="chip-st ok">✓ solved</span><span class="chip-st">✗ failed</span><span class="chip-st">! error</span>
       <span class="lbl">Left out</span><span class="chip-st out">stopped</span><span class="chip-st out">withdrawn</span><span class="chip-st out">still running</span></div>`,
-    modes: `<div class="rv-modes"><span><i class="dot p"></i>Open book</span><span class="ne">≠</span><span><i class="dot s"></i>Closed book</span></div>`,
+    modes: `<div class="rv-modes"><span><i class="dot p"></i>Privileged</span><span class="ne">≠</span><span><i class="dot s"></i>Standard</span></div>`,
     budget: `<div class="rv-states"><span class="chip-st">1 hour</span><span class="chip-st">100M tokens in</span><span class="chip-st">10M out</span><span class="chip-st out">no web search</span></div>`,
     venn: `<svg class="rv-venn" viewBox="0 0 120 92" aria-hidden="true"><defs><clipPath id="vv-a"><circle cx="46" cy="38" r="28"/></clipPath><clipPath id="vv-b"><circle cx="74" cy="38" r="28"/></clipPath></defs>
       <g clip-path="url(#vv-a)"><g clip-path="url(#vv-b)"><circle cx="60" cy="60" r="28" class="in"/></g></g>
@@ -817,7 +815,7 @@ const ffResults = (x, y) => `<rect class="ff-res ok" x="${x}" y="${y}" width="72
 function flowDiagram(el) {
   if (!el) return;
   const A = 'url(#ff-a-d)', B = 'url(#ff-a-m)';
-  const wide = `<svg class="ff ff-d" viewBox="0 0 1280 520" role="img" aria-label="How a question is marked: the question, sat open book or closed book, replayed and marked, then recorded">${ffArrowDefs('ff-a-d')}
+  const wide = `<svg class="ff ff-d" viewBox="0 0 1280 520" role="img" aria-label="How a question is marked: the question, sat privileged or standard, replayed and marked, then recorded">${ffArrowDefs('ff-a-d')}
     <path class="ff-link" d="M197 260C232 260 228 120 262 120" marker-end="${A}"/><path class="ff-link" d="M197 260C232 260 228 400 262 400" marker-end="${A}"/>
     <path class="ff-link" d="M682 120C726 120 726 260 768 260" marker-end="${A}"/><path class="ff-link" d="M682 400C726 400 726 260 768 260" marker-end="${A}"/>
     <path class="ff-link" d="M1020 260H1078" marker-end="${A}"/>
@@ -827,7 +825,7 @@ function flowDiagram(el) {
     ${ffText(26, 276, 'Question', 'ff-title')}${ffText(26, 302, 'A frozen scene', 'ff-sub')}${ffText(26, 322, 'and a goal', 'ff-sub')}
 
     <rect class="ff-lane p" x="262" y="40" width="420" height="160" rx="20"/>
-    ${ffText(284, 70, 'OPEN BOOK', 'ff-tag p')}${ffText(371, 70, 'privileged', 'ff-tag-sub')}${ffText(574, 80, 'one container', 'ff-mini', 'end')}
+    ${ffText(284, 70, 'PRIVILEGED', 'ff-tag p')}${ffText(371, 70, 'privileged', 'ff-tag-sub')}${ffText(574, 80, 'one container', 'ff-mini', 'end')}
     <rect class="ff-box" x="284" y="86" width="290" height="96" rx="14"/>
     ${ffIcon('terminal', 306, 102, 40)}${ffText(326, 166, 'agent', 'ff-label', 'middle')}
     ${ffIcon('cube', 512, 102, 40)}${ffText(532, 166, 'simulator', 'ff-label', 'middle')}
@@ -837,7 +835,7 @@ function flowDiagram(el) {
     <rect class="ff-pill" x="322" y="246" width="300" height="28" rx="14"/>${ffText(472, 265, '1 hour · 100M/10M tokens · no web search', 'ff-mini strong', 'middle')}
 
     <rect class="ff-lane s" x="262" y="320" width="420" height="160" rx="20"/>
-    ${ffText(284, 350, 'CLOSED BOOK', 'ff-tag s')}${ffText(383, 350, 'standard', 'ff-tag-sub')}${ffText(576, 360, 'separate service', 'ff-mini', 'end')}
+    ${ffText(284, 350, 'STANDARD', 'ff-tag s')}${ffText(383, 350, 'standard', 'ff-tag-sub')}${ffText(576, 360, 'separate service', 'ff-mini', 'end')}
     <rect class="ff-box" x="284" y="366" width="104" height="96" rx="14"/>${ffIcon('terminal', 316, 382, 40)}${ffText(336, 446, 'agent', 'ff-label', 'middle')}
     <rect class="ff-box" x="472" y="366" width="104" height="96" rx="14"/>${ffIcon('arm', 504, 382, 40)}${ffText(524, 446, 'robot', 'ff-label', 'middle')}
     <path class="ff-wall" d="M430 370V458"/>
@@ -867,14 +865,14 @@ function flowDiagram(el) {
     ${ffText(140, 52, 'Question', 'ff-title')}${ffText(140, 76, 'A frozen scene and a goal', 'ff-sub')}
     <rect class="ff-pill" x="44" y="124" width="272" height="26" rx="13"/>${ffText(180, 141, '1 hour · 100M/10M tokens · no search', 'ff-mini strong', 'middle')}
 
-    <rect class="ff-lane p" x="10" y="190" width="164" height="332" rx="18"/>${ffText(24, 214, 'OPEN BOOK', 'ff-tag p')}
+    <rect class="ff-lane p" x="10" y="190" width="164" height="332" rx="18"/>${ffText(24, 214, 'PRIVILEGED', 'ff-tag p')}
     <rect class="ff-box" x="24" y="226" width="136" height="186" rx="14"/>
     ${ffIcon('terminal', 72, 238, 40)}${ffText(92, 292, 'agent', 'ff-label', 'middle')}
     <path class="ff-thin" d="M92 300V326" marker-start="${B}" marker-end="${B}"/>
     ${ffIcon('cube', 72, 334, 40)}${ffText(92, 390, 'simulator', 'ff-label', 'middle')}${ffText(92, 404, 'one container', 'ff-mini', 'middle')}
     <path class="ff-thin" d="M92 414V432" marker-end="${B}"/>${ffIcon('traj', 72, 438, 40, 'p')}${ffText(92, 500, 'trajectory', 'ff-label', 'middle')}
 
-    <rect class="ff-lane s" x="186" y="190" width="164" height="332" rx="18"/>${ffText(200, 214, 'CLOSED BOOK', 'ff-tag s')}
+    <rect class="ff-lane s" x="186" y="190" width="164" height="332" rx="18"/>${ffText(200, 214, 'STANDARD', 'ff-tag s')}
     <rect class="ff-box" x="200" y="226" width="136" height="70" rx="14"/>${ffIcon('terminal', 250, 236, 34)}${ffText(268, 288, 'agent', 'ff-label', 'middle')}
     <path class="ff-wall" d="M206 318H330"/>
     <path class="ff-thin" d="M240 300V336" marker-end="${B}"/><path class="ff-thin" d="M296 336V300" marker-end="${B}"/>

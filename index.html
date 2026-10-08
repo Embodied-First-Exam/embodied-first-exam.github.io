@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/exam.css?v=5f048621">
+<link rel="stylesheet" href="assets/exam.css?v=aac4a58c">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=c36f9f3d"></script>
+<script type="module" src="assets/app.js?v=2a1039b7"></script>
 </head>
 <body data-page="home">
 <div id="nav"></div>
@@ -54,7 +54,9 @@
   <section class="section" id="leaderboard">
     <div class="head reveal">
       <h2>Leaderboard</h2>
-      <p>The same questions, open book and closed book. The line is what a model loses when the simulator closes.</p>
+      <p>The same questions in two modes. The arrow is what a model loses when the simulator closes.</p>
+      <div class="mode-def"><div><i class="md p"></i><b>Privileged</b><span>Open book: the agent can see inside the simulator and try again.</span></div>
+        <div><i class="md s"></i><b>Standard</b><span>Closed book: only the robot’s own sensors, in one go.</span></div></div>
     </div>
     <div class="dumbbell reveal" id="dumbbell"></div>
     <p class="note reveal" id="bars-note"></p>
