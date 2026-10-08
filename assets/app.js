@@ -924,6 +924,79 @@ function fillIcons(root = document) {
   $$('.ic[data-icon]', root).forEach((el) => { el.innerHTML = `<svg viewBox="0 0 24 24">${FF_ICONS[el.dataset.icon] || ''}</svg>`; });
 }
 
+/** Run it in one line: the command that sits the whole exam, typed out once, and switches that each add or drop one
+ *  argument. Counts come from the exam's own numbers. harbor's -i takes any of several globs, so a suite and a mode are
+ *  written as one pattern per suite. */
+function oneLine(el, ex) {
+  if (!el) return;
+  const suites = (ex.suites || []).filter((s) => !s.example);
+  const SCOPES = {
+    humanoid: { prefixes: ['humanoidbench', 'robocasa-gr1'], ids: ['humanoidbench', 'robocasa-gr1'] },
+    rc365: { prefixes: ['robocasa365'], ids: ['robocasa365'] },
+  };
+  const AGENTS = { codex: '-a codex -m openai/gpt-6-astra', claude: '-a claude-code -m anthropic/claude-opus-5-5' };
+  const st = { mode: '', scope: '', agent: 'codex', k: '' };
+  const parts = () => {
+    const sc = SCOPES[st.scope];
+    const tail = st.mode ? `-${st.mode}` : '';
+    const pats = sc ? sc.prefixes.map((p) => `${p}-*${tail}`) : st.mode ? [`*${tail}`] : [];
+    return [['base', 'harbor run -d embodied-first-exam'], ['pick', pats.map((p) => `-i '${p}'`).join(' ')],
+      ['agent', AGENTS[st.agent]], ['k', st.k ? '-k 3' : '']].filter(([, t]) => t);
+  };
+  const tally = () => {
+    const ids = SCOPES[st.scope]?.ids;
+    const pool = suites.filter((s) => !ids || ids.includes(s.id));
+    const modes = st.mode ? [st.mode] : ['privileged', 'standard'];
+    const n = pool.reduce((a, s) => a + modes.reduce((b, m) => b + (s.modes?.[m] || 0), 0), 0);
+    return { n, k: pool.filter((s) => modes.some((m) => s.modes?.[m])).length, modes };
+  };
+  const chip = (g, v, label, note = '') => `<button type="button" class="chip ol-chip" data-g="${g}" data-v="${v}" aria-pressed="false">${label}${note ? `<i>${note}</i>` : ''}</button>`;
+  el.innerHTML = `<div class="ol-wrap">
+    <div class="term"><div class="term-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
+    <div class="ol-groups">
+      <div><span class="ol-k">Mode</span><div class="chips">${chip('mode', 'standard', 'Standard')}${chip('mode', 'privileged', 'Privileged')}</div></div>
+      <div><span class="ol-k">Questions</span><div class="chips">${chip('scope', 'humanoid', 'Humanoids')}${chip('scope', 'rc365', 'RoboCasa365')}</div></div>
+      <div><span class="ol-k">Agent</span><div class="chips">${chip('agent', 'claude', 'Claude Code')}${chip('k', '1', 'Three attempts')}</div></div>
+      <div><span class="ol-k">Coming</span><div class="chips"><button type="button" class="chip ol-chip soon" disabled>Real-time play<i>Olympiad</i></button></div></div>
+    </div></div>`;
+  const cmdEl = $('.cmd', el), outEl = $('.out', el);
+  const out = () => {
+    const t = tally();
+    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> questions · ${t.k} suite${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
+      + `<span class="ok">▸</span> each answer marked by a fresh simulator${st.k ? ', <b>3 attempts</b> each' : ''}`;
+  };
+  let prev = {};
+  const show = (changed) => {
+    cmdEl.innerHTML = parts().map(([key, t]) => `<span class="${key === 'base' ? 'b' : 'arg'}${key === changed || (changed && prev[key] !== t && key !== 'base') ? ' new' : ''}">${esc(t)}</span>`).join(' ');
+    prev = Object.fromEntries(parts());
+    out();
+    $$('.ol-chip[data-g]', el).forEach((b) => b.setAttribute('aria-pressed', String(st[b.dataset.g] === b.dataset.v || (b.dataset.g === 'k' && !!st.k))));
+  };
+  $$('.ol-chip[data-g]', el).forEach((b) => b.addEventListener('click', () => {
+    const g = b.dataset.g;
+    if (g === 'agent') st.agent = st.agent === 'claude' ? 'codex' : 'claude';
+    else if (g === 'k') st.k = st.k ? '' : '1';
+    else st[g] = st[g] === b.dataset.v ? '' : b.dataset.v;
+    show(g === 'scope' || g === 'mode' ? 'pick' : g);
+  }));
+  // type the command once when it comes into view; at once for reduced motion
+  const full = parts().map(([, t]) => t).join(' ');
+  const typeIt = () => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { show(); return; }
+    let i = 0;
+    const tick = () => {
+      cmdEl.textContent = full.slice(0, ++i);
+      if (i < full.length) setTimeout(tick, 22 + Math.random() * 30); else setTimeout(() => show(), 250);
+    };
+    tick();
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); typeIt(); } }, { threshold: 0.4 });
+    io.observe(el);
+  } else show();
+}
+
 /** The leaderboard on the home page: one row per ranked model on the shared questions (precomputed in exam.json). */
 function dumbbell(el, ex) {
   const sh = ex.leaderboard?.shared;
@@ -963,6 +1036,7 @@ async function home(ex) {
   trustRow($('#trust'));
   taxonomyMap($('#taxmap'), $('#tm-panel'), ex);
   dumbbell($('#dumbbell'), ex);
+  oneLine($('#oneline'), ex);
   const sh = ex.leaderboard?.shared;
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);

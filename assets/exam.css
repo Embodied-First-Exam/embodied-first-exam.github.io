@@ -570,6 +570,26 @@ main { min-height: 70vh; }
 .g i { display: block; width: var(--d); height: var(--d); border-radius: 50%; }
 .g.p i { background: var(--priv); } .g.s i { background: var(--std); }
 .g.na { box-shadow: inset 0 0 0 1px var(--line); background: repeating-linear-gradient(135deg, transparent 0 3px, var(--line) 3px 4px), var(--surface); }
+/* run it in one line: a terminal that types the exam's command, and switches that each change one argument */
+.ol-wrap { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.term { overflow: hidden; border-radius: 18px; background: #11161d; color: #e6eaef; box-shadow: 0 24px 48px -28px rgba(15, 20, 26, .55); }
+.term-bar { display: flex; gap: 7px; padding: 13px 16px; border-bottom: 1px solid rgba(255, 255, 255, .07); }
+.term-bar i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .16); }
+.term-body { min-height: 168px; margin: 0; padding: 20px 22px 24px; font: 500 14.5px/1.75 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.term .pr { color: #6f7b8a; }
+.term .cmd .arg { color: #8ad4c6; }
+.term .cmd .new { border-radius: 4px; animation: olnew 1.4s ease-out; }
+@keyframes olnew { from { background: rgba(138, 212, 198, .32); } to { background: transparent; } }
+.term .caret { display: inline-block; width: 8px; height: 1.15em; margin-left: 3px; vertical-align: -3px; background: #e6eaef; animation: olblink 1.05s steps(1) infinite; }
+@keyframes olblink { 50% { opacity: 0; } }
+.term .out { color: #9aa5b3; } .term .out b { color: #e6eaef; font-weight: 600; } .term .out .ok { color: #8ad4c6; }
+.ol-groups { display: grid; gap: 18px; padding-top: 4px; }
+.ol-k { display: block; margin-bottom: 9px; font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.ol-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.ol-chip.soon { border-style: dashed; color: var(--ink-3); cursor: default; }
+.ol-chip.soon:hover { border-color: var(--line); color: var(--ink-3); }
+@media (max-width: 860px) { .ol-wrap { grid-template-columns: 1fr; gap: 22px; } .term-body { min-height: 0; font-size: 12.5px; } }
+@media (prefers-reduced-motion: reduce) { .term .caret, .term .cmd .new { animation: none; } }
 /* the two modes defined once, on the home page: the formal names, with the open-book / closed-book picture beside them */
 .mode-def { display: flex; flex-wrap: wrap; gap: 10px 32px; margin-top: 18px; }
 .mode-def > div { display: flex; align-items: baseline; gap: 10px; font-size: 15px; color: var(--ink-2); }

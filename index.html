@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/exam.css?v=aac4a58c">
+<link rel="stylesheet" href="assets/exam.css?v=ac62b457">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=9ed3e3a2"></script>
+<script type="module" src="assets/app.js?v=ffd5bf2a"></script>
 </head>
 <body data-page="home">
 <div id="nav"></div>
@@ -40,17 +40,6 @@
     <dl class="bignums reveal" id="bignums"></dl>
   </section>
 
-  <section class="section" id="tests">
-    <div class="tests reveal">
-      <div class="tests-text">
-        <h2>What the exam tests</h2>
-        <p class="tests-lead">Each question is labelled with its domain and the capabilities it needs. A dot counts the questions that share both.</p>
-        <div class="tm-panel" id="tm-panel" aria-live="polite"></div>
-      </div>
-      <div class="taxmap" id="taxmap"></div>
-    </div>
-  </section>
-
   <section class="section" id="leaderboard">
     <div class="head reveal">
       <h2>Leaderboard</h2>
@@ -60,6 +49,14 @@
     </div>
     <div class="dumbbell reveal" id="dumbbell"></div>
     <p class="note reveal" id="bars-note"></p>
+  </section>
+
+  <section class="section" id="run">
+    <div class="head reveal">
+      <h2>Run it in one line</h2>
+      <p>One command sits the whole exam. Add or drop an argument to change what it tests.</p>
+    </div>
+    <div class="oneline reveal" id="oneline"></div>
   </section>
 
   <section class="section" id="suites-sec">
@@ -81,6 +78,17 @@
       <ul id="trust"></ul>
     </div>
     <p class="note reveal"><a href="how/">Every rule, step by step →</a></p>
+  </section>
+
+  <section class="section" id="tests">
+    <div class="tests reveal">
+      <div class="tests-text">
+        <h2>What the exam tests</h2>
+        <p class="tests-lead">Each question is labelled with its domain and the capabilities it needs. A dot counts the questions that share both.</p>
+        <div class="tm-panel" id="tm-panel" aria-live="polite"></div>
+      </div>
+      <div class="taxmap" id="taxmap"></div>
+    </div>
   </section>
 
   <section class="section closing">
