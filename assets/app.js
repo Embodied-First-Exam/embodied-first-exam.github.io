@@ -282,51 +282,23 @@ function lbBoard(ex, tasks, onDraw) {
 
 /** Suite by suite: per ranked model, two gauge dots per suite (open book, closed book); a dot's area is the share solved,
  *  inside a ring that would be 100%. */
-/** Suite by suite: a table of numbers, one row per suite and one column per model, each cell tinted by its value.
- *  A switch picks the number: closed book, open book, or what is lost without the simulator. The best cell of a row is
- *  underlined. (It replaced bubbles sized by score, which were hard to read.) */
-let SX_MODE = 'standard';
 function lbSuites(el, ex, runs, scores) {
   if (!el) return;
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
-  const pct = (r, s, m) => pctOf(scores[r.id]?.suites?.[s.id]?.[m]);
-  const suites = ranked(ex).filter((s) => runs.some((r) => scores[r.id]?.suites?.[s.id]));
-  const value = (r, s) => {
-    if (SX_MODE !== 'drop') return pct(r, s, SX_MODE);
-    const p = pct(r, s, 'privileged'), q = pct(r, s, 'standard');
-    if (p == null || q == null) return null;
-    return p === 0 && q === 0 ? NaN : Math.round(p) - Math.round(q);     // solved neither way: no loss to speak of
+  const D = 26;
+  const gauge = (s, r, m) => {
+    const v = scores[r.id]?.suites?.[s.id]?.[m];
+    if (!v || !v[1]) return `<span class="g ${MK[m]} na" title="${MODE_LABEL[m]}: not sat"></span>`;
+    return `<span class="g ${MK[m]}" title="${esc(s.name)} · ${esc(r.model)} · ${m === 'privileged' ? 'open' : 'closed'} book: ${v[0]} of ${v[1]}"><i style="--d:${(Math.sqrt(v[0] / v[1]) * D).toFixed(1)}px"></i></span>`;
   };
-  const cell = (r, s, best) => {
-    const v = value(r, s);
-    if (v == null) return '<span class="sx-cell na" title="Not sat">–</span>';
-    if (Number.isNaN(v)) return '<span class="sx-cell zero" title="Solved neither open nor closed book">0 · 0</span>';
-    const sv = scores[r.id].suites[s.id];
-    const of = (m) => (sv[m] ? `${sv[m][0]} of ${sv[m][1]}` : 'not sat');
-    const tip = `${s.name} · ${r.model}: open book ${of('privileged')}, closed book ${of('standard')}`;
-    // tints stay light enough for dark text everywhere: up to 60% of the mode colour, 44% of grey for a drop
-    const tint = SX_MODE === 'drop' ? Math.round(4 + Math.min(100, Math.abs(v) * 1.4) * 0.4) : Math.round(4 + v * 0.56);
-    const text = SX_MODE === 'drop' ? `${v > 0 ? '−' : v < 0 ? '+' : ''}${Math.abs(v)}` : `${Math.round(v)}<small>%</small>`;
-    // where the build carries the suite's runs page (the internal site), a number opens that model's attempts there
-    const href = s.pages?.runs ? `${site(s.pages.runs)}?run=${encodeURIComponent(r.id)}` : '';
-    const tag = href ? `a href="${href}"` : 'span';
-    return `<${tag} class="sx-cell${best ? ' best' : ''}" style="--t:${tint}%" title="${esc(tip)}">${text}</${href ? 'a' : 'span'}>`;
-  };
-  const head = `<div class="sx-row sx-head"><span></span>${runs.map((r) => `<span class="sx-col"><b>${esc(r.model)}</b><small>${esc(r.effort)}</small></span>`).join('')}</div>`;
-  const rows = suites.map((s) => {
-    const vals = runs.map((r) => value(r, s));
-    const top = SX_MODE === 'drop' ? null : Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
-      ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
-  }).join('');
-  const modes = [['standard', '<i class="dot s"></i>Closed book'], ['privileged', '<i class="dot p"></i>Open book'], ['drop', '<i class="arr"></i>What it loses']];
-  const note = { standard: 'Share of each suite’s questions solved closed book. The best in each row is underlined.',
-    privileged: 'Share of each suite’s questions solved open book. The best in each row is underlined.',
-    drop: 'Points lost from open book to closed book: where the simulator matters most.' }[SX_MODE];
-  el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div>
-    <span class="sx-note">${note}</span></div>
-    <div class="sd-scroll"><div class="sx-grid sx-${SX_MODE}" style="--n:${runs.length}">${head}${rows}</div></div>`;
-  el.querySelectorAll('.sx-bar button').forEach((b) => b.addEventListener('click', () => { SX_MODE = b.dataset.m; lbSuites(el, ex, runs, scores); }));
+  const head = `<div class="sd-row sd-head"><span class="sd-name"></span>${runs.map((r) => `<span class="sd-col"><b>${esc(r.model)}</b><small>${esc(r.effort)}</small></span>`).join('')}</div>`;
+  const rows = ranked(ex).filter((s) => runs.some((r) => scores[r.id]?.suites?.[s.id])).map((s) => `<div class="sd-row">
+      <a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
+      ${runs.map((r) => `<span class="sd-cell">${gauge(s, r, 'privileged')}${gauge(s, r, 'standard')}</span>`).join('')}</div>`).join('');
+  const legend = `<div class="sd-legend"><span><span class="g p"><i style="--d:${(Math.sqrt(0.25) * D).toFixed(1)}px"></i></span>25%</span><span><span class="g p"><i style="--d:${(Math.sqrt(0.5) * D).toFixed(1)}px"></i></span>50%</span>
+    <span><span class="g p"><i style="--d:${D}px"></i></span>100%</span><span class="sep"></span><span><span class="g p"><i style="--d:${(Math.sqrt(0.7) * D).toFixed(1)}px"></i></span>open book</span>
+    <span><span class="g s"><i style="--d:${(Math.sqrt(0.7) * D).toFixed(1)}px"></i></span>closed book</span><span><span class="g p na"></span>not sat</span></div>`;
+  el.innerHTML = `${legend}<div class="sd-scroll"><div class="sd-grid" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
 /** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
