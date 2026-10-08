@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/exam.css?v=ac62b457">
+<link rel="stylesheet" href="assets/exam.css?v=2456c604">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=ffd5bf2a"></script>
+<script type="module" src="assets/app.js?v=b476805d"></script>
 </head>
 <body data-page="home">
 <div id="nav"></div>
@@ -27,6 +27,7 @@
         <p class="hero-q"><span>Code agents have passed many exams in the digital world.</span> <em>What is their first exam to enter the physical world?</em></p>
         <h1><span>Embodied</span><span>First Exam</span></h1>
         <p class="summary" id="hero-lead"></p>
+        <div class="hero-run" id="hero-run"></div>
         <div class="cta">
           <a class="btn primary" href="leaderboard/">See the leaderboard <span class="arr">→</span></a>
           <a class="btn" href="tasks/">Browse the tasks</a>
@@ -53,8 +54,8 @@
 
   <section class="section" id="run">
     <div class="head reveal">
-      <h2>Run it in one line</h2>
-      <p>One command sits the whole exam. Add or drop an argument to change what it tests.</p>
+      <h2>Change one argument</h2>
+      <p>Each switch adds or drops one argument. The command and the count follow.</p>
     </div>
     <div class="oneline reveal" id="oneline"></div>
   </section>

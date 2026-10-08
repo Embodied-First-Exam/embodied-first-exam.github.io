@@ -924,6 +924,32 @@ function fillIcons(root = document) {
   $$('.ic[data-icon]', root).forEach((el) => { el.innerHTML = `<svg viewBox="0 0 24 24">${FF_ICONS[el.dataset.icon] || ''}</svg>`; });
 }
 
+/** The one line under the title: the command that sits the whole exam, typed out once, with a copy button. */
+function heroRun(el, ex) {
+  if (!el) return;
+  const cmd = 'harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra';
+  const paint = (s) => esc(s).replace(/(^|\s)(-\w)(?=\s|$)/g, '$1<span class="f">$2</span>');
+  el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
+      <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
+    <p class="hr-note">One line runs all ${int(ex.totals?.task_dirs)} questions. <a href="#run">Change one argument <span class="arr">↓</span></a></p>`;
+  const code = $('.hr-cmd', el);
+  code.setAttribute('aria-label', cmd);
+  const done = () => { code.innerHTML = paint(cmd); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+  else {
+    let i = 0;
+    const tick = () => { code.textContent = cmd.slice(0, ++i); if (i < cmd.length) setTimeout(tick, 18 + Math.random() * 26); else done(); };
+    setTimeout(tick, 700);
+  }
+  const btn = $('.hr-copy', el);
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(cmd); } catch { return; }
+    btn.classList.add('ok'); btn.setAttribute('aria-label', 'Copied');
+    setTimeout(() => { btn.classList.remove('ok'); btn.setAttribute('aria-label', 'Copy the command'); }, 1600);
+  });
+}
+
 /** Run it in one line: the command that sits the whole exam, typed out once, and switches that each add or drop one
  *  argument. Counts come from the exam's own numbers. harbor's -i takes any of several globs, so a suite and a mode are
  *  written as one pattern per suite. */
@@ -1037,6 +1063,7 @@ async function home(ex) {
   taxonomyMap($('#taxmap'), $('#tm-panel'), ex);
   dumbbell($('#dumbbell'), ex);
   oneLine($('#oneline'), ex);
+  heroRun($('#hero-run'), ex);
   const sh = ex.leaderboard?.shared;
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);

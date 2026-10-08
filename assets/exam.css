@@ -570,6 +570,23 @@ main { min-height: 70vh; }
 .g i { display: block; width: var(--d); height: var(--d); border-radius: 50%; }
 .g.p i { background: var(--priv); } .g.s i { background: var(--std); }
 .g.na { box-shadow: inset 0 0 0 1px var(--line); background: repeating-linear-gradient(135deg, transparent 0 3px, var(--line) 3px 4px), var(--surface); }
+/* the one line under the title: the command that sits the exam, typed out, with a copy button */
+.hero-run { max-width: 600px; margin-top: 26px; }
+.hr-bar { display: flex; align-items: center; gap: 10px; padding: 9px 9px 9px 16px; border-radius: 14px; background: #11161d; color: #e6eaef;
+  font: 500 13px/1.5 var(--mono); box-shadow: 0 18px 36px -22px rgba(15, 20, 26, .55); }
+.hr-bar .pr { color: #6f7b8a; }
+.hr-cmd { flex: 1; min-width: 0; padding: 0; background: none; color: inherit; font: inherit; white-space: nowrap; overflow: hidden; }
+.hr-cmd .f { color: #8ad4c6; }
+.hr-bar .caret { flex: none; width: 8px; height: 1.15em; margin-left: -6px; background: #e6eaef; animation: olblink 1.05s steps(1) infinite; }
+.hr-copy { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 9px; background: rgba(255, 255, 255, .08);
+  color: #c9d1da; cursor: pointer; transition: background-color .15s; }
+.hr-copy:hover { background: rgba(255, 255, 255, .16); }
+.hr-copy svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hr-copy.ok { background: #2f7f6f; color: #fff; }
+.hr-note { margin: 10px 0 0 2px; font-size: 13.5px; color: var(--ink-3); }
+.hr-note a { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+@media (max-width: 760px) { .hr-bar { font-size: 12px; } .hr-cmd { white-space: normal; word-break: break-all; } .hr-bar .caret { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hr-bar .caret { animation: none; } }
 /* run it in one line: a terminal that types the exam's command, and switches that each change one argument */
 .ol-wrap { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 .term { overflow: hidden; border-radius: 18px; background: #11161d; color: #e6eaef; box-shadow: 0 24px 48px -28px rgba(15, 20, 26, .55); }
