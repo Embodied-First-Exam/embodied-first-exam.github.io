@@ -642,6 +642,7 @@ function heroWall(ex) {
   tiles.forEach((t) => { const g = groupOf(t); if (!pools.has(g)) pools.set(g, []); pools.get(g).push(t); });
   const groups = [...pools.keys()];
   const cols = Array.from({ length: n }, () => []);
+  const shown = new Map();
   const uses = (c) => new Set((cols[c] || []).map(groupOf));
   for (let c = 0; c < n; c++) {
     const near = [uses(c - 1), uses(c - 2), uses(c - 3)];
@@ -649,10 +650,12 @@ function heroWall(ex) {
       const here = uses(c);
       let left = groups.filter((g) => pools.get(g).length);
       if (!left.length) { tiles.forEach((t) => pools.get(groupOf(t)).push(t)); left = groups; }   // a screen too large for the pool
+      // every group gets its turn: the fewer times a group is on the wall so far, the sooner it comes next
       const cost = (g) => (here.has(g) ? 1000 : 0) + (near[0].has(g) ? 60 : 0) + (near[1].has(g) ? 36 : 0) + (near[2].has(g) ? 14 : 0)
-        - pools.get(g).length / 100 + ((groups.indexOf(g) - c * 5 - r * 3) % groups.length + groups.length) % groups.length / 1000;
+        + (shown.get(g) || 0) * 25 + ((groups.indexOf(g) - c * 5 - r * 3) % groups.length + groups.length) % groups.length / 1000;
       const g = left.reduce((a, b) => (cost(b) < cost(a) ? b : a));
       cols[c].push(pools.get(g).shift());
+      shown.set(g, (shown.get(g) || 0) + 1);
     }
   }
   const tile = (t) => {
