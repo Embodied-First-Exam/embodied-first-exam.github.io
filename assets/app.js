@@ -7,7 +7,7 @@ const BASE = new URL('../', import.meta.url).pathname;
 const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
 const MODES = ['privileged', 'standard'];
-const MK = { privileged: 'p', standard: 's' };
+const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
 const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal'];
 // difficulty labels, easiest first (RoboTangle's tiers add very_easy and easier)
@@ -378,8 +378,8 @@ const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1':
 
 // multi-camera posters: show the top-left camera only (the grid's layout per suite)
 // suites whose demos are still multi-view grids: the crop shows one view. A suite leaves the list once its demos are
-// re-rendered as one view (MuJoCo Playground, 2026-10-08: the old crop showed the sky above its new renders).
-const CROPS = { 'robotwin-2': 'crop-3x2 col2', dextoolbench: 'crop-2x2' };
+// re-rendered as one view (MuJoCo Playground and RoboTwin 2.0, 2026-10-08: the old crop cut their new renders).
+const CROPS = { dextoolbench: 'crop-2x2' };
 
 function suitesGrid(el, ex, filter = {}) {
   const runs = runMap(ex);
@@ -1058,7 +1058,7 @@ function oneLine(el, ex) {
   const tally = () => {
     const ids = SCOPES[st.scope]?.ids;
     const pool = suites.filter((s) => !ids || ids.includes(s.id));
-    const modes = st.mode ? [st.mode] : ['privileged', 'standard'];
+    const modes = st.mode ? [st.mode] : ['privileged', 'standard', 'standard-realtime'];
     const n = pool.reduce((a, s) => a + modes.reduce((b, m) => b + (s.modes?.[m] || 0), 0), 0);
     return { n, k: pool.filter((s) => modes.some((m) => s.modes?.[m])).length, modes };
   };
@@ -1067,10 +1067,9 @@ function oneLine(el, ex) {
     <div class="term"><div class="term-bar" aria-hidden="true"><i></i><i></i><i></i></div>
       <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
     <div class="ol-groups">
-      <div><span class="ol-k">Mode</span><div class="chips">${chip('mode', 'standard', 'Standard')}${chip('mode', 'privileged', 'Privileged')}</div></div>
+      <div><span class="ol-k">Mode</span><div class="chips">${chip('mode', 'standard', 'Standard')}${chip('mode', 'privileged', 'Privileged')}${chip('mode', 'standard-realtime', 'Real-time', 'RoboOlympics')}</div></div>
       <div><span class="ol-k">Questions</span><div class="chips">${chip('scope', 'humanoid', 'Humanoids')}${chip('scope', 'rc365', 'RoboCasa365')}</div></div>
       <div><span class="ol-k">Agent</span><div class="chips">${chip('agent', 'claude', 'Claude Code')}${chip('k', '1', 'Three attempts')}</div></div>
-      <div><span class="ol-k">Coming</span><div class="chips"><button type="button" class="chip ol-chip soon" disabled>Real-time play<i>Olympiad</i></button></div></div>
     </div></div>`;
   const cmdEl = $('.cmd', el), outEl = $('.out', el);
   const out = () => {

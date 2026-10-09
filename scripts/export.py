@@ -88,6 +88,9 @@ def source_file(src_root: Path, path: str) -> Path:
 
 VIDEO_MAX = 1_200_000          # bytes: smaller videos are kept as they are
 WEB_HEIGHT, WEB_RATE = 720, 3_200_000   # a larger video at most this tall and this many bits per second is kept too
+# GitHub Pages serves at most 1 GB per site: a video over this many bytes is re-encoded to fit it, at 540p
+# (BEHAVIOR's 30 s time-lapses were 6 MB each at 720p, and 99 of them alone would fill a third of the site)
+VIDEO_BUDGET, BUDGET_HEIGHT = 2_500_000, 540
 
 
 def web_sized(src: Path) -> bool:
@@ -107,6 +110,15 @@ def bring(src: Path, dest: Path) -> None:
     if src.suffix.lower() == ".png" and dest.suffix == ".jpg":
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-vf", "scale='min(1280,iw)':-2", "-q:v", "3",
                         "-f", "image2", str(tmp)], check=True)
+    elif src.suffix.lower() == ".mp4" and src.stat().st_size > VIDEO_BUDGET:
+        seconds = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(src)],
+                                       capture_output=True, text=True).stdout or 0) or 1.0
+        rate = int(VIDEO_BUDGET * 8 / seconds * 0.95 / 1000)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({BUDGET_HEIGHT},ih)'",
+                        "-c:v", "libx264", "-preset", "slow", "-crf", "26", "-maxrate", f"{rate}k", "-bufsize", f"{2 * rate}k",
+                        "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-f", "mp4", str(tmp)], check=True)
+        if tmp.stat().st_size >= src.stat().st_size:      # never larger than the original
+            shutil.copy2(src, tmp)
     elif src.suffix.lower() == ".mp4" and src.stat().st_size > VIDEO_MAX and not web_sized(src):
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({WEB_HEIGHT},ih)'",
                         "-c:v", "libx264", "-preset", "slow", "-crf", "26", "-maxrate", "2500k", "-bufsize", "5000k",
