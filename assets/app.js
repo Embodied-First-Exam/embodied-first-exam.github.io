@@ -9,7 +9,7 @@ const Q = new URLSearchParams(location.search);
 const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
-const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal'];
+const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal', 'aerial'];
 const GRADED = new Set(['S', 'F', 'E']);
 /** A trial's state code for scoring; undefined for a standard trial that ran with resets allowed (reported apart). */
 const scored = (c) => (c && !c.r ? c.s : undefined);
