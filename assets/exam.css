@@ -156,6 +156,20 @@ main { min-height: 70vh; }
 .band { background: var(--bg-2); box-shadow: 0 0 0 100vmax var(--bg-2); clip-path: inset(0 -100vmax); }
 .page-head { max-width: var(--maxw); margin: 0 auto; padding: clamp(116px, 13vw, 160px) var(--gutter) 0; }
 .page-head .kicker { margin: 0 0 14px; }
+/* The inner pages' heads: the home page's paper and, on the right, a small tilted wall of scenes (headWall in app.js),
+   faded out before the title's column and towards the content below. */
+.page-head { --clear: calc(max(0px, (100vw - var(--maxw)) / 2) + var(--gutter) + 800px); position: relative; isolation: isolate; padding-bottom: 8px; }
+.page-head > :not(.head-deco):not(.head-paper) { position: relative; z-index: 1; }
+.head-paper, .head-deco { position: absolute; z-index: 0; top: 0; bottom: clamp(-96px, -6vw, -56px); left: calc(50% - 50vw); width: 100vw; pointer-events: none; }
+.head-paper { background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px; -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent); mask-image: linear-gradient(180deg, #000 40%, transparent); }
+.head-deco { overflow: hidden;
+  --fade: linear-gradient(90deg, transparent var(--clear), #000 calc(var(--clear) + 240px));
+  -webkit-mask-image: var(--fade), linear-gradient(180deg, #000 48%, transparent); -webkit-mask-composite: source-in;
+  mask-image: var(--fade), linear-gradient(180deg, #000 48%, transparent); mask-composite: intersect; }
+.wall.head-wall { --tw: clamp(150px, 12.5vw, 230px); --wg: 14px; top: -70%; bottom: -70%; left: auto; right: -6%; width: 76%; pointer-events: auto; }
+.wall.head-wall .wt { box-shadow: 0 1px 2px rgba(20, 22, 25, .06), 0 10px 22px rgba(20, 22, 25, .10); }
+@media (max-width: 760px) { .head-paper, .head-deco { display: none; } }
 .page-head h1 { margin: 0; font: 800 clamp(44px, 6.4vw, 88px)/.95 var(--display); letter-spacing: -.035em; }
 .page-head .lead { margin: 18px 0 0; max-width: 760px; font-size: 18px; line-height: 1.55; color: var(--ink-2); }
 .kicker { font: 500 12px/1.6 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }

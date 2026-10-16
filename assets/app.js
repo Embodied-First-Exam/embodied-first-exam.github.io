@@ -773,6 +773,45 @@ function heroWall(ex) {
   new IntersectionObserver(([e]) => wall.classList.toggle('paused', !e.isIntersecting)).observe($('.hero-wall'));
 }
 
+/** The inner pages' heads: a small, quiet copy of the first screen's wall on the right, pictures only, so the title
+ *  sits on the same paper as the home page's. Each page deals the scenes in its own order; a phone gets none. */
+function headWall(ex) {
+  const head = $('.page-head');
+  const tiles = ex.hero?.tiles || [];
+  if (!head || PAGE === 'suite' || !tiles.length || innerWidth < 760) return;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // a page's own order: a seeded shuffle, then look-alikes spread apart
+  let seed = [...PAGE].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+  const pool = tiles.map((t) => [rnd(), t]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+  const n = 6, per = 8;
+  const cols = Array.from({ length: n }, (_, c) => pool.slice(c * per, c * per + per));
+  const tile = (t) => {
+    const s = ex._suites[t.suite];
+    const crop = CROPS[t.suite] ? ` class="${CROPS[t.suite]}"` : '';
+    return `<a class="wt" href="${exam('tasks/')}?task=${encodeURIComponent(`${t.suite}/${t.id}`)}" tabindex="-1">
+      <img src="${esc(site(t.poster))}" alt="" loading="lazy" decoding="async"${crop}>
+      <span class="tag">${esc(s?.code || '')}</span><span class="ttl">${esc(s?.name || '')} · ${esc(t.title)}</span></a>`;
+  };
+  const durs = [150, 124, 168, 136, 176, 118];
+  head.insertAdjacentHTML('afterbegin', `<div class="head-paper" aria-hidden="true"></div><div class="head-deco" aria-hidden="true">
+    <div class="wall head-wall${still ? ' paused' : ''}">${cols.map((c, i) => {
+      const html = c.map(tile).join('');
+      return `<div class="wall-col${i % 2 ? ' down' : ''}" style="--dur:${durs[i]}s;--delay:-${((i * 37) % 100) / 100 * durs[i]}s">${html}${html}</div>`;
+    }).join('')}</div></div>`);
+  const wall = $('.head-wall', head);
+  // the wall fades in only past the end of the title and the lead, measured on their text (a long title takes more)
+  const clear = () => {
+    const r = document.createRange();
+    const right = Math.max(0, ...$$('h1, .lead, .kicker', head).map((el) => { r.selectNodeContents(el); return r.getBoundingClientRect().right; }));
+    head.style.setProperty('--clear', `${Math.round(right + 48)}px`);
+  };
+  clear();
+  addEventListener('resize', clear);
+  document.fonts?.ready.then(clear);
+  new IntersectionObserver(([e]) => wall.classList.toggle('paused', still || !e.isIntersecting)).observe(head);
+}
+
 // line icons for the display tags (24-unit grid, drawn in the current colour)
 const TAG_ICON = {
   'perception-understanding': '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>',
@@ -1294,6 +1333,7 @@ chrome();
 loadExam().then(async (raw) => {
   const ex = prepare(raw);
   footer(ex);
+  headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
     how: async () => flowDiagram($('#flowfig')), notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
