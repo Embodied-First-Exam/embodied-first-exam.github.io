@@ -10,9 +10,6 @@ const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
 const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal'];
-// difficulty labels, easiest first (RoboTangle's tiers add very_easy and easier)
-const DIFF_ORDER = ['very_easy', 'easier', 'easy', 'medium', 'hard', 'extreme'];
-const diffName = (d) => String(d || '').replace(/_/g, ' ');
 const GRADED = new Set(['S', 'F', 'E']);
 /** A trial's state code for scoring; undefined for a standard trial that ran with resets allowed (reported apart). */
 const scored = (c) => (c && !c.r ? c.s : undefined);
@@ -472,8 +469,8 @@ function taskCard(ex, t, runs) {
   const crop = CROPS[t.suite];
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
     <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}</div>
-    <div class="body"><h4>${esc(t.title)}</h4><p>${esc(t.sentence || '')}</p>
-      <div class="res">${runs.length ? dots(ex, t, runs) : ''}<span class="label" style="margin-left:auto">${esc(diffName(t.difficulty))}</span></div></div></button>`;
+    <div class="body"><h4>${esc(t.title)}</h4>
+      ${runs.length ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
 
 function openTask(ex, t, runs) {
@@ -500,7 +497,6 @@ function openTask(ex, t, runs) {
     ['Modes', (t.modes || []).map((x) => `<span class="pill ${MK[x]}">${x}</span>`).join(' ')],
     ['Reference solution', esc({ full: 'Full: the oracle solves it', partial: 'Partial: the oracle reaches part of the goal', none: 'None: solvability shown in human review' }[t.oracle] || '')],
     ['Agent time', t.budget_min ? `${t.budget_min} min per attempt` : ''],
-    ['Difficulty', esc(diffName(t.difficulty))],
     ['Family', `<span class="mono">${esc(t.family || '')}</span>`],
     ['Task directories', (t.dirs || []).map((d) => `<span class="mono" style="font-size:12px">${esc(d)}</span>`).join('<br>')],
     ['Author', esc(t.author || '')],
@@ -541,7 +537,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   const runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
   drawerShell();
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
-  const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', diff: '', oracle: '', result: '', limit: 60,
+  const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60,
     tags: (opts.suite ? '' : Q.get('tags') || '').split(',').filter((x) => ex._tags[x]) };
   const f = $('.filters', el.parentElement);
   if (f && !opts.suite) {
@@ -551,7 +547,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
       <select data-f="suite" aria-label="Suite"><option value="">All suites</option>${suites.map((s) => `<option value="${s.id}"${s.id === state.suite ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>
       <select data-f="body" aria-label="Robot"><option value="">Any robot</option>${BODY_ORDER.map((b) => `<option value="${b}">${esc(ex.bodies?.[b] || b)}</option>`).join('')}</select>
       <select data-f="tag" aria-label="Capability or domain"><option value="">Any capability or domain</option>${tagOpts}</select>
-      <select data-f="diff" aria-label="Difficulty"><option value="">Any difficulty</option>${DIFF_ORDER.filter((d) => tasks.some((t) => t.difficulty === d)).map((d) => `<option value="${d}">${diffName(d)}</option>`).join('')}</select>
+
       <select data-f="result" aria-label="Results"><option value="">Any result</option><option value="solved">Solved by a model</option><option value="unsolved">Never solved</option><option value="unrun">Not run yet</option></select>
       <span class="tagset" hidden></span><span class="count"></span>`;
     f.addEventListener('input', (e) => { const k = e.target.dataset.f; if (!k) return; state[k] = e.target.value; state.limit = 60; draw(); });
@@ -562,7 +558,6 @@ function taskBrowser(el, ex, tasks, opts = {}) {
     if (state.body && t.body !== state.body) return false;
     if (state.tag && !(t.tags || []).includes(state.tag)) return false;
     if (state.tags.length && !state.tags.every((g) => (t.tags || []).includes(g))) return false;
-    if (state.diff && t.difficulty !== state.diff) return false;
     if (state.result) {
       const cells = Object.values(t.results || {}).flatMap((r) => Object.values(r).map(scored));
       const solved = cells.includes('S'), graded = cells.some((c) => GRADED.has(c));
@@ -625,9 +620,9 @@ function heroWall(ex) {
   if (!wall || !tiles.length) return;
   const phone = innerWidth < 760;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const gap = phone ? 12 : 16;
+  const gap = phone ? 10 : 12;
   // tiles a little larger on big screens if the pool would otherwise run short: every scene appears once
-  let tw = Math.round(Math.max(150, Math.min(600, innerWidth * (phone ? 0.4 : 0.23))));
+  let tw = Math.round(Math.max(130, Math.min(320, innerWidth * (phone ? 0.3 : 0.13))));
   let n, per;
   const fit = () => {
     wall.style.setProperty('--tw', `${tw}px`);
@@ -637,7 +632,7 @@ function heroWall(ex) {
   };
   wall.style.setProperty('--wg', `${gap}px`);
   fit();
-  while (n * per > tiles.length && tw < 460) { tw = Math.round(tw * 1.08); fit(); }
+  while (n * per > tiles.length * 1.5 && tw < 320) { tw = Math.round(tw * 1.08); fit(); }
   // Deal the scenes column by column so that look-alikes stay apart while the columns drift past each other. Suites
   // that look the same (the three RoboCasa kitchens, the two RoboPaints) count as one group. A group appears at most
   // once in a column (a column only ever moves as a whole, so this holds at every moment), and as rarely as possible in
@@ -751,7 +746,7 @@ function heroWall(ex) {
     const isFront = (el) => front.has(LOOKALIKE[el.dataset.suite] || el.dataset.suite);
     const inZone = new Set();
     const schedule = () => {
-      const want = new Set([...inZone].sort((a, b) => isFront(b) - isFront(a)).slice(0, 12));
+      const want = new Set([...inZone].sort((a, b) => isFront(b) - isFront(a)).slice(0, 18));
       $$('.wt.playing', wall).forEach((t) => { if (!want.has(t)) { $('video', t).pause(); t.classList.remove('playing'); } });
       want.forEach((t) => {
         if (t.classList.contains('playing')) return;

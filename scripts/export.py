@@ -195,6 +195,11 @@ def main() -> int:
         if not any(d.iterdir()):
             d.rmdir()
 
+    # difficulty labels stay off the public site until they are settled (user, 2026-10-16)
+    for t in tasks:
+        t.pop("difficulty", None)
+    for su in exam.get("suites", []):
+        su.pop("difficulty", None)
     DATA.mkdir(exist_ok=True)
     (DATA / "exam.json").write_text(json.dumps(exam, ensure_ascii=False, separators=(",", ":")))
     (DATA / "tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, separators=(",", ":")))

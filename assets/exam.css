@@ -888,7 +888,7 @@ a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0
 .filters input[type="search"], .filters select { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); font-size: 13.5px; }
 .filters input[type="search"] { min-width: 220px; flex: 1; max-width: 360px; }
 .filters .count { margin-left: auto; font: 500 12px/1 var(--mono); color: var(--ink-3); }
-.task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
+.task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 14px; }
 .task-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer;
   transition: transform .2s, box-shadow .2s, border-color .2s; text-align: left; padding: 0; }
 .task-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--line-2); }
@@ -896,8 +896,8 @@ a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0
 .task-card .media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .task-card .media .code-mark { position: absolute; z-index: 2; left: 8px; top: 8px; }
 .task-card .media .still { position: absolute; z-index: 2; right: 8px; top: 8px; padding: 3px 6px; border-radius: 4px; background: rgba(20, 22, 25, .6); color: #f8f8f6; font: 500 9.5px/1 var(--mono); }
-.task-card .body { padding: 11px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.task-card h4 { margin: 0; font: 600 15.5px/1.2 var(--display); letter-spacing: -.01em; }
+.task-card .body { padding: 9px 10px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.task-card h4 { margin: 0; font: 600 14px/1.2 var(--display); letter-spacing: -.01em; overflow-wrap: anywhere; }
 .task-card p { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .task-card .res { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
 .dots { display: inline-grid; grid-auto-flow: column; grid-template-rows: 7px 7px; gap: 2px; }
