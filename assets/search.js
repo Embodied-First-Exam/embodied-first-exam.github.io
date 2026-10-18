@@ -20,7 +20,11 @@ function styles() {
   if (styled) return;
   styled = document.createElement('link');
   styled.rel = 'stylesheet';
-  styled.href = new URL('./search.css?v=40da3a1c', import.meta.url).href;
+  // until the stylesheet is in, the search's parts stay hidden (an unstyled icon drew as a large black circle)
+  document.documentElement.classList.add('search-css-wait');
+  styled.addEventListener('load', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
+  styled.addEventListener('error', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
+  styled.href = new URL('./search.css?v=8e929bd9', import.meta.url).href;
   document.head.append(styled);
 }
 
@@ -146,7 +150,9 @@ export function tasksSearch(grid, ex, tasks, kit) {
   const box = document.getElementById('task-search'), f = grid.parentElement.querySelector('.filters');
   const byKey = new Map(tasks.map((t) => [keyOf(t), t]));
   const Q = new URLSearchParams(location.search);
-  const state = { q: Q.get('q') || '', limit: 60, one: Q.get('one') !== '0',
+  const SETS = [['core', 'Core set'], ['all', 'All set']];   // no easy-set view of its own (owners, 2026-10-18)
+  const state = { q: Q.get('q') || '', limit: 60, one: Q.get('one') !== '0', set: Q.get('set') === 'all' ? 'all' : 'core',
+    more: false,
     tags: (Q.get('tags') || '').split(',').filter((x) => ex._tags?.[x]) };
   let S = null, failed = false, res = null, A = new Map();   // A: key -> the task's Atlas index row (tt, cap, n, …)
 
@@ -156,15 +162,16 @@ export function tasksSearch(grid, ex, tasks, kit) {
   const G = [
     { id: 'suite', any: 'All suites', opts: () => suites.map((s) => ({ id: s.id, name: s.name })), test: (t, v) => t.suite === v },
     { id: 'body', any: 'Any robot', opts: () => kit.bodies.map((b) => ({ id: b, name: ex.bodies?.[b] || b })), test: (t, v) => t.body === v },
-    { id: 'mode', any: 'Any mode', opts: () => [{ id: 'privileged', name: 'Privileged' }, { id: 'standard', name: 'Standard' }],
-      test: (t, v) => (t.modes || []).some((m) => m.startsWith(v)) },
-    { id: 'tt', any: 'Any task type', opts: () => (S ? S.D.concepts.task_type.map((c) => ({ id: c.id, name: c.en })) : []), test: (t, v) => !!A.get(keyOf(t))?.tt.includes(v) },
-    { id: 'cap', any: 'Any capability', opts: () => (S ? S.D.concepts.capability.map((c) => ({ id: c.id, name: c.en })) : []), test: (t, v) => !!A.get(keyOf(t))?.cap.includes(v) },
-    ...(domain ? [{ id: 'domain', any: `Any ${domain.name.toLowerCase().replace('task ', '')}`, opts: () => domain.tags.map((x) => ({ id: x.id, name: x.name })), test: (t, v) => (t.tags || []).includes(v) }] : []),
-    { id: 'result', any: 'Any result', opts: () => [{ id: 'solved', name: 'Solved by a model' }, { id: 'unsolved', name: 'Never solved' }, { id: 'unrun', name: 'Not run yet' }],
+    { id: 'result', any: 'Any result', opts: () => [{ id: 'solved', name: 'Solved by a model' }, { id: 'unsolved', name: 'Never solved' }],
       test: (t, v) => kit.result(t) === v },
+    { id: 'tt', more: true, any: 'Any task type', opts: () => (S ? S.D.concepts.task_type.map((c) => ({ id: c.id, name: c.en })) : []), test: (t, v) => !!A.get(keyOf(t))?.tt.includes(v) },
+    { id: 'cap', more: true, any: 'Any capability', opts: () => (S ? S.D.concepts.capability.map((c) => ({ id: c.id, name: c.en })) : []), test: (t, v) => !!A.get(keyOf(t))?.cap.includes(v) },
+    ...(domain ? [{ id: 'domain', more: true, any: `Any ${domain.name.toLowerCase().replace('task ', '')}`, opts: () => domain.tags.map((x) => ({ id: x.id, name: x.name })), test: (t, v) => (t.tags || []).includes(v) }] : []),
   ];
   for (const g of G) state[g.id] = Q.get(g.id) || '';
+  if (G.some((g) => g.more && state[g.id])) state.more = true;
+  const inSet = (t) => state.set === 'all' || (t.set || 'core') === state.set;
+  const setCount = (k) => (k === 'all' ? tasks.length : tasks.filter((t) => (t.set || 'core') === k).length);
   const needsIndex = () => state.q.trim() || state.tt || state.cap;
 
   // ---- the box and the filter row
@@ -174,8 +181,11 @@ export function tasksSearch(grid, ex, tasks, kit) {
     <div class="ts-read" hidden></div>`;
   const input = box.querySelector('input'), read = box.querySelector('.ts-read'), clear = box.querySelector('.ts-clear');
   f.classList.add('ts-filters');
-  f.innerHTML = `<button type="button" class="chip ts-ftoggle" aria-expanded="false">Filters</button>`
-    + G.map((g) => `<select data-f="${g.id}" aria-label="${esc(g.any)}"></select>`).join('')
+  f.innerHTML = `<div class="seg ts-set" role="group" aria-label="Which tasks">${SETS.map(([k, name]) => `<button type="button" data-set="${k}" class="${state.set === k ? 'on' : ''}"
+      title="${k === 'core' ? 'The core set: what the headline counts' : 'Every task'}">${name} <i>${int(setCount(k))}</i></button>`).join('')}</div>`
+    + `<button type="button" class="chip ts-ftoggle" aria-expanded="false">Filters</button>`
+    + G.map((g) => `<select data-f="${g.id}" aria-label="${esc(g.any)}"${g.more ? ' class="ts-more"' : ''}></select>`).join('')
+    + `<button type="button" class="chip ts-moreb" aria-expanded="${state.more}">More filters</button>`
     + `<span class="tagset" hidden></span><span class="ts-end"><button type="button" class="chip ts-one" aria-pressed="${state.one}" title="Show each task family once, by its best scene">One per family</button><span class="count"></span></span>`;
   const sel = Object.fromEntries(G.map((g) => [g.id, f.querySelector(`[data-f="${g.id}"]`)]));
 
@@ -195,7 +205,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
     const ws = q.toLowerCase().split(/\s+/);   // until the index is in: the words as typed, in titles and sentences
     return tasks.filter((t) => { const h = `${t.title} ${t.sentence} ${t.family} ${t.id}`.toLowerCase(); return ws.every((w) => h.includes(w)); });
   }
-  const passes = (t, skip) => G.every((g) => g.id === skip || !state[g.id] || g.test(t, state[g.id]))
+  const passes = (t, skip) => inSet(t) && G.every((g) => g.id === skip || !state[g.id] || g.test(t, state[g.id]))
     && (!state.tags.length || state.tags.every((x) => (t.tags || []).includes(x)));
 
   function drawFilters(order) {
@@ -264,11 +274,16 @@ export function tasksSearch(grid, ex, tasks, kit) {
       if (m > 1) c.querySelector('.media')?.insertAdjacentHTML('beforeend', `<span class="ts-fam" title="This family has ${m} scenes in the result">${m} scenes</span>`);
     }
     kit.mark?.(grid);
-    f.querySelector('.count').textContent = waiting ? '' : `${state.one ? `${int(hits.length)} families` : `${int(hits.length)} of ${int(tasks.length)} scenes`}`;
+    const nSet = setCount(state.set);
+    f.querySelector('.count').textContent = waiting ? '' : `${state.one ? `${int(hits.length)} families` : `${int(hits.length)} of ${int(nSet)} tasks`}`;
+    f.querySelectorAll('.ts-set button').forEach((b) => b.classList.toggle('on', b.dataset.set === state.set));
+    f.classList.toggle('more', state.more);
+    f.querySelector('.ts-moreb').setAttribute('aria-expanded', String(state.more));
+    f.querySelector('.ts-moreb').textContent = state.more ? 'Fewer filters' : `More filters${G.some((g) => g.more && state[g.id]) ? ' ·' : ''}`;
     if (res && !waiting) f.querySelector('.count').insertAdjacentHTML('beforeend', '<span class="ts-by"> · by relevance</span>');
     f.querySelector('.ts-one').setAttribute('aria-pressed', String(state.one));
     const u = new URL(location.href);
-    for (const [k, v] of [['q', state.q.trim()], ...G.map((g) => [g.id, state[g.id]]), ['tags', state.tags.join(',')], ['one', state.one ? '' : '0']])
+    for (const [k, v] of [['q', state.q.trim()], ['set', state.set === 'core' ? '' : state.set], ...G.map((g) => [g.id, state[g.id]]), ['tags', state.tags.join(',')], ['one', state.one ? '' : '0']])
       v ? u.searchParams.set(k, v) : u.searchParams.delete(k);
     history.replaceState(null, '', u);
   }
@@ -282,6 +297,8 @@ export function tasksSearch(grid, ex, tasks, kit) {
   f.addEventListener('click', (e) => {
     if (e.target.closest('.tagset button')) { state.tags = []; redraw(); }
     else if (e.target.closest('.ts-one')) { state.one = !state.one; redraw(); }
+    else if (e.target.closest('[data-set]')) { state.set = e.target.closest('[data-set]').dataset.set; redraw(); }
+    else if (e.target.closest('.ts-moreb')) { state.more = !state.more; if (!state.more) for (const g of G) if (g.more) state[g.id] = ''; redraw(); }
     else if (e.target.closest('.ts-ftoggle')) { const o = f.classList.toggle('open'); e.target.setAttribute('aria-expanded', String(o)); }
   });
   read.addEventListener('click', (e) => {

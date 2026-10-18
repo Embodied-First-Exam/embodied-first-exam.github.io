@@ -11,9 +11,9 @@ const PAGE = (p) => new URL(`../${p}`, import.meta.url).href;
 const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal', 'aerial'];
 const SLOTS = 9;                    // colour slots in the stylesheet (--sph-c1 .. --sph-c9); a mode with more categories folds the rest
 const SUITE_SLOTS = 8;              // suites beyond the eight largest share one neutral "other" entry
-const SPIN = 0.00011;               // auto-rotation, rad/ms (about one turn a minute)
+const SPIN = 0.00006;               // auto-rotation, rad/ms (a slow turn, about 1 min 45 s)
 const HAZE_SCALE = 1 / 3;          // the density haze is drawn at this fraction of the canvas size (CSS px)
-const IDLE = 7000;                  // ms without interaction before the auto-rotation resumes
+const IDLE = 18000;                 // ms after the last click, drag, zoom or key before the rotation resumes (owners, 2026-10-18)
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 
 /* ---------- small quaternion kit (w, x, y, z) ---------- */
@@ -501,9 +501,11 @@ function build(el, ex, atlas, tasks, set = 'all') {
       if (Math.abs(vel[0]) < 2e-6 && Math.abs(vel[1]) < 2e-6) vel = [0, 0];
       moving = dirty = true;
     }
-    const wantSpin = !reduce.matches && !drag && !over && pinned < 0 && now - lastInput > IDLE;
+    // it turns slowly by default; a click, drag, zoom or key stops it, and it starts again after IDLE (hovering does not stop it)
+    const wantSpin = !reduce.matches && !drag && pinned < 0 && now - lastInput > IDLE;
     spinAmt = wantSpin ? Math.min(1, spinAmt + dt / 1500) : 0;
     if (spinAmt > 0) { rot = qnorm(qmul(qaxis(0, 1, 0, SPIN * dt * spinAmt * spinAmt), rot)); moving = dirty = true; }
+    if (wantSpin) moving = true;   // the first frame after a wake has dt = 0: keep the loop going so the spin can ease in
     if (dirty && W > 10) { dirty = false; draw(); }
     // keep going while moving; otherwise wake up when the idle time is over
     if (visible && !document.hidden) {
@@ -622,7 +624,6 @@ function build(el, ex, atlas, tasks, set = 'all') {
       if (h < 0 && pinned < 0) tip.classList.remove('show');
       kick();
     }
-    lastInput = performance.now();
   });
   const end = (e, cancelled) => {
     if (!drag || e.pointerId !== drag.id) return;
@@ -647,7 +648,7 @@ function build(el, ex, atlas, tasks, set = 'all') {
     if (e.pointerType === 'touch') return;
     over = false;
     if (!drag && hover >= 0) { hover = -1; tip.classList.remove('show'); cv.classList.remove('pt'); }
-    lastInput = performance.now(); kick();
+    kick();
   });
   cv.addEventListener('keydown', (e) => {
     const st = 0.14, mv = { ArrowLeft: [0, -st], ArrowRight: [0, st], ArrowUp: [-st, 0], ArrowDown: [st, 0] }[e.key];

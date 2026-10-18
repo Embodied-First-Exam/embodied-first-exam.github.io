@@ -40,7 +40,7 @@ def main() -> int:
     media = 0
     for name in ("exam.json", "tasks.json"):
         data = (ROOT / "data" / name).read_text(encoding="utf-8")
-        for path in re.findall(r'"(media/[^"]+)"', data):
+        for path in (m.split("?", 1)[0] for m in re.findall(r'"(media/[^"]+)"', data)):
             media += 1
             if not (ROOT / path).is_file():
                 problems.append(f"data/{name}: missing {path}")

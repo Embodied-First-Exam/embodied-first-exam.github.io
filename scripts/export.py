@@ -17,6 +17,7 @@ holds the exam's task set and results), run in its public mode. This script runs
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -204,6 +205,26 @@ def main() -> int:
     for su in exam.get("suites", []):
         su.pop("difficulty", None)
         su.pop("authors", None)
+    # no suites "on the way in" on the public site (user, 2026-10-18)
+    exam.pop("incoming", None)
+    exam.get("totals", {}).pop("incoming", None)
+    # every picture and video is linked with a content hash (?v=...): a replaced render gets a new address, so no browser
+    # keeps showing the one it cached under the old file name (owners, 2026-10-18)
+    hashes: dict[str, str] = {}
+    def version(path: str) -> str:
+        if path not in hashes:
+            f = ROOT / path
+            hashes[path] = hashlib.md5(f.read_bytes()).hexdigest()[:8] if f.is_file() else ""
+        return hashes[path]
+    def stamp_media(node):
+        if isinstance(node, dict):
+            return {k: stamp_media(v) for k, v in node.items()}
+        if isinstance(node, list):
+            return [stamp_media(v) for v in node]
+        if isinstance(node, str) and node.startswith("media/") and "?" not in node and version(node):
+            return f"{node}?v={version(node)}"
+        return node
+    exam, tasks = stamp_media(exam), stamp_media(tasks)
     DATA.mkdir(exist_ok=True)
     (DATA / "exam.json").write_text(json.dumps(exam, ensure_ascii=False, separators=(",", ":")))
     (DATA / "tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, separators=(",", ":")))

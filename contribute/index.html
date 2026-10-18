@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=1f888298">
+<link rel="stylesheet" href="../assets/exam.css?v=56273f51">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=a5632823"></script>
+<script type="module" src="../assets/app.js?v=a8b804db"></script>
 </head>
 <body data-page="contribute">
 <div id="nav"></div>
@@ -32,7 +32,7 @@
       <h2>Five ways in</h2>
     </div>
     <div class="ways reveal">
-      <a class="way" href="#propose"><span class="ic" data-icon="layers" aria-hidden="true"></span><b>Propose a suite</b><p>Bring a benchmark under the protocol, in both modes.</p><span class="go">Fill in the proposal ↓</span></a>
+      <a class="way" href="#propose"><span class="ic" data-icon="layers" aria-hidden="true"></span><b>Propose a suite</b><p>Bring a benchmark under the protocol, in both modes.</p><span class="go">Send us an e-mail ↓</span></a>
       <a class="way" data-doc="CONTRIBUTING.md" href="#process"><span class="ic" data-icon="doc" aria-hidden="true"></span><b>Add tasks</b><p>A new family or more scenes for a suite already in.</p><span class="go">Kinds of pull requests ↗</span></a>
       <a class="way" data-doc="docs/REVIEWING.md" href="#process"><span class="ic" data-icon="review" aria-hidden="true"></span><b>Review a family</b><p>Check a family that has no full reference solution.</p><span class="go">The review checklist ↗</span></a>
       <a class="way" data-doc="CONTRIBUTING.md" href="#rules"><span class="ic" data-icon="cheat" aria-hidden="true"></span><b>Break a task</b><p>Pass a verifier without doing the task, then help fix it.</p><span class="go">Task fixes ↗</span></a>
@@ -59,7 +59,7 @@
       <h2>From proposal to leaderboard</h2>
     </div>
     <ol class="journey reveal">
-      <li><b>Propose</b><span>Open an issue, or fill in the form below.</span><span class="chips"><i>proposal-approved</i></span></li>
+      <li><b>Propose</b><span>E-mail a short proposal.</span><span class="chips"><i>proposal-approved</i></span></li>
       <li><b>Build</b><span>Two task folders per frozen scene, from a generator.</span><span class="chips"><i>-privileged</i><i>-standard</i></span></li>
       <li><b>Self-check</b><span>Run the checks the reviewers will run.</span><span class="chips"><i>run_all.sh</i><i>oracle = 1</i><i>nop = 0</i><i>2 replays</i></span></li>
       <li><b>Review</b><span>A maintainer, a cheat trial and a model trial.</span><span class="chips"><i>cheat trial</i><i>human review</i></span></li>
@@ -72,26 +72,10 @@
     <div class="head reveal">
       <h2>Propose a suite</h2>
     </div>
-    <form class="form frame reveal" id="proposal" autocomplete="on">
-      <label><span>Your name</span><input name="name" autocomplete="name"></label>
-      <label><span>Affiliation</span><input name="affiliation" autocomplete="organization"></label>
-      <label><span>E-mail</span><input name="email" type="email" autocomplete="email"></label>
-      <label><span>Benchmark <em>*</em></span><input name="benchmark" placeholder="the suite’s name"></label>
-      <label class="full"><span>Upstream benchmark and version <em>*</em></span><input name="upstream" placeholder="name, URL, commit or release"></label>
-      <label class="full"><span>Scope <em>*</em></span><textarea name="scope" placeholder="Simulator, robot, task families, number of instances, modes (privileged / standard)."></textarea></label>
-      <label><span>Oracle <em>*</em></span><textarea name="oracle" placeholder="Source (upstream expert, planner, policy, none) and expected level: full / partial / none."></textarea></label>
-      <label><span>Verification and determinism <em>*</em></span><textarea name="verification" placeholder="Success predicate, how it is replayed in a fresh process, and the hardware determinism was checked on."></textarea></label>
-      <label><span>Why it is hard <em>*</em></span><textarea name="difficulty" placeholder="Why strong coding agents fail today; a trial run if you have one."></textarea></label>
-      <label><span>Images and resources <em>*</em></span><textarea name="images" placeholder="Base image size, GPU / VRAM, whether the image can be published (licences, data), expected wall time of an oracle run."></textarea></label>
-      <label class="full"><span>Expected pull request size</span><input name="size" placeholder="number of task directories, MB"></label>
-      <div class="actions">
-        <button type="button" class="btn primary" data-act="issue">Open the issue on GitHub ↗</button>
-        <button type="button" class="btn" data-act="copy">Copy as Markdown</button>
-        <button type="button" class="btn" data-act="form">Send through the public form ↗</button>
-        <span class="msg" role="status"></span>
-      </div>
-    </form>
-    <p class="board-foot" id="contact"></p>
+    <div class="propose-mail frame reveal">
+      <p>Send a short description of the benchmark: the upstream version, the scope, a reference solution if there is one, how success is verified, and why it is hard for today’s coding agents.</p>
+      <a class="btn primary" href="mailto:embodied-first-benchmark@gmail.com">embodied-first-benchmark@gmail.com</a>
+    </div>
   </section>
 
   <section class="section" id="thin-sec">
@@ -130,7 +114,7 @@
     </div>
     <div class="faq reveal">
       <details><summary>How do I send a proposal?</summary>
-        <p>Fill in the form above and copy it as Markdown, then send it to a maintainer you know. The exam’s repository is not public yet; access for the pull request is arranged once a proposal is approved.</p></details>
+        <p>E-mail it to <a class="link" href="mailto:embodied-first-benchmark@gmail.com">embodied-first-benchmark@gmail.com</a>. The exam’s repository is not public yet; access for the pull request is arranged once a proposal is approved.</p></details>
       <details><summary>My benchmark has no scripted expert. Can it still come in?</summary>
         <p>Yes. A family without a full reference solution needs a positive example (a successful model trial, an upstream policy rollout or a hand-built trajectory) and a human review. Its results are reported apart from the tasks with a verified solution until it has one.</p></details>
       <details><summary>Does my suite need both modes?</summary>

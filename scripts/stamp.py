@@ -46,6 +46,16 @@ def stamp(name: str, seen=()) -> str:
 
 for n in sorted(mods):
     stamp(n)
+# the site's own pictures named in the modules (site('media/ways/...')) get a content hash too
+MEDIA_REF = re.compile(r"""(site\(['"`])(media/[\w./-]+\.(?:jpg|png|mp4))(\?v=[0-9a-f]*)?(['"`]\))""")
+for n, p in mods.items():
+    text = p.read_text(encoding="utf-8")
+    new = MEDIA_REF.sub(lambda m: f"{m.group(1)}{m.group(2)}?v={digest(ROOT / m.group(2))}{m.group(4)}" if (ROOT / m.group(2)).is_file() else m.group(0), text)
+    if new != text:
+        p.write_text(new, encoding="utf-8")
+        done.pop(n, None)
+for n in sorted(mods):
+    stamp(n)
 stamps = {"exam.css": digest(A / "exam.css"), "app.js": done["app.js"]}
 changed = 0
 for page in sorted([*ROOT.glob("**/index.html"), ROOT / "404.html"]):

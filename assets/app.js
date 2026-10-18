@@ -42,18 +42,22 @@ const MARK = `<svg viewBox="0 0 32 32" fill="none" stroke-linecap="round" stroke
     <circle cx="15" cy="24" r="3.5" fill="currentColor"/><circle cx="15" cy="9" r="3.5" fill="var(--std)"/></g>
   <path d="M21.2 20.4L24 23.2L29.2 16.8" stroke="var(--priv)" stroke-width="3.2"/></svg>`;
 const MOON = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
+// the exam on GitHub (the organisation for now; the code's repository is not public yet)
+// GitHub and the blog are not linked yet: their buttons stay in place, inert, until the real addresses exist
+const GITHUB_URL = '';
+const GITHUB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
 const MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
 
 function chrome() {
-  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['run', 'run/', 'Runs'], ['contribute', 'contribute/', 'Contribute']];
+  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['run', 'run/', 'Runs'], ['blog', null, 'Blog'], ['contribute', 'contribute/', 'Contribute']];
   const active = (n) => PAGE === n || (PAGE === 'suite' && n === 'suites');
   const nav = $('#nav');
   if (nav) {
     nav.outerHTML = `<nav class="nav always" aria-label="Sections">
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
-      <div class="nav-links">${links.map(([n, p, label]) => `<a href="${exam(p)}"${active(n) ? ' class="active"' : ''}>${label}</a>`).join('')}</div>
-      <span class="preview-flag" title="A preview of the site">Preview</span>
+      <div class="nav-links">${links.map(([n, p, label]) => (p ? `<a href="${exam(p)}"${active(n) ? ' class="active"' : ''}>${label}</a>` : `<a class="soon" aria-disabled="true" title="Coming soon">${label}</a>`)).join('')}</div>
+      <a class="icon-btn gh-btn${GITHUB_URL ? '' : ' soon'}"${GITHUB_URL ? ` href="${GITHUB_URL}"` : ' aria-disabled="true"'} aria-label="The exam on GitHub" title="${GITHUB_URL ? 'GitHub' : 'GitHub: coming soon'}">${GITHUB}</a>
       <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false">${MENU}</button>
       <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between day and night">${MOON}${SUN}</button>
     </nav>`;
@@ -75,15 +79,16 @@ function footer(ex) {
   if (!f) return;
   const ts = ex.task_set || {};
   const date = (iso) => (iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+  // the links stay; no paragraph about the exam (user, 2026-10-18)
   f.outerHTML = `<footer class="footer"><div class="footer-grid">
     <div>
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
-      <p>${esc(ex.summary || '')}</p>
       <div class="prov">Questions as of ${esc(date(ts.date))} · results updated ${esc(date(ex.build?.at))}</div>
+      <div class="copy">© 2026 Embodied First Exam</div>
     </div>
     <div><h5>The exam</h5><ul>
       <li><a href="${exam('leaderboard/')}">Leaderboard</a></li><li><a href="${exam('suites/')}">Suites</a></li>
-      <li><a href="${exam('tasks/')}">Tasks</a></li></ul></div>
+      <li><a href="${exam('tasks/')}">Tasks</a></li><li><a href="${exam('run/')}">Runs</a></li></ul></div>
     <div><h5>About</h5><ul>
       <li><a href="${exam('how/')}">How it is marked</a></li><li><a href="${exam('contribute/')}">Contribute</a></li></ul></div>
   </div></footer>`;
@@ -104,18 +109,6 @@ const ranked = (ex) => ex.suites.filter((s) => !s.example);
 function mixColor(color, share) {
   const p = Math.max(0, Math.min(100, Math.round(share * 100)));
   return `color-mix(in srgb, var(${color}) ${p}%, var(--cell-0))`;
-}
-
-function scoreCell(mode, a, n, best) {
-  if (!n) return `<td class="score ${MK[mode]} na"><div class="top"><span class="pct">–</span></div><span class="frac">not run</span></td>`;
-  const v = (100 * a) / n;
-  return `<td class="score ${MK[mode]}${best ? ' best' : ''}"><div class="top"><span class="pct">${Math.round(v)}%</span><span class="frac">${a} / ${n}</span></div>
-    <div class="bar"><i style="width:${v.toFixed(1)}%"></i></div></td>`;
-}
-
-function modelCell(run, extra = '', compact = false) {
-  const sub = [`<span class="h">${esc(run.harness)}</span>`, esc(run.effort), compact ? '' : esc(run.route)].filter(Boolean).join(' · ');
-  return `<td class="model"><b>${esc(run.model)}</b><small>${sub}</small>${extra}</td>`;
 }
 
 /** The line under a run's name when some of its standard trials ran with resets allowed (scored apart). */
@@ -162,54 +155,26 @@ function scoreGroup(group, tasks, view) {
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 
-/** One dumbbell: the privileged mark (a hollow ring) and the standard mark (a solid dot) on a 0–100% scale, with an arrow
- *  from the first to the second: what is lost without the simulator. `pv` and `sv` are [solved, sat]; a mode not sat has no
- *  mark. Each number sits on the outer side of its mark. `mini`: no numbers. */
-function dbTrack(pv, sv, mini = false) {
-  const p = pctOf(pv), q = pctOf(sv);
-  const parts = [];
-  const both = p != null && q != null;
-  const close = both && Math.abs(p - q) < 3;                // too close for an arrow: the dot sits inside the ring
-  if (both && !close) {
-    const lo = Math.min(p, q), w = Math.abs(p - q);
-    parts.push(`<span class="db-arrow ${q < p ? 'l' : 'r'}" style="--lo:${lo.toFixed(1)}%;--w:${w.toFixed(1)}%"></span>`);
-  }
-  // the standard number goes on the side away from the privileged mark, and the other way round
-  const side = (self, other) => (other == null ? (self > 88 ? 'l' : 'r') : self <= other ? 'l' : 'r');
-  if (p != null) parts.push(`<span class="db-dot p${close ? ' ring' : ''}" style="--x:${p.toFixed(1)}%" title="Privileged: ${pv[0]} of ${pv[1]}">${mini ? '' : `<em class="${close ? 'r' : side(p, q)}">${Math.round(p)}%</em>`}</span>`);
-  if (q != null) parts.push(`<span class="db-dot s" style="--x:${q.toFixed(1)}%" title="Standard: ${sv[0]} of ${sv[1]}">${mini ? '' : `<em class="${close ? 'l' : side(q, p)}">${Math.round(q)}%</em>`}</span>`);
-  return `<span class="db-track${mini ? ' mini' : ''}"><span class="db-scale">${parts.join('')}</span></span>`;
-}
-
-function dbGap(pv, sv) {
-  const p = pctOf(pv), q = pctOf(sv);
-  if (p == null || q == null) return '<span class="db-gap na">–</span>';
-  const g = Math.round(p) - Math.round(q);
-  return `<span class="db-gap" title="${Math.abs(g)} points ${g >= 0 ? 'lower' : 'higher'} in standard mode">${g >= 0 ? '−' : '+'}${Math.abs(g)}<small>points</small></span>`;
-}
-
-const DB_HEAD = `<div class="db-legend"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>
-    <span class="db-key"><i></i>What it loses without the simulator</span></div>
-  <div class="db-axis"><span></span><span></span><span class="db-ticks">${[0, 25, 50, 75, 100].map((v) => `<span style="left:${v}%">${v}%</span>`).join('')}</span><span class="db-gap-h">Gap</span></div>`;
-
-const whoLine = (r) => esc([r.harness, r.effort, r.route].filter(Boolean).join(' · '));
-
-/** A model, suite by suite: a small dumbbell per suite it sat. */
-function dbDetail(ex, r, sc) {
+/** A model, suite by suite, as the ranked rows: the standard score as a thin ink bar over the privileged score's grey
+ *  hatched ghost, both numbers at the end. */
+function suiteBars(ex, r, sc) {
+  const frac = (x) => (x?.[1] ? `${x[0]} of ${x[1]}` : 'not sat');
   const minis = ranked(ex).filter((s) => sc.suites[s.id]).map((s) => {
     const v = sc.suites[s.id];
-    const href = `${exam('suite/')}?id=${s.id}`;
-    const val = (m) => (v[m] ? `${Math.round(pctOf(v[m]))}%` : '–');
-    return `<a class="db-mini" href="${href}" title="${esc(s.name)}: privileged ${v.privileged ? `${v.privileged[0]} of ${v.privileged[1]}` : 'not sat'}, standard ${v.standard ? `${v.standard[0]} of ${v.standard[1]}` : 'not sat'}">
-      <span class="nm">${codeMark(s)}<span>${esc(s.name)}</span></span>${dbTrack(v.privileged, v.standard, true)}<span class="vals"><b class="p">${val('privileged')}</b><b class="s">${val('standard')}</b></span></a>`;
+    const q = pctOf(v.standard), p = pctOf(v.privileged);
+    const k = Math.round(38 + 62 * (q ?? 0) / 100);
+    return `<a class="lbh-mini" href="${exam('suite/')}?id=${s.id}" style="--i:0" title="${esc(s.name)}: standard ${frac(v.standard)}, privileged ${frac(v.privileged)}">
+      <span class="nm">${codeMark(s)}<span>${esc(s.name)}</span></span>
+      <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%"></span>` : ''}${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
+      <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${p != null ? `${Math.round(p)}%` : '–'}</em></span></a>`;
   }).join('');
   const cost = r.est_n ? `about $${(r.est_usd / r.est_n).toFixed(r.est_usd / r.est_n < 1 ? 2 : 1)} of model use per question at list price` : '';
   const time = r.agent_n ? `${Math.round(r.agent_s / r.agent_n / 60)} min per attempt` : '';
-  return `<div class="db-detail"><div class="db-minis">${minis || '<p class="muted">No suite marked yet.</p>'}</div>
-    <p class="db-foot">${[esc(r.label), cost, time].filter(Boolean).join(' · ')}</p></div>`;
+  return `<div class="lbh-minis">${minis || '<p class="muted">No suite marked yet.</p>'}</div>
+    <p class="lbh-foot">${[esc(r.label), cost, time].filter(Boolean).join(' · ')}</p>`;
 }
 
-/** The leaderboard page: the dumbbell board with its controls, smaller runs folded away, a model's suites on a click. */
+/** The leaderboard page: the ranked board with its controls, smaller runs folded away, a model's suites on a click. */
 function lbBoard(ex, tasks, onDraw) {
   const lb = ex.leaderboard || {};
   const minSuites = lb.min_suites || 10;
@@ -314,7 +279,7 @@ function lbSuites(el, ex, runs, scores) {
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
       ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   }).join('');
-  const modes = [['standard', '<i class="dot s"></i>Standard'], ['privileged', '<i class="dot p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
+  const modes = [['standard', '<i class="sw s"></i>Standard'], ['privileged', '<i class="sw p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
   const note = { standard: 'Share of each suite’s questions solved in standard mode. The best in each row is underlined.',
     privileged: 'Share of each suite’s questions solved in privileged mode. The best in each row is underlined.',
     drop: 'Points lost from privileged to standard: where the simulator matters most.' }[SX_MODE];
@@ -332,7 +297,7 @@ function lbRules(el, ex) {
   const visual = {
     states: `<div class="rv-states"><span class="lbl">Counted</span><span class="chip-st ok">✓ solved</span><span class="chip-st">✗ failed</span><span class="chip-st">! error</span>
       <span class="lbl">Left out</span><span class="chip-st out">stopped</span><span class="chip-st out">withdrawn</span><span class="chip-st out">still running</span></div>`,
-    modes: `<div class="rv-modes"><span><i class="dot p"></i>Privileged</span><span class="ne">≠</span><span><i class="dot s"></i>Standard</span></div>`,
+    modes: `<div class="rv-modes"><span><i class="sw p"></i>Privileged</span><span class="ne">≠</span><span><i class="sw s"></i>Standard</span></div>`,
     budget: `<div class="rv-states"><span class="chip-st">1 hour</span><span class="chip-st">100M tokens in</span><span class="chip-st">10M out</span><span class="chip-st out">no web search</span></div>`,
     venn: `<svg class="rv-venn" viewBox="0 0 120 92" aria-hidden="true"><defs><clipPath id="vv-a"><circle cx="46" cy="38" r="28"/></clipPath><clipPath id="vv-b"><circle cx="74" cy="38" r="28"/></clipPath></defs>
       <g clip-path="url(#vv-a)"><g clip-path="url(#vv-b)"><circle cx="60" cy="60" r="28" class="in"/></g></g>
@@ -356,17 +321,6 @@ function suiteCard(ex, s) {
       <div class="meta">${int(s.instances)} scenes · ${esc(robot)}${more}${s.origin === 'ours' ? ' · ours' : ''}</div></div></a>`;
 }
 
-function incomingCard(x) {
-  const robots = (x.robots || []).map((r) => r.name).join(', ');
-  const media = x.poster ? `<img src="${esc(site(x.poster))}" alt="" loading="lazy">` : `<div class="placeholder-art"><span>${esc(x.code)}</span></div>`;
-  const link = Object.values(x.links || {}).find(Boolean);
-  const tag = link ? 'a' : 'div';
-  return `<${tag} class="suite-card"${link ? ` href="${esc(link)}"` : ''}>
-    <div class="media">${media}<span class="origin">${x.stage === 'candidate' ? 'candidate' : 'in review'}</span></div>
-    <div class="body"><h4>${esc(x.name)}</h4><p>${esc(x.blurb || '')}</p>
-      <div class="meta">${esc(x.size || '')} · ${esc(robots)}${x.origin === 'ours' ? ' · ours' : ''}</div></div></${tag}>`;
-}
-
 // suites whose scenes look alike, kept apart on the home page's wall as if they were one
 const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1': 'kitchen' };
 
@@ -383,19 +337,11 @@ const coverOf = (s) => s.teaser || s.preview?.find((p) => p.cover)
   || (CROPS[s.id] && s.preview?.find((p) => SINGLE_VIEW.has(`${s.id}/${p.task}`))) || s.preview?.find((p) => !p.still) || s.preview?.[0];
 
 function suitesGrid(el, ex, filter = {}) {
-  const runs = runMap(ex);
-  const bodies = ex.bodies || {};
   const list = ex.suites.filter((s) => (!filter.body || s.body === filter.body) && (!filter.origin || s.origin === filter.origin));
-  const groups = BODY_ORDER.map((b) => [b, list.filter((s) => s.body === b && !s.example)]).filter(([, l]) => l.length);
-  const example = list.filter((s) => s.example);
-  el.innerHTML = groups.map(([b, l]) => `<div class="suite-group reveal"><h3>${esc(bodies[b] || b)} <small>${l.length} suite${l.length > 1 ? 's' : ''} · ${int(l.reduce((a, s) => a + s.instances, 0))} scenes</small></h3>
-      <div class="suite-grid">${l.map((s) => suiteCard(ex, s)).join('')}</div></div>`).join('')
-    + (example.length && !filter.body ? `<div class="suite-group reveal"><h3>Example <small>the task every suite starts from · not ranked</small></h3><div class="suite-grid">${example.map((s) => suiteCard(ex, s)).join('')}</div></div>` : '');
+  // one plain grid, no headings by robot body (user, 2026-10-18); the example task comes last
+  const shown = [...list.filter((s) => !s.example), ...(filter.body ? [] : list.filter((s) => s.example))];
+  el.innerHTML = `<div class="suite-group reveal"><div class="suite-grid">${shown.map((s) => suiteCard(ex, s)).join('')}</div></div>`;
   reveal(el);
-}
-
-function incomingGrid(el, ex) {
-  el.innerHTML = `<div class="suite-grid">${(ex.incoming || []).map(incomingCard).join('')}</div>`;
 }
 
 /* -------------------------------------------------------------------------------------- coverage (taxonomy) */
@@ -411,14 +357,9 @@ function thinSpots(el, ex, info) {
   const tags = info.groups.flatMap((g) => g.tags.map((t) => ({ ...t, group: g.name, n: info.suites.reduce((a, s) => a + (s.tags?.[t.id] || 0), 0) })));
   const thin = tags.filter((t) => t.n / info.total < 0.12).sort((a, b) => a.n - b.n);
   const bodies = BODY_ORDER.map((b) => ({ b, n: ranked(ex).filter((s) => s.body === b).length })).filter((x) => x.n <= 1);
-  const coming = (b) => (ex.incoming || []).filter((x) => (x.robots || []).some((r) => r.body === b))
-    .map((x) => `${esc(x.name)} is ${x.stage === 'candidate' ? 'a candidate' : 'in review'}`);
   const items = [
     ...thin.map((t) => `<a href="${exam('contribute/')}#propose">${tagIcon(t.id)}<span class="label">${esc(t.group)}</span><b>${esc(t.name)}</b><span title="${esc(t.description)}">${int(t.n)} question${t.n === 1 ? '' : 's'} so far</span></a>`),
-    ...bodies.map((x) => {
-      const c = coming(x.b);
-      return `<a href="${exam('contribute/')}#propose"><span class="ic" data-icon="arm"></span><span class="label">Robot body</span><b>${esc(ex.bodies?.[x.b] || x.b)}</b><span>${x.n ? 'One suite so far' : 'A first suite is welcome'}${c.length ? ` · on the way: ${c.map((z) => z.split(' is ')[0]).join(', ')}` : ''}</span></a>`;
-    }),
+    ...bodies.map((x) => `<a href="${exam('contribute/')}#propose"><span class="ic" data-icon="arm"></span><span class="label">Robot body</span><b>${esc(ex.bodies?.[x.b] || x.b)}</b><span>${x.n ? 'One suite so far' : 'A first suite is welcome'}</span></a>`),
   ];
   el.innerHTML = items.join('');
 }
@@ -441,7 +382,7 @@ function taskCard(ex, t, runs) {
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
     <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${WATCH.has(`${t.suite}/${t.id}`) ? '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>' : ''}</div>
     <div class="body"><h4>${esc(t.title)}</h4>${t.code ? `<span class="t-code">${esc(t.code)}</span>` : ''}
-      ${runs.length ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
+      ${runs.length && resultOf(t) !== 'unrun' ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
 
 // Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-media (runs/), or a local runlog/ folder
@@ -473,15 +414,15 @@ function openTask(ex, t, runs) {
   else if (m.watch) media = `<div class="media">${m.poster ? `<img src="${esc(site(m.poster))}" alt="">` : ''}<span class="note"><a href="${esc(m.watch)}" target="_blank" rel="noopener">watch the official demo ↗</a></span></div>`;
   else if (m.poster) media = `<div class="media"><img src="${esc(site(m.poster))}" alt=""><span class="note">${m.still ? 'the scene the task starts from' : 'preview'}</span></div>`;
   const allRuns = ex.runs.filter((r) => t.results?.[r.id]);
+  // one row per model, as the ranked rows: its maker's mark, then each mode's verdict, standard in ink, privileged grey hatched
   const res = allRuns.map((r) => {
     const cell = (mode) => {
       const c = t.results[r.id]?.[MK[mode]];
-      if (!c) return '<span class="muted">–</span>';
-      const word = stateWord(c.s) + (c.r ? ` · ${c.r} resets` : '');
-      const cls = c.r ? `st rs` : `st ${c.s}${c.s === 'S' ? ' ' + MK[mode] : ''}`;
-      return `<span class="${cls}">${word}</span>`;
+      if (!c) return '<span class="lbh-c"><span class="lbh-v na">–</span></span>';
+      const cls = c.r ? 'rs' : c.s === 'S' ? `S ${MK[mode]}` : c.s;
+      return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
     };
-    return `<tr><td>${modelCell(r).replace('<td class="model">', '<div class="model">').replace(/<\/td>$/, '</div>')}</td><td>${cell('privileged')}</td><td>${cell('standard')}</td></tr>`;
+    return `<div class="lbh-res">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cell('standard')}${cell('privileged')}</div>`;
   }).join('');
   const facts = [
     ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}?id=${s.id}">${esc(s.name)}</a>`],
@@ -499,8 +440,7 @@ function openTask(ex, t, runs) {
     ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${tags}</div>` : ''}
     ${media}
     <div id="drawer-atlas"></div>
-    <h3>Results</h3>
-    ${res ? `<table class="res-table"><thead><tr><th>Model</th><th>Privileged</th><th>Standard</th></tr></thead><tbody>${res}</tbody></table>` : '<p class="muted">No agent has run this task yet.</p>'}
+    ${res ? `<h3>Results</h3><div class="lbh-task"><div class="lbh-res lbh-rh"><span></span><span>Model</span><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></div>${res}</div>` : ''}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
@@ -513,7 +453,7 @@ function openTask(ex, t, runs) {
     if (media) media.insertAdjacentHTML('afterend', `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`);
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=c7c60ac6').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=50ce7d17').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -607,7 +547,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=c7c60ac6').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=50ce7d17').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -648,7 +588,15 @@ function heroWall(ex) {
   const groupOf = (t) => LOOKALIKE[t.suite] || t.suite;
   const pools = new Map();
   tiles.forEach((t) => { const g = groupOf(t); if (!pools.has(g)) pools.set(g, []); pools.get(g).push(t); });
+  const centreKey0 = ex.hero?.centre || '';
+  for (const [g, list] of pools) {   // a fresh order of every suite's scenes on each visit; the centre scene stays first
+    for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+    const ci = list.findIndex((t) => `${t.suite}/${t.id}` === centreKey0);
+    if (ci > 0) list.unshift(list.splice(ci, 1)[0]);
+  }
   const groups = [...pools.keys()];
+  const size = new Map(groups.map((g) => [g, pools.get(g).length]));   // a suite with more scenes shows proportionally more often
+  const shownP = new Map();   // how often each suite is on the playing side: there, every suite takes its turn (RoboARC twice as often)
   const cols = Array.from({ length: n }, () => []);
   const shown = new Map();
   const uses = (c) => new Set((cols[c] || []).map(groupOf));
@@ -656,32 +604,68 @@ function heroWall(ex) {
   // own, with every task replayed) are the first thing people see; then the columns further from it.
   const frontOrder = (ex.hero?.front || []).map((s) => LOOKALIKE[s] || s);
   const front = new Set(frontOrder);
+  // suites kept to the left, behind the title (hero.back); the columns right of the middle are where tiles play
+  const back = new Set((ex.hero?.back || []).map((s) => LOOKALIKE[s] || s));
+  const centreSuite = (ex.hero?.centre || '').split('/')[0];
+  const leadOrder = new Map();
+  // a fresh order on every visit; `first`, when given, leads
+  const shuffle = (a, first) => { const o = a.filter((x) => x !== first); for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return first && a.includes(first) ? [first, ...o] : o; };
   const wr = wall.getBoundingClientRect();
   const focus = phone ? innerWidth / 2 : innerWidth * 0.72;
-  const seq = [...cols.keys()].sort((a, b) => Math.abs(wr.left + a * (tw + gap) + tw / 2 - focus) - Math.abs(wr.left + b * (tw + gap) + tw / 2 - focus));
+  const colX = (c) => wr.left + c * (tw + gap) + tw / 2;
+  const seq = [...cols.keys()].sort((a, b) => Math.abs(colX(a) - focus) - Math.abs(colX(b) - focus));
+  // the columns dealt first gather the showcase suites, the later ones the suites kept back; the columns are placed on
+  // screen by what they hold once their positions are measured (below)
+  const playing = (c) => !phone && seq.indexOf(c) < Math.ceil(seq.length * 0.55);
   for (const c of seq) {
     const near = [1, 2, 3].map((d) => new Set([...uses(c - d), ...uses(c + d)]));
     for (let r = 0; r < per; r++) {
       const here = uses(c);
       let left = groups.filter((g) => pools.get(g).length);
       // the two columns people see first lead with the front suites (hero.front), one scene of each
-      const fr = c === seq[0] || c === seq[1] ? left.filter((g) => front.has(g) && !here.has(g)) : [];
+      // on the playing side RoboARC sits only in the centre column and the third (at most two on screen, none still)
+      if (playing(c) && seq.indexOf(c) !== 0 && seq.indexOf(c) !== 2) left = left.filter((g) => g !== centreSuite);
+      // the two lead columns: one scene of each front suite, in an order shuffled anew on every visit (the first column
+      // opens with the centre scene's suite), never next to the same suite in the other lead column
+      const isLead = c === seq[0] || c === seq[1];
+      const other = c === seq[0] ? cols[seq[1]] : cols[seq[0]];
+      const besideOther = (g) => [r - 1, r, r + 1].some((k) => other && other[k] && groupOf(other[k]) === g);
+      const fr = isLead ? left.filter((g) => front.has(g) && !here.has(g)) : [];
       if (fr.length) {
-        // the first front suite sits second in the block, where the screen's window catches it best
-        const mid = [frontOrder[1], frontOrder[0], ...frontOrder.slice(2)];
-        const g = fr.sort((a, b) => mid.indexOf(a) - mid.indexOf(b))[0];
+        const ord = leadOrder.get(c) ?? (leadOrder.set(c, shuffle(frontOrder, c === seq[0] ? centreSuite : '')), leadOrder.get(c));
+        const g = [...fr].sort((a, b) => (besideOther(a) - besideOther(b)) || (ord.indexOf(a) - ord.indexOf(b)))[0];
         cols[c].push(pools.get(g).shift());
         shown.set(g, (shown.get(g) || 0) + 1);
+        if (playing(c)) shownP.set(g, (shownP.get(g) || 0) + 1);
         continue;
       }
       if (!left.length) { tiles.forEach((t) => pools.get(groupOf(t)).push(t)); left = groups; }   // a screen too large for the pool
+      // when only RoboARC is left the other suites' scenes come round again, rather than a column of RoboARC alone
+      if (centreSuite && left.every((g) => g === centreSuite)) {
+        tiles.forEach((t) => { if (groupOf(t) !== centreSuite) pools.get(groupOf(t)).push(t); });
+        left = groups.filter((g) => pools.get(g).length);
+      }
       // every group gets its turn: the fewer times a group is on the wall so far, the sooner it comes next; ties go to the
       // group that leads the order
-      const cost = (g) => (here.has(g) ? 1000 : 0) + (near[0].has(g) ? 60 : 0) + (near[1].has(g) ? 36 : 0) + (near[2].has(g) ? 14 : 0)
-        + (shown.get(g) || 0) * 25 + groups.indexOf(g) / 1000;
+      // where tiles play, the showcase suites (hero.front) come first and hero.back never shows; behind the title, the rest
+      // a look-alike group (the kitchens) counts as front when any of its suites is: front wins over back
+      const place = (g) => (playing(c) ? (front.has(g) ? 0 : back.has(g) ? 800 : 40) : (front.has(g) ? 30 : back.has(g) ? 0 : 10));
+      // RoboARC sits in two columns only (the centre one and the third), so at most two of it are on screen at once and
+      // none of them stands still waiting for a turn to play
+      const rare = () => 0;
+      // a suite with many distinct scenes (RoboARC) may sit in neighbouring columns and twice in one column
+      const cost = (g) => {
+        // behind the title a suite with many distinct scenes (RoboARC) may sit in neighbouring columns and twice in a column
+        const big = false, inCol = cols[c].filter((t) => groupOf(t) === g).length, soft = big ? 0.25 : 1;
+        const nk = playing(c) ? 4 : 1;   // where tiles play, neighbouring columns keep apart much more strongly
+        return (inCol && (!big || inCol >= 2) ? 1000 : inCol ? 90 : 0) + rare(g)
+          + soft * nk * ((near[0].has(g) ? 60 : 0) + (near[1].has(g) ? 36 : 0) + (near[2].has(g) ? 14 : 0))
+          + (playing(c) ? (shownP.get(g) || 0) * 120 : ((shown.get(g) || 0) / size.get(g)) * 150) + place(g) + Math.random() * 6;
+      };
       const g = left.reduce((a, b) => (cost(b) < cost(a) ? b : a));
       cols[c].push(pools.get(g).shift());
       shown.set(g, (shown.get(g) || 0) + 1);
+      if (playing(c)) shownP.set(g, (shownP.get(g) || 0) + 1);
     }
   }
   const tile = (t) => {
@@ -702,6 +686,9 @@ function heroWall(ex) {
       const delay = lead.has(i) ? 0 : ((i * 37) % 100) / 100 * dur;
       return `<div class="wall-col${i % 2 ? ' down' : ''}" style="--dur:${dur}s;--delay:-${delay}s">${html}${html}</div>`;
     }).join('');
+    // a column moves one copy of itself per loop: its duration follows its length, so every column drifts at about the
+    // speed of the old wall (some 9 px/s, a little faster or slower per column)
+    $$('.wall-col', wall).forEach((el, i) => { const half = el.offsetHeight / 2; if (half > 0) el.style.setProperty('--dur', `${(half / 9 * durs[i % durs.length] / 84).toFixed(1)}s`); });
   };
   render();
   // The wall is tilted, so where a column shows on screen is measured rather than computed: the front columns move to
@@ -712,17 +699,24 @@ function heroWall(ex) {
         .filter((r) => r.bottom > 0 && r.top < innerHeight).map((r) => r.left + r.width / 2);
       return xs.length ? xs.reduce((a, b) => a + b) / xs.length : Infinity;
     };
+    // Where each column shows on screen (measured: the wall is tilted). The columns are then placed by what they hold:
+    // the two lead columns (the front suites, one each) nearest the open part of the hero, then the columns richest in
+    // showcase suites (hero.front) on the rest of the playing side, and those with the suites kept back (hero.back) on
+    // the left, behind the title.
     const xs = $$('.wall-col', wall).map(shownX);
-    const best = [...cols.keys()].sort((a, b) => Math.abs(xs[a] - focus) - Math.abs(xs[b] - focus)).slice(0, 2);
-    const from = [seq[0], seq[1]];
-    if (best.join() !== from.join()) {
-      const moved = from.map((i) => cols[i]);
-      const freed = best.filter((i) => !from.includes(i)).map((i) => cols[i]);
-      from.filter((i) => !best.includes(i)).forEach((i, k) => { cols[i] = freed[k]; });
-      best.forEach((i, k) => { cols[i] = moved[k]; });
-      lead = new Set(best);
-      render();
-    }
+    // the slots in the order they get columns: the playing side nearest the open part first (those past the right edge,
+    // which the tilt still shows in part, after the rest of it), then the left, farthest left last
+    const rank = (x) => (x >= innerWidth * 0.46 ? Math.abs(x - focus) : 1e4 + (innerWidth * 0.46 - x));
+    const slots = [...cols.keys()].sort((a, b) => rank(xs[a]) - rank(xs[b]));
+    const score = (col) => { const seenG = new Set(); return col.reduce((n, t) => { const g = LOOKALIKE[t.suite] || t.suite; const first = !seenG.has(g); seenG.add(g); return n + (g === centreSuite ? (t.suite + '/' + t.id === (ex.hero?.centre || '') ? 50 : -8) : front.has(g) ? (first ? 1 : 0.5) : back.has(g) ? -3 : 0); }, 0); };
+    const leadCols = [seq[0], seq[1]].map((i) => cols[i]);
+    const others = cols.filter((_, i) => i !== seq[0] && i !== seq[1]).sort((p, q) => score(q) - score(p));
+    const placed = [...leadCols, ...others];
+    const next = new Array(cols.length);
+    slots.forEach((slot, k) => { next[slot] = placed[k]; });
+    next.forEach((c, i) => { cols[i] = c; });
+    lead = new Set(slots.slice(0, 2));
+    render();
     // Start each front column where its front scenes sit in the open part of the hero: try phases and keep the best.
     // The second column favours the front suites the first does not show, and the first front suite counts a little more.
     const order = ex.hero?.front || [];
@@ -731,21 +725,56 @@ function heroWall(ex) {
       const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
       return x > innerWidth * 0.5 && x < innerWidth && y > innerHeight * 0.1 && y < innerHeight * 0.9;
     };
-    const seen = new Set();
-    [...lead].forEach((i) => {
-      const col = $$('.wall-col', wall)[i];
-      const dur = durs[i % durs.length];
-      let bestD = 0, bestN = -1;
-      for (let k = 0; k < 32; k++) {
-        const d = (k / 32) * dur;
-        col.style.setProperty('--delay', `-${d}s`);
-        const n = $$('.wt', col).filter((el) => frontEl(el) && inView(el))
-          .reduce((a, el) => a + (seen.has(el.dataset.suite) ? 1 : 2) + (el.dataset.suite === order[0] && !seen.has(el.dataset.suite) ? 1.5 : 0), 0);
-        if (n > bestN) { bestN = n; bestD = d; }
-      }
-      col.style.setProperty('--delay', `-${bestD}s`);
-      $$('.wt', col).filter((el) => frontEl(el) && inView(el)).forEach((el) => seen.add(el.dataset.suite));
-    });
+    // The phases are set once the wall is laid out: before that its columns have no height, so no phase moves anything.
+    const align = () => {
+      const seen = new Set();
+      // hero.centre: the scene that opens in the middle of the playing side (owners, 2026-10-18). Its column takes the slot
+      // nearest the open part, and starts where that scene sits at the centre of it.
+      // a column's phase, set on its running animation (a changed --delay is not measurable in the same frame)
+      const phase = (col, d) => { const a = col.getAnimations?.()[0]; if (a) a.currentTime = d * 1000; else col.style.setProperty('--delay', `-${d}s`); };
+      const centreKey = ex.hero?.centre || '';
+      const centreSel = centreKey ? `.wt[href$="task=${encodeURIComponent(centreKey)}"]` : '';
+      const centreAt = () => {
+        const hc = centreSel && wall.querySelector(centreSel);
+        if (!hc) return;
+        let ci = $$('.wall-col', wall).indexOf(hc.closest('.wall-col'));
+        if (ci !== slots[0]) {   // swap it into the slot nearest the open part
+          [cols[ci], cols[slots[0]]] = [cols[slots[0]], cols[ci]];
+          lead = new Set([slots[0], ...[...lead].filter((x) => x !== slots[0] && x !== ci), ...(lead.has(ci) ? [] : [])]);
+          render();
+          ci = slots[0];
+        }
+        const col = $$('.wall-col', wall)[ci], dur = (col.getAnimations?.()[0]?.effect.getTiming().duration || durs[ci % durs.length] * 1000) / 1000;
+        const tx = focus, ty = innerHeight * (col.classList.contains('down') ? 0.3 : 0.62);
+        let bestD = 0, bestE = Infinity;
+        for (let k = 0; k < 96; k++) {
+          const d = (k / 96) * dur;
+          phase(col, d);
+          const e = Math.min(...$$(centreSel, col).map((el) => { const r = el.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - tx, r.top + r.height / 2 - ty); }));
+          if (e < bestE) { bestE = e; bestD = d; }
+        }
+        phase(col, bestD);
+        return ci;
+      };
+      const centreCol = centreAt();
+      [...lead].filter((i) => i !== centreCol).forEach((i) => {
+        const col = $$('.wall-col', wall)[i];
+        const dur = (col.getAnimations?.()[0]?.effect.getTiming().duration || durs[i % durs.length] * 1000) / 1000;
+        let bestD = 0, bestN = -1;
+        for (let k = 0; k < 32; k++) {
+          const d = (k / 32) * dur;
+          phase(col, d);
+          const n = $$('.wt', col).filter((el) => frontEl(el) && inView(el))
+            .reduce((a, el) => a + (seen.has(el.dataset.suite) ? 1 : 2) + (el.dataset.suite === order[0] && !seen.has(el.dataset.suite) ? 1.5 : 0), 0);
+          if (n > bestN) { bestN = n; bestD = d; }
+        }
+        phase(col, bestD);
+        $$('.wt', col).filter((el) => frontEl(el) && inView(el)).forEach((el) => seen.add(el.dataset.suite));
+      });
+    };
+    let tries = 0;
+    const whenLaidOut = () => { if ($('.wall-col', wall)?.offsetHeight > innerHeight || ++tries > 60) align(); else requestAnimationFrame(whenLaidOut); };
+    requestAnimationFrame(whenLaidOut);
   }
   if (!phone && !still) {
     // play every tile in the open right part of the wall (the left part sits under the title's veil): eight to eleven
@@ -753,8 +782,18 @@ function heroWall(ex) {
     // goes, the set is worked out again, so no tile in the open part stays still waiting for another to leave.
     const isFront = (el) => front.has(LOOKALIKE[el.dataset.suite] || el.dataset.suite);
     const inZone = new Set();
+    // at most two RoboARC tiles play at a time
+    const centreSel0 = ex.hero?.centre ? `.wt[href$="task=${encodeURIComponent(ex.hero.centre)}"]` : '';
+    const PER_SUITE = (sid) => (sid === 'roboarc' ? 2 : 99);   // RoboARC: two at a time (owners, 2026-10-18); the dealing keeps the rest apart
     const schedule = () => {
-      const want = new Set([...inZone].sort((a, b) => isFront(b) - isFront(a)).slice(0, 18));
+      const per = new Map(), pick = [];
+      const isCentre = (el) => !!centreSel0 && el.matches(centreSel0);
+      for (const t of [...inZone].sort((a, b) => isCentre(b) - isCentre(a) || isFront(b) - isFront(a))) {
+        const n = per.get(t.dataset.suite) || 0;
+        if (n >= PER_SUITE(t.dataset.suite) || pick.length >= 30) continue;
+        per.set(t.dataset.suite, n + 1); pick.push(t);
+      }
+      const want = new Set(pick);
       $$('.wt.playing', wall).forEach((t) => { if (!want.has(t)) { $('video', t).pause(); t.classList.remove('playing'); } });
       want.forEach((t) => {
         if (t.classList.contains('playing')) return;
@@ -886,7 +925,7 @@ function flowDiagram(el, ex) {
       <i class="fx-arrow" style="grid-row:2"></i>
       <div class="fx-in fx-scene" style="grid-row:4 / 6" title="A simulation scene rebuilt bit for bit and checked against its starting state">
         <span class="fx-ih">${ic('cube')}frozen scene</span>
-        <img src="${esc(site('media/ways/scene_start.jpg'))}" alt="The scene at the start: two arms hold two interlocked claw pieces, orange and teal" loading="lazy">
+        <img src="${esc(site('media/ways/scene_start.jpg?v=bcb9718e'))}" alt="The scene at the start: two arms hold two interlocked claw pieces, orange and teal" loading="lazy">
         <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in both modes</li></ul></div>
       <i class="fx-arrow" style="grid-row:5"></i>
       ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
@@ -894,17 +933,19 @@ function flowDiagram(el, ex) {
       ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
       <div class="fx-iface" style="grid-row:4">
         <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per mode</small></span>
-        <div class="fx-mode s" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success check.">
-          <div class="fx-mh"><span class="fx-lock">${ic('lock')}</span><b>Standard</b><em title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
-          <dl><div><dt>access</dt><dd>the <b>eai-standard</b> robot API<span class="fx-eps"><code>/spec</code><code>/observe</code><code>/submit</code><code>/kinematics</code></span></dd></div>
-            <div><dt>actions</dt><dd><code>joint_position</code> or <code>ee_pose</code>, sent as <code>(T, dim)</code> chunks</dd></div>
-            <div><dt>sees</dt><dd>RGB, depth, the robot’s own state</dd></div></dl>
+        <div class="fx-mode s" data-rt="standard" role="button" tabindex="0" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success check.">
+          <div class="fx-mh"><span class="fx-lock">${ic('lock')}</span><b>Standard</b><em data-rt="realtime" title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
+          <dl><div><dt>reach</dt><dd><span class="fx-pipe" title="The agent’s code reaches the simulator only through the eai-standard API: /spec, /observe, /submit, /kinematics"><i class="b">${ic('code')}</i><i class="ln"></i><i class="api">${ic('lock')}API</i><i class="ln"></i><i class="b">${ic('cube')}</i></span><small>robot API only</small></dd></div>
+            <div><dt>sees</dt><dd><span class="fx-chips"><i>${ic('camera')}RGB</i><i>${ic('layers')}depth</i><i>${ic('arm')}joints</i></span><small title="Never given: object poses, segmentation, contact forces, the success check">no object poses</small></dd></div>
+            <div><dt>sends</dt><dd><span class="fx-chunk" title="joint_position or ee_pose rows, dt apart: a (T, dim) array per /submit" aria-hidden="true">${'<i></i>'.repeat(15)}</span><small>action chunks <code>(T, dim)</code></small></dd></div></dl>
+          <span class="fx-how">How it runs underneath →</span>
         </div>
-        <div class="fx-mode p" title="Privileged, the reference. Agent and simulator share one container; the suite’s own tooling gives the simulator’s full state and unlimited resets. The deliverable is /app/output/trajectory.npz, or code for a policy task; it is replayed in a fresh simulator.">
+        <div class="fx-mode p" data-rt="privileged" role="button" tabindex="0" title="Privileged, the reference. Agent and simulator share one container; the suite’s own tooling gives the simulator’s full state and unlimited resets. The deliverable is /app/output/trajectory.npz, or code for a policy task; it is replayed in a fresh simulator.">
           <div class="fx-mh"><span class="fx-lock p">${ic('cube')}</span><b>Privileged</b></div>
-          <dl><div><dt>access</dt><dd>the suite’s own simulator tools, in the same container</dd></div>
-            <div><dt>actions</dt><dd>the same action space, delivered as <code>trajectory.npz</code> (or policy code)</dd></div>
-            <div><dt>sees</dt><dd>the full simulator state; resets at will</dd></div></dl>
+          <dl><div><dt>reach</dt><dd><span class="fx-pipe p" title="Agent and simulator share one container; the suite’s own tools"><i class="b both">${ic('code')}${ic('cube')}</i></span><small>inside the simulator</small></dd></div>
+            <div><dt>sees</dt><dd><span class="fx-chips p"><i>${ic('cube')}full state</i><i>${ic('replay')}resets ∞</i></span><small>everything, at will</small></dd></div>
+            <div><dt>sends</dt><dd><span class="fx-file" title="The same action space, delivered as /app/output/trajectory.npz (or code for a policy task), replayed in a fresh simulator">${ic('doc')}trajectory.npz</span><small>replayed fresh</small></dd></div></dl>
+          <span class="fx-how">How it runs underneath →</span>
         </div>
       </div>
       ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.simulators || 20)} · ${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
@@ -922,20 +963,130 @@ function flowDiagram(el, ex) {
         <span class="fx-pomdp">a POMDP rollout</span>
         <span class="fx-seq">${soa(0)}<b>→</b>${soa(1)}<b>→</b><span class="fx-dots">…</span></span>
         <span class="fx-legend"><span><i>s</i>simulator state</span><span><i>o</i>RGB(-D)</span><span><i>a</i>action</span></span>
-        <img class="fx-obs" src="${esc(site('media/ways/traj_frame.jpg'))}" title="Rendered from the reference solution" alt="Mid-episode: the two claw pieces sliding apart" loading="lazy">
+        <img class="fx-obs" src="${esc(site('media/ways/traj_frame.jpg?v=3bf6e22a'))}" title="Rendered from the reference solution" alt="Mid-episode: the two claw pieces sliding apart" loading="lazy">
         <span class="fx-ex">See an example →</span>
       </button>
     </div>
   </div>`;
   $$('.fx-way[data-way]', el).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); wayDemo(a.dataset.way, a); }));
   $('.fx-traj', el).addEventListener('click', (e) => trajDemo(e.currentTarget));
+  const rt = (e) => { const m = e.target.closest('[data-rt]'); if (m) runtimeDemo(m.dataset.rt, m.closest('.fx-mode')); };
+  $$('.fx-mode', el).forEach((m) => {
+    m.addEventListener('click', rt);
+    m.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rt(e); } });
+  });
+}
+
+/** Opens one of the page's dialogs (an .ol-modal) growing from the element that asked; Escape, a click on the fog or
+ *  the close button closes it and gives the focus back. */
+function showModal(dlg, opener) {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  const onClick = (e) => { if (!e.target.closest('.ol-card') || e.target.closest('.ol-x')) close(); };
+  function close() {
+    dlg.classList.remove('on');
+    document.documentElement.classList.remove('ol-lock');
+    removeEventListener('keydown', onKey);
+    dlg.removeEventListener('click', onClick);
+    setTimeout(() => { if (!dlg.classList.contains('on')) dlg.hidden = true; }, still ? 0 : 320);
+    opener?.focus({ preventScroll: true });
+  }
+  dlg.hidden = false;
+  const card = $('.ol-card', dlg), b = opener?.getBoundingClientRect(), c = card.getBoundingClientRect();
+  if (b) card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
+  document.documentElement.classList.add('ol-lock');
+  requestAnimationFrame(() => dlg.classList.add('on'));
+  addEventListener('keydown', onKey);
+  dlg.addEventListener('click', onClick);
+}
+
+/** How a trial runs underneath, per mode, as the protocol (docs/protocol on main) has it: the containers of one trial,
+ *  what each holds, what crosses between them, what happens when the time is up, and how the verifier decides. */
+const RT_MON = '<code>rcb_monitor</code> sidecar: samples CPU, memory and GPU, and shows the agent its clock in <code>/run/rcb-limits/usage.json</code> (read-only)';
+const RT_NET = 'Out of the agent’s container: the model’s API (through the usage gateway) and the package registries (PyPI, apt), nothing else. GitHub, Hugging Face and the web do not answer.';
+const RUNTIME = {
+  standard: {
+    tab: 'Standard', proto: 'eai-standard/2.x · robot as a service',
+    lead: 'The exam’s own mode. The simulator runs in a sidecar container the agent cannot open; the agent drives the robot over HTTP, as it would drive a real one, and the sidecar marks the episode it ran.',
+    agent: ['the harness (Codex, Claude Code, …) calling its model', 'everything the agent writes: controller, planner, any model it trains', 'the shipped client, <code>rcb_client.py</code>', 'no simulator, no scene, no simulation code'],
+    link: ['/spec', '/observe', '/submit', '/kinematics'],
+    sim: ['the simulator, the frozen scene, the seed and the success check', 'checks the start state when the episode begins and after every reset', 'runs each chunk of actions; resets within the budget <i>N</i>', 'keeps a journal of every call'],
+    stop: ['every process the agent left running is killed (<code>kill -9 -1</code>)', 'the monitor seals its record', 'the sidecar refuses any more physics and finalizes the episode: <code>final.json</code>, the journal, the trajectory'],
+    verify: ['receives only the sidecar’s evidence', 'transcribes its verdict on the live episode: <code>graded_by_live = 1</code>, no replay', 'writes <code>reward.txt</code> (1 or 0) and <code>reward.json</code>', 'renders the video after the verdict, never from it'],
+  },
+  realtime: {
+    tab: 'Standard · real-time', proto: 'eai-standard/2.3 · a clock that does not stop',
+    lead: 'Standard mode in real time. Once the episode starts the robot keeps moving whatever the agent is doing, so the agent’s controller has to run as a program in its own container, not as a chat.',
+    agent: ['the harness calling its model', 'the agent’s controller: a program in this container that streams action chunks and reads observations', 'the shipped client, <code>rcb_client.py</code>', 'no simulator, no scene, no simulation code'],
+    link: ['/spec', '/observe', '/submit', '/kinematics'],
+    sim: ['the simulator, the frozen scene, the seed and the success check', 'runs at 1/<i>S</i> of real speed from the first action, whatever the agent does', 'holds the last targets while the agent thinks', 'resets within the budget (10 by default); a journal of every call'],
+    stop: ['every process the agent left running is killed (<code>kill -9 -1</code>)', 'the monitor seals its record', 'the sidecar refuses any more physics and finalizes the episode: <code>final.json</code>, the journal, the trajectory'],
+    verify: ['receives only the sidecar’s evidence', 'transcribes its verdict on the live episode: <code>graded_by_live = 1</code>, no replay', 'writes <code>reward.txt</code> (1 or 0) and <code>reward.json</code>', 'renders the video after the verdict, never from it'],
+  },
+  privileged: {
+    tab: 'Privileged', proto: 'open book · the reference',
+    lead: 'The reference mode. Agent and simulator share one container: the agent reads the full simulator state, resets at will and plans offline. Only its deliverable leaves the container, and a fresh simulator replays it.',
+    agent: ['the harness calling its model', 'the simulator, the frozen scene and the suite’s own tools', 'the full simulator state; resets at will', 'writes <code>/app/output/trajectory.npz</code>, or code for a policy task'],
+    stop: ['the harness stops the agent', 'only <code>/app/output/</code> is collected; nothing else the agent did counts'],
+    verify: ['empties <code>/logs/verifier</code>; drops links, pipes and devices from <code>/app/output</code>', 'rebuilds the frozen scene from its own byte-identical copy (another start state: no verdict, an infrastructure failure)', 'replays the trajectory in a fresh process, twice; the final-state hashes must match', 'judges success on the end state: <code>reward.txt</code> (1 or 0), <code>reward.json</code>', 'a policy task’s code runs as an unprivileged user, in its own process, with no network, unable to read the simulator or the grader'],
+  },
+};
+const RT_RULES = ['one Docker Compose project per trial, run by Harbor', 'every image pinned: <code>eai-<em>suite</em>:<em>version</em></code>', 'the cutoff is wall-clock time, the same in both modes', 'one full retry for an infrastructure failure, nothing more', 'a verdict, once written, is never rewritten'];
+let rtDlg;
+function runtimeDemo(mode, opener) {
+  const ic = (n) => `<svg class="fx-ic" viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n]}</svg>`;
+  const li = (a) => `<ul>${a.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  const box = (cls, icon, name, tag, items, extra = '') => `<div class="rt-box ${cls}"><div class="rt-bh">${ic(icon)}<b>${name}</b><em>${tag}</em></div>${li(items)}${extra}</div>`;
+  const body = (m) => {
+    const r = RUNTIME[m], priv = m === 'privileged';
+    const agent = box(priv ? 'agent p' : 'agent', 'terminal', 'Agent container', 'the agent is root here', r.agent);
+    const inner = priv ? agent : `${agent}
+      <div class="rt-link"><span class="rt-wire" aria-hidden="true"></span><b>HTTP</b><span class="rt-eps">${r.link.map((x) => `<code>${x}</code>`).join('')}</span><small>every other path: 404</small><span class="rt-trust">trust boundary</span></div>
+      ${box('sim', 'shield', '<code>sim</code> sidecar', 'trusted', r.sim, '<p class="rt-bf">publishes no port; its volumes are <code>*_trusted</code>, never mounted by the agent</p>')}`;
+    return `<p class="rt-lead"><span class="rt-proto">${r.proto}</span>${r.lead}</p>
+      <div class="rt-flow${priv ? ' p' : ''}">
+        <section class="rt-stage s1"><h4><i>1</i>The agent’s time<small>the cutoff, wall clock</small></h4>
+          <div class="rt-host"><span class="rt-hl">${ic('net')}one trial’s Docker network</span>
+            <div class="rt-row">${inner}</div>
+            <div class="rt-mon">${ic('controls')}<span>${RT_MON}</span></div></div>
+          <div class="rt-net">${ic('cloud')}<span>${RT_NET}</span></div></section>
+        <span class="rt-arrow" aria-hidden="true"></span>
+        <section class="rt-stage s2"><h4><i>2</i>Time is up</h4><ol>${r.stop.map((x) => `<li>${x}</li>`).join('')}</ol>
+          ${priv ? '<p class="rt-cross">crosses to the verifier: <code>trajectory.npz</code> (or the policy code) only</p>' : '<p class="rt-cross">crosses to the verifier: the sidecar’s record only</p>'}</section>
+        <span class="rt-arrow" aria-hidden="true"></span>
+        <section class="rt-stage s3"><h4><i>3</i>Marking</h4>
+          ${box('ver', 'sandbox', 'Verifier container', 'its own image · no network', r.verify)}
+          <div class="rt-res"><b>1</b><span>0</span></div></section>
+      </div>`;
+  };
+  if (!rtDlg) {
+    rtDlg = document.createElement('div');
+    rtDlg.className = 'ol-modal rt-modal';
+    rtDlg.hidden = true;
+    rtDlg.innerHTML = `<div class="ol-fog"></div>
+      <div class="ol-card rt-card" role="dialog" aria-modal="true" aria-labelledby="rt-title">
+        <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <h3 id="rt-title">How a trial runs</h3>
+        <div class="way-tabs rt-tabs" role="tablist">${Object.entries(RUNTIME).map(([k, r]) => `<button type="button" class="way-tab" role="tab" data-m="${k}">${esc(r.tab)}</button>`).join('')}</div>
+        <div class="rt-body"></div>
+        <div class="rt-rules">${RT_RULES.map((x) => `<span>${x}</span>`).join('')}</div>
+        <div class="way-foot"><span>From the exam’s task protocol: the modes, the trust boundary, the verifier’s isolation.</span></div>
+      </div>`;
+    document.body.append(rtDlg);
+    $('.rt-tabs', rtDlg).addEventListener('click', (e) => { const b = e.target.closest('[data-m]'); if (b) show(b.dataset.m); });
+  }
+  function show(m) {
+    $$('.rt-tabs .way-tab', rtDlg).forEach((b) => { b.classList.toggle('on', b.dataset.m === m); b.setAttribute('aria-selected', b.dataset.m === m); });
+    $('.rt-body', rtDlg).innerHTML = body(m);
+  }
+  show(mode);
+  showModal(rtDlg, opener);
 }
 
 /** The episode as a POMDP trajectory, with one real example: what the state, the observation and the action are in a
  *  RoboTwin 2.0 run (standard mode). Opens as a dialog over a fogged page, like the other demos. */
 let trajDlg;
 function trajDemo(opener) {
-  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!trajDlg) {
     trajDlg = document.createElement('div');
     trajDlg.className = 'ol-modal traj-modal';
@@ -952,7 +1103,7 @@ robot  = 2 × ALOHA arm (6 joints + gripper)
 engine = MuJoCo 3.14, CPU float64
 tick   = 2.5 ms, 10 ticks per control step</code></pre></figure>
           <figure><span class="traj-k">o<sub>t</sub></span><b>Observation</b><p>What the robot senses: an RGB image from each of its 4 cameras (480 × 848), z-depth on request, and its own state (72 proprioception columns).</p>
-            <div class="traj-img"><img src="${esc(site('media/ways/obs_head.jpg'))}" alt="The high camera's view: two arms hold the interlocked claws"><img src="${esc(site('media/ways/obs_front.jpg'))}" alt="The high camera later in the episode"></div>
+            <div class="traj-img"><img src="${esc(site('media/ways/obs_head.jpg?v=58e32b0f'))}" alt="The high camera's view: two arms hold the interlocked claws"><img src="${esc(site('media/ways/obs_front.jpg?v=3d817aff'))}" alt="The high camera later in the episode"></div>
             <small>the high camera at two moments, as the agent saw them; + depth (optional), + proprioception</small></figure>
           <figure><span class="traj-k">a<sub>t</sub></span><b>Action</b><p>What the simulator executes, in the robot’s own terms: <code>joint_position</code>, 14 numbers per row (6 joints and a gripper per arm), rows <i>dt</i> apart and streamed at 40 Hz with linear interpolation. Or <code>ee_pose</code>: 16 numbers per row, tool-frame targets solved by inverse kinematics.</p>
             <pre><code>A = rows of [q1 … q6, g | q1 … q6, g]   # (T, 14)
@@ -961,22 +1112,8 @@ r.submit("joint_position", A, dt=0.1)</code></pre></figure>
         <div class="way-foot"><span>RoboARC · Interlocked Claws 05 · standard · Codex · GPT-6 Astra</span><a class="btn small" href="${exam('run/')}?r=${encodeURIComponent('roboarc-interlocked-claws-05-i01-standard--vquy4fi')}">Watch the whole run <span class="arr">→</span></a></div>
       </div>`;
     document.body.append(trajDlg);
-    trajDlg.addEventListener('click', (e) => { if (!e.target.closest('.ol-card') || e.target.closest('.ol-x')) close(); });
   }
-  const onKey = (e) => { if (e.key === 'Escape') close(); };
-  function close() {
-    trajDlg.classList.remove('on');
-    document.documentElement.classList.remove('ol-lock');
-    removeEventListener('keydown', onKey);
-    setTimeout(() => { if (!trajDlg.classList.contains('on')) trajDlg.hidden = true; }, still() ? 0 : 320);
-    opener?.focus({ preventScroll: true });
-  }
-  trajDlg.hidden = false;
-  const card = $('.ol-card', trajDlg), b = opener?.getBoundingClientRect(), c = card.getBoundingClientRect();
-  if (b) card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
-  document.documentElement.classList.add('ol-lock');
-  requestAnimationFrame(() => trajDlg.classList.add('on'));
-  addEventListener('keydown', onKey);
+  showModal(trajDlg, opener);
 }
 
 /** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay) beside a few
@@ -1117,6 +1254,10 @@ function bigNumbers(el, ex) {
 
 /** Icons named in the markup: <span class="ic" data-icon="cube"></span>. */
 function fillIcons(root = document) {
+  $$('[data-gh]', root).forEach((el) => {
+    if (GITHUB_URL) el.href = GITHUB_URL; else { el.removeAttribute('href'); el.classList.add('soon'); el.setAttribute('aria-disabled', 'true'); el.title = 'Coming soon'; }
+    el.insertAdjacentHTML('afterbegin', GITHUB);
+  });
   $$('.ic[data-icon]', root).forEach((el) => { el.innerHTML = `<svg viewBox="0 0 24 24">${FF_ICONS[el.dataset.icon] || ''}</svg>`; });
 }
 
@@ -1289,17 +1430,17 @@ function makerMark(model) {
 /** One ranked row, shared by the home page and the leaderboard page: place (gold, silver, bronze), maker's mark, model
  *  and setting, the standard score as an ink bar (deeper for higher, relative to `best`), the privileged score as a grey
  *  hatched ghost behind it, and both numbers at the end. `part`: a smaller run, listed but not ranked. */
-function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false } = {}) {
+function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false, still = false } = {}) {
   const v = pctOf(sc.standard), p = pctOf(sc.privileged);
   const k = Math.round(38 + 62 * (v ?? 0) / Math.max(best || 0, 1));
   const frac = (x) => (x?.[1] ? `${x[0]} of ${x[1]}` : 'not sat');
-  return `<button type="button" class="lbh-row${part ? ' part' : ''}${open ? ' on' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}" aria-expanded="${open}"
+  return `<${still ? 'div' : 'button type="button"'} class="lbh-row${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
       aria-label="${esc(r.model)}: standard ${frac(sc.standard)}, privileged ${frac(sc.privileged)}">
     <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
     <span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small>${meta ? `<small class="lbh-meta">${meta}</small>` : ''}</span>
     <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%" title="Privileged: ${frac(sc.privileged)}"></span>` : ''}${v != null ? `<span class="lbh-s" style="--w:${v.toFixed(1)}%;--k:${k}%" title="Standard: ${frac(sc.standard)}"></span>` : ''}</span>
     <span class="lbh-val" style="--k:${k}%"><b>${v != null ? `${Math.round(v)}<small>%</small>` : '–'}</b>${p != null ? `<em>${Math.round(p)}%</em>` : '<em>–</em>'}</span>
-  </button>`;
+  </${still ? 'div' : 'button'}>`;
 }
 const LBH_KEY = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b>the robot’s own sensors, one go; deeper is higher</span>
   <span><i class="sw p"></i><b>Privileged</b>open book: the simulator’s inside and retries</span></div>`;
@@ -1311,7 +1452,7 @@ function lbhDetail(ex, r, sc, href = true) {
       <div class="lbh-pair"><span class="s"><b>${pc(sc.standard)}%</b>standard · ${sc.standard?.[0] ?? 0} of ${sc.standard?.[1] ?? 0}</span>
         <span class="p"><b>${pc(sc.privileged)}%</b>privileged · ${sc.privileged?.[0] ?? 0} of ${sc.privileged?.[1] ?? 0}</span></div>
       ${href ? `<a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
-    <p class="lbh-dk"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>each suite</p>${dbDetail(ex, r, { suites: sc.suites || {} })}</div>`;
+    <p class="lbh-dk"><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span>each suite</p>${suiteBars(ex, r, { suites: sc.suites || {} })}</div>`;
 }
 
 /** The leaderboard on the home page. The message is the standard mode, the exam itself: how much of it each agent solves
@@ -1347,7 +1488,7 @@ function homeBoard(el, ex) {
   });
 }
 
-/** The suites on the home page: a picture and a name each, and the ones on their way in. */
+/** The suites on the home page: a picture and a name each. */
 function gallery(el, ex) {
   if (!el) return;
   const items = ranked(ex).map((s) => {
@@ -1356,9 +1497,6 @@ function gallery(el, ex) {
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}</div><b>${esc(s.name)}</b>
       <span>${int(s.instances)} scenes · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
   });
-  const coming = (ex.incoming || []).length;
-  if (coming) items.push(`<a class="g-item more" href="${exam('suites/')}#on-the-way"><div class="img"><em>+${coming}</em></div><b>On the way in</b>
-    <span>${esc((ex.incoming || []).slice(0, 3).map((x) => x.name).join(', '))}${coming > 3 ? ' and more' : ''}</span></a>`);
   el.innerHTML = items.join('');
 }
 
@@ -1376,8 +1514,8 @@ async function home(ex) {
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=c7c60ac6').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
-  import('./sphere.js?v=1f034d4c').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=50ce7d17').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=bbdaf9c2').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {
@@ -1402,7 +1540,6 @@ async function suitesPage(ex) {
     suitesGrid($('#suites'), ex, state);
   });
   suitesGrid($('#suites'), ex, state);
-  incomingGrid($('#incoming'), ex);
 }
 
 async function suitePage(ex) {
@@ -1420,7 +1557,6 @@ async function suitePage(ex) {
     ['Scenes', `${int(s.instances)} frozen scenes · ${int(s.task_dirs)} tasks (${(Object.entries(s.modes || {}).filter(([, n]) => n).map(([m, n]) => `${n} ${m}`)).join(', ')})`],
     ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
     ['Agent time', (s.budgets_min || []).map((b) => `${b} min`).join(', ')],
-    ['Standard protocol', esc((s.protocols || []).join(', '))],
   ].filter(([, v]) => v);
   $('#suite-head').innerHTML = `
     <div class="suite-hero">
@@ -1434,17 +1570,19 @@ async function suitePage(ex) {
       <div><div class="cover frame">${cover ? (cover.video ? `<video src="${esc(site(cover.video))}" poster="${esc(site(cover.poster || ''))}" muted loop autoplay playsinline${crop ? ` class="${crop}"` : ''}></video>` : poster(cover, crop)) : `<div class="placeholder-art">${esc(s.code)}</div>`}</div>
         <table class="facts-table" style="margin-top:16px"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table></div>
     </div>`;
-  // results on this suite: a dumbbell per model, as on the leaderboard
+  // results on this suite: the leaderboard's ranked rows, standard first
   const rows = Object.entries(s.results || {}).filter(([, r]) => MODES.some((m) => r[m]?.done) || r.standard_reset?.done)
     .map(([id, r]) => [id, r, [r.privileged?.success || 0, r.privileged?.done || 0], [r.standard?.success || 0, r.standard?.done || 0]])
-    .sort((a, b) => (pctOf(b[2]) ?? -1) - (pctOf(a[2]) ?? -1) || (pctOf(b[3]) ?? -1) - (pctOf(a[3]) ?? -1));
-  $('#suite-results').innerHTML = rows.length ? DB_HEAD + rows.map(([id, r, pv, sv]) => {
+    .sort((a, b) => (pctOf(b[3]) ?? -1) - (pctOf(a[3]) ?? -1) || (pctOf(b[2]) ?? -1) - (pctOf(a[2]) ?? -1));
+  const best = rows.length ? pctOf(rows[0][3]) ?? 0 : 0;
+  let place = 0;
+  $('#suite-results').innerHTML = rows.length ? `${LBH_KEY}<div class="lbh-chart">${LBH_AXIS}<div class="lbh-rows">${rows.map(([id, r, pv, sv]) => {
     const run = runs[id] || { id, model: id };
     const reset = r.standard_reset?.done ? ` · <span class="rs">+${r.standard_reset.done} with resets, not counted</span>` : '';
-    return `<div class="db-row"><span class="rank">·</span>
-      <span class="who"><b>${esc(run.model)}</b><small>${whoLine(run)}</small><small class="meta">${int(pv[1] + sv[1])} questions${reset}</small></span>
-      ${dbTrack(pv[1] ? pv : null, sv[1] ? sv : null)}${dbGap(pv[1] ? pv : null, sv[1] ? sv : null)}</div>`;
-  }).join('') + '<p class="note">Everything each model sat in this suite. For a like-for-like comparison, see the leaderboard’s head-to-head view.</p>'
+    const part = !sv[1];
+    return lbhRow(run, { standard: sv[1] ? sv : null, privileged: pv[1] ? pv : null }, part ? 0 : ++place, best,
+      { part, still: true, meta: `${int(pv[1] + sv[1])} questions${reset}` });
+  }).join('')}</div></div><p class="lbh-hint">Everything each model sat in this suite. For a like-for-like comparison, see the <a class="link" href="${exam('leaderboard/')}">leaderboard</a>.</p>`
     : '<div class="empty-state">No model has sat this suite yet.</div>';
   const tasks = (await loadTasks()).filter((t) => t.suite === s.id);
   $('#suite-tasks-count').textContent = `${int(tasks.length)} scene${tasks.length === 1 ? '' : 's'}`;
@@ -1454,7 +1592,7 @@ async function suitePage(ex) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=c7c60ac6').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=50ce7d17').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
@@ -1471,7 +1609,7 @@ async function tasksPage(ex) {
 async function contributePage(ex) {
   const c = ex.contribute || {};
   const t = ex.totals || {};
-  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['clock', t.incoming, 'on their way in'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'questions']]);
+  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'questions']]);
   $$('[data-doc]').forEach((a) => {
     if (c.docs) { a.href = c.docs + a.dataset.doc; return; }
     // no public documents yet: cards keep their place on this page, inline mentions become plain text
@@ -1480,33 +1618,6 @@ async function contributePage(ex) {
   });
   const info = coverageInfo(ex);
   thinSpots($('#thin'), ex, info);
-  // the proposal form
-  const form = $('#proposal');
-  const fields = ['upstream', 'scope', 'oracle', 'verification', 'difficulty', 'images', 'size'];
-  const labels = { upstream: 'Upstream benchmark and version', scope: 'Scope', oracle: 'Oracle', verification: 'Verification and determinism', difficulty: 'Why it is hard', images: 'Images and resources', size: 'Expected pull request size' };
-  const md = () => {
-    const v = (k) => form.elements[k]?.value.trim() || '';
-    const who = [v('name'), v('affiliation'), v('email')].filter(Boolean).join(' · ');
-    return `# [proposal] ${v('benchmark') || '<benchmark>'}\n\n${who ? `Proposed by: ${who}\n\n` : ''}${fields.map((k) => `## ${labels[k]}\n\n${v(k) || '_(not filled in)_'}`).join('\n\n')}\n`;
-  };
-  const msg = $('.msg', form);
-  form.addEventListener('submit', (e) => e.preventDefault());
-  if (!c.proposal_issue) $('[data-act="issue"]', form).remove();
-  $('[data-act="issue"]', form)?.addEventListener('click', () => {
-    if (!c.proposal_issue) { msg.textContent = 'The proposal issue link is not set up.'; return; }
-    const u = new URL(c.proposal_issue);
-    u.searchParams.set('title', `[proposal] ${form.elements.benchmark.value.trim() || '<benchmark>'}`);
-    for (const k of fields) if (form.elements[k].value.trim()) u.searchParams.set(k, form.elements[k].value.trim());
-    window.open(u.toString(), '_blank', 'noopener');
-    msg.textContent = 'Opened a prefilled proposal issue.';
-  });
-  $('[data-act="copy"]', form).addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(md()); msg.textContent = 'Copied as Markdown.'; } catch (e) { msg.textContent = 'Could not copy; select the text by hand.'; }
-  });
-  const send = $('[data-act="form"]', form);
-  if (c.intake_form) send.addEventListener('click', () => window.open(c.intake_form, '_blank', 'noopener'));
-  else send.remove();
-  $('#contact').innerHTML = c.contact ? `Questions: <a class="link" href="mailto:${esc(c.contact)}">${esc(c.contact)}</a>` : '';
   // recognition (a draft for the maintainers while it says so)
   const rec = c.recognition;
   // the credit scheme is shown once the maintainers settle it (data: contribute.recognition.draft = false)
@@ -1811,7 +1922,7 @@ loadExam().then(async (raw) => {
   footer(ex);
   headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
-    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, notfound: async () => {} };
+    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blog: async () => {}, notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
   fillIcons();
   reveal();

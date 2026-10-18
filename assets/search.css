@@ -113,3 +113,10 @@ button.ts-c:hover { border-color: var(--ink); }
 .hs-all.on, .hs-all:hover { color: var(--ink); background: var(--bg-2); }
 .hs-note { padding: 10px; font: 500 12px/1.4 var(--mono); color: var(--ink-3); }
 @media (max-width: 760px) { .home-search { max-width: none; } }
+
+/* the task sets (core first), and the less used filters folded behind "More filters" (owners, 2026-10-18) */
+.ts-set { flex: none; }
+.ts-set button i { margin-left: 4px; font-style: normal; font-family: var(--mono); font-size: .85em; opacity: .7; }
+.ts-filters select.ts-more { display: none; }
+.ts-filters.more select.ts-more { display: block; }
+.ts-moreb { flex: none; }

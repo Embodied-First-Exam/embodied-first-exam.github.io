@@ -338,6 +338,13 @@ def main() -> int:
             print(f"wrote data/{name}: {len(text) / 1e6:.2f} MB")
     for p in problems:
         print("  ERROR", p, file=sys.stderr)
+    # each question's set, on the question itself so the Tasks page can filter before the Atlas loads: the easy set
+    # (docs/easy_set.toml of the exam's repository: reported apart) or the core set (owners, 2026-10-18)
+    if not problems:
+        for t, rec in zip(site, recs):
+            t["set"] = "easy" if rec["easy"] else "core"
+        (DATA / "tasks.json").write_text(json.dumps(site, ensure_ascii=False, separators=(",", ":")))
+        print(f"data/tasks.json: set written ({sum(t['set'] == 'core' for t in site)} core, {sum(t['set'] == 'easy' for t in site)} easy)")
 
     missing = [k for k in keys if not base[k]]
     shown = set(key_of)
