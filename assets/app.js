@@ -1130,7 +1130,7 @@ r.submit("joint_position", A, dt=0.1)</code></pre></figure>
 
 /** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay) beside a few
  *  lines of the code the agent wrote, quoted as it wrote them. */
-const WAY_ORDER = ['a', 'c', 'b'];   // the owner's order: direct control, train a model to control, code to control
+const WAY_ORDER = ['a', 'b', 'c'];   // the owner's order (2026-10-18): direct control, code to control, train a model to control
 const WAYS = {
   a: { tab: 'Direct Control', title: 'Direct control', vid: 'a_barkour', step: 10,
     line: 'A trot written by hand: a phase clock, a duty cycle and foot targets, turned into joint targets for every step.',
