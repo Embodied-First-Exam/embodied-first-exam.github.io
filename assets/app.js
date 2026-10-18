@@ -1548,13 +1548,18 @@ async function suitePage(ex) {
   const runs = runMap(ex);
   const cover = coverOf(s);
   const crop = cropFor(s.id, cover?.task);
-  const linkLabels = { paper: 'Paper', project_page: 'Project page', repository: 'Code', dataset: 'Dataset', documentation: 'Docs', challenge: 'Challenge', leaderboard: 'Upstream leaderboard', project: 'Project page', site: 'Project site' };
-  const ext = Object.entries(s.links || {}).filter(([k, v]) => v && linkLabels[k]).map(([k, v]) => `<a class="btn small" href="${esc(v)}">${linkLabels[k]} ↗</a>`).join('');
+  // the suite's own pages, always in this order: paper, website, code, then the rest (owners, 2026-10-18)
+  const L = s.links || {};
+  const ic = (n) => `<svg class="lk-ic" viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n]}</svg>`;
+  const ext = [['Paper', L.paper, ic('doc')], ['Website', L.website || L.project_page || L.project || L.site, '<svg class="lk-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 3.9 5.5 3.9 9s-1.3 6.5-3.9 9c-2.6-2.5-3.9-5.5-3.9-9S9.4 5.5 12 3z"/></svg>'],
+    ['Code', L.repository, `<span class="lk-gh" aria-hidden="true">${GITHUB}</span>`], ['Dataset', L.dataset], ['Docs', L.documentation],
+    ['Challenge', L.challenge], ['Upstream leaderboard', L.leaderboard]]
+    .filter(([, v]) => v).map(([label, v, icon]) => `<a class="btn small lk" href="${esc(v)}" target="_blank" rel="noopener">${icon || ''}${label} ↗</a>`).join('');
   const robots = (s.robots || []).map((r) => esc(r.name)).join(', ');
   const facts = [
     ['Origin', s.origin === 'ours' ? 'built by the lab' : `adapted from the upstream benchmark${s.edition ? ` (${esc(s.edition)})` : ''}`],
     ['Simulator', esc(s.simulator || '')], ['Robot', robots],
-    ['Scenes', `${int(s.instances)} frozen scenes · ${int(s.task_dirs)} tasks (${(Object.entries(s.modes || {}).filter(([, n]) => n).map(([m, n]) => `${n} ${m}`)).join(', ')})`],
+    ['Scenes', `${int(s.instances)} scenes`],   // no count per mode (owners, 2026-10-18)
     ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
     ['Agent time', (s.budgets_min || []).map((b) => `${b} min`).join(', ')],
   ].filter(([, v]) => v);
