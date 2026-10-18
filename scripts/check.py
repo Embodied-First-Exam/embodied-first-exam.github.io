@@ -16,6 +16,8 @@ REF = re.compile(r'(?:href|src)="([^"]+)"')
 FORBIDDEN = ["embodied-agent-interface", "runs/overview", "/runs/", "benchmarks/", "reference/capabilities", "github.com/JamesKrW",
              "robot_coding_bench", "internal preview", "log.json", "RoboPaint-strict", "robopaint-strict"]
 SKIP = ("http://", "https://", "mailto:", "#", "data:", "javascript:")
+# public addresses that contain a forbidden fragment by coincidence: removed from the text before the scan
+ALLOWED = ["huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/"]
 
 
 def exists(base: Path, ref: str) -> bool:
@@ -45,6 +47,8 @@ def main() -> int:
         json.loads(data)
     for f in [*pages, ROOT / "assets/app.js", ROOT / "assets/exam.css", ROOT / "data/exam.json", ROOT / "data/tasks.json"]:
         text = f.read_text(encoding="utf-8")
+        for ok in ALLOWED:
+            text = text.replace(ok, "")
         for bad in FORBIDDEN:
             if bad in text:
                 problems.append(f"{f.relative_to(ROOT)}: contains '{bad}'")

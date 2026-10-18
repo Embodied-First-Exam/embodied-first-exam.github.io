@@ -29,6 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 MEDIA = ROOT / "media"
+SITE_MEDIA = MEDIA / "ways"
 
 # data keys that hold addresses on other sites, or the private repository's task directory names; dropped wherever
 # they occur
@@ -188,7 +189,8 @@ def main() -> int:
         list(pool.map(lambda job: bring(*job), jobs))
     copied = len(jobs)
     wanted = {ROOT / p for p in rw.media}
-    stale = [f for f in MEDIA.rglob("*") if f.is_file() and f not in wanted]
+    # media/ways/ is the site's own (the home diagram's demos of how agents answer), not the source's: kept
+    stale = [f for f in MEDIA.rglob("*") if f.is_file() and f not in wanted and SITE_MEDIA not in f.parents]
     for f in stale:
         f.unlink()
     for d in sorted((d for d in MEDIA.rglob("*") if d.is_dir()), reverse=True):

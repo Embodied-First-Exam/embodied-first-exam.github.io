@@ -46,7 +46,7 @@ const MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
 
 function chrome() {
-  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['contribute', 'contribute/', 'Contribute']];
+  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['run', 'run/', 'Runs'], ['contribute', 'contribute/', 'Contribute']];
   const active = (n) => PAGE === n || (PAGE === 'suite' && n === 'suites');
   const nav = $('#nav');
   if (nav) {
@@ -350,11 +350,11 @@ function lbRules(el, ex) {
 /* ---------------------------------------------------------------------------------------------- suites */
 
 function suiteCard(ex, s) {
-  const cover = s.teaser || s.preview?.find((p) => p.cover) || s.preview?.find((p) => !p.still) || s.preview?.[0];
+  const cover = coverOf(s);
   const robot = s.robots?.[0]?.name || '';
   const more = (s.robots?.length || 0) > 1 ? ` and ${s.robots.length - 1} more` : '';
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
-    <div class="media">${cover ? poster(cover, CROPS[s.id]) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}</div>
+    <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}</div>
     <div class="body"><h4>${esc(s.name)}</h4><p>${esc(s.blurb || '')}</p>
       <div class="meta">${int(s.instances)} scenes · ${esc(robot)}${more}${s.origin === 'ours' ? ' · ours' : ''}</div></div></a>`;
 }
@@ -377,6 +377,13 @@ const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1':
 // suites whose demos are still multi-view grids: the crop shows one view. A suite leaves the list once its demos are
 // re-rendered as one view (MuJoCo Playground and RoboTwin 2.0, 2026-10-08: the old crop cut their new renders).
 const CROPS = { dextoolbench: 'crop-2x2' };
+// tasks of a cropped suite whose media is already one view (re-rendered since): shown whole
+const SINGLE_VIEW = new Set(['dextoolbench/hammer_claw_hammer_swing_side']);
+const cropFor = (suite, task) => (SINGLE_VIEW.has(`${suite}/${task}`) ? '' : CROPS[suite] || '');
+/** A suite's cover: its teaser, else a preview marked as cover, else (for a cropped suite) one already re-rendered as one view,
+ *  else the first preview with motion, else the first. */
+const coverOf = (s) => s.teaser || s.preview?.find((p) => p.cover)
+  || (CROPS[s.id] && s.preview?.find((p) => SINGLE_VIEW.has(`${s.id}/${p.task}`))) || s.preview?.find((p) => !p.still) || s.preview?.[0];
 
 function suitesGrid(el, ex, filter = {}) {
   const runs = runMap(ex);
@@ -466,12 +473,33 @@ const stateWord = (c) => STATE_WORD[c] || 'not run';
 
 function taskCard(ex, t, runs) {
   const s = ex._suites[t.suite];
-  const crop = CROPS[t.suite];
+  const crop = cropFor(t.suite, t.id);
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
-    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}</div>
+    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${WATCH.has(`${t.suite}/${t.id}`) ? '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>' : ''}</div>
     <div class="body"><h4>${esc(t.title)}</h4>
       ${runs.length ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
+
+// Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-media (runs/), or a local runlog/ folder
+// when one is there (previews). Decided once, by asking for the local index.
+const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/';
+let runBaseP;
+const runBase = () => (runBaseP ??= fetch(exam('runlog/index.json'), { method: 'HEAD', cache: 'no-cache' })
+  .then((r) => (r.ok ? exam('runlog/') : RUNS_REMOTE)).catch(() => RUNS_REMOTE));
+let RUN_BASE = RUNS_REMOTE;
+const runURL = (p) => RUN_BASE + p;
+const runJSON = async (p) => { RUN_BASE = await runBase(); const r = await fetch(runURL(p)); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
+let runIndexP, WATCH = new Set();
+const markWatchable = (root = document) => $$('.task-card', root).forEach((c) => {
+  if (WATCH.has(c.dataset.task) && !$('.watch-mark', c)) $('.media', c)?.insertAdjacentHTML('beforeend', '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>');
+});
+/** Runs that can be watched step by step, by the site's "<suite>/<task id>": runlog/index.json, fetched once. */
+const watchable = () => (runIndexP ??= runJSON('index.json').then((d) => {
+  const m = new Map();
+  for (const r of d.runs || []) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
+  WATCH = new Set(m.keys());
+  return m;
+}).catch(() => new Map()));
 
 function openTask(ex, t, runs) {
   const s = ex._suites[t.suite] || {};
@@ -511,7 +539,14 @@ function openTask(ex, t, runs) {
     ${res ? `<table class="res-table"><thead><tr><th>Model</th><th>Privileged</th><th>Standard</th></tr></thead><tbody>${res}</tbody></table>` : '<p class="muted">No agent has run this task yet.</p>'}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
-    <div class="link-list"><a class="btn small" href="${exam('suite/')}?id=${s.id}">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
+    <div class="link-list" id="drawer-links"><a class="btn small" href="${exam('suite/')}?id=${s.id}">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
+  watchable().then((m) => {
+    const mine = m.get(`${t.suite}/${t.id}`) || [];
+    if (!mine.length || !$('#drawer-links')) return;
+    $('#drawer-links').insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
+    const media = $('#drawer .media');
+    if (media) media.insertAdjacentHTML('afterend', `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`);
+  });
   document.body.classList.add('drawer-open');
   const u = new URL(location.href);
   u.searchParams.set('task', `${t.suite}/${t.id}`);
@@ -536,6 +571,7 @@ function drawerShell() {
 function taskBrowser(el, ex, tasks, opts = {}) {
   const runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
   drawerShell();
+  watchable().then(() => markWatchable(el));
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
   const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60,
     tags: (opts.suite ? '' : Q.get('tags') || '').split(',').filter((x) => ex._tags[x]) };
@@ -678,7 +714,7 @@ function heroWall(ex) {
   }
   const tile = (t) => {
     const s = ex._suites[t.suite];
-    const crop = CROPS[t.suite] ? ` class="${CROPS[t.suite]}"` : '';
+    const crop = cropFor(t.suite, t.id) ? ` class="${cropFor(t.suite, t.id)}"` : '';
     const video = t.video && !phone && !still ? `<video muted loop playsinline preload="none" data-src="${esc(site(t.video))}"${crop}></video>` : '';
     return `<a class="wt" data-suite="${esc(t.suite)}" href="${exam('tasks/')}?task=${encodeURIComponent(`${t.suite}/${t.id}`)}" tabindex="-1">
       <img src="${esc(site(t.poster))}" alt="" loading="lazy" decoding="async"${crop}>${video}
@@ -773,7 +809,7 @@ function heroWall(ex) {
 function headWall(ex) {
   const head = $('.page-head');
   const tiles = ex.hero?.tiles || [];
-  if (!head || PAGE === 'suite' || !tiles.length || innerWidth < 760) return;
+  if (!head || PAGE === 'suite' || PAGE === 'run' || !tiles.length || innerWidth < 760) return;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // a page's own order: a seeded shuffle, then look-alikes spread apart
   let seed = [...PAGE].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -783,7 +819,7 @@ function headWall(ex) {
   const cols = Array.from({ length: n }, (_, c) => pool.slice(c * per, c * per + per));
   const tile = (t) => {
     const s = ex._suites[t.suite];
-    const crop = CROPS[t.suite] ? ` class="${CROPS[t.suite]}"` : '';
+    const crop = cropFor(t.suite, t.id) ? ` class="${cropFor(t.suite, t.id)}"` : '';
     return `<a class="wt" href="${exam('tasks/')}?task=${encodeURIComponent(`${t.suite}/${t.id}`)}" tabindex="-1">
       <img src="${esc(site(t.poster))}" alt="" loading="lazy" decoding="async"${crop}>
       <span class="tag">${esc(s?.code || '')}</span><span class="ttl">${esc(s?.name || '')} · ${esc(t.title)}</span></a>`;
@@ -864,7 +900,7 @@ function taxonomyMap(el, panel, ex) {
       <p>The most common mix: <b>${mix.ids.map((id) => esc(tag(id).name.split(' & ')[0])).join(', ').replace(/, ([^,]*)$/, ' and $1')}</b>, in ${int(mix.n)} questions.</p></div>` : ''}
     <div class="tm-legend" aria-hidden="true">${legend}<span class="cap">questions per dot</span></div>
     <p class="tm-hint">Point at a dot to see its questions; click it to open them.</p>`;
-  const shots = (list) => (list?.length ? `<div class="tm-ex">${list.slice(0, 3).map((e) => `<a href="${exam('tasks/')}?task=${encodeURIComponent(`${e.s}/${e.id}`)}" title="${esc(e.t)}"><img src="${esc(site(e.p))}" alt="" loading="lazy"${CROPS[e.s] ? ` class="${CROPS[e.s]}"` : ''}><span>${esc(ex._suites[e.s]?.code || '')}</span></a>`).join('')}</div>` : '');
+  const shots = (list) => (list?.length ? `<div class="tm-ex">${list.slice(0, 3).map((e) => `<a href="${exam('tasks/')}?task=${encodeURIComponent(`${e.s}/${e.id}`)}" title="${esc(e.t)}"><img src="${esc(site(e.p))}" alt="" loading="lazy"${cropFor(e.s, e.id) ? ` class="${cropFor(e.s, e.id)}"` : ''}><span>${esc(ex._suites[e.s]?.code || '')}</span></a>`).join('')}</div>` : '');
   panel.innerHTML = idle;
   const show = (target) => {
     $$('.on, .hrow, .hcol', el).forEach((x) => x.classList.remove('on', 'hrow', 'hcol'));
@@ -920,96 +956,172 @@ const FF_ICONS = {
   venn: '<circle cx="9" cy="9.5" r="5.5"/><circle cx="15" cy="9.5" r="5.5"/><circle cx="12" cy="14.5" r="5.5"/>',
   pair: '<circle cx="6.5" cy="12" r="3.5"/><circle cx="17.5" cy="12" r="3.5"/><path d="M10 12h4"/>',
   target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" class="fill"/>',
+  cloud: '<path d="M7 18.5h10.5a4 4 0 0 0 .6-8 6 6 0 0 0-11.5-1.4A4.5 4.5 0 0 0 7 18.5z"/>',
+  camera: '<rect x="2.5" y="6.5" width="19" height="13" rx="3"/><path d="M8.5 6.5l1.5-2.5h4l1.5 2.5"/><circle cx="12" cy="13" r="3.4"/>',
+  code: '<path d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5M13.5 5l-3 14"/>',
+  net: '<circle cx="5" cy="7" r="1.8"/><circle cx="5" cy="17" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/><circle cx="19" cy="12" r="1.8"/><path d="M6.7 7.6l3.6 3.6M6.7 6.4l3.6-1M6.7 16.4l3.6-3.6M6.7 17.6l3.6 1M13.8 5.7l3.6 5.4M13.8 12h3.4M13.8 18.3l3.6-5.4"/>',
+  mix: '<path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c4 0 6-10 10-10h4"/><path d="M18.5 4.5L21 7l-2.5 2.5M18.5 14.5L21 17l-2.5 2.5"/>',
+  wave: '<path d="M2.5 12c2-5 4-5 6 0s4 5 6 0 4-5 6.5 0"/>',
+  eyeoff: '<path d="M3 12s3.5-6.5 9-6.5S21 12 21 12s-3.5 6.5-9 6.5S3 12 3 12z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/>',
   podium: '<path d="M3 20.5h18M5 20.5v-6h4v6M10 20.5V9h4v11.5M15 20.5v-8h4v8"/><path d="M12 3.5l.9 1.8 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z"/>',
 };
-const ffIcon = (name, x, y, size = 40, cls = '') => `<g class="ff-ic ${cls}" transform="translate(${x} ${y}) scale(${(size / 24).toFixed(4)})">${FF_ICONS[name]}</g>`;
-const ffText = (x, y, text, cls, anchor = 'start') => `<text x="${x}" y="${y}" class="${cls}" text-anchor="${anchor}">${esc(text)}</text>`;
-const ffArrowDefs = (id) => `<defs><marker id="${id}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-  <path d="M0.5 1L9 5 0.5 9z" class="ff-head"/></marker></defs>`;
-const ffSnowBadge = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="10" class="ff-badge"/>${ffIcon('snow', cx - 7, cy - 7, 14, 'std')}`;
-const ffResults = (x, y) => `<rect class="ff-res ok" x="${x}" y="${y}" width="72" height="34" rx="17"/>${ffText(x + 36, y + 22, '✓  1', 'ff-res-t ok', 'middle')}
-  <rect class="ff-res no" x="${x + 82}" y="${y}" width="72" height="34" rx="17"/>${ffText(x + 118, y + 22, '✗  0', 'ff-res-t', 'middle')}`;
 
-/** How a question is marked, drawn: the question forks into the two ways to sit it, both answers are replayed and
- *  marked, every attempt is recorded. One drawing for wide screens, one stacked for phones. */
-function flowDiagram(el) {
+/** How a question is marked, as a stack of layers inside Harbor: the model, the harness, the agent's code, the interface
+ *  (standard: the robot API behind a locked wall; privileged: the simulator's API), the simulators. The question enters
+ *  twice (its goal is the harness's prompt, its frozen scene is loaded into the simulator); the verifier marks what the
+ *  interface recorded. One row style, colour only for the two modes; details in the tooltips. */
+function flowDiagram(el, ex) {
   if (!el) return;
-  const A = 'url(#ff-a-d)', B = 'url(#ff-a-m)';
-  const wide = `<svg class="ff ff-d" viewBox="0 0 1280 520" role="img" aria-label="How a question is marked: the question, sat privileged or standard, replayed and marked, then recorded">${ffArrowDefs('ff-a-d')}
-    <path class="ff-link" d="M197 260C232 260 228 120 262 120" marker-end="${A}"/><path class="ff-link" d="M197 260C232 260 228 400 262 400" marker-end="${A}"/>
-    <path class="ff-link" d="M682 120C726 120 726 260 768 260" marker-end="${A}"/><path class="ff-link" d="M682 400C726 400 726 260 768 260" marker-end="${A}"/>
-    <path class="ff-link" d="M1020 260H1078" marker-end="${A}"/>
+  const t = ex?.totals || {};
+  const ic = (n, cls = '') => `<svg class="fx-ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n]}</svg>`;
+  const run = (slug) => `${exam('run/')}?r=${encodeURIComponent(slug)}`;
+  const way = (k, txt, tip, slug) => `<a class="fx-way" href="${run(slug)}" data-way="${k}" title="${esc(tip)} Click to see it in a real run."><i>${k}</i>${esc(txt)}</a>`;
+  const layer = (row, name, icon, body, tip, cls = '') => `<div class="fx-layer ${cls}" style="grid-row:${row}" title="${esc(tip)}"><span class="fx-ln">${ic(icon)}${name}</span><div class="fx-lb">${body}</div></div>`;
+  const sims = ['MuJoCo', 'Isaac Sim', 'OmniGibson', 'SAPIEN', 'Genesis'];
+  el.innerHTML = `<div class="fx"><span class="fx-tag">Harbor · one command</span>
+    <div class="fx-grid">
+      <div class="fx-qcard" style="grid-row:1 / 6"></div><span class="fx-qh" style="grid-row:1">${ic('snow')}Question</span>
+      <div class="fx-twin" style="grid-row:3 / 5" title="Each question ships twice, standard and privileged, on one frozen scene with one success rule, the same seeds and the same time limit, so the two marks compare">
+        <span class="fx-tw">${ic('pair')}two twins</span><span class="fx-tm s">standard</span><span class="fx-tm p">privileged</span><small>same scene · rule · time</small></div>
+      <div class="fx-in" style="grid-row:2" title="The goal written for a person, with every convention the agent cannot guess: the harness’s prompt">${ic('doc')}<span>goal in words</span></div>
+      <i class="fx-arrow" style="grid-row:2"></i>
+      <div class="fx-in" style="grid-row:5" title="A simulation scene rebuilt bit for bit and checked against its starting state">${ic('cube')}<span>frozen scene</span></div>
+      <i class="fx-arrow" style="grid-row:5"></i>
+      ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
+      ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the question is its prompt; web search off')}
+      ${layer(3, 'Agent’s code', 'code', `${way('a', 'actions', 'Joint targets written directly: keyframes, interpolation, gaits.', 'mujoco_playground_barkour_joystick-privileged--dycu4ar')}${way('b', 'IK script', 'Targets from vision or state, inverse kinematics, a joint path.', 'robotwin_2_0_stack_blocks_three-standard--5vbeb5g')}${way('c', 'policy', 'A reward, parallel simulations, a trained network rolled out.', 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za')}${way('d', 'mix', 'IK, camera feedback, search and learning combined.', 'roboolympics-dunk-i00-privileged--wmry4fr')}`, 'Whatever the agent writes: the answer is code')}
+      <div class="fx-layer fx-if" style="grid-row:4"><span class="fx-ln">${ic('layers')}Interface</span>
+        <div class="fx-half s" title="Standard, the exam: the robot runs in a service the agent cannot open; only the robot API answers. Never given: object poses, segmentation, contact forces, the success check.">
+          <span class="fx-lock">${ic('lock')}</span><div><b>Standard</b><span>robot API · RGB-D · joints · FK/IK</span></div>
+          <em title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
+        <div class="fx-half p" title="Privileged, the reference: agent and simulator share one container"><span class="fx-lock p">${ic('cube')}</span><div><b>Privileged</b><span>sim API · full state · resets</span></div></div>
+      </div>
+      ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.simulators || 20)} · ${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
+      <i class="fx-arrow out" style="grid-row:4"><em>episode<br>trajectory</em></i>
+      <div class="fx-orch" title="Harbor runs each trial: it builds and starts the question’s containers, installs the harness, starts the clock, stops the agent at the limit, collects the answer and runs the verifier">
+        <span class="fx-vh">${ic('layers')}Harbor</span>
+        <div class="fx-vi">${ic('sandbox')}builds containers</div>
+        <div class="fx-vi">${ic('terminal')}installs harness</div>
+        <div class="fx-vi">${ic('clock')}time limit</div>
+      </div>
+      <div class="fx-ver" title="Its own sandbox, no network">
+        <span class="fx-vh">${ic('shield')}Verifier</span>
+        <div class="fx-vi s" title="Standard: the service judges the live episode it ran">${ic('rec', 's')}live verdict</div>
+        <div class="fx-vi p" title="Privileged: replayed twice in a fresh simulator; both replays must end in the same state">${ic('replay', 'p')}replay ×2</div>
+        <div class="fx-res"><b>1</b><span>0</span></div>
+        <div class="fx-rec" title="Every step, its tokens and cost, and a video">${ic('log')}steps · cost · video</div>
+      </div>
+    </div>
+  </div>`;
+  $$('.fx-way', el).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); wayDemo(a.dataset.way, a); }));
+}
 
-    <rect class="ff-node" x="1" y="170" width="196" height="180" rx="20"/>
-    ${ffIcon('cube', 26, 196, 38)}${ffSnowBadge(62, 200)}${ffIcon('doc', 82, 196, 38)}
-    ${ffText(26, 276, 'Question', 'ff-title')}${ffText(26, 302, 'A frozen scene', 'ff-sub')}${ffText(26, 322, 'and a goal', 'ff-sub')}
-
-    <rect class="ff-lane p" x="262" y="40" width="420" height="160" rx="20"/>
-    ${ffText(284, 70, 'PRIVILEGED', 'ff-tag p')}${ffText(371, 70, 'privileged', 'ff-tag-sub')}${ffText(574, 80, 'one container', 'ff-mini', 'end')}
-    <rect class="ff-box" x="284" y="86" width="290" height="96" rx="14"/>
-    ${ffIcon('terminal', 306, 102, 40)}${ffText(326, 166, 'agent', 'ff-label', 'middle')}
-    ${ffIcon('cube', 512, 102, 40)}${ffText(532, 166, 'simulator', 'ff-label', 'middle')}
-    <path class="ff-thin" d="M356 122H502" marker-start="${A}" marker-end="${A}"/>${ffText(429, 114, 'full state · resets', 'ff-mini', 'middle')}
-    <path class="ff-thin" d="M576 122H598" marker-end="${A}"/>${ffIcon('traj', 604, 102, 40, 'p')}${ffText(624, 166, 'trajectory', 'ff-label', 'middle')}
-
-    <rect class="ff-pill" x="322" y="246" width="300" height="28" rx="14"/>${ffText(472, 265, '1 hour · 100M/10M tokens · no web search', 'ff-mini strong', 'middle')}
-
-    <rect class="ff-lane s" x="262" y="320" width="420" height="160" rx="20"/>
-    ${ffText(284, 350, 'STANDARD', 'ff-tag s')}${ffText(383, 350, 'standard', 'ff-tag-sub')}${ffText(576, 360, 'separate service', 'ff-mini', 'end')}
-    <rect class="ff-box" x="284" y="366" width="104" height="96" rx="14"/>${ffIcon('terminal', 316, 382, 40)}${ffText(336, 446, 'agent', 'ff-label', 'middle')}
-    <rect class="ff-box" x="472" y="366" width="104" height="96" rx="14"/>${ffIcon('arm', 504, 382, 40)}${ffText(524, 446, 'robot', 'ff-label', 'middle')}
-    <path class="ff-wall" d="M430 370V458"/>
-    <path class="ff-thin" d="M392 392H466" marker-end="${A}"/>${ffText(430, 385, 'actions', 'ff-mini halo-s', 'middle')}
-    <path class="ff-thin" d="M466 438H392" marker-end="${A}"/>${ffText(430, 455, 'images', 'ff-mini halo-s', 'middle')}
-    <circle cx="430" cy="415" r="12" class="ff-badge"/>${ffIcon('lock', 422, 407, 16)}
-    <path class="ff-thin" d="M578 414H598" marker-end="${A}"/>${ffIcon('rec', 604, 382, 40, 's')}${ffText(624, 446, 'episode', 'ff-label', 'middle')}
-
-    <rect class="ff-node strong" x="768" y="130" width="252" height="260" rx="20"/>
-    ${ffText(792, 168, 'Marking', 'ff-title')}
-    ${ffIcon('replay', 792, 186, 36)}${ffText(840, 202, 'fresh simulator', 'ff-label')}${ffText(840, 220, 'replayed twice', 'ff-sub')}
-    <path class="ff-thin" d="M810 228V244" marker-end="${A}"/>
-    ${ffIcon('shield', 792, 248, 36)}${ffText(840, 264, 'verifier', 'ff-label')}${ffText(840, 282, 'in its own sandbox', 'ff-sub')}
-    <path class="ff-thin" d="M810 290V306" marker-end="${A}"/>
-    ${ffResults(792, 312)}${ffText(792, 368, 'by the suite’s rule', 'ff-sub')}
-
-    <rect class="ff-node" x="1080" y="170" width="198" height="180" rx="20"/>
-    ${ffIcon('log', 1104, 196, 38)}${ffText(1104, 276, 'Record', 'ff-title')}${ffText(1104, 302, 'Every attempt', 'ff-sub')}${ffText(1104, 322, 'logged in full', 'ff-sub')}
-  </svg>`;
-  const tall = `<svg class="ff ff-m" viewBox="0 0 360 1000" role="img" aria-label="How a question is marked">${ffArrowDefs('ff-a-m')}
-    <path class="ff-link" d="M180 111V124"/><path class="ff-link" d="M180 150C180 172 92 166 92 188" marker-end="${B}"/><path class="ff-link" d="M180 150C180 172 268 166 268 188" marker-end="${B}"/>
-    <path class="ff-link" d="M92 522C92 556 180 548 180 586" marker-end="${B}"/><path class="ff-link" d="M268 522C268 556 180 548 180 586" marker-end="${B}"/>
-    <path class="ff-link" d="M180 832V876" marker-end="${B}"/>
-
-    <rect class="ff-node" x="20" y="1" width="320" height="110" rx="18"/>
-    ${ffIcon('cube', 40, 30, 34)}${ffSnowBadge(72, 32)}${ffIcon('doc', 86, 30, 34)}
-    ${ffText(140, 52, 'Question', 'ff-title')}${ffText(140, 76, 'A frozen scene and a goal', 'ff-sub')}
-    <rect class="ff-pill" x="44" y="124" width="272" height="26" rx="13"/>${ffText(180, 141, '1 hour · 100M/10M tokens · no search', 'ff-mini strong', 'middle')}
-
-    <rect class="ff-lane p" x="10" y="190" width="164" height="332" rx="18"/>${ffText(24, 214, 'PRIVILEGED', 'ff-tag p')}
-    <rect class="ff-box" x="24" y="226" width="136" height="186" rx="14"/>
-    ${ffIcon('terminal', 72, 238, 40)}${ffText(92, 292, 'agent', 'ff-label', 'middle')}
-    <path class="ff-thin" d="M92 300V326" marker-start="${B}" marker-end="${B}"/>
-    ${ffIcon('cube', 72, 334, 40)}${ffText(92, 390, 'simulator', 'ff-label', 'middle')}${ffText(92, 404, 'one container', 'ff-mini', 'middle')}
-    <path class="ff-thin" d="M92 414V432" marker-end="${B}"/>${ffIcon('traj', 72, 438, 40, 'p')}${ffText(92, 500, 'trajectory', 'ff-label', 'middle')}
-
-    <rect class="ff-lane s" x="186" y="190" width="164" height="332" rx="18"/>${ffText(200, 214, 'STANDARD', 'ff-tag s')}
-    <rect class="ff-box" x="200" y="226" width="136" height="70" rx="14"/>${ffIcon('terminal', 250, 236, 34)}${ffText(268, 288, 'agent', 'ff-label', 'middle')}
-    <path class="ff-wall" d="M206 318H330"/>
-    <path class="ff-thin" d="M240 300V336" marker-end="${B}"/><path class="ff-thin" d="M296 336V300" marker-end="${B}"/>
-    <circle cx="268" cy="318" r="11" class="ff-badge"/>${ffIcon('lock', 261, 311, 14)}
-    <rect class="ff-box" x="200" y="340" width="136" height="72" rx="14"/>${ffIcon('arm', 251, 346, 34)}${ffText(268, 402, 'robot', 'ff-label', 'middle')}
-    <path class="ff-thin" d="M268 414V432" marker-end="${B}"/>${ffIcon('rec', 248, 438, 40, 's')}${ffText(268, 500, 'episode', 'ff-label', 'middle')}
-
-    <rect class="ff-node strong" x="20" y="588" width="320" height="244" rx="18"/>
-    ${ffText(44, 622, 'Marking', 'ff-title')}
-    ${ffIcon('replay', 44, 640, 34)}${ffText(90, 654, 'fresh simulator', 'ff-label')}${ffText(90, 672, 'replayed twice', 'ff-sub')}
-    ${ffIcon('shield', 44, 698, 34)}${ffText(90, 712, 'verifier', 'ff-label')}${ffText(90, 730, 'in its own sandbox', 'ff-sub')}
-    ${ffResults(44, 758)}${ffText(210, 780, 'by the suite’s rule', 'ff-sub')}
-
-    <rect class="ff-node" x="20" y="878" width="320" height="110" rx="18"/>
-    ${ffIcon('log', 44, 906, 34)}${ffText(96, 930, 'Record', 'ff-title')}${ffText(96, 954, 'Every attempt logged in full', 'ff-sub')}
-  </svg>`;
-  el.innerHTML = wide + tall;
+/** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay) beside a few
+ *  lines of the code the agent wrote, quoted as it wrote them. */
+const WAYS = {
+  a: { tab: 'actions', title: 'Write the actions', vid: 'a_barkour', step: 10,
+    line: 'A trot written by hand: a phase clock, a duty cycle and foot targets, turned into joint targets for every step.',
+    slug: 'mujoco_playground_barkour_joystick-privileged--dycu4ar', who: 'MuJoCo Playground · Barkour joystick · privileged · Codex · GPT-6 Astra',
+    code: `for t in range(1000):
+  ...
+  phase=((t*dt-p.get('start',.10))/T+offsets)%1
+  stance=(phase<duty) if t*dt>=p.get('start',.10) else np.ones(4,dtype=bool)
+  feet=d.site_xpos[footids].copy()
+  for i in range(4):
+   mujoco.mj_jacSite(m,d,jacs[i],jr,int(footids[i]))` },
+  b: { tab: 'IK script', title: 'Script it with inverse kinematics', vid: 'b_stack_blocks', step: 9,
+    line: 'Gripper poses for each arm, sent as end-effector targets; depth and video after every move to check the blocks.',
+    slug: 'robotwin_2_0_stack_blocks_three-standard--5vbeb5g', who: 'RoboTwin 2.0 · Stack three blocks · standard · Codex · GPT-6 Astra',
+    code: `    rot=Rotation.from_quat(np.array(q)[[1,2,3,0]]).as_matrix()
+    a[j:j+3]=np.array(xyz)-.12*rot[:,0]; a[j+3:j+7]=q; a[j+7]=grip
+    obs=r.submit('ee_pose',[a],include_depth=True,video='mp4',note=note)
+    ...
+def watch(t=.6):
+    obs=r.get_obs(seconds=t,include_depth=True)` },
+  c: { tab: 'policy', title: 'Train a policy', vid: 'c_hurdle', step: 15,
+    line: 'A neural controller trained from scratch on parallel rollouts with taller and taller hurdles, then refined by rollout search.',
+    slug: 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za', who: 'HumanoidBench · Hurdle · privileged · Codex · GPT-6 Astra',
+    code: `class Agent(nn.Module):
+ def __init__(self):
+  super().__init__();self.actor=nn.Sequential(nn.Linear(74,128),nn.ELU(),…,nn.Linear(128,19))
+  …
+   delta=rw[t]+.99*vv*(1-nd)-va[t];last=delta+.99*.95*(1-nd)*last;adv[t]=last
+  …
+  for epoch in range(5):` },
+  d: { tab: 'mix', title: 'Mix them', vid: 'd_dunk', step: 15,
+    line: 'Its own inverse kinematics by least squares for the arm, combined with a search over the jump and the throw.',
+    slug: 'roboolympics-dunk-i00-privileged--wmry4fr', who: 'RoboOlympics · Dunk · privileged · Codex · GPT-6 Astra',
+    code: `from scipy.optimize import least_squares
+...
+def fun(x):
+ d.qpos[ix]=x;mujoco.mj_kinematics(m,d)
+ b=r.mount['right']; ball=d.xpos[b]+d.xmat[b].reshape(3,3)@np.array([0,0,.2245])
+ return np.r_[(ball-np.array([.18,0,2.48]))*10, .02*(x-np.array([-3,0,0,1.57,0,0,0]))]` },
+};
+/** A little Python colouring for the quoted code: keywords, strings, numbers, comments, calls. */
+function pyHL(src) {
+  const KW = /^(def|class|return|for|in|if|else|elif|while|import|from|as|with|not|and|or|None|True|False|lambda|self|super)$/;
+  return src.split('\n').map((line) => {
+    const out = [];
+    const re = /(#.*$)|('[^']*'|"[^"]*")|(\b\d+(?:\.\d+)?\b|\.\d+)|([A-Za-z_]\w*)(?=\s*\()|([A-Za-z_]\w*)|([^A-Za-z_\d#'"]+)/g;
+    let m;
+    while ((m = re.exec(line))) {
+      const [t, com, str, num, call, word] = m;
+      if (com) out.push(`<span class="hl-c">${esc(com)}</span>`);
+      else if (str) out.push(`<span class="hl-s">${esc(str)}</span>`);
+      else if (num) out.push(`<span class="hl-n">${esc(num)}</span>`);
+      else if (call) out.push(KW.test(call) ? `<span class="hl-k">${esc(call)}</span>` : `<span class="hl-f">${esc(call)}</span>`);
+      else if (word) out.push(KW.test(word) ? `<span class="hl-k">${esc(word)}</span>` : esc(word));
+      else out.push(esc(t));
+    }
+    return out.join('');
+  }).join('\n');
+}
+let wayDlg;
+async function wayDemo(k, opener) {
+  const w = WAYS[k]; if (!w) return;
+  if (!wayDlg) {
+    wayDlg = document.createElement('div');
+    wayDlg.className = 'ol-modal way-modal';
+    wayDlg.hidden = true;
+    document.body.append(wayDlg);
+    wayDlg.addEventListener('click', (e) => { if (!e.target.closest('.ol-card') || e.target.closest('.ol-x')) close(); });
+  }
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  function close() {
+    wayDlg.classList.remove('on');
+    document.documentElement.classList.remove('ol-lock');
+    removeEventListener('keydown', onKey);
+    $('video', wayDlg)?.pause();
+    setTimeout(() => { if (!wayDlg.classList.contains('on')) wayDlg.hidden = true; }, still() ? 0 : 320);
+    opener?.focus({ preventScroll: true });
+  }
+  const tabs = Object.entries(WAYS).map(([key, x]) => `<button type="button" class="way-tab${key === k ? ' on' : ''}" data-k="${key}"><i>${key}</i>${esc(x.tab)}</button>`).join('');
+  wayDlg.innerHTML = `<div class="ol-fog"></div>
+    <div class="ol-card way-card" role="dialog" aria-modal="true" aria-labelledby="way-title">
+      <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="way-tabs">${tabs}</div>
+      <h3 id="way-title"><span class="way-k">${k}</span>${esc(w.title)}</h3>
+      <p class="ol-sub">${esc(w.line)}</p>
+      <div class="way-body">
+        <figure class="way-vid"><video src="${esc(site(`media/ways/${w.vid}.mp4`))}" poster="${esc(site(`media/ways/${w.vid}.jpg`))}" autoplay muted loop playsinline></video>
+          <figcaption>This run, rendered</figcaption></figure>
+        <figure class="way-code"><pre><code>${pyHL(w.code)}</code></pre><figcaption>The agent’s own code, step ${w.step}</figcaption></figure>
+      </div>
+      <div class="way-foot"><span>${esc(w.who)}</span><a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(w.slug)}">Watch the whole run <span class="arr">→</span></a></div>
+    </div>`;
+  $$('.way-tab', wayDlg).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); wayDemo(b.dataset.k, opener); }));
+  if (wayDlg.hidden) {
+    wayDlg.hidden = false;
+    const card = $('.ol-card', wayDlg), b = opener?.getBoundingClientRect(), c = card.getBoundingClientRect();
+    if (b) card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
+    document.documentElement.classList.add('ol-lock');
+    requestAnimationFrame(() => wayDlg.classList.add('on'));
+    addEventListener('keydown', onKey);
+  } else {
+    wayDlg.classList.add('on');
+  }
 }
 
 /** What keeps the marks honest: one icon and a few words each, the sentence on hover or focus. */
@@ -1052,7 +1164,8 @@ function heroRun(el, ex) {
   el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
-    <p class="hr-note">One line runs all ${int(ex.totals?.task_dirs)} questions. <a href="#run">Change one argument <span class="arr">↓</span></a></p>`;
+    <p class="hr-note">One line runs all ${int(ex.totals?.task_dirs)} questions. <button type="button" class="ol-open" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Change one argument</button></p>`;
   const code = $('.hr-cmd', el);
   code.setAttribute('aria-label', cmd);
   const done = () => { code.innerHTML = paint(cmd); };
@@ -1070,11 +1183,12 @@ function heroRun(el, ex) {
   });
 }
 
-/** Run it in one line: the command that sits the whole exam, typed out once, and switches that each add or drop one
- *  argument. Counts come from the exam's own numbers. harbor's -i takes any of several globs, so a suite and a mode are
- *  written as one pattern per suite. */
-function oneLine(el, ex) {
-  if (!el) return;
+/** Change one argument: a dialog over a fogged page with the command that sits the whole exam and switches that each add
+ *  or drop one argument, and a copy button for the result. It grows out of the button that opens it and closes on ×, a
+ *  click outside or Esc. Counts come from the exam's own numbers. harbor's -i takes any of several globs, so a suite and a
+ *  mode are written as one pattern per suite. */
+function oneLine(opener, ex) {
+  if (!opener) return;
   const suites = (ex.suites || []).filter((s) => !s.example);
   const SCOPES = {
     humanoid: { prefixes: ['humanoidbench', 'robocasa-gr1'], ids: ['humanoidbench', 'robocasa-gr1'] },
@@ -1089,6 +1203,7 @@ function oneLine(el, ex) {
     return [['base', 'harbor run -d embodied-first-exam'], ['pick', pats.map((p) => `-i '${p}'`).join(' ')],
       ['agent', AGENTS[st.agent]], ['k', st.k ? '-k 3' : '']].filter(([, t]) => t);
   };
+  const command = () => parts().map(([, t]) => t).join(' ');
   const tally = () => {
     const ids = SCOPES[st.scope]?.ids;
     const pool = suites.filter((s) => !ids || ids.includes(s.id));
@@ -1096,16 +1211,25 @@ function oneLine(el, ex) {
     const n = pool.reduce((a, s) => a + modes.reduce((b, m) => b + (s.modes?.[m] || 0), 0), 0);
     return { n, k: pool.filter((s) => modes.some((m) => s.modes?.[m])).length, modes };
   };
-  const chip = (g, v, label, note = '') => `<button type="button" class="chip ol-chip" data-g="${g}" data-v="${v}" aria-pressed="false">${label}${note ? `<i>${note}</i>` : ''}</button>`;
-  el.innerHTML = `<div class="ol-wrap">
-    <div class="term"><div class="term-bar" aria-hidden="true"><i></i><i></i><i></i></div>
-      <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
-    <div class="ol-groups">
-      <div><span class="ol-k">Mode</span><div class="chips">${chip('mode', 'standard', 'Standard')}${chip('mode', 'privileged', 'Privileged')}${chip('mode', 'standard-realtime', 'Real-time', 'RoboOlympics')}</div></div>
-      <div><span class="ol-k">Questions</span><div class="chips">${chip('scope', 'humanoid', 'Humanoids')}${chip('scope', 'rc365', 'RoboCasa365')}</div></div>
-      <div><span class="ol-k">Agent</span><div class="chips">${chip('agent', 'claude', 'Claude Code')}${chip('k', '1', 'Three attempts')}</div></div>
-    </div></div>`;
-  const cmdEl = $('.cmd', el), outEl = $('.out', el);
+  const opt = (g, v, label, note) => `<button type="button" class="ol-opt" data-g="${g}" data-v="${v}" aria-pressed="false"><b>${label}</b><small>${note}</small></button>`;
+  const dlg = document.createElement('div');
+  dlg.className = 'ol-modal';
+  dlg.hidden = true;
+  dlg.innerHTML = `<div class="ol-fog"></div>
+    <div class="ol-card" role="dialog" aria-modal="true" aria-labelledby="ol-title">
+      <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <h3 id="ol-title">Change one argument</h3>
+      <p class="ol-sub">Pick what to change. The command follows; copy it and run.</p>
+      <div class="term"><div class="term-bar"><i></i><i></i><i></i>
+          <button type="button" class="ol-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg><span>Copy</span></button></div>
+        <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
+      <div class="ol-groups">
+        <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'standard-realtime', 'Real-time', 'RoboOlympics')}</div>
+        <div class="ol-g"><span class="ol-k">Questions</span>${opt('scope', 'humanoid', 'Humanoids', 'HumanoidBench, RoboCasa-GR1')}${opt('scope', 'rc365', 'RoboCasa365', 'mobile kitchens')}</div>
+        <div class="ol-g"><span class="ol-k">Agent</span>${opt('agent', 'claude', 'Claude Code', 'Opus 5.5')}${opt('k', '1', 'Three attempts', 'pass@3')}</div>
+      </div></div>`;
+  document.body.append(dlg);
+  const card = $('.ol-card', dlg), cmdEl = $('.cmd', dlg), outEl = $('.out', dlg), copy = $('.ol-copy', dlg);
   const out = () => {
     const t = tally();
     outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> questions · ${t.k} suite${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
@@ -1116,53 +1240,146 @@ function oneLine(el, ex) {
     cmdEl.innerHTML = parts().map(([key, t]) => `<span class="${key === 'base' ? 'b' : 'arg'}${key === changed || (changed && prev[key] !== t && key !== 'base') ? ' new' : ''}">${esc(t)}</span>`).join(' ');
     prev = Object.fromEntries(parts());
     out();
-    $$('.ol-chip[data-g]', el).forEach((b) => b.setAttribute('aria-pressed', String(st[b.dataset.g] === b.dataset.v || (b.dataset.g === 'k' && !!st.k))));
+    $$('.ol-opt', dlg).forEach((b) => b.setAttribute('aria-pressed', String(st[b.dataset.g] === b.dataset.v || (b.dataset.g === 'k' && !!st.k))));
   };
-  $$('.ol-chip[data-g]', el).forEach((b) => b.addEventListener('click', () => {
+  $$('.ol-opt', dlg).forEach((b) => b.addEventListener('click', () => {
     const g = b.dataset.g;
     if (g === 'agent') st.agent = st.agent === 'claude' ? 'codex' : 'claude';
     else if (g === 'k') st.k = st.k ? '' : '1';
     else st[g] = st[g] === b.dataset.v ? '' : b.dataset.v;
     show(g === 'scope' || g === 'mode' ? 'pick' : g);
   }));
-  // type the command once when it comes into view; at once for reduced motion
-  const full = parts().map(([, t]) => t).join(' ');
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(command()); } catch { return; }
+    copy.classList.add('ok'); $('span', copy).textContent = 'Copied';
+    setTimeout(() => { copy.classList.remove('ok'); $('span', copy).textContent = 'Copy'; }, 1600);
+  });
+  // the command types itself out the first time the dialog opens; at once for reduced motion
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let typed = false;
   const typeIt = () => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { show(); return; }
+    typed = true;
+    if (still()) { show(); return; }
+    const full = command();
     let i = 0;
     const tick = () => {
       cmdEl.textContent = full.slice(0, ++i);
-      if (i < full.length) setTimeout(tick, 22 + Math.random() * 30); else setTimeout(() => show(), 250);
+      if (i < full.length) setTimeout(tick, 14 + Math.random() * 20); else setTimeout(() => show(), 200);
     };
-    tick();
+    setTimeout(tick, 260);
   };
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); typeIt(); } }, { threshold: 0.4 });
-    io.observe(el);
-  } else show();
+  const open = () => {
+    // the card grows out of the button: its transform origin is the button's centre
+    const b = opener.getBoundingClientRect();
+    dlg.hidden = false;
+    const c = card.getBoundingClientRect();
+    card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
+    document.documentElement.classList.add('ol-lock');
+    requestAnimationFrame(() => dlg.classList.add('on'));
+    if (!typed) typeIt();
+    setTimeout(() => $('.ol-opt', dlg).focus({ preventScroll: true }), 60);
+    addEventListener('keydown', onKey);
+  };
+  const close = () => {
+    dlg.classList.remove('on');
+    document.documentElement.classList.remove('ol-lock');
+    removeEventListener('keydown', onKey);
+    setTimeout(() => { if (!dlg.classList.contains('on')) dlg.hidden = true; }, still() ? 0 : 320);
+    opener.focus({ preventScroll: true });
+  };
+  const onKey = (e) => {
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {   // keep the focus inside the dialog
+      const f = $$('button', card);
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  };
+  opener.addEventListener('click', open);
+  $('.ol-x', dlg).addEventListener('click', close);
+  dlg.addEventListener('click', (e) => { if (!card.contains(e.target)) close(); });
 }
 
-/** The leaderboard on the home page: one row per ranked model on the shared questions (precomputed in exam.json). */
-function dumbbell(el, ex) {
+/** Who made a model: its maker's mark beside its name (LobeHub's monochrome icons, MIT; the marks belong to their
+ *  owners). */
+const MAKERS = [
+  [/gpt|openai|\bo\d/i, 'OpenAI', `<path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path>`],
+  [/claude|opus|sonnet|haiku|fable|anthropic/i, 'Anthropic', `<path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"></path>`],
+  [/gemini|gemma|google/i, 'Google', `<path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z"></path>`],
+  [/qwen/i, 'Qwen', `<path d="M12.604 1.34c.393.69.784 1.382 1.174 2.075a.18.18 0 00.157.091h5.552c.174 0 .322.11.446.327l1.454 2.57c.19.337.24.478.024.837-.26.43-.513.864-.76 1.3l-.367.658c-.106.196-.223.28-.04.512l2.652 4.637c.172.301.111.494-.043.77-.437.785-.882 1.564-1.335 2.34-.159.272-.352.375-.68.37-.777-.016-1.552-.01-2.327.016a.099.099 0 00-.081.05 575.097 575.097 0 01-2.705 4.74c-.169.293-.38.363-.725.364-.997.003-2.002.004-3.017.002a.537.537 0 01-.465-.271l-1.335-2.323a.09.09 0 00-.083-.049H4.982c-.285.03-.553-.001-.805-.092l-1.603-2.77a.543.543 0 01-.002-.54l1.207-2.12a.198.198 0 000-.197 550.951 550.951 0 01-1.875-3.272l-.79-1.395c-.16-.31-.173-.496.095-.965.465-.813.927-1.625 1.387-2.436.132-.234.304-.334.584-.335a338.3 338.3 0 012.589-.001.124.124 0 00.107-.063l2.806-4.895a.488.488 0 01.422-.246c.524-.001 1.053 0 1.583-.006L11.704 1c.341-.003.724.032.9.34zm-3.432.403a.06.06 0 00-.052.03L6.254 6.788a.157.157 0 01-.135.078H3.253c-.056 0-.07.025-.041.074l5.81 10.156c.025.042.013.062-.034.063l-2.795.015a.218.218 0 00-.2.116l-1.32 2.31c-.044.078-.021.118.068.118l5.716.008c.046 0 .08.02.104.061l1.403 2.454c.046.081.092.082.139 0l5.006-8.76.783-1.382a.055.055 0 01.096 0l1.424 2.53a.122.122 0 00.107.062l2.763-.02a.04.04 0 00.035-.02.041.041 0 000-.04l-2.9-5.086a.108.108 0 010-.113l.293-.507 1.12-1.977c.024-.041.012-.062-.035-.062H9.2c-.059 0-.073-.026-.043-.077l1.434-2.505a.107.107 0 000-.114L9.225 1.774a.06.06 0 00-.053-.031zm6.29 8.02c.046 0 .058.02.034.06l-.832 1.465-2.613 4.585a.056.056 0 01-.05.029.058.058 0 01-.05-.029L8.498 9.841c-.02-.034-.01-.052.028-.054l.216-.012 6.722-.012z"></path>`],
+  [/deepseek/i, 'DeepSeek', `<path d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.696 4.696 0 011.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614zm1-6.44a.306.306 0 01.415-.287.302.302 0 01.2.288.306.306 0 01-.31.307.303.303 0 01-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.245 1.245 0 01-.798-.254c-.274-.23-.47-.358-.552-.758a1.73 1.73 0 01.016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.559.559 0 01-.254-.078c-.11-.054-.2-.19-.114-.358.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452z"></path>`],
+  [/kimi|moonshot/i, 'Moonshot AI', `<path d="M21.846 0a1.923 1.923 0 110 3.846H20.15a.226.226 0 01-.227-.226V1.923C19.923.861 20.784 0 21.846 0z"></path><path d="M11.065 11.199l7.257-7.2c.137-.136.06-.41-.116-.41H14.3a.164.164 0 00-.117.051l-7.82 7.756c-.122.12-.302.013-.302-.179V3.82c0-.127-.083-.23-.185-.23H3.186c-.103 0-.186.103-.186.23V19.77c0 .128.083.23.186.23h2.69c.103 0 .186-.102.186-.23v-3.25c0-.069.025-.135.069-.178l2.424-2.406a.158.158 0 01.205-.023l6.484 4.772a7.677 7.677 0 003.453 1.283c.108.012.2-.095.2-.23v-3.06c0-.117-.07-.212-.164-.227a5.028 5.028 0 01-2.027-.807l-5.613-4.064c-.117-.078-.132-.279-.028-.381z"></path>`],
+  [/glm|zhipu/i, 'Zhipu AI', `<path d="M11.991 23.503a.24.24 0 00-.244.248.24.24 0 00.244.249.24.24 0 00.245-.249.24.24 0 00-.22-.247l-.025-.001zM9.671 5.365a1.697 1.697 0 011.099 2.132l-.071.172-.016.04-.018.054c-.07.16-.104.32-.104.498-.035.71.47 1.279 1.186 1.314h.366c1.309.053 2.338 1.173 2.286 2.523-.052 1.332-1.152 2.38-2.478 2.327h-.174c-.715.018-1.274.64-1.239 1.368 0 .124.018.23.053.337.209.373.54.658.96.8.75.23 1.517-.125 1.9-.782l.018-.035c.402-.64 1.17-.96 1.92-.711.854.284 1.378 1.226 1.099 2.167a1.661 1.661 0 01-2.077 1.102 1.711 1.711 0 01-.907-.711l-.017-.035c-.2-.323-.463-.58-.851-.711l-.056-.018a1.646 1.646 0 00-1.954.746 1.66 1.66 0 01-1.065.764 1.677 1.677 0 01-1.989-1.279c-.209-.906.332-1.83 1.257-2.043a1.51 1.51 0 01.296-.035h.018c.68-.071 1.151-.622 1.116-1.333a1.307 1.307 0 00-.227-.693 2.515 2.515 0 01-.366-1.403 2.39 2.39 0 01.366-1.208c.14-.195.21-.444.227-.693.018-.71-.506-1.261-1.186-1.332l-.07-.018a1.43 1.43 0 01-.299-.07l-.05-.019a1.7 1.7 0 01-1.047-2.114 1.68 1.68 0 012.094-1.101zm-5.575 10.11c.26-.264.639-.367.994-.27.355.096.633.379.728.74.095.362-.007.748-.267 1.013-.402.41-1.053.41-1.455 0a1.062 1.062 0 010-1.482zm14.845-.294c.359-.09.738.024.992.297.254.274.344.665.237 1.025-.107.36-.396.634-.756.718-.551.128-1.1-.22-1.23-.781a1.05 1.05 0 01.757-1.26zm-.064-4.39c.314.32.49.753.49 1.206 0 .452-.176.886-.49 1.206-.315.32-.74.5-1.185.5-.444 0-.87-.18-1.184-.5a1.727 1.727 0 010-2.412 1.654 1.654 0 012.369 0zm-11.243.163c.364.484.447 1.128.218 1.691a1.665 1.665 0 01-2.188.923c-.855-.36-1.26-1.358-.907-2.228a1.68 1.68 0 011.33-1.038c.593-.08 1.183.169 1.547.652zm11.545-4.221c.368 0 .708.2.892.524.184.324.184.724 0 1.048a1.026 1.026 0 01-.892.524c-.568 0-1.03-.47-1.03-1.048 0-.579.462-1.048 1.03-1.048zm-14.358 0c.368 0 .707.2.891.524.184.324.184.724 0 1.048a1.026 1.026 0 01-.891.524c-.569 0-1.03-.47-1.03-1.048 0-.579.461-1.048 1.03-1.048zm10.031-1.475c.925 0 1.675.764 1.675 1.706s-.75 1.705-1.675 1.705-1.674-.763-1.674-1.705c0-.942.75-1.706 1.674-1.706zm-2.626-.684c.362-.082.653-.356.761-.718a1.062 1.062 0 00-.238-1.028 1.017 1.017 0 00-.996-.294c-.547.14-.881.7-.752 1.257.13.558.675.907 1.225.783zm0 16.876c.359-.087.644-.36.75-.72a1.062 1.062 0 00-.237-1.019 1.018 1.018 0 00-.985-.301 1.037 1.037 0 00-.762.717c-.108.361-.017.754.239 1.028.245.263.606.377.953.305l.043-.01zM17.19 3.5a.631.631 0 00.628-.64c0-.355-.279-.64-.628-.64a.631.631 0 00-.628.64c0 .355.28.64.628.64zm-10.38 0a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64a.631.631 0 00-.628.64c0 .355.279.64.628.64zm-5.182 7.852a.631.631 0 00-.628.64c0 .354.28.639.628.639a.63.63 0 00.627-.606l.001-.034a.62.62 0 00-.628-.64zm5.182 9.13a.631.631 0 00-.628.64c0 .355.279.64.628.64a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64zm10.38.018a.631.631 0 00-.628.64c0 .355.28.64.628.64a.631.631 0 00.628-.64c0-.355-.279-.64-.628-.64zm5.182-9.148a.631.631 0 00-.628.64c0 .354.279.639.628.639a.631.631 0 00.628-.64c0-.355-.28-.64-.628-.64zm-.384-4.992a.24.24 0 00.244-.249.24.24 0 00-.244-.249.24.24 0 00-.244.249c0 .142.122.249.244.249zM11.991.497a.24.24 0 00.245-.248A.24.24 0 0011.99 0a.24.24 0 00-.244.249c0 .133.108.236.223.247l.021.001zM2.011 6.36a.24.24 0 00.245-.249.24.24 0 00-.244-.249.24.24 0 00-.244.249.24.24 0 00.244.249zm0 11.263a.24.24 0 00-.243.248.24.24 0 00.244.249.24.24 0 00.244-.249.252.252 0 00-.244-.248zm19.995-.018a.24.24 0 00-.245.248.24.24 0 00.245.25.24.24 0 00.244-.25.252.252 0 00-.244-.248z"></path>`],
+  [/grok|xai/i, 'xAI', `<path d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path>`],
+  [/mistral|devstral|codestral/i, 'Mistral AI', `<path clip-rule="evenodd" d="M3.428 3.4h3.429v3.428h3.429v3.429h-.002 3.431V6.828h3.427V3.4h3.43v13.714H24v3.429H13.714v-3.428h-3.428v-3.429h-3.43v3.428h3.43v3.429H0v-3.429h3.428V3.4zm10.286 13.715h3.428v-3.429h-3.427v3.429z"></path>`],
+  [/minimax/i, 'MiniMax', `<path d="M16.278 2c1.156 0 2.093.927 2.093 2.07v12.501a.74.74 0 00.744.709.74.74 0 00.743-.709V9.099a2.06 2.06 0 012.071-2.049A2.06 2.06 0 0124 9.1v6.561a.649.649 0 01-.652.645.649.649 0 01-.653-.645V9.1a.762.762 0 00-.766-.758.762.762 0 00-.766.758v7.472a2.037 2.037 0 01-2.048 2.026 2.037 2.037 0 01-2.048-2.026v-12.5a.785.785 0 00-.788-.753.785.785 0 00-.789.752l-.001 15.904A2.037 2.037 0 0113.441 22a2.037 2.037 0 01-2.048-2.026V18.04c0-.356.292-.645.652-.645.36 0 .652.289.652.645v1.934c0 .263.142.506.372.638.23.131.514.131.744 0a.734.734 0 00.372-.638V4.07c0-1.143.937-2.07 2.093-2.07zm-5.674 0c1.156 0 2.093.927 2.093 2.07v11.523a.648.648 0 01-.652.645.648.648 0 01-.652-.645V4.07a.785.785 0 00-.789-.78.785.785 0 00-.789.78v14.013a2.06 2.06 0 01-2.07 2.048 2.06 2.06 0 01-2.071-2.048V9.1a.762.762 0 00-.766-.758.762.762 0 00-.766.758v3.8a2.06 2.06 0 01-2.071 2.049A2.06 2.06 0 010 12.9v-1.378c0-.357.292-.646.652-.646.36 0 .653.29.653.646V12.9c0 .418.343.757.766.757s.766-.339.766-.757V9.099a2.06 2.06 0 012.07-2.048 2.06 2.06 0 012.071 2.048v8.984c0 .419.343.758.767.758.423 0 .766-.339.766-.758V4.07c0-1.143.937-2.07 2.093-2.07z"></path>`],
+  [/doubao|seed/i, 'ByteDance', `<path d="M5.31 15.756c.172-3.75 1.883-5.999 2.549-6.739-3.26 2.058-5.425 5.658-6.358 8.308v1.12C1.501 21.513 4.226 24 7.59 24a6.59 6.59 0 002.2-.375c.353-.12.7-.248 1.039-.378.913-.899 1.65-1.91 2.243-2.992-4.877 2.431-7.974.072-7.763-4.5l.002.001z" fill-opacity=".5"></path><path d="M22.57 10.283c-1.212-.901-4.109-2.404-7.397-2.8.295 3.792.093 8.766-2.1 12.773a12.782 12.782 0 01-2.244 2.992c3.764-1.448 6.746-3.457 8.596-5.219 2.82-2.683 3.353-5.178 3.361-6.66a2.737 2.737 0 00-.216-1.084v-.002zM14.303 1.867C12.955.7 11.248 0 9.39 0 7.532 0 5.883.677 4.545 1.807 2.791 3.29 1.627 5.557 1.5 8.125v9.201c.932-2.65 3.097-6.25 6.357-8.307.5-.318 1.025-.595 1.569-.829 1.883-.801 3.878-.932 5.746-.706-.222-2.83-.718-5.002-.87-5.617h.001z"></path><path d="M17.305 4.961a199.47 199.47 0 01-1.08-1.094c-.202-.213-.398-.419-.586-.622l-1.333-1.378c.151.615.648 2.786.869 5.617 3.288.395 6.185 1.898 7.396 2.8-1.306-1.275-3.475-3.487-5.266-5.323z" fill-opacity=".5"></path>`],
+  [/llama|meta/i, 'Meta', `<path d="M6.897 4c1.915 0 3.516.932 5.43 3.376l.282-.373c.19-.246.383-.484.58-.71l.313-.35C14.588 4.788 15.792 4 17.225 4c1.273 0 2.469.557 3.491 1.516l.218.213c1.73 1.765 2.917 4.71 3.053 8.026l.011.392.002.25c0 1.501-.28 2.759-.818 3.7l-.14.23-.108.153c-.301.42-.664.758-1.086 1.009l-.265.142-.087.04a3.493 3.493 0 01-.302.118 4.117 4.117 0 01-1.33.208c-.524 0-.996-.067-1.438-.215-.614-.204-1.163-.56-1.726-1.116l-.227-.235c-.753-.812-1.534-1.976-2.493-3.586l-1.43-2.41-.544-.895-1.766 3.13-.343.592C7.597 19.156 6.227 20 4.356 20c-1.21 0-2.205-.42-2.936-1.182l-.168-.184c-.484-.573-.837-1.311-1.043-2.189l-.067-.32a8.69 8.69 0 01-.136-1.288L0 14.468c.002-.745.06-1.49.174-2.23l.1-.573c.298-1.53.828-2.958 1.536-4.157l.209-.34c1.177-1.83 2.789-3.053 4.615-3.16L6.897 4zm-.033 2.615l-.201.01c-.83.083-1.606.673-2.252 1.577l-.138.199-.01.018c-.67 1.017-1.185 2.378-1.456 3.845l-.004.022a12.591 12.591 0 00-.207 2.254l.002.188c.004.18.017.36.04.54l.043.291c.092.503.257.908.486 1.208l.117.137c.303.323.698.492 1.17.492 1.1 0 1.796-.676 3.696-3.641l2.175-3.4.454-.701-.139-.198C9.11 7.3 8.084 6.616 6.864 6.616zm10.196-.552l-.176.007c-.635.048-1.223.359-1.82.933l-.196.198c-.439.462-.887 1.064-1.367 1.807l.266.398c.18.274.362.56.55.858l.293.475 1.396 2.335.695 1.114c.583.926 1.03 1.6 1.408 2.082l.213.262c.282.326.529.54.777.673l.102.05c.227.1.457.138.718.138.176.002.35-.023.518-.073.338-.104.61-.32.813-.637l.095-.163.077-.162c.194-.459.29-1.06.29-1.785l-.006-.449c-.08-2.871-.938-5.372-2.2-6.798l-.176-.189c-.67-.683-1.444-1.074-2.27-1.074z"></path>`],
+];
+function makerMark(model) {
+  const m = MAKERS.find(([re]) => re.test(model || ''));
+  if (!m) return `<span class="mk txt">${esc((model || '?').slice(0, 2))}</span>`;
+  return `<span class="mk" title="${m[1]}"><svg viewBox="0 0 24 24" role="img" aria-label="${m[1]}">${m[2]}</svg></span>`;
+}
+
+/** The leaderboard on the home page. The message is the standard mode, the exam itself: how much of it each agent solves
+ *  with only the robot's own sensors, and how far apart the agents are. One bar per ranked model, longest first, with
+ *  its maker's mark and its place, one row each so the board can grow; the privileged score (open book) stands behind it as a hatched ghost, so the gap is
+ *  there to see but never the headline. A click on a bar opens that model's two modes suite by suite. */
+function homeBoard(el, ex) {
   const sh = ex.leaderboard?.shared;
   const runs = runMap(ex);
   if (!el || !sh?.runs?.length) { if (el) el.innerHTML = '<div class="empty-state">No ranked runs yet.</div>'; return; }
-  const key = (id, m) => pctOf(sh.scores[id][m]) ?? -1;
-  const order = [...sh.runs].sort((a, b) => key(b, 'privileged') - key(a, 'privileged') || key(b, 'standard') - key(a, 'standard'));
-  el.innerHTML = DB_HEAD + order.map((id, i) => {
+  const P = (id, m) => pctOf(sh.scores[id][m]);
+  const order = [...sh.runs].sort((a, b) => (P(b, 'standard') ?? -1) - (P(a, 'standard') ?? -1) || (P(b, 'privileged') ?? -1) - (P(a, 'privileged') ?? -1));
+  const best = P(order[0], 'standard') ?? 0;
+  const rows = order.map((id, i) => {
     const r = runs[id] || { model: id };
-    return `<a class="db-row" href="${exam('leaderboard/')}?open=${encodeURIComponent(id)}"><span class="rank">${i + 1}</span>
-      <span class="who"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>
-      ${dbTrack(sh.scores[id].privileged, sh.scores[id].standard)}${dbGap(sh.scores[id].privileged, sh.scores[id].standard)}</a>`;
+    const v = P(id, 'standard') ?? 0, p = P(id, 'privileged');
+    const [sv, pv] = [sh.scores[id].standard, sh.scores[id].privileged];
+    return `<button type="button" class="lbh-row" data-id="${esc(id)}" style="--i:${i}" aria-expanded="false"
+        aria-label="${esc(r.model)}: ${Math.round(v)}% in standard mode${p != null ? `, ${Math.round(p)}% privileged` : ''}">
+      <span class="rk r${i + 1}">${i + 1}</span>${makerMark(r.model)}
+      <span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>
+      <span class="lbh-track">
+        ${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%" title="Privileged: ${pv[0]} of ${pv[1]}"></span>` : ''}
+        <span class="lbh-s" style="--w:${v.toFixed(1)}%;--k:${Math.round(38 + 62 * v / Math.max(best, 1))}%" title="Standard: ${sv[0]} of ${sv[1]}"></span>
+      </span>
+      <span class="lbh-val" style="--k:${Math.round(38 + 62 * v / Math.max(best, 1))}%"><b>${Math.round(v)}<small>%</small></b>${p != null ? `<em>${Math.round(p)}%</em>` : ''}</span>
+    </button>`;
   }).join('');
+  el.innerHTML = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b>the robot’s own sensors, one go; deeper is higher</span>
+      <span><i class="sw p"></i><b>Privileged</b>open book: the simulator’s inside and retries</span></div>
+    <div class="lbh-chart"><div class="lbh-axis" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>
+      <div class="lbh-rows">${rows}</div></div>
+    <p class="lbh-hint">Click a model to see where its open-book gap comes from, suite by suite.</p>
+    <div class="lbh-detail" hidden></div>`;
+  const det = $('.lbh-detail', el);
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('.lbh-row'); if (!b) return;
+    const was = b.getAttribute('aria-expanded') === 'true';
+    $$('.lbh-row', el).forEach((c) => { c.setAttribute('aria-expanded', 'false'); c.classList.remove('on'); });
+    el.classList.toggle('picked', !was);
+    if (was) { det.hidden = true; return; }
+    b.setAttribute('aria-expanded', 'true'); b.classList.add('on');
+    const id = b.dataset.id, r = runs[id] || { model: id }, sc = sh.scores[id];
+    det.innerHTML = `<div class="lbh-dh">${makerMark(r.model)}<div><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></div>
+        <div class="lbh-pair"><span class="s"><b>${Math.round(pctOf(sc.standard))}%</b>standard · ${sc.standard[0]} of ${sc.standard[1]}</span>
+          <span class="p"><b>${Math.round(pctOf(sc.privileged))}%</b>privileged · ${sc.privileged[0]} of ${sc.privileged[1]}</span></div>
+        <a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(id)}">On the leaderboard →</a></div>
+      <p class="lbh-dk"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>each suite, on the questions every ranked model sat</p>${dbDetail(ex, r, { suites: sh.suites[id] || {} })}`;
+    b.after(det);
+    det.hidden = false;
+    det.classList.remove('in'); void det.offsetWidth; det.classList.add('in');
+  });
 }
 
 /** The suites on the home page: a picture and a name each, and the ones on their way in. */
 function gallery(el, ex) {
   if (!el) return;
   const items = ranked(ex).map((s) => {
-    const cover = s.teaser || s.preview?.find((p) => p.cover) || s.preview?.find((p) => !p.still) || s.preview?.[0];
-    const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${CROPS[s.id] ? ` class="${CROPS[s.id]}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
+    const cover = coverOf(s);
+    const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${cropFor(s.id, cover.task) ? ` class="${cropFor(s.id, cover.task)}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}</div><b>${esc(s.name)}</b>
       <span>${int(s.instances)} scenes · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
   });
@@ -1177,12 +1394,12 @@ async function home(ex) {
   $('#hero-lead').textContent = ex.hero?.lead || ex.summary || '';
   heroWall(ex);
   bigNumbers($('#bignums'), ex);
-  flowDiagram($('#flowfig'));
+  flowDiagram($('#flowfig'), ex);
   trustRow($('#trust'));
   taxonomyMap($('#taxmap'), $('#tm-panel'), ex);
-  dumbbell($('#dumbbell'), ex);
-  oneLine($('#oneline'), ex);
+  homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
+  oneLine($('.ol-open'), ex);
   const sh = ex.leaderboard?.shared;
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
@@ -1210,8 +1427,6 @@ async function suitesPage(ex) {
   });
   suitesGrid($('#suites'), ex, state);
   incomingGrid($('#incoming'), ex);
-  $('#n-suites').textContent = int(ex.totals?.suites);
-  $('#n-incoming').textContent = int((ex.incoming || []).length);
   coverage($('#coverage'), ex);
 }
 
@@ -1219,8 +1434,8 @@ async function suitePage(ex) {
   const s = ex._suites[Q.get('id')] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
   const runs = runMap(ex);
-  const cover = s.teaser || s.preview?.find((p) => p.cover) || s.preview?.find((p) => p.video) || s.preview?.[0];
-  const crop = CROPS[s.id];
+  const cover = coverOf(s);
+  const crop = cropFor(s.id, cover?.task);
   const linkLabels = { paper: 'Paper', project_page: 'Project page', repository: 'Code', dataset: 'Dataset', documentation: 'Docs', challenge: 'Challenge', leaderboard: 'Upstream leaderboard', project: 'Project page', site: 'Project site' };
   const ext = Object.entries(s.links || {}).filter(([k, v]) => v && linkLabels[k]).map(([k, v]) => `<a class="btn small" href="${esc(v)}">${linkLabels[k]} ↗</a>`).join('');
   const robots = (s.robots || []).map((r) => esc(r.name)).join(', ');
@@ -1322,6 +1537,287 @@ async function contributePage(ex) {
   }
 }
 
+/* ------------------------------------------------------------------------------------------------- one run */
+
+// what a tool call did, one colour each (the strip's lanes, the log's rows, the filters)
+const RUN_KINDS = {
+  robot: { name: 'Robot', verb: 'drives the robot', icon: '<path d="M12 3v3M8 6h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><circle cx="9.5" cy="11" r="1.2"/><circle cx="14.5" cy="11" r="1.2"/><path d="M9 20h6M12 16v4"/>' },
+  look: { name: 'Look', verb: 'looks at a picture', icon: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>' },
+  edit: { name: 'Edit', verb: 'edits its code', icon: '<path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/>' },
+  shell: { name: 'Shell', verb: 'runs a command', icon: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M7 10l3 2.5L7 15M12.5 15H17"/>' },
+  other: { name: 'Tool', verb: 'calls a tool', icon: '<circle cx="12" cy="12" r="7"/>' },
+};
+const KIND_ORDER = ['robot', 'look', 'edit', 'shell'];
+const runIcon = (k) => `<svg class="rk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(RUN_KINDS[k] || RUN_KINDS.other).icon}</svg>`;
+const clock = (s) => { s = Math.max(0, Math.round(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; };
+const kTok = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
+// the evaluation's bench names that differ from the site's suite ids
+const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'robosafe', rsb: 'robosafe', ikea: 'roboarc' };
+// a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
+const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
+const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5',
+  glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
+const settingOf = (r) => {
+  const id = r.run || '';
+  const h = Object.keys(HARNESS_NAME).find((k) => id.startsWith(k + '-'));
+  if (!h) {   // no run id (older builds): the harness, model and effort fields
+    const hn = /^codex/.test(r.agent || '') ? 'Codex' : /claude/.test(r.agent || '') ? 'Claude Code' : /antigravity/i.test(r.agent || '') ? 'Antigravity CLI' : /dsh/i.test(r.agent || '') ? 'DSH' : r.agent;
+    const mn = MODEL_NAME[(r.model || '').replace(/-\d$/, '')] || r.model;
+    return [hn, mn, r.effort].filter(Boolean).join(' · ');
+  }
+  const rest = id.slice(h.length + 1), effort = rest.slice(rest.lastIndexOf('-') + 1), model = rest.slice(0, rest.lastIndexOf('-'));
+  return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}`;
+};
+const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5',
+  'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
+
+/** The list of runs that can be watched step by step (runlog/index.json). */
+async function runIndex(ex, head) {
+  let idx;
+  head.innerHTML = '<p class="kicker">Runs</p><h1>Watch an agent work</h1>';
+  $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the runs…</div>';
+  try { idx = await runJSON('index.json'); } catch (e) { idx = { runs: [] }; }
+  const runs = idx.runs || [];
+  head.innerHTML = `<p class="kicker">Runs</p><h1>Watch an agent work</h1>
+`;
+  $('#run-strip').remove();
+  $('#run-side').remove();
+  const titleOf = (r) => r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+    .replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const modeOf = (t) => (/-standard-realtime$/.test(t) ? 'standard-realtime' : /-standard$/.test(t) ? 'standard' : 'privileged');
+  $('#run-log').classList.add('run-index');
+  const suiteOf = (r) => ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
+  const okOf = (r) => r.success === 1 || r.state === 'success';
+  const suites = [...new Map(runs.map((r) => [suiteOf(r).id || r.bench, suiteOf(r).name || r.bench])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  let view = 'list';
+  try { view = localStorage.getItem('exam-runs-view') || 'list'; } catch (e) { /* private mode */ }
+  const per = () => (view === 'list' ? 50 : 24);
+  const st = { suite: Q.get('suite') || '', setting: Q.get('setting') || '', out: '', mode: '', q: '', page: Math.max(1, +Q.get('page') || 1) };
+  const settings = [...new Map(runs.map((r) => [r.run, settingOf(r)])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  const row = (r) => {
+    const s = suiteOf(r), ok = okOf(r);
+    return `<a class="rr" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
+      <span class="rr-pic">${r.poster ? `<img loading="lazy" src="${esc(runURL(r.poster))}" alt="">` : ''}</span>
+      <span class="rr-task"><b>${esc(titleOf(r))}</b><small>${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</small></span>
+      <span class="rr-model">${esc(settingOf(r))}</span>
+      <span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span>
+      <span class="rr-n">${clock(r.wall_s)}</span><span class="rr-n">${int(r.steps)}</span>
+      <span class="ri-bars rr-bars">${KIND_ORDER.map((k) => `<span class="k-${k}" style="flex:${r.kinds?.[k] || 0}" title="${esc(RUN_KINDS[k].name)}: ${int(r.kinds?.[k] || 0)}"></span>`).join('')}</span>
+      <span class="rr-n">$${(r.usd ?? 0).toFixed(2)}</span></a>`;
+  };
+  const card = (r) => {
+    const s = suiteOf(r), ok = okOf(r);
+    return `<a class="ri-card" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
+      <div class="ri-pic">${r.poster ? `<img loading="lazy" src="${esc(runURL(r.poster))}" alt="">` : ''}<span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span></div>
+      <div class="ri-body"><div class="ri-k">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</div><h4>${esc(titleOf(r))}</h4>
+        <div class="ri-meta">${esc(settingOf(r))} · ${clock(r.wall_s)} · ${int(r.steps)} steps</div>
+        <div class="ri-bars">${KIND_ORDER.map((k) => `<span class="k-${k}" style="flex:${r.kinds?.[k] || 0}" title="${esc(RUN_KINDS[k].name)}: ${int(r.kinds?.[k] || 0)}"></span>`).join('')}</div></div></a>`;
+  };
+  $('#run-log').innerHTML = `<div class="ri-tools">
+      <input type="search" id="ri-q" placeholder="Search tasks" aria-label="Search tasks">
+      <select id="ri-setting" aria-label="Setting"><option value="">All settings</option>${settings.map(([id, n]) => `<option value="${esc(id)}"${id === st.setting ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
+      <select id="ri-suite" aria-label="Suite"><option value="">All suites</option>${suites.map(([id, n]) => `<option value="${esc(id)}"${id === st.suite ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
+      <select id="ri-mode" aria-label="Mode"><option value="">Both modes</option><option value="privileged">Privileged</option><option value="standard">Standard</option><option value="standard-realtime">Standard, real time</option></select>
+      <div class="ri-out">${[['', 'All'], ['ok', 'Solved'], ['no', 'Not solved']].map(([v, n]) => `<button type="button" class="chip${v === '' ? ' on' : ''}" data-out="${v}">${n}</button>`).join('')}</div>
+      <span class="ri-count" id="ri-count"></span>
+      <div class="ri-view" role="group" aria-label="View">${[['list', 'List'], ['grid', 'Cards']].map(([v, n]) => `<button type="button" class="chip${v === view ? ' on' : ''}" data-view="${v}">${n}</button>`).join('')}</div></div>
+    <div class="ri-grid" id="ri-grid"></div><nav class="ri-pager" id="ri-pager" aria-label="Pages"></nav>`;
+  const draw = () => {
+    const q = st.q.toLowerCase();
+    const list = runs.filter((r) => (!st.setting || r.run === st.setting) && (!st.suite || (suiteOf(r).id || r.bench) === st.suite) && (!st.mode || modeOf(r.task) === st.mode)
+      && (!st.out || (st.out === 'ok') === okOf(r)) && (!q || `${titleOf(r)} ${r.task} ${suiteOf(r).name || ''}`.toLowerCase().includes(q)));
+    const g = $('#ri-grid');
+    g.className = view === 'list' ? 'ri-list' : 'ri-grid';
+    g.innerHTML = (view === 'list' && list.length ? '<div class="rr rr-head"><span></span><span>Task</span><span>Setting</span><span>Result</span><span class="rr-n">Time</span><span class="rr-n">Steps</span><span>What it did</span><span class="rr-n">Cost</span></div>' : '')
+      + (list.slice((st.page - 1) * per(), st.page * per()).map(view === 'list' ? row : card).join('') || '<p class="muted">No run matches.</p>');
+    const pages = Math.max(1, Math.ceil(list.length / per()));
+    st.page = Math.min(st.page, pages);
+    const from = list.length ? (st.page - 1) * per() + 1 : 0, to = Math.min(st.page * per(), list.length);
+    $('#ri-count').textContent = `${int(from)}–${int(to)} of ${int(list.length)} runs`;
+    // page numbers: the first, the last, and two either side of the current one; gaps as an ellipsis
+    const nums = [...new Set([1, pages, ...Array.from({ length: 5 }, (_, k) => st.page - 2 + k)])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+    const btn = (n, label, extra = '') => `<button type="button" class="pg${n === st.page && !extra ? ' on' : ''}" data-page="${n}"${extra}>${label}</button>`;
+    $('#ri-pager').innerHTML = pages < 2 ? '' : `${btn(st.page - 1, '← Previous', st.page === 1 ? ' disabled' : ' data-nav="1"')}
+      <span class="pg-nums">${nums.map((n, k) => `${k && n - nums[k - 1] > 1 ? '<span class="pg-gap">…</span>' : ''}${btn(n, int(n))}`).join('')}</span>
+      ${btn(st.page + 1, 'Next →', st.page === pages ? ' disabled' : ' data-nav="1"')}
+      <label class="pg-jump">Page <input type="number" min="1" max="${pages}" value="${st.page}" aria-label="Go to page"> of ${int(pages)}</label>`;
+    const u = new URL(location.href);
+    st.page > 1 ? u.searchParams.set('page', st.page) : u.searchParams.delete('page');
+    history.replaceState(null, '', u);
+  };
+  $('#ri-q').addEventListener('input', (e) => { st.q = e.target.value; st.page = 1; draw(); });
+  $('#ri-suite').addEventListener('change', (e) => { st.suite = e.target.value; st.page = 1; draw(); });
+  $('#ri-setting').addEventListener('change', (e) => { st.setting = e.target.value; st.page = 1; draw(); });
+  $('#ri-mode').addEventListener('change', (e) => { st.mode = e.target.value; st.page = 1; draw(); });
+  $$('.ri-out .chip').forEach((c) => c.addEventListener('click', () => { $$('.ri-out .chip').forEach((d) => d.classList.toggle('on', d === c)); st.out = c.dataset.out; st.page = 1; draw(); }));
+  const go = (n) => { st.page = n; draw(); $('#run-log').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  $('#ri-pager').addEventListener('click', (e) => { const b = e.target.closest('button[data-page]'); if (b && !b.disabled) go(+b.dataset.page); });
+  $('#ri-pager').addEventListener('change', (e) => { if (e.target.matches('.pg-jump input')) go(Math.max(1, Math.round(+e.target.value) || 1)); });
+  $$('.ri-view .chip').forEach((c) => c.addEventListener('click', () => {
+    view = c.dataset.view; $$('.ri-view .chip').forEach((d) => d.classList.toggle('on', d === c));
+    try { localStorage.setItem('exam-runs-view', view); } catch (e) { /* private mode */ }
+    st.page = 1; draw();
+  }));
+  draw();
+}
+
+async function runPage(ex) {
+  const slug = Q.get('r');
+  const head = $('#run-head');
+  if (!slug) return runIndex(ex, head);
+  let r;
+  head.innerHTML = '<p class="kicker">Run</p><h1>&nbsp;</h1>';
+  $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the run: every step, command and picture…</div>';
+  try { r = await runJSON(`${slug}.json`); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; return; }
+  const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
+  const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
+  const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+    .replace(/[-_]+/g, ' ')).replace(/\b\w/g, (c) => c.toUpperCase());
+  document.title = `${title} · run · Embodied First Exam`;
+  const steps = r.steps || [];
+  const total = Math.max(r.wall_s || 0, (steps.at(-1)?.t || 0) + 5);
+  const count = (k) => steps.reduce((a, st) => a + st.calls.filter((c) => c.kind === k).length, 0);
+  const submits = steps.reduce((a, st) => a + (st.sim?.submit || 0), 0), resets = steps.reduce((a, st) => a + (st.sim?.reset || 0), 0);
+  const solved = r.success === 1 || r.state === 'success';
+  const model = settingOf(r);
+  head.innerHTML = `<p class="kicker">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(mode)} · one run</p>
+    <h1>${esc(title)}</h1>
+    <div class="run-who"><span class="run-model">${esc(model)}</span><span class="run-verdict ${solved ? 'ok' : 'no'}">${solved ? 'Solved' : 'Not solved'}</span>
+      <span class="run-links" id="run-links"><a class="btn small" href="${exam('run/')}">All runs</a></span></div>
+    <dl class="run-stats">
+      <div><dt>Time</dt><dd>${clock(r.wall_s)}</dd></div>
+      <div><dt>Model calls</dt><dd>${int(steps.length)}</dd></div>
+      <div><dt>Robot commands</dt><dd>${int(submits)}${resets ? `<small> · ${resets} reset${resets > 1 ? 's' : ''}</small>` : ''}</dd></div>
+      <div><dt>Pictures seen</dt><dd>${int(count('look'))}</dd></div>
+      <div><dt>Tokens</dt><dd>${kTok(r.tokens?.in)}<small> in · ${kTok(r.tokens?.out)} out</small></dd></div>
+      <div><dt>Cost</dt><dd>$${(r.tokens?.usd ?? 0).toFixed(2)}</dd></div>
+    </dl>
+    ${r.task_text ? `<details class="run-task"><summary>The question, as the agent read it</summary><pre>${esc(r.task_text)}</pre></details>` : ''}`;
+
+  runJSON('index.json').then((idx) => {
+    const me = (idx.runs || []).find((x) => x.slug === slug);
+    if (!me?.site) return;
+    const others = (idx.runs || []).filter((x) => x.site === me.site && x.slug !== slug);
+    $('#run-links').insertAdjacentHTML('afterbegin', `<a class="btn small primary" href="${exam('tasks/')}?task=${encodeURIComponent(me.site)}">Open the task <span class="arr">→</span></a>`
+      + others.map((o) => `<a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(o.slug)}">${esc(settingOf(o))} · ${/-standard/.test(o.task) ? 'standard' : 'privileged'}</a>`).join(''));
+  }).catch(() => {});
+
+  // ---- the strip: one lane per kind of action over the run's clock, the context growing behind, a playhead
+  const W = 1000, laneH = 15, top = 8, lanes = KIND_ORDER.length, H = top + lanes * laneH + 30;
+  const x = (t) => ((t / total) * W).toFixed(1);
+  const maxIn = Math.max(1, ...steps.map((st) => st.tok?.in || 0));
+  const area = steps.length > 1 ? `M0,${H - 4} ${steps.map((st) => `L${x(st.t)},${(H - 4 - ((st.tok?.in || 0) / maxIn) * 24).toFixed(1)}`).join(' ')} L${x(steps.at(-1).t)},${H - 4} Z` : '';
+  const marks = steps.flatMap((st, i) => {
+    const kinds = [...new Set(st.calls.map((c) => c.kind))];
+    return kinds.filter((k) => KIND_ORDER.includes(k)).map((k) => `<rect class="lane-mark k-${k}" data-i="${i}" x="${x(st.t)}" y="${top + KIND_ORDER.indexOf(k) * laneH + 2}" width="${Math.max(2.4, ((steps[i + 1]?.t ?? st.t + 4) - st.t) / total * W - 1).toFixed(1)}" height="${laneH - 4}" rx="2"/>`);
+  }).join('');
+  const resetMarks = steps.map((st, i) => (st.sim?.reset ? `<line class="lane-reset" x1="${x(st.t)}" x2="${x(st.t)}" y1="${top - 4}" y2="${top + lanes * laneH}"/>` : '')).join('');
+  $('#run-strip').innerHTML = `<div class="run-strip">
+    <div class="rs-ctrl"><button class="rs-play" type="button" aria-label="Play the run"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pl" d="M8 5v14l11-7z"/><path class="pa" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+      <div class="rs-time"><b id="rs-now">0:00</b> / ${clock(total)}</div></div>
+    <div class="rs-lanes">${KIND_ORDER.map((k) => `<span class="k-${k}">${runIcon(k)}${RUN_KINDS[k].name}</span>`).join('')}<span class="rs-ctx">context</span></div>
+    <svg class="rs-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      ${KIND_ORDER.map((k, j) => `<rect class="lane-bg" x="0" y="${top + j * laneH}" width="${W}" height="${laneH}"/>`).join('')}
+      <path class="rs-area" d="${area}"/>${marks}${resetMarks}
+      <line class="rs-head" id="rs-head" x1="0" x2="0" y1="0" y2="${H}"/>
+    </svg></div>`;
+
+  // ---- the side: what the agent saw at this moment, and what the robot finally did
+  $('#run-side').innerHTML = `<div class="rv-card rv-eye"><div class="rv-label">${runIcon('look')} What the agent was looking at</div>
+      <div class="rv-pic"><img id="rv-img" alt=""><div class="rv-none" id="rv-none">No picture yet: the agent has not looked at the robot.</div></div>
+      <div class="rv-cap" id="rv-cap"></div></div>
+    ${r.replay ? `<div class="rv-card rv-out"><div class="rv-label">${runIcon('robot')} What the robot did</div>
+      <video src="${esc(runURL(r.replay))}" ${r.replay_last ? `poster="${esc(runURL(r.replay_last))}"` : ''} controls muted loop playsinline preload="metadata"></video>
+      <div class="rv-cap">The verifier replays the agent's final trajectory in a fresh simulator; this is that replay.</div></div>` : ''}`;
+
+  // ---- the log
+  const filters = ['all', 'say', ...KIND_ORDER];
+  const fname = { all: 'Everything', say: 'Messages', robot: 'Robot', look: 'Pictures', edit: 'Edits', shell: 'Shell' };
+  const stepHTML = (st, i) => {
+    const kinds = [...new Set(st.calls.map((c) => c.kind))];
+    const calls = st.calls.map((c, j) => `<details class="rc k-${c.kind}"><summary>${runIcon(c.kind)}<span class="rc-verb">${esc(RUN_KINDS[c.kind]?.verb || 'calls a tool')}</span><span class="rc-lab">${esc(c.label)}</span></summary><pre class="rc-code">${esc(c.code)}</pre></details>`).join('');
+    const o = st.out || {};
+    const bad = (o.exit || []).some((e) => e !== 0);
+    const outLines = (o.text || '').split('\n');
+    const out = o.text || o.pics?.length ? `<div class="ro ${bad ? 'bad' : ''}"><div class="ro-head"><span>Back to the agent</span>${(o.exit || []).length ? `<span class="ro-exit">exit ${o.exit.map((e) => esc(e)).join(', ')}</span>` : ''}</div>
+      ${o.text ? (outLines.length > 6 || o.text.length > 520 ? `<details class="ro-more"><summary><pre>${esc(outLines.slice(0, 5).join('\n').slice(0, 480))}</pre><span class="ro-expand">show all ${int(outLines.length)} lines</span></summary><pre>${esc(o.text)}</pre></details>` : `<pre>${esc(o.text)}</pre>`) : ''}
+      ${o.pics?.length ? `<div class="ro-pics">${o.pics.map((p) => `<img loading="lazy" src="${esc(runURL(p))}" alt="what the agent saw">`).join('')}</div>` : ''}</div>` : '';
+    const sim = st.sim?.submit || st.sim?.reset ? `<span class="rt-sim">${st.sim.submit ? `${st.sim.submit} command${st.sim.submit > 1 ? 's' : ''} to the robot` : ''}${st.sim.reset ? ` · reset` : ''}</span>` : '';
+    return `<article class="rstep" data-i="${i}" data-kinds="${['all', ...(st.say ? ['say'] : []), ...kinds].join(' ')}">
+      <div class="rt"><span class="rt-time">${clock(st.t)}</span><span class="rt-n">step ${i + 1}</span>${sim}<span class="rt-tok" title="prompt tokens · new output tokens · cost">${kTok(st.tok?.in)} ctx · +${int(st.tok?.out)} · $${(st.tok?.usd || 0).toFixed(2)}</span></div>
+      ${st.say ? `<div class="rsay">${prose(st.say)}</div>` : ''}${calls}${out}</article>`;
+  };
+  $('#run-log').innerHTML = `<div class="rl-bar">${filters.map((f) => `<button type="button" class="chip${f === 'all' ? ' on' : ''}" data-f="${f}">${f !== 'all' && f !== 'say' ? runIcon(f) : ''}${fname[f]}</button>`).join('')}</div>
+    <div class="rl-steps">${steps.map(stepHTML).join('')}</div>
+    <div class="rl-end ${solved ? 'ok' : 'no'}">${solved ? 'The verifier replayed the final trajectory and the task was solved.' : 'The run ended without solving the task.'}</div>`;
+
+  // ---- behaviour: the current step drives the strip's playhead and the agent's view
+  const arts = $$('.rstep');
+  const picAt = (i) => { for (let k = i; k >= 0; k--) if (steps[k].out?.pics?.length) return [k, steps[k].out.pics.at(-1)]; return [-1, null]; };
+  let cur = -1;
+  const setStep = (i, scroll) => {
+    if (i === cur || i < 0 || i >= steps.length) return;
+    cur = i;
+    arts.forEach((a, k) => a.classList.toggle('on', k === i));
+    $('#rs-head').setAttribute('x1', x(steps[i].t)); $('#rs-head').setAttribute('x2', x(steps[i].t));
+    $('#rs-now').textContent = clock(steps[i].t);
+    $$('.lane-mark').forEach((m) => m.classList.toggle('on', +m.dataset.i === i));
+    const [k, p] = picAt(i);
+    const img = $('#rv-img');
+    if (p && img.dataset.src !== p) { img.classList.remove('in'); img.parentElement.classList.add('loading'); img.onload = () => { img.classList.add('in'); img.parentElement.classList.remove('loading'); }; img.src = runURL(p); img.dataset.src = p; }
+    $('#rv-none').hidden = !!p; img.hidden = !p;
+    $('#rv-cap').textContent = p ? `Step ${k + 1} · ${clock(steps[k].t)}${k < i ? ` (the latest picture by step ${i + 1})` : ''}` : '';
+    if (scroll) arts[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  const io = new IntersectionObserver((es) => {
+    if (playing) return;
+    const vis = es.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    if (vis.length) setStep(+vis[0].target.dataset.i);
+  }, { rootMargin: '-35% 0px -55% 0px' });
+  arts.forEach((a) => io.observe(a));
+  setStep(0);
+  // the strip: click or drag to a moment
+  const svg = $('.rs-svg');
+  const seek = (ev) => {
+    const b = svg.getBoundingClientRect(), t = ((ev.clientX - b.left) / b.width) * total;
+    let i = 0; while (i + 1 < steps.length && steps[i + 1].t <= t) i++;
+    const hidden = arts[i].hidden; if (hidden) { $$('.rl-bar .chip').forEach((c) => c.classList.toggle('on', c.dataset.f === 'all')); arts.forEach((a) => { a.hidden = false; }); }
+    setStep(i, true);
+  };
+  let drag = false;
+  svg.addEventListener('pointerdown', (e) => { drag = true; svg.setPointerCapture(e.pointerId); seek(e); });
+  svg.addEventListener('pointermove', (e) => { if (drag) seek(e); });
+  svg.addEventListener('pointerup', () => { drag = false; });
+  // play: walk through the steps, a beat each (longer where the agent wrote something or looked at a picture)
+  let playing = false, timer = null;
+  const btn = $('.rs-play');
+  const tick = () => {
+    if (!playing) return;
+    const n = cur + 1;
+    if (n >= steps.length) { playing = false; btn.classList.remove('on'); return; }
+    setStep(n, true);
+    const st = steps[n];
+    timer = setTimeout(tick, 900 + (st.say ? 1400 : 0) + (st.out?.pics?.length ? 700 : 0));
+  };
+  btn.addEventListener('click', () => {
+    playing = !playing; btn.classList.toggle('on', playing);
+    clearTimeout(timer);
+    if (playing) { if (cur >= steps.length - 1) cur = -1; tick(); }
+  });
+  // filters
+  $$('.rl-bar .chip').forEach((c) => c.addEventListener('click', () => {
+    $$('.rl-bar .chip').forEach((d) => d.classList.toggle('on', d === c));
+    arts.forEach((a) => { a.hidden = !a.dataset.kinds.split(' ').includes(c.dataset.f); });
+  }));
+  // a picture in the log opens large
+  $('#run-log').addEventListener('click', (e) => {
+    const im = e.target.closest('.ro-pics img');
+    if (!im) return;
+    document.body.insertAdjacentHTML('beforeend', `<div class="rv-zoom" role="dialog"><img src="${esc(im.src)}" alt=""></div>`);
+    $('.rv-zoom').addEventListener('click', (ev) => ev.currentTarget.remove());
+  });
+}
+
 /* ------------------------------------------------------------------------------------------------- boot */
 
 chrome();
@@ -1330,7 +1826,7 @@ loadExam().then(async (raw) => {
   footer(ex);
   headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
-    how: async () => flowDiagram($('#flowfig')), notfound: async () => {} };
+    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
   fillIcons();
   reveal();
