@@ -316,9 +316,9 @@ function suiteCard(ex, s) {
   const robot = s.robots?.[0]?.name || '';
   const more = (s.robots?.length || 0) > 1 ? ` and ${s.robots.length - 1} more` : '';
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
-    <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}</div>
-    <div class="body"><h4>${esc(s.name)}</h4><p>${esc(s.blurb || '')}</p>
-      <div class="meta">${int(s.instances)} scenes · ${esc(robot)}${more}${s.origin === 'ours' ? ' · ours' : ''}</div></div></a>`;
+    <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${releaseTag(s)}</div>
+    <div class="body"><h4>${esc(s.name)}${nameTag(s)}</h4><p>${esc(s.blurb || '')}</p>
+      <div class="meta">${int(s.instances)} scenes · ${esc(robot)}${more}</div></div></a>`;
 }
 
 // suites whose scenes look alike, kept apart on the home page's wall as if they were one
@@ -326,10 +326,11 @@ const LOOKALIKE = { robocasa: 'kitchen', robocasa365: 'kitchen', 'robocasa-gr1':
 
 // multi-camera posters: show the top-left camera only (the grid's layout per suite)
 // suites whose demos are still multi-view grids: the crop shows one view. A suite leaves the list once its demos are
-// re-rendered as one view (MuJoCo Playground and RoboTwin 2.0, 2026-10-08: the old crop cut their new renders).
-const CROPS = { dextoolbench: 'crop-2x2' };
+// re-rendered as one view (MuJoCo Playground and RoboTwin 2.0, 2026-10-08; DexToolBench, 2026-10-18: the old crop showed only
+// a corner of its new single-view renders).
+const CROPS = {};
 // tasks of a cropped suite whose media is already one view (re-rendered since): shown whole
-const SINGLE_VIEW = new Set(['dextoolbench/hammer_claw_hammer_swing_side']);
+const SINGLE_VIEW = new Set();
 const cropFor = (suite, task) => (SINGLE_VIEW.has(`${suite}/${task}`) ? '' : CROPS[suite] || '');
 /** A suite's cover: its teaser, else a preview marked as cover, else (for a cropped suite) one already re-rendered as one view,
  *  else the first preview with motion, else the first. */
@@ -337,7 +338,7 @@ const coverOf = (s) => s.teaser || s.preview?.find((p) => p.cover)
   || (CROPS[s.id] && s.preview?.find((p) => SINGLE_VIEW.has(`${s.id}/${p.task}`))) || s.preview?.find((p) => !p.still) || s.preview?.[0];
 
 function suitesGrid(el, ex, filter = {}) {
-  const list = ex.suites.filter((s) => (!filter.body || s.body === filter.body) && (!filter.origin || s.origin === filter.origin));
+  const list = ex.suites.filter((s) => (!filter.body || s.body === filter.body) && (!filter.origin || (filter.origin === 'ours' ? isOurs(s) : s.origin === filter.origin)));
   // one plain grid, no headings by robot body (user, 2026-10-18); the example task comes last
   const shown = [...list.filter((s) => !s.example), ...(filter.body ? [] : list.filter((s) => s.example))];
   el.innerHTML = `<div class="suite-group reveal"><div class="suite-grid">${shown.map((s) => suiteCard(ex, s)).join('')}</div></div>`;
@@ -554,7 +555,18 @@ function taskBrowser(el, ex, tasks, opts = {}) {
 
 /* ------------------------------------------------------------------------------------------------ pages */
 
+/** The suites the exam's team built and releases with the exam (owners, 2026-10-18): first everywhere, in this order,
+ *  each with the EFE Original tag beside its name. */
+const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics', 'robosafe', 'dexhand'];
+const isOurs = (s) => OUR_RELEASE.includes(s?.id);
+// beside the name, small (nameTag), and on the picture's top right corner, as a frosted chip (owners, 2026-10-18)
+const nameTag = (s) => (isOurs(s) ? `<span class="name-tag" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
+const releaseTag = (s, big = false) => (isOurs(s)
+  ? `<span class="rel-tag${big ? ' big' : ''}" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
+
 function prepare(ex) {
+  const rank = (s) => (isOurs(s) ? OUR_RELEASE.indexOf(s.id) : OUR_RELEASE.length);
+  ex.suites = ex.suites.map((s, i) => [s, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([s]) => s);
   ex._suites = suiteMap(ex);
   ex._tags = Object.fromEntries((ex.taxonomy || []).flatMap((g) => g.tags.map((t) => [t.id, t])));
   return ex;
@@ -1494,7 +1506,7 @@ function gallery(el, ex) {
   const items = ranked(ex).map((s) => {
     const cover = coverOf(s);
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${cropFor(s.id, cover.task) ? ` class="${cropFor(s.id, cover.task)}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
-    return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}</div><b>${esc(s.name)}</b>
+    return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
       <span>${int(s.instances)} scenes · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
   });
   el.innerHTML = items.join('');
@@ -1531,7 +1543,7 @@ async function suitesPage(ex) {
   const chips = $('#suite-filter');
   const bodies = BODY_ORDER.filter((b) => ex.suites.some((s) => s.body === b));
   chips.innerHTML = `<button class="chip on" data-b="">All</button>${bodies.map((b) => `<button class="chip" data-b="${b}">${esc(ex.bodies?.[b] || b)}</button>`).join('')}
-    <button class="chip" data-o="ours">Ours</button>`;
+    <button class="chip" data-o="ours">EFE Originals</button>`;
   const state = {};
   chips.addEventListener('click', (e) => {
     const b = e.target.closest('.chip'); if (!b) return;
@@ -1557,7 +1569,7 @@ async function suitePage(ex) {
     .filter(([, v]) => v).map(([label, v, icon]) => `<a class="btn small lk" href="${esc(v)}" target="_blank" rel="noopener">${icon || ''}${label} ↗</a>`).join('');
   const robots = (s.robots || []).map((r) => esc(r.name)).join(', ');
   const facts = [
-    ['Origin', s.origin === 'ours' ? 'built by the lab' : `adapted from the upstream benchmark${s.edition ? ` (${esc(s.edition)})` : ''}`],
+    ['Origin', isOurs(s) ? 'built by the exam’s team, released with the exam' : s.origin === 'ours' ? 'built by the lab' : `adapted from the upstream benchmark${s.edition ? ` (${esc(s.edition)})` : ''}`],
     ['Simulator', esc(s.simulator || '')], ['Robot', robots],
     ['Scenes', `${int(s.instances)} scenes`],   // no count per mode (owners, 2026-10-18)
     ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
@@ -1567,12 +1579,12 @@ async function suitePage(ex) {
     <div class="suite-hero">
       <div>
         <p class="kicker">${codeMark(s)} &nbsp;${s.example ? 'example task' : 'a suite of the exam'} · ${esc(ex.bodies?.[s.body] || '')}</p>
-        <h1 style="margin:10px 0 0;font:800 clamp(40px,5.6vw,76px)/.95 var(--display);letter-spacing:-.035em">${esc(s.name)}</h1>
+        <h1 style="margin:10px 0 0;font:800 clamp(40px,5.6vw,76px)/.95 var(--display);letter-spacing:-.035em">${esc(s.name)}${nameTag(s)}</h1>
         <p class="lead" style="margin:16px 0 0;font-size:18px;color:var(--ink-2)">${esc(s.blurb || '')}</p>
         <p class="desc">${prose(s.description || '')}</p>
         ${ext ? `<div class="link-list">${ext}</div>` : ''}
       </div>
-      <div><div class="cover frame">${cover ? (cover.video ? `<video src="${esc(site(cover.video))}" poster="${esc(site(cover.poster || ''))}" muted loop autoplay playsinline${crop ? ` class="${crop}"` : ''}></video>` : poster(cover, crop)) : `<div class="placeholder-art">${esc(s.code)}</div>`}</div>
+ <div><div class="cover frame">${releaseTag(s, true)}${cover ? (cover.video ? `<video src="${esc(site(cover.video))}" poster="${esc(site(cover.poster || ''))}" muted loop autoplay playsinline${crop ? ` class="${crop}"` : ''}></video>` : poster(cover, crop)) : `<div class="placeholder-art">${esc(s.code)}</div>`}</div>
         <table class="facts-table" style="margin-top:16px"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table></div>
     </div>`;
   // results on this suite: the leaderboard's ranked rows, standard first
