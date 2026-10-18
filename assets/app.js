@@ -215,16 +215,16 @@ function lbBoard(ex, tasks, onDraw) {
   const minSuites = lb.min_suites || 10;
   const board = $('#lb-board');
   const harnesses = [...new Set(ex.runs.filter((r) => (r.kind || 'agent') === 'agent').map((r) => r.harness))];
-  const state = { view: Q.get('view') === 'all' ? 'all' : 'shared', sort: Q.get('mode') === 'standard' ? 'standard' : 'privileged',
+  const state = { view: Q.get('view') === 'all' ? 'all' : 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
-  const rowHTML = (r, sc, rank, part) => {
-    const open = state.open === r.id;
-    const total = MODES.reduce((a, m) => a + sc[m][1], 0);
-    const meta = `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} questions`;
+  const metaOf = (r, sc, part) => {
+    const total = MODES.reduce((a, m) => a + (sc[m]?.[1] || 0), 0);
     const reset = part && r.standard_reset?.done ? ` · <span class="rs" title="Standard attempts with ${r.standard_reset.budget} resets allowed are not counted">+${r.standard_reset.done} with resets, not counted</span>` : '';
-    return `<div class="db-row x${open ? ' open' : ''}${part ? ' part' : ''}" role="button" tabindex="0" aria-expanded="${open}" data-run="${esc(r.id)}">
-        <span class="rank">${part ? '·' : rank}</span><span class="who"><b>${esc(r.model)}</b><small>${whoLine(r)}</small><small class="meta">${meta}${reset}</small></span>
-        ${dbTrack(sc.privileged, sc.standard)}${dbGap(sc.privileged, sc.standard)}</div>${open ? dbDetail(ex, r, sc) : ''}`;
+    return `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} questions${reset}`;
+  };
+  const rowHTML = (r, sc, rank, part, best) => {
+    const open = state.open === r.id;
+    return lbhRow(r, sc, rank, best, { part, meta: metaOf(r, sc, part), open }) + (open ? lbhDetail(ex, r, sc, false) : '');
   };
   function draw() {
     const pool = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
@@ -240,12 +240,13 @@ function lbBoard(ex, tasks, onDraw) {
       html = `<div class="empty-state">${state.kind === 'vla' ? 'No VLA policy has sat the exam yet.' : 'No run with this harness yet.'}</div>`;
     } else {
       let rank = 0, prev = null;
-      html = DB_HEAD + main.map((r, i) => { const k = key(scores[r.id], state.sort); if (k !== prev) { rank = i + 1; prev = k; } return rowHTML(r, scores[r.id], rank, false); }).join('');
+      const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].standard) ?? 0));
+      html = LBH_AXIS + main.map((r, i) => { const k = key(scores[r.id], state.sort); if (k !== prev) { rank = i + 1; prev = k; } return rowHTML(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}</button>
           <span>Fewer than ${minSuites} suites each: scored on what they sat, not ranked.</span></div>`;
-        if (open) html += partial.map((r) => rowHTML(r, pscores[r.id], 0, true)).join('');
+        if (open) html += partial.map((r) => rowHTML(r, pscores[r.id], 0, true, best)).join('');
       }
     }
     board.innerHTML = html;
@@ -254,11 +255,7 @@ function lbBoard(ex, tasks, onDraw) {
       ? `Head to head: the same ${int(n[0])} privileged and ${int(n[1])} standard questions for every ranked model.`
       : 'Everything each model sat: the counts differ from row to row, so compare with care.';
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
-    $$('.db-row.x', board).forEach((row) => {
-      const toggle = () => { state.open = state.open === row.dataset.run ? null : row.dataset.run; draw(); };
-      row.addEventListener('click', toggle);
-      row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
-    });
+    $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
     if (onDraw) onDraw({ state, main, scores });
   }
   function sync() {
@@ -1322,6 +1319,34 @@ function makerMark(model) {
   return `<span class="mk" title="${m[1]}"><svg viewBox="0 0 24 24" role="img" aria-label="${m[1]}">${m[2]}</svg></span>`;
 }
 
+/** One ranked row, shared by the home page and the leaderboard page: place (gold, silver, bronze), maker's mark, model
+ *  and setting, the standard score as an ink bar (deeper for higher, relative to `best`), the privileged score as a grey
+ *  hatched ghost behind it, and both numbers at the end. `part`: a smaller run, listed but not ranked. */
+function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false } = {}) {
+  const v = pctOf(sc.standard), p = pctOf(sc.privileged);
+  const k = Math.round(38 + 62 * (v ?? 0) / Math.max(best || 0, 1));
+  const frac = (x) => (x?.[1] ? `${x[0]} of ${x[1]}` : 'not sat');
+  return `<button type="button" class="lbh-row${part ? ' part' : ''}${open ? ' on' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}" aria-expanded="${open}"
+      aria-label="${esc(r.model)}: standard ${frac(sc.standard)}, privileged ${frac(sc.privileged)}">
+    <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
+    <span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small>${meta ? `<small class="lbh-meta">${meta}</small>` : ''}</span>
+    <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%" title="Privileged: ${frac(sc.privileged)}"></span>` : ''}${v != null ? `<span class="lbh-s" style="--w:${v.toFixed(1)}%;--k:${k}%" title="Standard: ${frac(sc.standard)}"></span>` : ''}</span>
+    <span class="lbh-val" style="--k:${k}%"><b>${v != null ? `${Math.round(v)}<small>%</small>` : '–'}</b>${p != null ? `<em>${Math.round(p)}%</em>` : '<em>–</em>'}</span>
+  </button>`;
+}
+const LBH_KEY = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b>the robot’s own sensors, one go; deeper is higher</span>
+  <span><i class="sw p"></i><b>Privileged</b>open book: the simulator’s inside and retries</span></div>`;
+const LBH_AXIS = `<div class="lbh-axis" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>`;
+/** A model opened under its row: both modes, then its suites one by one. */
+function lbhDetail(ex, r, sc, href = true) {
+  const pc = (x) => (x?.[1] ? Math.round(pctOf(x)) : '–');
+  return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></div>
+      <div class="lbh-pair"><span class="s"><b>${pc(sc.standard)}%</b>standard · ${sc.standard?.[0] ?? 0} of ${sc.standard?.[1] ?? 0}</span>
+        <span class="p"><b>${pc(sc.privileged)}%</b>privileged · ${sc.privileged?.[0] ?? 0} of ${sc.privileged?.[1] ?? 0}</span></div>
+      ${href ? `<a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
+    <p class="lbh-dk"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>each suite</p>${dbDetail(ex, r, { suites: sc.suites || {} })}</div>`;
+}
+
 /** The leaderboard on the home page. The message is the standard mode, the exam itself: how much of it each agent solves
  *  with only the robot's own sensors, and how far apart the agents are. One bar per ranked model, longest first, with
  *  its maker's mark and its place, one row each so the board can grow; the privileged score (open book) stands behind it as a hatched ghost, so the gap is
@@ -1333,24 +1358,9 @@ function homeBoard(el, ex) {
   const P = (id, m) => pctOf(sh.scores[id][m]);
   const order = [...sh.runs].sort((a, b) => (P(b, 'standard') ?? -1) - (P(a, 'standard') ?? -1) || (P(b, 'privileged') ?? -1) - (P(a, 'privileged') ?? -1));
   const best = P(order[0], 'standard') ?? 0;
-  const rows = order.map((id, i) => {
-    const r = runs[id] || { model: id };
-    const v = P(id, 'standard') ?? 0, p = P(id, 'privileged');
-    const [sv, pv] = [sh.scores[id].standard, sh.scores[id].privileged];
-    return `<button type="button" class="lbh-row" data-id="${esc(id)}" style="--i:${i}" aria-expanded="false"
-        aria-label="${esc(r.model)}: ${Math.round(v)}% in standard mode${p != null ? `, ${Math.round(p)}% privileged` : ''}">
-      <span class="rk r${i + 1}">${i + 1}</span>${makerMark(r.model)}
-      <span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>
-      <span class="lbh-track">
-        ${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%" title="Privileged: ${pv[0]} of ${pv[1]}"></span>` : ''}
-        <span class="lbh-s" style="--w:${v.toFixed(1)}%;--k:${Math.round(38 + 62 * v / Math.max(best, 1))}%" title="Standard: ${sv[0]} of ${sv[1]}"></span>
-      </span>
-      <span class="lbh-val" style="--k:${Math.round(38 + 62 * v / Math.max(best, 1))}%"><b>${Math.round(v)}<small>%</small></b>${p != null ? `<em>${Math.round(p)}%</em>` : ''}</span>
-    </button>`;
-  }).join('');
-  el.innerHTML = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b>the robot’s own sensors, one go; deeper is higher</span>
-      <span><i class="sw p"></i><b>Privileged</b>open book: the simulator’s inside and retries</span></div>
-    <div class="lbh-chart"><div class="lbh-axis" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>
+  const rows = order.map((id, i) => lbhRow(runs[id] || { model: id }, sh.scores[id], i + 1, best)).join('');
+  el.innerHTML = `${LBH_KEY}
+    <div class="lbh-chart">${LBH_AXIS}
       <div class="lbh-rows">${rows}</div></div>
     <p class="lbh-hint">Click a model to see where its open-book gap comes from, suite by suite.</p>
     <div class="lbh-detail" hidden></div>`;
@@ -1362,12 +1372,8 @@ function homeBoard(el, ex) {
     el.classList.toggle('picked', !was);
     if (was) { det.hidden = true; return; }
     b.setAttribute('aria-expanded', 'true'); b.classList.add('on');
-    const id = b.dataset.id, r = runs[id] || { model: id }, sc = sh.scores[id];
-    det.innerHTML = `<div class="lbh-dh">${makerMark(r.model)}<div><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></div>
-        <div class="lbh-pair"><span class="s"><b>${Math.round(pctOf(sc.standard))}%</b>standard · ${sc.standard[0]} of ${sc.standard[1]}</span>
-          <span class="p"><b>${Math.round(pctOf(sc.privileged))}%</b>privileged · ${sc.privileged[0]} of ${sc.privileged[1]}</span></div>
-        <a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(id)}">On the leaderboard →</a></div>
-      <p class="lbh-dk"><span><i class="dot p"></i>Privileged</span><span><i class="dot s"></i>Standard</span>each suite, on the questions every ranked model sat</p>${dbDetail(ex, r, { suites: sh.suites[id] || {} })}`;
+    const id = b.dataset.id, r = runs[id] || { model: id };
+    det.innerHTML = lbhDetail(ex, r, { ...sh.scores[id], suites: sh.suites[id] || {} }).replace(/^<div class="lbh-detail in">|<\/div>$/g, '');
     b.after(det);
     det.hidden = false;
     det.classList.remove('in'); void det.offsetWidth; det.classList.add('in');
@@ -1408,6 +1414,7 @@ async function home(ex) {
 async function leaderboardPage(ex) {
   const lb = ex.leaderboard || {};
   $('#lb-pre-text').textContent = lb.note || '';
+  $('#lb-key').innerHTML = LBH_KEY;
   lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
   lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores));

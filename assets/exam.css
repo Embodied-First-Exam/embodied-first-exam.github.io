@@ -1349,3 +1349,22 @@ html.ol-lock { overflow: hidden; }
 .way-code code { background: none; padding: 0; color: inherit; font: inherit; }
 .way-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
 @media (max-width: 860px) { .way-body { grid-template-columns: minmax(0, 1fr); } .way-code pre { max-height: 220px; } }
+
+/* the leaderboard page: the home page's ranked rows, with a meta line, smaller runs and the board's controls */
+.lbh-page { margin-top: 18px; }
+.lbh-page .lbh-chart { margin-top: 22px; }
+.lbh-meta { font: 500 11px/1.4 var(--mono); color: var(--ink-3); }
+.lbh-meta .rs { color: var(--priv-ink); }
+.lbh-row.part { opacity: .72; }
+.lbh-row.part .lbh-s { background: color-mix(in srgb, var(--ink) 30%, var(--bg-2)); }
+.rk.r0 { color: var(--ink-3); }
+.lbh-page .db-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 6px 8px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
+.lbh-page .lbh-row .lbh-name { padding: 2px 0; }
+/* the leaderboard's own palette, as the ranked rows: standard in ink, privileged in grey (only here; the rest of the
+   site keeps its mode colours) */
+.lbh .lbh-detail, .lbh-dk { --std: var(--ink); --std-ink: var(--ink); --priv: var(--ink-3); --priv-ink: var(--ink-3); }
+#lb-suites .sx-grid { --c: color-mix(in srgb, var(--ink) 52%, var(--surface)); }
+#lb-suites .sx-grid.sx-privileged { --c: color-mix(in srgb, var(--ink-3) 70%, var(--surface)); }
+#lb-suites .sx-bar .seg button .dot.s { background: var(--ink); }
+#lb-suites .sx-bar .seg button .dot.p { box-shadow: inset 0 0 0 2px var(--ink-3); }
+#lb-suites .sx-bar .seg button.on .dot.s { background: var(--bg); }
