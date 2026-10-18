@@ -1,13 +1,52 @@
 #!/usr/bin/env python3
-"""Give the pages' links to assets/exam.css and assets/app.js a content hash (?v=...), so a browser fetches a new
-version as soon as one is published and keeps its cached copy otherwise."""
+"""Give the site's own assets a content hash (?v=...), so a browser fetches a new version as soon as one is published and
+keeps its cached copy otherwise.
+
+- Modules that app.js (or another module) imports by a relative URL, `import('./search.js?v=…')` or
+  `from './search_core.js?v=…'`, get the hash of the module they name. Leaves are hashed first, so a change in a
+  module changes the hash of everything that imports it.
+- The pages' links to assets/exam.css and assets/app.js get their hashes last."""
 
 import hashlib
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-stamps = {name: hashlib.sha256((ROOT / "assets" / name).read_bytes()).hexdigest()[:8] for name in ("exam.css", "app.js")}
+A = ROOT / "assets"
+REF = re.compile(r"""(['"`]\./([\w-]+\.(?:js|css)))(\?v=[0-9a-f]*)?(['"`])""")
+
+
+def digest(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()[:8]
+
+
+# the JS modules and the imports between them, then stamp each in an order where the modules it names come first
+mods = {p.name: p for p in A.glob("*.js")}
+deps = {n: {m.group(2) for m in REF.finditer(p.read_text(encoding="utf-8")) if m.group(2) in mods or (A / m.group(2)).is_file()}
+        for n, p in mods.items()}
+done: dict[str, str] = {}
+
+
+def stamp(name: str, seen=()) -> str:
+    if name in done:
+        return done[name]
+    p = A / name
+    if name in mods:
+        for d in deps[name] - set(seen) - {name}:
+            stamp(d, (*seen, name))
+        text = p.read_text(encoding="utf-8")
+        # a module that names itself (in a comment, say) is left as it is: its own hash cannot be inside it
+        new = REF.sub(lambda m: f"{m.group(1)}?v={done.get(m.group(2)) or stamp(m.group(2), (*seen, name))}{m.group(4)}"
+                      if (A / m.group(2)).is_file() and m.group(2) != name and m.group(2) not in seen else m.group(0), text)
+        if new != text:
+            p.write_text(new, encoding="utf-8")
+    done[name] = digest(p)
+    return done[name]
+
+
+for n in sorted(mods):
+    stamp(n)
+stamps = {"exam.css": digest(A / "exam.css"), "app.js": done["app.js"]}
 changed = 0
 for page in sorted([*ROOT.glob("**/index.html"), ROOT / "404.html"]):
     text = page.read_text(encoding="utf-8")
@@ -15,4 +54,5 @@ for page in sorted([*ROOT.glob("**/index.html"), ROOT / "404.html"]):
     if new != text:
         page.write_text(new, encoding="utf-8")
         changed += 1
-print(f"stamped {changed} pages: " + ", ".join(f"{k}?v={v}" for k, v in stamps.items()))
+print(f"stamped {changed} pages: " + ", ".join(f"{k}?v={v}" for k, v in stamps.items())
+      + (f"; modules: {', '.join(f'{k}?v={v}' for k, v in sorted(done.items()) if k != 'app.js')}" if len(done) > 1 else ""))

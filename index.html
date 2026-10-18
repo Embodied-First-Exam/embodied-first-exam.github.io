@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/exam.css?v=38dd7b1e">
+<link rel="stylesheet" href="assets/exam.css?v=1f888298">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=f79d1a13"></script>
+<script type="module" src="assets/app.js?v=a5632823"></script>
 </head>
 <body data-page="home">
 <div id="nav"></div>
@@ -32,6 +32,7 @@
           <a class="btn primary" href="leaderboard/">See the leaderboard <span class="arr">→</span></a>
           <a class="btn" href="tasks/">Browse the tasks</a>
         </div>
+        <div class="home-search" id="home-search"></div>
       </div>
     </div>
     <a class="scroll-cue" href="#statement" aria-label="Scroll down">↓</a>
@@ -47,6 +48,13 @@
     </div>
     <div class="lbh reveal" id="lbh"></div>
     <p class="note reveal" id="bars-note"></p>
+  </section>
+
+  <section class="section" id="diversity">
+    <div class="head reveal">
+      <h2>Task diversity</h2>
+    </div>
+    <div class="sphere reveal" id="sphere"></div>
   </section>
 
   <section class="section" id="suites-sec">
@@ -66,16 +74,6 @@
       <ul id="trust"></ul>
     </div>
     <p class="note reveal"><a href="how/">Every rule, step by step →</a></p>
-  </section>
-
-  <section class="section" id="tests">
-    <div class="tests reveal">
-      <div class="tests-text">
-        <h2>What the exam tests</h2>
-        <div class="tm-panel" id="tm-panel" aria-live="polite"></div>
-      </div>
-      <div class="taxmap" id="taxmap"></div>
-    </div>
   </section>
 
   <section class="section closing">

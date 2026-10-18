@@ -407,39 +407,6 @@ function coverageInfo(ex) {
   return { groups, suites, total: suites.reduce((a, s) => a + s.instances, 0) };
 }
 
-/** Coverage, drawn like the home page's map: a row per suite, a column per label (capabilities, then domains), a dot on
- *  each crossing whose area is the share of the suite's scenes with that label. Pointing lights the row and the column;
- *  a click opens those scenes in the task list. */
-function coverage(el, ex) {
-  const info = coverageInfo(ex);
-  if (!el) return info;
-  const { groups, suites, total } = info;
-  const D = 30;
-  const cols = groups.flatMap((g, gi) => g.tags.map((t, ti) => ({ ...t, group: g.name, first: ti === 0 && gi > 0 })));
-  const short = (t) => t.name.split(/[ &/]+/)[0];
-  const dot = (n, of) => (n ? `<i style="--d:${Math.max(6, Math.sqrt(n / of) * D).toFixed(1)}px"></i>` : '');
-  const head = `<div class="cv-row cv-head"><span class="cv-name"></span>${cols.map((t) => `<a class="cv-col${t.first ? ' gstart' : ''}" href="${exam('tasks/')}?tags=${t.id}" data-tag="${t.id}" title="${esc(t.name)}">${tagIcon(t.id)}<b>${esc(short(t))}</b></a>`).join('')}</div>`;
-  const groupsRow = `<div class="cv-row cv-groups"><span class="cv-name"></span>${groups.map((g) => `<span class="cv-grp" style="grid-column: span ${g.tags.length}">${esc(g.name)}</span>`).join('')}</div>`;
-  const rows = suites.map((s) => `<div class="cv-row" data-suite="${s.id}"><a class="cv-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span><small>${int(s.instances)}</small></a>
-      ${cols.map((t) => { const n = s.tags?.[t.id] || 0; return `<a class="cv-cell${t.first ? ' gstart' : ''}${n ? '' : ' none'}" data-tag="${t.id}" href="${exam('tasks/')}?suite=${s.id}&tags=${t.id}" title="${esc(s.name)}: ${n} of ${s.instances} scenes need ${esc(t.name)}">${dot(n, s.instances)}</a>`; }).join('')}</div>`).join('');
-  const totals = `<div class="cv-row cv-total"><span class="cv-name"><b>All ${int(total)} scenes</b></span>${cols.map((t) => {
-    const n = suites.reduce((a, s) => a + (s.tags?.[t.id] || 0), 0);
-    return `<span class="cv-cell${t.first ? ' gstart' : ''}" data-tag="${t.id}" title="${n} of ${total} scenes">${dot(n, total)}<em>${Math.round((100 * n) / total)}%</em></span>`;
-  }).join('')}</div>`;
-  const legend = `<div class="sd-legend">${[0.1, 0.5, 1].map((x) => `<span><span class="cv-dot">${dot(x, 1)}</span>${Math.round(x * 100)}%</span>`).join('')}<span class="cap">of a suite’s scenes carry the label</span></div>`;
-  el.innerHTML = `${legend}<div class="sd-scroll"><div class="cv-grid" style="--n:${cols.length}">${groupsRow}${head}${rows}${totals}</div></div>`;
-  const grid = $('.cv-grid', el);
-  const light = (tag, suite) => {
-    $$('.on', grid).forEach((x) => x.classList.remove('on'));
-    grid.classList.toggle('focus', !!(tag || suite));
-    if (tag) $$(`[data-tag="${tag}"]`, grid).forEach((x) => x.classList.add('on'));
-    if (suite) $(`.cv-row[data-suite="${suite}"]`, grid)?.classList.add('on');
-  };
-  grid.addEventListener('mouseover', (e) => { const c = e.target.closest('[data-tag]'); const r = e.target.closest('.cv-row[data-suite]'); light(c?.dataset.tag, r?.dataset.suite); });
-  grid.addEventListener('mouseleave', () => light());
-  return info;
-}
-
 function thinSpots(el, ex, info) {
   const tags = info.groups.flatMap((g) => g.tags.map((t) => ({ ...t, group: g.name, n: info.suites.reduce((a, s) => a + (s.tags?.[t.id] || 0), 0) })));
   const thin = tags.filter((t) => t.n / info.total < 0.12).sort((a, b) => a.n - b.n);
@@ -473,7 +440,7 @@ function taskCard(ex, t, runs) {
   const crop = cropFor(t.suite, t.id);
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
     <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${WATCH.has(`${t.suite}/${t.id}`) ? '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>' : ''}</div>
-    <div class="body"><h4>${esc(t.title)}</h4>
+    <div class="body"><h4>${esc(t.title)}</h4>${t.code ? `<span class="t-code">${esc(t.code)}</span>` : ''}
       ${runs.length ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
 
@@ -524,18 +491,19 @@ function openTask(ex, t, runs) {
     ['Agent time', t.budget_min ? `${t.budget_min} min per attempt` : ''],
     ['Family', `<span class="mono">${esc(t.family || '')}</span>`],
     ['Task directories', (t.dirs || []).map((d) => `<span class="mono" style="font-size:12px">${esc(d)}</span>`).join('<br>')],
-    ['Author', esc(t.author || '')],
   ].filter(([, v]) => v);
   const tags = (t.tags || []).map((id) => ex._tags[id]).filter(Boolean).map((tg) => `<span class="pill">${esc(tg.name)}</span>`).join(' ');
   $('#drawer .drawer-inner').innerHTML = `
     <div class="drawer-top"><span class="label">${esc(s.name || '')} · task</span><button class="icon-btn" data-close aria-label="Close">✕</button></div>
-    <h2>${esc(t.title)}</h2><p class="sentence">${prose(t.sentence || '')}</p>
+    <h2>${esc(t.title)}</h2>${t.code ? `<p class="t-code">${esc(t.code)}</p>` : ''}<p class="sentence">${prose(t.sentence || '')}</p>
     ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${tags}</div>` : ''}
     ${media}
+    <div id="drawer-atlas"></div>
     <h3>Results</h3>
     ${res ? `<table class="res-table"><thead><tr><th>Model</th><th>Privileged</th><th>Standard</th></tr></thead><tbody>${res}</tbody></table>` : '<p class="muted">No agent has run this task yet.</p>'}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
+    <div id="drawer-related"></div>
     <div class="link-list" id="drawer-links"><a class="btn small" href="${exam('suite/')}?id=${s.id}">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
   watchable().then((m) => {
     const mine = m.get(`${t.suite}/${t.id}`) || [];
@@ -544,6 +512,11 @@ function openTask(ex, t, runs) {
     const media = $('#drawer .media');
     if (media) media.insertAdjacentHTML('afterend', `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`);
   });
+  // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
+  import('./search.js?v=c7c60ac6').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+    const x = all.find((y) => `${y.suite}/${y.id}` === k);
+    if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
+  }) })).catch((e) => console.error(e));
   document.body.classList.add('drawer-open');
   const u = new URL(location.href);
   u.searchParams.set('task', `${t.suite}/${t.id}`);
@@ -563,6 +536,12 @@ function drawerShell() {
   document.body.insertAdjacentHTML('beforeend', '<div class="drawer-scrim" data-close></div><aside class="drawer" id="drawer" aria-label="Task"><div class="drawer-inner"></div></aside>');
   document.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeTask(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTask(); });
+}
+
+/** A task's results over every model: 'solved' (by some model), 'unsolved' (graded, never solved) or 'unrun'. */
+function resultOf(t) {
+  const cells = Object.values(t.results || {}).flatMap((r) => Object.values(r).map(scored));
+  return cells.includes('S') ? 'solved' : cells.some((c) => GRADED.has(c)) ? 'unsolved' : 'unrun';
 }
 
 function taskBrowser(el, ex, tasks, opts = {}) {
@@ -591,13 +570,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
     if (state.body && t.body !== state.body) return false;
     if (state.tag && !(t.tags || []).includes(state.tag)) return false;
     if (state.tags.length && !state.tags.every((g) => (t.tags || []).includes(g))) return false;
-    if (state.result) {
-      const cells = Object.values(t.results || {}).flatMap((r) => Object.values(r).map(scored));
-      const solved = cells.includes('S'), graded = cells.some((c) => GRADED.has(c));
-      if (state.result === 'solved' && !solved) return false;
-      if (state.result === 'unsolved' && (solved || !graded)) return false;
-      if (state.result === 'unrun' && graded) return false;
-    }
+    if (state.result && resultOf(t) !== state.result) return false;
     if (state.q) {
       const s = ex._suites[t.suite];
       const hay = `${t.title} ${t.sentence} ${t.family} ${s?.name} ${s?.code} ${t.id}`.toLowerCase();
@@ -633,6 +606,8 @@ function taskBrowser(el, ex, tasks, opts = {}) {
     if (b) openTask(ex, index.get(b.dataset.task), runs);
   });
   draw();
+  // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
+  import('./search.js?v=c7c60ac6').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -854,81 +829,6 @@ const TAG_ICON = {
 };
 const tagIcon = (id) => `<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAG_ICON[id] || '<circle cx="12" cy="12" r="8"/>'}</svg>`;
 
-/** What the exam tests: task domains (rows) by capabilities (columns), a dot on each crossing sized by the questions
- *  that carry both labels, on a light lattice so that a missing pair reads as a gap, not as a hole in the layout.
- *  Pointing at a dot or a label explains it in `panel` (beside the map) with a few of its questions; a click opens them
- *  in the task list. */
-function taxonomyMap(el, panel, ex) {
-  const m = ex.taxmap;
-  if (!el || !m?.rows?.length) return;
-  const caps = m.rows, doms = m.cols;
-  const cellOf = (cap, dom) => m.cells[`${cap}|${dom}`];
-  const max = Math.max(1, ...Object.values(m.cells).map((c) => c.n));
-  const size = (n) => (n ? Math.max(10, Math.round(Math.sqrt(n / max) * 64)) : 0);
-  const tasksFor = (...ids) => `${exam('tasks/')}?tags=${ids.map(encodeURIComponent).join(',')}`;
-  const tag = (id) => [...caps, ...doms].find((t) => t.id === id);
-  const cells = [`<div class="tm-corner"><span>Domain ↓</span><span>Capability →</span></div>`,
-    ...caps.map((c) => `<a class="tm-head tm-col" href="${tasksFor(c.id)}" data-cap="${c.id}" title="${esc(c.name)}">${tagIcon(c.id)}<b class="full">${esc(c.name)}</b>`
-      + `<b class="short">${esc(c.name.split(/[ &/]+/)[0])}</b><small>${int(c.n)}</small></a>`)];
-  doms.forEach((d, r) => {
-    cells.push(`<a class="tm-head tm-row" href="${tasksFor(d.id)}" data-dom="${d.id}">${tagIcon(d.id)}<span><b>${esc(d.name)}</b><small>${int(d.n)} questions</small></span></a>`);
-    caps.forEach((c, k) => {
-      const x = cellOf(c.id, d.id);
-      const pos = [k === 0 && 'first', k === caps.length - 1 && 'last', r === 0 && 'top', r === doms.length - 1 && 'bottom'].filter(Boolean).join(' ');
-      cells.push(x
-        ? `<a class="tm-cell ${pos}" href="${tasksFor(c.id, d.id)}" data-cap="${c.id}" data-dom="${d.id}" aria-label="${esc(d.name)} needing ${esc(c.name)}: ${x.n} questions"><i style="--d:${size(x.n)}px"></i><em class="${size(x.n) >= 30 ? 'in' : 'out'}">${int(x.n)}</em></a>`
-        : `<a class="tm-cell gap ${pos}" href="${exam('contribute/')}#propose" data-cap="${c.id}" data-dom="${d.id}" aria-label="${esc(d.name)} needing ${esc(c.name)}: no questions yet"><i></i></a>`);
-    });
-  });
-  el.innerHTML = `<div class="tm-grid" style="--cols:${caps.length}">${cells.join('')}</div>`;
-
-  // the reading when nothing is pointed at: how many capabilities a question needs at once, which the map's pairs
-  // cannot show, and the most common mix
-  const perQ = Object.entries(m.per_question || {}).map(([k, n]) => [Number(k), n]);
-  const multi = perQ.filter(([k]) => k >= 2).reduce((a, [, n]) => a + n, 0);
-  const mix = m.top_mix || { ids: [], n: 0 };
-  const bar = perQ.map(([k, n]) => `<span class="seg k${k}" style="flex:${n}" title="${int(n)} questions need ${k} capabilit${k === 1 ? 'y' : 'ies'}"><b>${k}</b><small>${int(n)}</small></span>`).join('');
-  const legend = [10, 100, 300].filter((n) => n <= max).map((n) => `<span><i style="--d:${size(n)}px"></i>${int(n)}</span>`).join('');
-  const idle = `<p class="label">${int(m.total)} labelled questions</p>
-    <h3><em>${Math.round((100 * multi) / m.total)}%</em> of them need two or more capabilities at once.</h3>
-    <div class="tm-perq" aria-label="Capabilities needed per question">${bar}</div>
-    <p class="tm-perq-cap">capabilities per question</p>
-    ${mix.n ? `<div class="tm-mix"><span class="tm-mix-ic">${mix.ids.map((id) => tagIcon(id)).join('<i>+</i>')}</span>
-      <p>The most common mix: <b>${mix.ids.map((id) => esc(tag(id).name.split(' & ')[0])).join(', ').replace(/, ([^,]*)$/, ' and $1')}</b>, in ${int(mix.n)} questions.</p></div>` : ''}
-    <div class="tm-legend" aria-hidden="true">${legend}<span class="cap">questions per dot</span></div>
-    <p class="tm-hint">Point at a dot to see its questions; click it to open them.</p>`;
-  const shots = (list) => (list?.length ? `<div class="tm-ex">${list.slice(0, 3).map((e) => `<a href="${exam('tasks/')}?task=${encodeURIComponent(`${e.s}/${e.id}`)}" title="${esc(e.t)}"><img src="${esc(site(e.p))}" alt="" loading="lazy"${cropFor(e.s, e.id) ? ` class="${cropFor(e.s, e.id)}"` : ''}><span>${esc(ex._suites[e.s]?.code || '')}</span></a>`).join('')}</div>` : '');
-  panel.innerHTML = idle;
-  const show = (target) => {
-    $$('.on, .hrow, .hcol', el).forEach((x) => x.classList.remove('on', 'hrow', 'hcol'));
-    el.classList.toggle('focus', !!target);
-    if (!target) { panel.innerHTML = idle; return; }
-    const { cap, dom } = target.dataset;
-    if (cap) $$(`[data-cap="${cap}"]`, el).forEach((e) => e.classList.add(e.classList.contains('tm-cell') ? 'hcol' : 'on'));
-    if (dom) $$(`[data-dom="${dom}"]`, el).forEach((e) => e.classList.add(e.classList.contains('tm-cell') ? 'hrow' : 'on'));
-    if (cap && dom) {
-      target.classList.add('on');
-      const c = tag(cap), d = tag(dom), x = cellOf(cap, dom);
-      panel.innerHTML = x
-        ? `<p class="label">Domain × capability</p><h3>${esc(d.name)} <span>×</span> ${esc(c.name)}</h3>
-          <p class="tm-n"><b>${int(x.n)}</b> question${x.n === 1 ? '' : 's'} from ${int(x.suites)} suite${x.suites === 1 ? '' : 's'}</p>${shots(x.ex)}
-          <a class="btn small" href="${tasksFor(cap, dom)}">Open these questions <span class="arr">→</span></a>`
-        : `<p class="label">Domain × capability</p><h3>${esc(d.name)} <span>×</span> ${esc(c.name)}</h3>
-          <p>No question needs this pair yet. A suite that does would fill one of the exam’s gaps.</p>
-          <a class="btn small" href="${exam('contribute/')}#propose">Propose a suite <span class="arr">→</span></a>`;
-    } else {
-      const id = cap || dom, t = tag(id);
-      $$(`.tm-cell[data-${cap ? 'cap' : 'dom'}="${id}"]`, el).forEach((e) => e.classList.add('on'));
-      panel.innerHTML = `<p class="label">${cap ? 'Capability' : 'Domain'}</p><h3>${tagIcon(id)} ${esc(t.name)}</h3>
-        <p class="tm-n"><b>${int(t.n)}</b> of ${int(m.total)} questions</p><p>${esc(t.description || '')}</p>
-        <a class="btn small" href="${tasksFor(id)}">Open these questions <span class="arr">→</span></a>`;
-    }
-  };
-  const grid$ = $('.tm-grid', el);
-  grid$.addEventListener('mouseover', (e) => { const t = e.target.closest('[data-cap],[data-dom]'); if (t) show(t); });
-  grid$.addEventListener('focusin', (e) => { const t = e.target.closest('[data-cap],[data-dom]'); if (t) show(t); });
-  grid$.addEventListener('mouseleave', () => show(null));
-}
 
 // line icons for the marking diagram and the guarantees (24-unit grid; the stroke keeps its width when scaled)
 const FF_ICONS = {
@@ -972,51 +872,118 @@ function flowDiagram(el, ex) {
   const t = ex?.totals || {};
   const ic = (n, cls = '') => `<svg class="fx-ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n]}</svg>`;
   const run = (slug) => `${exam('run/')}?r=${encodeURIComponent(slug)}`;
-  const way = (k, txt, tip, slug) => `<a class="fx-way" href="${run(slug)}" data-way="${k}" title="${esc(tip)} Click to see it in a real run."><i>${k}</i>${esc(txt)}</a>`;
+  const way = (k) => `<a class="fx-way" href="${run(WAYS[k].slug)}" data-way="${k}" title="${esc(WAYS[k].line)} Click to see it in a real run.">${esc(WAYS[k].tab)}</a>`;
   const layer = (row, name, icon, body, tip, cls = '') => `<div class="fx-layer ${cls}" style="grid-row:${row}" title="${esc(tip)}"><span class="fx-ln">${ic(icon)}${name}</span><div class="fx-lb">${body}</div></div>`;
   const sims = ['MuJoCo', 'Isaac Sim', 'OmniGibson', 'SAPIEN', 'Genesis'];
+  const soa = (k) => `<span class="fx-soa"><i>s<sub>${k}</sub></i><i>o<sub>${k}</sub></i><i>a<sub>${k}</sub></i></span>`;
   el.innerHTML = `<div class="fx"><span class="fx-tag">Harbor · one command</span>
     <div class="fx-grid">
-      <div class="fx-qcard" style="grid-row:1 / 6"></div><span class="fx-qh" style="grid-row:1">${ic('snow')}Question</span>
-      <div class="fx-twin" style="grid-row:3 / 5" title="Each question ships twice, standard and privileged, on one frozen scene with one success rule, the same seeds and the same time limit, so the two marks compare">
-        <span class="fx-tw">${ic('pair')}two twins</span><span class="fx-tm s">standard</span><span class="fx-tm p">privileged</span><small>same scene · rule · time</small></div>
-      <div class="fx-in" style="grid-row:2" title="The goal written for a person, with every convention the agent cannot guess: the harness’s prompt">${ic('doc')}<span>goal in words</span></div>
+      <div class="fx-qcard" style="grid-row:1 / 6"></div>
+      <div class="fx-qh" style="grid-row:1"><b>${ic('snow')}Question</b></div>
+      <div class="fx-in fx-goal" style="grid-row:2 / 4" title="The goal written for a person, with every convention the agent cannot guess (frames, units, the action layout, the time limit): the harness’s prompt">
+        <span class="fx-ih">${ic('doc')}goal in words</span>
+        <q>Completely separate the two claw pieces and briefly hold both still.</q></div>
       <i class="fx-arrow" style="grid-row:2"></i>
-      <div class="fx-in" style="grid-row:5" title="A simulation scene rebuilt bit for bit and checked against its starting state">${ic('cube')}<span>frozen scene</span></div>
+      <div class="fx-in fx-scene" style="grid-row:4 / 6" title="A simulation scene rebuilt bit for bit and checked against its starting state">
+        <span class="fx-ih">${ic('cube')}frozen scene</span>
+        <img src="${esc(site('media/ways/scene_start.jpg'))}" alt="The scene at the start: two arms hold two interlocked claw pieces, orange and teal" loading="lazy">
+        <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in both modes</li></ul></div>
       <i class="fx-arrow" style="grid-row:5"></i>
       ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
       ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the question is its prompt; web search off')}
-      ${layer(3, 'Agent’s code', 'code', `${way('a', 'actions', 'Joint targets written directly: keyframes, interpolation, gaits.', 'mujoco_playground_barkour_joystick-privileged--dycu4ar')}${way('b', 'IK script', 'Targets from vision or state, inverse kinematics, a joint path.', 'robotwin_2_0_stack_blocks_three-standard--5vbeb5g')}${way('c', 'policy', 'A reward, parallel simulations, a trained network rolled out.', 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za')}${way('d', 'mix', 'IK, camera feedback, search and learning combined.', 'roboolympics-dunk-i00-privileged--wmry4fr')}`, 'Whatever the agent writes: the answer is code')}
-      <div class="fx-layer fx-if" style="grid-row:4"><span class="fx-ln">${ic('layers')}Interface</span>
-        <div class="fx-half s" title="Standard, the exam: the robot runs in a service the agent cannot open; only the robot API answers. Never given: object poses, segmentation, contact forces, the success check.">
-          <span class="fx-lock">${ic('lock')}</span><div><b>Standard</b><span>robot API · RGB-D · joints · FK/IK</span></div>
-          <em title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
-        <div class="fx-half p" title="Privileged, the reference: agent and simulator share one container"><span class="fx-lock p">${ic('cube')}</span><div><b>Privileged</b><span>sim API · full state · resets</span></div></div>
+      ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
+      <div class="fx-iface" style="grid-row:4">
+        <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per mode</small></span>
+        <div class="fx-mode s" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success check.">
+          <div class="fx-mh"><span class="fx-lock">${ic('lock')}</span><b>Standard</b><em title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
+          <dl><div><dt>access</dt><dd>the <b>eai-standard</b> robot API<span class="fx-eps"><code>/spec</code><code>/observe</code><code>/submit</code><code>/kinematics</code></span></dd></div>
+            <div><dt>actions</dt><dd><code>joint_position</code> or <code>ee_pose</code>, sent as <code>(T, dim)</code> chunks</dd></div>
+            <div><dt>sees</dt><dd>RGB, depth, the robot’s own state</dd></div></dl>
+        </div>
+        <div class="fx-mode p" title="Privileged, the reference. Agent and simulator share one container; the suite’s own tooling gives the simulator’s full state and unlimited resets. The deliverable is /app/output/trajectory.npz, or code for a policy task; it is replayed in a fresh simulator.">
+          <div class="fx-mh"><span class="fx-lock p">${ic('cube')}</span><b>Privileged</b></div>
+          <dl><div><dt>access</dt><dd>the suite’s own simulator tools, in the same container</dd></div>
+            <div><dt>actions</dt><dd>the same action space, delivered as <code>trajectory.npz</code> (or policy code)</dd></div>
+            <div><dt>sees</dt><dd>the full simulator state; resets at will</dd></div></dl>
+        </div>
       </div>
       ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.simulators || 20)} · ${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
-      <i class="fx-arrow out" style="grid-row:4"><em>episode<br>trajectory</em></i>
-      <div class="fx-orch" title="Harbor runs each trial: it builds and starts the question’s containers, installs the harness, starts the clock, stops the agent at the limit, collects the answer and runs the verifier">
-        <span class="fx-vh">${ic('layers')}Harbor</span>
-        <div class="fx-vi">${ic('sandbox')}builds containers</div>
-        <div class="fx-vi">${ic('terminal')}installs harness</div>
-        <div class="fx-vi">${ic('clock')}time limit</div>
-      </div>
+      <i class="fx-arrow out" style="grid-row:4"><em>recorded</em></i>
       <div class="fx-ver" title="Its own sandbox, no network">
         <span class="fx-vh">${ic('shield')}Verifier</span>
+        <div class="fx-vi" title="Its own sandbox, no network; it sees only the trajectory">${ic('sandbox')}sandbox</div>
         <div class="fx-vi s" title="Standard: the service judges the live episode it ran">${ic('rec', 's')}live verdict</div>
-        <div class="fx-vi p" title="Privileged: replayed twice in a fresh simulator; both replays must end in the same state">${ic('replay', 'p')}replay ×2</div>
+        <div class="fx-vi p" title="Privileged: the trajectory replayed in a fresh simulator from the frozen start">${ic('replay', 'p')}replay</div>
         <div class="fx-res"><b>1</b><span>0</span></div>
         <div class="fx-rec" title="Every step, its tokens and cost, and a video">${ic('log')}steps · cost · video</div>
       </div>
+      <button type="button" class="fx-traj" title="The episode as a POMDP trajectory: at every step the simulator's state, what the robot observed and the action it took. Click for an example.">
+        <span class="fx-vh">${ic('traj')}Episode trajectory</span>
+        <span class="fx-pomdp">a POMDP rollout</span>
+        <span class="fx-seq">${soa(0)}<b>→</b>${soa(1)}<b>→</b><span class="fx-dots">…</span></span>
+        <span class="fx-legend"><span><i>s</i>simulator state</span><span><i>o</i>RGB(-D)</span><span><i>a</i>action</span></span>
+        <img class="fx-obs" src="${esc(site('media/ways/traj_frame.jpg'))}" title="Rendered from the reference solution" alt="Mid-episode: the two claw pieces sliding apart" loading="lazy">
+        <span class="fx-ex">See an example →</span>
+      </button>
     </div>
   </div>`;
-  $$('.fx-way', el).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); wayDemo(a.dataset.way, a); }));
+  $$('.fx-way[data-way]', el).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); wayDemo(a.dataset.way, a); }));
+  $('.fx-traj', el).addEventListener('click', (e) => trajDemo(e.currentTarget));
+}
+
+/** The episode as a POMDP trajectory, with one real example: what the state, the observation and the action are in a
+ *  RoboTwin 2.0 run (standard mode). Opens as a dialog over a fogged page, like the other demos. */
+let trajDlg;
+function trajDemo(opener) {
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!trajDlg) {
+    trajDlg = document.createElement('div');
+    trajDlg.className = 'ol-modal traj-modal';
+    trajDlg.hidden = true;
+    trajDlg.innerHTML = `<div class="ol-fog"></div>
+      <div class="ol-card traj-card" role="dialog" aria-modal="true" aria-labelledby="traj-title">
+        <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <h3 id="traj-title">Episode trajectory</h3>
+        <p class="ol-sub">An episode is a partially observed Markov decision process: at every step <i>t</i> the simulator has a state <i>s<sub>t</sub></i>, the robot observes <i>o<sub>t</sub></i>, and the agent’s code sends an action <i>a<sub>t</sub></i>. The trajectory (<i>s<sub>0</sub>, o<sub>0</sub>, a<sub>0</sub></i>), (<i>s<sub>1</sub>, o<sub>1</sub>, a<sub>1</sub></i>), … is what the verifier marks.</p>
+        <div class="traj-grid">
+          <figure><span class="traj-k">s<sub>t</sub></span><b>State</b><p>The simulator’s full state: both claw pieces’ poses and velocities, both arms’ joints, every contact. It stays inside the simulator; in standard mode the agent never sees it.</p>
+            <pre><code>pieces = claw_0, claw_1 (pose, velocity)
+robot  = 2 × ALOHA arm (6 joints + gripper)
+engine = MuJoCo 3.14, CPU float64
+tick   = 2.5 ms, 10 ticks per control step</code></pre></figure>
+          <figure><span class="traj-k">o<sub>t</sub></span><b>Observation</b><p>What the robot senses: an RGB image from each of its 4 cameras (480 × 848), z-depth on request, and its own state (72 proprioception columns).</p>
+            <div class="traj-img"><img src="${esc(site('media/ways/obs_head.jpg'))}" alt="The high camera's view: two arms hold the interlocked claws"><img src="${esc(site('media/ways/obs_front.jpg'))}" alt="The high camera later in the episode"></div>
+            <small>the high camera at two moments, as the agent saw them; + depth (optional), + proprioception</small></figure>
+          <figure><span class="traj-k">a<sub>t</sub></span><b>Action</b><p>What the simulator executes, in the robot’s own terms: <code>joint_position</code>, 14 numbers per row (6 joints and a gripper per arm), rows <i>dt</i> apart and streamed at 40 Hz with linear interpolation. Or <code>ee_pose</code>: 16 numbers per row, tool-frame targets solved by inverse kinematics.</p>
+            <pre><code>A = rows of [q1 … q6, g | q1 … q6, g]   # (T, 14)
+r.submit("joint_position", A, dt=0.1)</code></pre></figure>
+        </div>
+        <div class="way-foot"><span>RoboARC · Interlocked Claws 05 · standard · Codex · GPT-6 Astra</span><a class="btn small" href="${exam('run/')}?r=${encodeURIComponent('roboarc-interlocked-claws-05-i01-standard--vquy4fi')}">Watch the whole run <span class="arr">→</span></a></div>
+      </div>`;
+    document.body.append(trajDlg);
+    trajDlg.addEventListener('click', (e) => { if (!e.target.closest('.ol-card') || e.target.closest('.ol-x')) close(); });
+  }
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  function close() {
+    trajDlg.classList.remove('on');
+    document.documentElement.classList.remove('ol-lock');
+    removeEventListener('keydown', onKey);
+    setTimeout(() => { if (!trajDlg.classList.contains('on')) trajDlg.hidden = true; }, still() ? 0 : 320);
+    opener?.focus({ preventScroll: true });
+  }
+  trajDlg.hidden = false;
+  const card = $('.ol-card', trajDlg), b = opener?.getBoundingClientRect(), c = card.getBoundingClientRect();
+  if (b) card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
+  document.documentElement.classList.add('ol-lock');
+  requestAnimationFrame(() => trajDlg.classList.add('on'));
+  addEventListener('keydown', onKey);
 }
 
 /** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay) beside a few
  *  lines of the code the agent wrote, quoted as it wrote them. */
+const WAY_ORDER = ['a', 'c', 'b'];   // the owner's order: direct control, train a model to control, code to control
 const WAYS = {
-  a: { tab: 'actions', title: 'Write the actions', vid: 'a_barkour', step: 10,
+  a: { tab: 'Direct Control', title: 'Direct control', vid: 'a_barkour', step: 10,
     line: 'A trot written by hand: a phase clock, a duty cycle and foot targets, turned into joint targets for every step.',
     slug: 'mujoco_playground_barkour_joystick-privileged--dycu4ar', who: 'MuJoCo Playground · Barkour joystick · privileged · Codex · GPT-6 Astra',
     code: `for t in range(1000):
@@ -1026,7 +993,7 @@ const WAYS = {
   feet=d.site_xpos[footids].copy()
   for i in range(4):
    mujoco.mj_jacSite(m,d,jacs[i],jr,int(footids[i]))` },
-  b: { tab: 'IK script', title: 'Script it with inverse kinematics', vid: 'b_stack_blocks', step: 9,
+  b: { tab: 'Code to Control', title: 'Code to control', vid: 'b_stack_blocks', step: 9,
     line: 'Gripper poses for each arm, sent as end-effector targets; depth and video after every move to check the blocks.',
     slug: 'robotwin_2_0_stack_blocks_three-standard--5vbeb5g', who: 'RoboTwin 2.0 · Stack three blocks · standard · Codex · GPT-6 Astra',
     code: `    rot=Rotation.from_quat(np.array(q)[[1,2,3,0]]).as_matrix()
@@ -1035,7 +1002,7 @@ const WAYS = {
     ...
 def watch(t=.6):
     obs=r.get_obs(seconds=t,include_depth=True)` },
-  c: { tab: 'policy', title: 'Train a policy', vid: 'c_hurdle', step: 15,
+  c: { tab: 'Train Model to Control', title: 'Train a model to control', vid: 'c_hurdle', step: 15,
     line: 'A neural controller trained from scratch on parallel rollouts with taller and taller hurdles, then refined by rollout search.',
     slug: 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za', who: 'HumanoidBench · Hurdle · privileged · Codex · GPT-6 Astra',
     code: `class Agent(nn.Module):
@@ -1094,12 +1061,12 @@ async function wayDemo(k, opener) {
     setTimeout(() => { if (!wayDlg.classList.contains('on')) wayDlg.hidden = true; }, still() ? 0 : 320);
     opener?.focus({ preventScroll: true });
   }
-  const tabs = Object.entries(WAYS).map(([key, x]) => `<button type="button" class="way-tab${key === k ? ' on' : ''}" data-k="${key}"><i>${key}</i>${esc(x.tab)}</button>`).join('');
+  const tabs = WAY_ORDER.map((key) => `<button type="button" class="way-tab${key === k ? ' on' : ''}" data-k="${key}">${esc(WAYS[key].tab)}</button>`).join('');
   wayDlg.innerHTML = `<div class="ol-fog"></div>
     <div class="ol-card way-card" role="dialog" aria-modal="true" aria-labelledby="way-title">
       <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="way-tabs">${tabs}</div>
-      <h3 id="way-title"><span class="way-k">${k}</span>${esc(w.title)}</h3>
+      <h3 id="way-title">${esc(w.title)}</h3>
       <p class="ol-sub">${esc(w.line)}</p>
       <div class="way-body">
         <figure class="way-vid"><video src="${esc(site(`media/ways/${w.vid}.mp4`))}" poster="${esc(site(`media/ways/${w.vid}.jpg`))}" autoplay muted loop playsinline></video>
@@ -1161,7 +1128,7 @@ function heroRun(el, ex) {
   el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
-    <p class="hr-note">One line runs all ${int(ex.totals?.task_dirs)} questions. <button type="button" class="ol-open" aria-haspopup="dialog">
+    <p class="hr-note">One line runs all ${int(ex.totals?.instances)} questions, in every mode. <button type="button" class="ol-open" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Change one argument</button></p>`;
   const code = $('.hr-cmd', el);
   code.setAttribute('aria-label', cmd);
@@ -1402,13 +1369,15 @@ async function home(ex) {
   bigNumbers($('#bignums'), ex);
   flowDiagram($('#flowfig'), ex);
   trustRow($('#trust'));
-  taxonomyMap($('#taxmap'), $('#tm-panel'), ex);
   homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   const sh = ex.leaderboard?.shared;
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
+  // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
+  import('./search.js?v=c7c60ac6').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=1f034d4c').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {
@@ -1434,7 +1403,6 @@ async function suitesPage(ex) {
   });
   suitesGrid($('#suites'), ex, state);
   incomingGrid($('#incoming'), ex);
-  coverage($('#coverage'), ex);
 }
 
 async function suitePage(ex) {
@@ -1453,7 +1421,6 @@ async function suitePage(ex) {
     ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
     ['Agent time', (s.budgets_min || []).map((b) => `${b} min`).join(', ')],
     ['Standard protocol', esc((s.protocols || []).join(', '))],
-    ['Integrated by', esc((s.authors || []).join(', '))],
   ].filter(([, v]) => v);
   $('#suite-head').innerHTML = `
     <div class="suite-hero">
@@ -1485,15 +1452,26 @@ async function suitePage(ex) {
 }
 
 async function tasksPage(ex) {
+  // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
+  // here if the module fails to load); app.js lends it the cards, the results and the drawer.
+  const mod = import('./search.js?v=c7c60ac6').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
-  taskBrowser($('#tasks'), ex, tasks);
+  const m = await mod.catch((e) => { console.error(e); });
+  if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
+  const el = $('#tasks'), runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
+  const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
+  drawerShell();
+  m.tasksSearch(el, ex, tasks, { card: (t) => taskCard(ex, t, runs), close: closeTask,
+    mark: (root) => watchable().then(() => markWatchable(root)), result: resultOf, bodies: BODY_ORDER });
+  el.addEventListener('click', (e) => { const b = e.target.closest('[data-task]'); if (b && index.has(b.dataset.task)) openTask(ex, index.get(b.dataset.task), runs); });
+  const want = Q.get('task');
+  if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
 
 async function contributePage(ex) {
   const c = ex.contribute || {};
   const t = ex.totals || {};
-  const authors = new Set(ex.suites.flatMap((s) => s.authors || []));
-  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['clock', t.incoming, 'on their way in'], ['review', authors.size, 'people have brought suites'], ['doc', t.instances, 'questions']]);
+  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['clock', t.incoming, 'on their way in'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'questions']]);
   $$('[data-doc]').forEach((a) => {
     if (c.docs) { a.href = c.docs + a.dataset.doc; return; }
     // no public documents yet: cards keep their place on this page, inline mentions become plain text
@@ -1675,7 +1653,7 @@ async function runPage(ex) {
   let r;
   head.innerHTML = '<p class="kicker">Run</p><h1>&nbsp;</h1>';
   $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the run: every step, command and picture…</div>';
-  try { r = await runJSON(`${slug}.json`); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; return; }
+  try { r = await runJSON(`${slug}.json`); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
   const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
   const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
   const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')

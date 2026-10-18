@@ -45,7 +45,9 @@ def main() -> int:
             if not (ROOT / path).is_file():
                 problems.append(f"data/{name}: missing {path}")
         json.loads(data)
-    for f in [*pages, ROOT / "assets/app.js", ROOT / "assets/exam.css", ROOT / "data/exam.json", ROOT / "data/tasks.json"]:
+    # the Task Atlas files (scripts/export_atlas.py), when present
+    atlas = [p for p in (ROOT / "assets/search_core.js", ROOT / "data/atlas.json", ROOT / "data/search.json") if p.is_file()]
+    for f in [*pages, ROOT / "assets/app.js", ROOT / "assets/exam.css", ROOT / "data/exam.json", ROOT / "data/tasks.json", *atlas]:
         text = f.read_text(encoding="utf-8")
         for ok in ALLOWED:
             text = text.replace(ok, "")

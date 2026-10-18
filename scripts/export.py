@@ -200,8 +200,10 @@ def main() -> int:
     # difficulty labels stay off the public site until they are settled (user, 2026-10-16)
     for t in tasks:
         t.pop("difficulty", None)
+        t.pop("author", None)          # no per-person attribution on the public site (user, 2026-10-17)
     for su in exam.get("suites", []):
         su.pop("difficulty", None)
+        su.pop("authors", None)
     DATA.mkdir(exist_ok=True)
     (DATA / "exam.json").write_text(json.dumps(exam, ensure_ascii=False, separators=(",", ":")))
     (DATA / "tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, separators=(",", ":")))

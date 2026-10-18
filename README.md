@@ -28,3 +28,27 @@ git push                   # GitHub Pages publishes main within a minute or two
 
 `make check` also fails if any page or data file points at the internals of other sites (run logs, review pages,
 private repositories): this site links only to its own pages and to public upstream projects.
+
+## Task Atlas data
+
+`data/atlas.json` (each question's summary, categories, keywords, objects, atomic steps, place on the task sphere and
+related questions) and `data/search.json` (the index that `assets/search_core.js` searches) come from the EFE Task
+Atlas package and cover exactly the questions in `data/tasks.json`. Rebuild both after every `make data`:
+
+```bash
+python3 scripts/export_atlas.py --atlas <Atlas package> --src ../tmp/2026-10-06_exam_site [--easy-set <easy_set.toml>]
+```
+
+- `--src` is the same source checkout as `make data`; its task inventory says which Atlas record each question is.
+  Without it the record is found from the suite and the id.
+- A question the Atlas has no record for is placed at the centre of its family (else its suite) on the sphere,
+  marked `"est": 1`; rebuild the Atlas package to give it a summary and labels.
+- `--easy-set` takes a newer easy-set list than the package's.
+- The script writes only English, leaves out model results and task directory names, and refuses to write a file
+  that contains Chinese text or anything `make check` forbids.
+
+```js
+import { makeSearch } from "/assets/search_core.js";
+const S = makeSearch(await (await fetch("/data/search.json")).json());
+const r = S.search("fold cloth");      // r.hits: indices into S.keys, best first; r.score[i] in 0..1
+```
