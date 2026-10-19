@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
 <link rel="stylesheet" href="../assets/blog.css?v=2c2fb761">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=99302ff4"></script>
+<script type="module" src="../assets/app.js?v=03e4adc7"></script>
 <script type="module" src="../assets/blog.js?v=4c1416f4"></script>
 </head>
 <body data-page="blog">
@@ -427,7 +427,7 @@
     <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 to 3.</p>
     <p>Only <span data-s="nt"></span> core tests run in the standard-realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
     <p>Finally, the standard setting gives the agent only what a real robot provides: camera images, depth, joint readings and a control interface. The same tests can therefore run on physical hardware, and we plan to evaluate agents on real robots under the standard rules.</p>
-    <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/gMEfvXNDc" target="_blank" rel="noopener">Discord</a>.</p>
+    <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://github.com/mll-lab-nu/embodied-first-exam#readme" target="_blank" rel="noopener">Discord</a>.</p>
 
     <h3 id="limits">Limitations</h3>
     <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The labels of approach and of the point of no return in Finding 6 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
