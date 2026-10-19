@@ -164,6 +164,14 @@ const LB_SETTINGS = [
   { id: 'privileged', label: 'Privileged', key: 'p' },
 ];
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
+/** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
+const LB_DESC = {
+  core: (n) => `Each of the ${int(n)} core tasks once, in its default setting. The core set is the harder part of the exam: tasks judged easy or already solved by an early screening run are left out.`,
+  standard: (n) => `Real-robot rules: the agent reaches the robot only through its API and sees camera images and joint readings, never object poses (${int(n)} core tests).`,
+  'standard-realtime': (n) => `Standard rules on a running clock: the world keeps moving while the agent thinks (${int(n)} core tests, mostly dynamic tasks).`,
+  privileged: (n) => `Full simulator access: the agent sees the whole state and can reset as often as it likes (${int(n)} core tests; some tasks have no privileged setting).`,
+};
+const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
 
 /** Scores of a group of runs in one setting, on all the core tests of that setting: the denominator is fixed, and a test
  *  without a finished result counts as failed (owners, 2026-10-19). {tests: the setting's core tests,
@@ -278,6 +286,7 @@ function lbBoard(ex, tasks, onDraw) {
     } else {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
+      { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
       html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
@@ -1580,6 +1589,7 @@ function homeBoard(el, ex) {
   const note = $('#bars-note');
   if (!el || !sh?.runs?.length || !sh.views) { if (el) el.innerHTML = '<div class="empty-state">No ranked runs yet.</div>'; return; }
   el.innerHTML = `<div class="lbh-top"><div class="seg lb-set" id="lbh-set"></div></div>
+    <p class="lb-desc" id="lbh-desc"></p>
     <div class="lbh-chart"><div class="lbh-ax"></div><div class="lbh-rows"></div></div>
     <p class="lbh-hint">Click a model to see its suites one by one.</p>
     <div class="lbh-detail" hidden></div>`;
@@ -1595,6 +1605,7 @@ function homeBoard(el, ex) {
     det.hidden = true;
     el.classList.remove('picked');
     $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0);
+    $('#lbh-desc', el).textContent = lbDesc(set.id, vw.tests || 0);
     if (note) note.innerHTML = `<a href="${exam('leaderboard/')}${set.id === 'core' ? '' : `?mode=${set.id}`}">Full leaderboard, per suite →</a>`;
   };
   settingSwitch($('#lbh-set', el), set.id, (id) => { set = lbSetting(id); draw(); });

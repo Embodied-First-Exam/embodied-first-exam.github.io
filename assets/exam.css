@@ -1622,3 +1622,7 @@ button.as-link:hover { color: var(--ink); }
 .suite-card .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .3s ease; pointer-events: none; }
 .suite-card.playing .media video { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .suite-card .media video { display: none; } }
+
+/* the leaderboard: one line on what the setting shown measures */
+.lb-desc { max-width: 860px; margin: 12px 0 4px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.lbh .lb-desc { margin: 14px 2px 2px; }
