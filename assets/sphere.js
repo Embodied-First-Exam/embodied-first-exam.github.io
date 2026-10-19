@@ -179,7 +179,7 @@ function build(el, ex, atlas, tasks, set = 'all') {
   const setEl = el$('div', 'seg sph-set');
   setEl.setAttribute('role', 'group'); setEl.setAttribute('aria-label', 'Which tasks');
   setEl.innerHTML = `<button type="button" data-set="all" class="${set === 'all' ? 'on' : ''}">All set <i>${int(nAll)}</i><small class="sph-tests">${int((tasks || []).reduce((n, t) => n + (t.modes?.length || 0), 0))} tests</small></button>`
-    + `<button type="button" data-set="core" class="${set === 'core' ? 'on' : ''}" title="The core set: the tasks the headline counts">Core set <i>${int(nCore)}</i><small class="sph-tests">${int((tasks || []).reduce((n, t) => n + coreModes(t), 0))} tests</small></button>`;
+    + `<button type="button" data-set="core" class="${set === 'core' ? 'on' : ''}" title="The core set: the tasks the leaderboard counts">Core set <i>${int(nCore)}</i><small class="sph-tests">${int((tasks || []).reduce((n, t) => n + coreModes(t), 0))} tests</small></button>`;
   setEl.addEventListener('click', (e) => {
     const b = e.target.closest('[data-set]');
     if (!b || b.dataset.set === set) return;

@@ -1,5 +1,5 @@
 // The Embodied First Exam's pages: one module for all of them; body[data-page] says which page this is.
-// Data: data/exam.json (suites, runs, the taxonomy, the head-to-head view) and data/tasks.json (every question with its
+// Data: data/exam.json (suites, runs, the taxonomy, the core tests every ranked model sat) and data/tasks.json (every task with its
 // results), refreshed by scripts/export.py. Pictures and videos are under media/. Paths are taken from the site root,
 // which is worked out from where this file is served (assets/app.js), so the site works at any address.
 
@@ -189,7 +189,7 @@ function lbBoard(ex, tasks, onDraw) {
   const minSuites = lb.min_suites || 10;
   const board = $('#lb-board');
   const harnesses = [...new Set(ex.runs.filter((r) => (r.kind || 'agent') === 'agent').map((r) => r.harness))];
-  // head to head only: the core tests every ranked model sat (owners, 2026-10-19: one view, no 'everything each sat')
+  // only the core tests every ranked model sat (owners, 2026-10-19: one view, no 'everything each sat')
   const state = { view: 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
   // no small line of suites and tests under a row (owner, 2026-10-19: the leaderboard carries no small print)
@@ -370,7 +370,7 @@ function thinSpots(el, ex, info) {
   const thin = tags.filter((t) => t.n / info.total < 0.12).sort((a, b) => a.n - b.n);
   const bodies = BODY_ORDER.map((b) => ({ b, n: ranked(ex).filter((s) => s.body === b).length })).filter((x) => x.n <= 1);
   const items = [
-    ...thin.map((t) => `<a href="${exam('contribute/')}#propose">${tagIcon(t.id)}<span class="label">${esc(t.group)}</span><b>${esc(t.name)}</b><span title="${esc(t.description)}">${int(t.n)} question${t.n === 1 ? '' : 's'} so far</span></a>`),
+    ...thin.map((t) => `<a href="${exam('contribute/')}#propose">${tagIcon(t.id)}<span class="label">${esc(t.group)}</span><b>${esc(t.name)}</b><span title="${esc(t.description)}">${int(t.n)} task${t.n === 1 ? '' : 's'} so far</span></a>`),
     ...bodies.map((x) => `<a href="${exam('contribute/')}#propose"><span class="ic" data-icon="arm"></span><span class="label">Robot body</span><b>${esc(ex.bodies?.[x.b] || x.b)}</b><span>${x.n ? 'One suite so far' : 'A first suite is welcome'}</span></a>`),
   ];
   el.innerHTML = items.join('');
@@ -498,7 +498,7 @@ function openTask(ex, t, runs) {
     ['Reference solution', esc({ full: 'Full: the oracle solves it', partial: 'Partial: the oracle reaches part of the goal', none: 'None: solvability shown in human review' }[t.oracle] || '')],
     ['Agent time', t.budget_min ? `${t.budget_min} min per attempt` : ''],
     ['Family', `<span class="mono">${esc(t.family || '')}</span>`],
-    ['Task directories', (t.dirs || []).map((d) => `<span class="mono" style="font-size:12px">${esc(d)}</span>`).join('<br>')],
+    ['Tests', (t.dirs || []).map((d) => `<span class="mono" style="font-size:12px">${esc(d)}</span>`).join('<br>')],
   ].filter(([, v]) => v);
   const tags = (t.tags || []).map((id) => ex._tags[id]).filter(Boolean).map((tg) => `<span class="pill">${esc(tg.name)}</span>`).join(' ');
   $('#drawer .drawer-inner').innerHTML = `
@@ -524,7 +524,7 @@ function openTask(ex, t, runs) {
     if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=916167f2').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=53875b2c').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -617,7 +617,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=916167f2').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=53875b2c').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -1011,7 +1011,7 @@ function flowDiagram(el, ex) {
         <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in both modes</li></ul></div>
       <i class="fx-arrow" style="grid-row:5"></i>
       ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
-      ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the question is its prompt; web search off')}
+      ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the task is its prompt; web search off')}
       ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
       <div class="fx-iface" style="grid-row:4">
         <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per mode</small></span>
@@ -1319,8 +1319,8 @@ function trustRow(el) {
     ['nokey', 'No answer key', 'Reference solutions never enter the agent’s container; upstream experts are removed from the images.'],
     ['controls', 'Controls', 'Doing nothing must score 0, and a full reference solution must score 1.'],
     ['cheat', 'A cheat trial', 'An agent is told to pass without doing the task. Any success blocks the suite until the verifier is fixed.'],
-    ['review', 'Human review', 'A question without a full reference solution is checked by a reviewer who did not write it.'],
-    ['snow', 'Frozen questions', 'A published question never changes. Fixing a scene makes a new question.'],
+    ['review', 'Human review', 'A task without a full reference solution is checked by a reviewer who did not write it.'],
+    ['snow', 'Frozen tasks', 'A published task never changes. Fixing a scene makes a new task.'],
   ];
   el.innerHTML = items.map(([icon, name, tip]) => `<li tabindex="0"><span class="tr-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[icon]}</svg></span>
     <b>${esc(name)}</b><span class="tip" role="tooltip">${esc(tip)}</span></li>`).join('');
@@ -1358,7 +1358,7 @@ function heroRun(el, ex) {
   el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
-    <p class="hr-note">One line runs the core set: ${int(ex.totals?.core_tasks)} tasks, each in its default mode. <button type="button" class="ol-open" aria-haspopup="dialog">
+    <p class="hr-note">One line runs the core set: ${int(ex.totals?.core_tasks)} tasks, each once in its default mode, ${int(ex.totals?.default_run)} tests. <button type="button" class="ol-open" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Change one argument</button></p>`;
   const code = $('.hr-cmd', el);
   code.setAttribute('aria-label', cmd);
@@ -1402,8 +1402,11 @@ function oneLine(opener, ex) {
     const n = pool.reduce((a, f) => a + at(f)[i], 0);
     // the core set without a mode flag runs each task once, in its default mode; otherwise every chosen mode of each task
     const tests = !all() && !st.mode ? n : pool.reduce((a, f) => a + modes.reduce((b, m) => b + (F[f]?.modes?.[m] || [0, 0])[i], 0), 0);
-    // benchmarks as the site counts suites: the repository's ikea-mujoco folder is part of RoboARC
-    return { n, tests, k: new Set(pool.filter((f) => at(f)[i]).map((f) => (f === 'ikea-mujoco' ? 'roboarc' : f))).size, modes: !all() && !st.mode ? ['each in its default mode'] : modes };
+    // suites as the site counts them: the repository's ikea-mujoco folder is part of RoboARC (owners, 2026-10-19: said
+    // once, here, where a reader compares with the repository's folders)
+    const used = pool.filter((f) => at(f)[i]);
+    return { n, tests, k: new Set(used.map((f) => (f === 'ikea-mujoco' ? 'roboarc' : f))).size, folders: used.length,
+      modes: !all() && !st.mode ? ['each in its default mode'] : modes };
   };
   const opt = (g, v, label, note) => `<button type="button" class="ol-opt" data-g="${g}" data-v="${v}" aria-pressed="false"><b>${label}</b><small>${note}</small></button>`;
   const dlg = document.createElement('div');
@@ -1426,7 +1429,7 @@ function oneLine(opener, ex) {
   const card = $('.ol-card', dlg), cmdEl = $('.cmd', dlg), outEl = $('.out', dlg), copy = $('.ol-copy', dlg);
   const out = () => {
     const t = tally();
-    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${all() ? '' : ' of the core set'} · ${t.k} benchmark${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
+    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${all() ? '' : ' of the core set'} · ${t.k} suite${t.k === 1 ? '' : 's'}${st.set && !st.mode && t.folders !== t.k ? ` (${t.folders} folders in the repository: ikea-mujoco is part of RoboARC)` : ''} · ${t.modes.join(' + ')}\n`
       + `<span class="ok">▸</span> ${st.agent === 'oracle' ? 'the reference solutions, marked like any answer' : 'each answer marked by a fresh simulator'}`;
   };
   let prev = {};
@@ -1543,7 +1546,7 @@ function lbhDetail(ex, r, sc, href = true) {
   return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
       <div class="lbh-pair"><span class="s" title="${of(sc.standard)}"><b>${pc(sc.standard)}%</b>Standard</span>
         <span class="p" title="${of(sc.privileged)}"><b>${pc(sc.privileged)}%</b>Privileged</span>
-        ${usd != null ? `<span class="x" title="Model use per question at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per question</span>` : ''}
+        ${usd != null ? `<span class="x" title="Model use per test at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per test</span>` : ''}
         ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
       ${href ? `<a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
     <p class="lbh-dk"><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></p>${suiteBars(ex, r, { suites: sc.suites || {} })}</div>`;
@@ -1707,11 +1710,11 @@ async function home(ex) {
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   const sh = ex.leaderboard?.shared;
-  if (sh) $('#bars-note').innerHTML = `On the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests of the core set that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
+  if (sh) $('#bars-note').innerHTML = `On the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests (real-time included) of the core set that every ranked model has sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=916167f2').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
-  import('./sphere.js?v=481d5d3f').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=53875b2c').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=99c133d0').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {
@@ -1793,7 +1796,7 @@ async function suitePage(ex) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=916167f2').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=53875b2c').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
@@ -2025,7 +2028,7 @@ async function runPage(ex) {
       <div><dt>Tokens</dt><dd>${kTok(r.tokens?.in)}<small> in · ${kTok(r.tokens?.out)} out</small></dd></div>
       <div><dt>Cost</dt><dd>$${(r.tokens?.usd ?? 0).toFixed(2)}</dd></div>
     </dl>
-    ${r.task_text ? `<details class="run-task"><summary>The question, as the agent read it</summary><pre>${esc(r.task_text)}</pre></details>` : ''}`;
+    ${r.task_text ? `<details class="run-task"><summary>The task, as the agent read it</summary><pre>${esc(r.task_text)}</pre></details>` : ''}`;
 
   // the task this run sat and the other runs of it: from the run's suite's rows only (watchable), not the whole index
   watchable(BENCH_SUITE[r.bench] || r.bench).then((m) => {

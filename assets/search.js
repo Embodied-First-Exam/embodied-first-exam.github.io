@@ -108,7 +108,7 @@ export function homeSearch(el, ex) {
     drop.innerHTML = (rows.length ? rows.map(({ t, n }, i) => {
       const s = suites[t.suite], name = S.at(keyOf(t))?.n || t.title;
       return `<a class="hs-row" role="option" id="hs-o${i}" href="${page('tasks/')}?task=${encodeURIComponent(keyOf(t))}">
-        <b>${esc(name)}</b><small>${s ? `<span class="code-mark">${esc(s.code)}</span>` : ''}${esc(s?.name || t.suite)}${name.toLowerCase() !== t.title.toLowerCase() ? ` · ${esc(t.title)}` : ''}${n > 1 ? ` · ${n} scenes` : ''}</small></a>`;
+        <b>${esc(name)}</b><small>${s ? `<span class="code-mark">${esc(s.code)}</span>` : ''}${esc(s?.name || t.suite)}${name.toLowerCase() !== t.title.toLowerCase() ? ` · ${esc(t.title)}` : ''}${n > 1 ? ` · ${n} tasks` : ''}</small></a>`;
     }).join('') : '<div class="hs-note">No task matches.</div>')
       + `<a class="hs-all" href="${all()}">${res.hits.length ? `See all ${int(res.hits.length)} tasks` : 'Search on the Tasks page'} <span class="arr">→</span></a>`;
     show(true);
@@ -185,7 +185,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
   const input = box.querySelector('input'), read = box.querySelector('.ts-read'), clear = box.querySelector('.ts-clear');
   f.classList.add('ts-filters');
   f.innerHTML = `<div class="seg ts-set" role="group" aria-label="Which tasks">${SETS.map(([k, name]) => `<button type="button" data-set="${k}" class="${state.set === k ? 'on' : ''}"
-      title="${k === 'core' ? 'The core set: the tasks the headline counts' : 'Every task'}">${name} <i>${int(setCount(k))}</i><small class="ts-tests">${int(setTests(k))} tests</small></button>`).join('')}</div>`
+      title="${k === 'core' ? 'The core set: the tasks the leaderboard counts' : 'Every task'}">${name} <i>${int(setCount(k))}</i><small class="ts-tests">${int(setTests(k))} tests</small></button>`).join('')}</div>`
     + `<button type="button" class="chip ts-ftoggle" aria-expanded="false">Filters</button>`
     + G.map((g) => `<select data-f="${g.id}" aria-label="${esc(g.any)}"${g.more ? ' class="ts-more"' : ''}></select>`).join('')
     + `<button type="button" class="chip ts-moreb" aria-expanded="${state.more}">More filters</button>`
@@ -274,7 +274,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
       : `<div class="empty-state">No task matches ${state.q.trim() ? 'this search' : ''}${state.q.trim() && G.some((g) => state[g.id]) ? ' and ' : ''}${G.some((g) => state[g.id]) ? 'these filters' : ''}.</div>`;
     if (more) for (const c of grid.querySelectorAll('.task-card')) {
       const m = more.get(c.dataset.task);
-      if (m > 1) c.querySelector('.media')?.insertAdjacentHTML('beforeend', `<span class="ts-fam" title="This family has ${m} scenes in the result">${m} scenes</span>`);
+      if (m > 1) c.querySelector('.media')?.insertAdjacentHTML('beforeend', `<span class="ts-fam" title="This family has ${m} tasks in the result">${m} tasks</span>`);
     }
     kit.mark?.(grid);
     const nSet = setCount(state.set);
@@ -368,7 +368,7 @@ export function drawerAtlas(t, opts = {}) {
         <span><b>${esc(x.title)}</b><small>${esc(x.code || AT.tasks?.[keyOf(x)]?.n || '')}</small></span></a>`;
     };
     low.innerHTML = (rel.length ? `<h3>Related tasks</h3><div class="da-rels">${rel.map(relRow).join('')}</div>` : '')
-      + (fam.length ? `<h3>Same family <span class="da-n">${fam.length + 1} scenes</span></h3><div class="da-fam">${fam.slice(0, 24).map((x) => `<a href="${page('tasks/')}?task=${encodeURIComponent(keyOf(x))}" data-rel="${esc(keyOf(x))}">${esc(x.code || x.title)}</a>`).join('')}${fam.length > 24 ? `<span>+${fam.length - 24}</span>` : ''}</div>` : '');
+      + (fam.length ? `<h3>Same family <span class="da-n">${fam.length + 1} tasks</span></h3><div class="da-fam">${fam.slice(0, 24).map((x) => `<a href="${page('tasks/')}?task=${encodeURIComponent(keyOf(x))}" data-rel="${esc(keyOf(x))}">${esc(x.code || x.title)}</a>`).join('')}${fam.length > 24 ? `<span>+${fam.length - 24}</span>` : ''}</div>` : '');
     const go = (e) => {
       const r = e.target.closest('[data-rel]'), p = e.target.closest('[data-pick]');
       if (r && opts.open && !e.metaKey && !e.ctrlKey) { e.preventDefault(); opts.open(r.dataset.rel); }
