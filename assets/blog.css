@@ -579,7 +579,7 @@ table.heat td.hi { color: #fff; }
 @media (max-width: 640px) { table.heat { font-size: 10.5px; border-spacing: 2px; } table.heat th { padding: 3px 4px; } .chart .rl { font-size: 13px; } }
 
 /* each finding: its one-sentence summary, shown even when the finding is folded */
-.finding-sum { margin: -4px 0 14px !important; color: var(--ink-2, var(--ink)); font-size: 16px; line-height: 1.55; }
+.finding-sum { margin: 8px 0 16px !important; color: var(--ink-2, var(--ink)); font-size: 16px; line-height: 1.55; }
 
 /* in-text citations: small superscript numbers with a hover card; the reference list */
 sup.ref { font: 600 .68em/0 var(--mono); vertical-align: super; margin-left: 1px; white-space: nowrap; }

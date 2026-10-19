@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=6754080a">
+<link rel="stylesheet" href="../assets/blog.css?v=ab8a2df0">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
 <script type="module" src="../assets/blog.js?v=af7a8bc9"></script>
@@ -147,7 +147,7 @@
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="7"></div>
     </figure>
-    <p>Figure 7 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 to 3 examine what is lost in standard and standard-realtime mode.</p>
+    <p>Figure 7 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-types" data-fig="8"></div>
     </figure>
@@ -155,63 +155,31 @@
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-suites" data-fig="9"></div>
     </figure>
-    <p class="fig-note">Data as of <span data-s="built"></span>. The approach labels in Finding 6 come from a random sample of <span data-s="cb_sample"></span> attempts (snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent that read the logs of each run and not yet checked by hand. Every clip in this post shows the run it names, and clicking it opens a step-by-step view of that run. The <a href="../leaderboard/">leaderboard</a> lists the same results for every suite.</p>
+    <p class="fig-note">Data as of <span data-s="built"></span>. The approach labels in Finding 5 come from a random sample of <span data-s="cb_sample"></span> attempts (snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent that read the logs of each run and not yet checked by hand. Every clip in this post shows the run it names, and clicking it opens a step-by-step view of that run. The <a href="../leaderboard/">leaderboard</a> lists the same results for every suite.</p>
 
     <!-- ===================================================================================== 4 -->
     <h2 id="findings" data-short="Findings"><span class="num">04</span>Findings</h2>
     <p>Click a finding to open it. Each one shows the main numbers, a figure and one representative run, followed by a section you can expand with more evidence, more cases and caveats.</p>
 
     <div class="finding">
-      <h3 id="f1" data-short="Standard-mode performance remains low"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard-mode performance remains low.</button></h3>
-      <p class="finding-sum">Even the strongest agent fails most tasks in standard mode, and standard-realtime poses an even greater challenge.</p>
+      <h3 id="f1" data-short="Standard mode is far from solved"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard mode is far from solved, and no single agent covers it.</button></h3>
+      <p class="finding-sum">GPT-6 Astra, the strongest agent, solves only about a third of the standard and standard-realtime tests. In privileged mode it solves nearly every test that Claude Opus 5.5 or Gemini 4 Argon solves, but in standard mode those two solve dozens of tests that it fails.</p>
       <div class="finding-body" id="f1-body" hidden="until-found">
         <ul class="claims">
             <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
             <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 10).</li>
-            <li><span data-s="order_note"></span> Every agent’s results by setting are in <a href="#results">Figure 7</a>.</li>
-        </ul>
-        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 10.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
-          <div class="cases rep">
-            <a class="case s" href="../run/?r=humanoidbench-manip-cube-i00-standard--5uz2mv2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/video.mp4"></video>
-              <span class="case-k">The only one of six agents to solve it</span><b>HumanoidBench · Two-handed cube</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">With no access to the cubes’ orientation, it kept the humanoid standing using IMU feedback, tilted the palms and curled the fingers into a cage, measured the cube faces with stereo depth and corrected its moves from the camera images. It passed on its 21st episode, after 20 resets and 40 minutes.</span></a>
-          </div>
-        <details class="more">
-          <summary>Evidence, more cases and scope</summary>
-          <h4>Evidence</h4>
-          <p>Even in privileged mode, the strongest agent did not finish a long assembly: on IKEA Stegesund, GPT-6 Astra took 40 minutes to drive one bolt and ran out of time on the second (the run is in <a href="#f4">Finding 4</a>).</p>
-          <p>Across all three settings together, the three Flash-class models solve <span data-s="flash_rate"></span> of their tests (counting each model’s tests separately), compared with <span data-s="astra_rate"></span> for <span data-s="best"></span>.</p>
-          <div class="cases">
-            <a class="case s" href="../run/?r=maniguard-jar-transport-i25-standard--yljlf7s"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--yljlf7s/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--yljlf7s/replay.mp4"></video>
-              <span class="case-k">A Flash-class model</span><b>ManiGuard · Glass jar</b><span class="case-m">GLM 5.3 Flash · standard · failed · 4× speed</span><span class="case-t">Depth cameras barely see glass, and it misjudged where the jar and its lid were again and again. After about 80 minutes, one grasp finally caught the jar but lifted it at a tilt, breaking the “keep it upright” rule. Claude Opus 5.5 solved the same test (Finding 2).</span></a>
-          </div>
-          <p>The drop is not limited to one benchmark: in <span data-s="gap_bench"></span> benchmarks with at least 5 tests in both settings, <span data-s="best"></span> solves a smaller share of the tests in standard mode than in privileged mode.</p>
-          <p><a href="../leaderboard/">The leaderboard</a> has every agent’s results for each suite and each trial.</p>
-          <h4>Interpretation <small>(inferred)</small></h4>
-          <ul>
-            <li>Since the gap shows up across benchmarks, it is unlikely to come from one kind of task.</li>
-          </ul>
-          <h4>Scope</h4>
-          <ul>
-            <li>One attempt per test, on a core set that leaves out easy tests by design.</li>
-            <li>The verifier alone decides pass or fail. Time limits differ by benchmark, from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span>.</li>
-          </ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="finding">
-      <h3 id="f2" data-short="Model strengths become more complementary in standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>Model strengths become more complementary in standard mode.</button></h3>
-      <p class="finding-sum">In privileged mode, GPT-6 Astra solves nearly all tasks solved by its rivals. In standard mode, Claude Opus 5.5 and Gemini 4 Argon each solve many tasks that Astra cannot.</p>
-      <div class="finding-body" id="f2-body" hidden="until-found">
-        <ul class="claims">
             <li>In privileged mode, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves.</li>
             <li>In standard mode, Claude Opus 5.5 and Gemini 4 Argon solve <span data-s="rival_s_extra"></span> tests that GPT-6 Astra fails. Between them, the three solve <span data-s="u_s_any"></span> of the standard tests; GPT-6 Astra solves <span data-s="u_s_astra"></span>.</li>
             <li>In standard-realtime, GPT-6 Astra again solves <span data-s="rival_t"></span> of the tests its rivals solve; they add <span data-s="rival_t_extra"></span> that it fails.</li>
-            <li>The tests that only one agent solves are of different kinds: for GPT-6 Astra mostly <span data-s="uniq_types_0"></span>; for Claude Opus 5.5 mostly <span data-s="uniq_types_1"></span>; for Gemini 4 Argon mostly <span data-s="uniq_types_2"></span>.</li>
         </ul>
+        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 10.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
         <figure class="fig">
           <div class="fig-body" id="fig-overlap" data-fig="11"></div>
         </figure>
+  <div class="cases rep">
+            <a class="case s" href="../run/?r=humanoidbench-manip-cube-i00-standard--5uz2mv2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/video.mp4"></video>
+              <span class="case-k">The only one of six agents to solve it</span><b>HumanoidBench · Two-handed cube</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">With no access to the cubes’ orientation, it kept the humanoid standing using IMU feedback, tilted the palms and curled the fingers into a cage, measured the cube faces with stereo depth and corrected its moves from the camera images. It passed on its 21st episode, after 20 resets and 40 minutes.</span></a>
+          </div>
           <div class="cases rep">
             <a class="case s" href="../run/?r=maniguard-jar-transport-i25-standard--kz3tvs9"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay.mp4"></video>
               <span class="case-k">Only Claude Opus 5.5</span><b>ManiGuard · Glass jar</b><span class="case-m">Claude Opus 5.5 · standard · solved · 2× speed</span><span class="case-t">It estimated the shape of the jar’s square body and the position of the lid’s hinge from the depth point cloud, slid its closed fingers under the lid and swung the lid shut about the hinge. It then gripped one edge of the jar, lifted it 1 cm as a test and carried it to the goal without breaking a rule. GPT-6 Astra knocked the jar over while pushing the lid.</span></a>
@@ -219,6 +187,15 @@
         <details class="more">
           <summary>Evidence, more cases and scope</summary>
           <h4>Evidence</h4>
+          <p>Even in privileged mode, the strongest agent did not finish a long assembly: on IKEA Stegesund, GPT-6 Astra took 40 minutes to drive one bolt and ran out of time on the second (the run is in <a href="#f3">Finding 3</a>).</p>
+          <p>Across all three settings together, the three Flash-class models solve <span data-s="flash_rate"></span> of their tests (counting each model’s tests separately), compared with <span data-s="astra_rate"></span> for <span data-s="best"></span>.</p>
+          <div class="cases">
+            <a class="case s" href="../run/?r=maniguard-jar-transport-i25-standard--yljlf7s"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--yljlf7s/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--yljlf7s/replay.mp4"></video>
+              <span class="case-k">A Flash-class model</span><b>ManiGuard · Glass jar</b><span class="case-m">GLM 5.3 Flash · standard · failed · 4× speed</span><span class="case-t">Depth cameras barely see glass, and it misjudged where the jar and its lid were again and again. After about 80 minutes, one grasp finally caught the jar but lifted it at a tilt, breaking the “keep it upright” rule. Claude Opus 5.5 solved the same test (Finding 2).</span></a>
+          </div>
+          <p>The drop is not limited to one benchmark: in <span data-s="gap_bench"></span> benchmarks with at least 5 tests in both settings, <span data-s="best"></span> solves a smaller share of the tests in standard mode than in privileged mode.</p>
+          <p><a href="../leaderboard/">The leaderboard</a> has every agent’s results for each suite and each trial.</p>
+
           <p>In privileged mode, at least one of the three solves <span data-s="u_p_any"></span> of the tests; GPT-6 Astra solves <span data-s="u_p_astra"></span>.</p>
           <div class="cases">
             <a class="case p" href="../run/?r=robopaint-acrylic-vision-i00-privileged--tvzr6sk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/video.mp4"></video>
@@ -237,10 +214,13 @@
           </div>
           <h4>Interpretation <small>(inferred)</small></h4>
           <ul>
+            <li>Since the gap shows up across benchmarks, it is unlikely to come from one kind of task.</li>
             <li>In privileged mode, with the full state and unlimited resets, GPT-6 Astra can do most of what the other two can. In standard mode, most tests defeat all three, and each solves some tests that the others fail.</li>
           </ul>
           <h4>Scope</h4>
           <ul>
+            <li>One attempt per test, on a core set that leaves out easy tests by design.</li>
+            <li>The verifier alone decides pass or fail. Time limits differ by benchmark, from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span>.</li>
             <li>Time limits differ by benchmark.</li>
             <li>There are only <span data-s="nt"></span> standard-realtime tests, so a single test shifts a standard-realtime success rate by about 2 percentage points.</li>
             <li>With one attempt per test, we cannot yet tell whether these differences come from the models or from the luck of a single attempt; that needs repeated attempts.</li>
@@ -250,9 +230,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f3" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
+      <h3 id="f2" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
       <p class="finding-sum">For every agent, most tasks solved in privileged mode become failures when rerun in standard mode.</p>
-      <div class="finding-body" id="f3-body" hidden="until-found">
+      <div class="finding-body" id="f2-body" hidden="until-found">
         <ul class="claims">
             <li>On the <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test, each agent fails in standard mode between <span data-s="ps_lose_lo"></span> (<span data-s="ps_lose_lo_who"></span>) and <span data-s="ps_lose_hi"></span> (<span data-s="ps_lose_hi_who"></span>) of the tasks it solves in privileged mode. GPT-6 Astra, for example, solves <span data-s="ps_astra_a"></span> of these tasks in privileged mode and only <span data-s="ps_astra_both"></span> of those in standard mode.</li>
             <li>Standard-realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a standard-realtime test, each of the three strongest agents solves fewer in standard-realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
@@ -297,9 +277,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f4" data-short="The hardest tasks demand dexterity, dynamic control, or sustained execution"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>The hardest tasks demand dexterity, dynamic control, or sustained execution.</button></h3>
-      <p class="finding-sum">Across privileged and standard modes, the hardest tasks involve tool use and assembly, balance and rapid reactions, or long household chores.</p>
-      <div class="finding-body" id="f4-body" hidden="until-found">
+      <h3 id="f3" data-short="Dexterity, dynamic control and long-horizon execution are common failure points"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Dexterity, dynamic control and long-horizon execution are common failure points.</button></h3>
+      <p class="finding-sum">In both privileged and standard mode, many of the benchmarks that the strongest agents fail most often involve tool use and assembly, balance and rapid reactions, or long household chores, although hard tasks are not limited to these kinds.</p>
+      <div class="finding-body" id="f3-body" hidden="until-found">
         <ul class="claims">
             <li>In standard mode, in <span data-s="hard_s_frac"></span> benchmarks (counting benchmarks with at least five tests), at least half of the tests are solved by none of the three strongest agents.</li>
             <li><span data-s="hard_groups"></span></li>
@@ -349,9 +329,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f5" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Planning, retries, and explicit rules favor success.</button></h3>
+      <h3 id="f4" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>Planning, retries, and explicit rules favor success.</button></h3>
       <p class="finding-sum">Agents perform best when motions can be planned in advance, privileged access allows unrestricted resets and retries, or task rules are explicitly specified.</p>
-      <div class="finding-body" id="f5-body" hidden="until-found">
+      <div class="finding-body" id="f4-body" hidden="until-found">
         <ul class="claims">
             <li>We call a benchmark easy when the three strongest agents’ mean success rate on it is high: 70% or more in privileged mode, 60% or more in standard mode. Each test counts once per agent (agent-attempts).</li>
             <li>In privileged mode, <span data-s="easy_p_frac"></span> benchmarks reach a mean success rate of 70% or more: <span data-s="easy_p_list"></span>.</li>
@@ -384,7 +364,7 @@
           <h4>Interpretation <small>(inferred)</small></h4>
           <ul>
             <li>Each of the easier benchmarks in privileged mode offers one of three things. Some give an exact state, so the agent can compute the motion in advance and then execute it (RoboDynamicExam, RoboCasa365, MuJoCo Playground). In some, unlimited resets let the agent check its answer against the score and retry before it submits (RoboWits, RoboPaint, BiGym 2.0). ManiGuard spells out its rules in the task, so the agent can check each step against them.</li>
-            <li>These benchmarks also mostly have short tasks with clear goals. Two of them, RoboDynamicExam and RoboPaint, drop in standard mode to <span data-s="em_s_pandadyn"></span> and <span data-s="em_s_robopaint"></span> (<a href="#f4">Finding 4</a>).</li>
+            <li>These benchmarks also mostly have short tasks with clear goals. Two of them, RoboDynamicExam and RoboPaint, drop in standard mode to <span data-s="em_s_pandadyn"></span> and <span data-s="em_s_robopaint"></span> (<a href="#f3">Finding 3</a>).</li>
           </ul>
           <h4>Scope</h4>
           <ul>
@@ -396,9 +376,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f6" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f6-body"><span class="fn">Finding 6</span>Control strategies shift with the evaluation mode.</button></h3>
+      <h3 id="f5" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Control strategies shift with the evaluation mode.</button></h3>
       <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in standard-realtime.</p>
-      <div class="finding-body" id="f6-body" hidden="until-found">
+      <div class="finding-body" id="f5-body" hidden="until-found">
         <ul class="claims">
             <li>Agents control the robot in one of three ways: they write a program that moves it (code to control), send it commands themselves one segment at a time (direct control), or first train a model that then controls it. The figure also splits programs into three kinds and counts attempts that mixed approaches or never settled on one.</li>
             <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
@@ -413,7 +393,7 @@
         <details class="more">
           <summary>Evidence, more cases and scope</summary>
           <h4>Evidence</h4>
-          <p>Each sampled attempt is counted once, by the approach that produced its graded answer. The privileged programs were <span data-s="ap_p_kinds"></span>. When the setting changes, so does the approach: in standard mode, the same agent on the same glass jar switched to direct control and looked at the point cloud before each segment (the run is in <a href="#f2">Finding 2</a>).</p>
+          <p>Each sampled attempt is counted once, by the approach that produced its graded answer. The privileged programs were <span data-s="ap_p_kinds"></span>. When the setting changes, so does the approach: in standard mode, the same agent on the same glass jar switched to direct control and looked at the point cloud before each segment (the run is in <a href="#f1">Finding 1</a>).</p>
           <p>In standard-realtime, the agent writes a program to play and lets it run:</p>
           <div class="cases">
             <a class="case t" href="../run/?r=roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/video.mp4"></video>
@@ -429,14 +409,14 @@
 
     <!-- ===================================================================================== 5 -->
     <h2 id="future" data-short="Future work"><span class="num">05</span>Future work</h2>
-    <p>The exam currently reports whether an attempt passed, not why it failed. We plan to label every failed attempt with a single cause: the agent misread the task, the grasp missed, the controller lost the robot, or the agent declared success before the goal was met. Each label will be checked by a person against the trace and the replay, so that statements such as the one in Finding 4 can rest on counted causes rather than on the suites in which failures occur.</p>
-    <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 to 3.</p>
+    <p>The exam currently reports whether an attempt passed, not why it failed. We plan to label every failed attempt with a single cause: the agent misread the task, the grasp missed, the controller lost the robot, or the agent declared success before the goal was met. Each label will be checked by a person against the trace and the replay, so that statements such as the one in Finding 3 can rest on counted causes rather than on the suites in which failures occur.</p>
+    <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 and 2.</p>
     <p>Only <span data-s="nt"></span> core tests run in the standard-realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
     <p>Finally, the standard setting gives the agent only what a real robot provides: camera images, depth, joint readings and a control interface. The same tests can therefore run on physical hardware, and we plan to evaluate agents on real robots under the standard rules.</p>
     <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/AhC6utNyfk" target="_blank" rel="noopener">Discord</a>.</p>
 
     <h3 id="limits">Limitations</h3>
-    <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The labels of approach and of the point of no return in Finding 6 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
+    <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The labels of approach and of the point of no return in Findings 2 and 5 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
 
     <h3 id="references">References</h3>
     <ol class="refs">
