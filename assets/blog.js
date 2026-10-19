@@ -15,7 +15,7 @@ const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (
 const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const MIN_BODY = 20;   // a body gets its own row in the body chart from this many standard tests
-const MIN_HARD = 8;   // a suite counts among the hardest from this many tests in the setting
+const MIN_BENCH = 5;   // a benchmark counts among the hardest or the easiest from this many tests in the setting
 
 /* ---------------------------------------------------------------------------------------------- numbers */
 
@@ -58,6 +58,10 @@ function compute(ex, tasks, b, atlas) {
   const types = { p: group(M.p, ttOf), s: group(M.s, ttOf) };
   const bodiesH = { p: group(M.p, (t) => [t.body]), s: group(M.s, (t) => [t.body]) };
   const suitesH = { p: group(M.p, (t) => [t.suite]), s: group(M.s, (t) => [t.suite]) };
+  // benchmarks as the analysis counts them: the IKEA assembly tasks (family ikea_*) apart from the rest of RoboARC
+  const benchOf = (t) => [(t.family || '').startsWith('ikea_') ? 'ikea' : t.suite];
+  const benchH = { p: group(M.p, benchOf), s: group(M.s, benchOf) };
+  const mean3 = (L) => L.reduce((a, [t, m]) => a + TOP.filter((r) => ok(t, r, m)).length, 0);   // solved by the three, summed
   // the three strongest: how many of them solved each test
   const overlap = (L) => [3, 2, 1, 0].map((k) => L.filter(([t, m]) => TOP.filter((r) => ok(t, r, m)).length === k).length);
   const only = (L, r) => L.filter(([t, m]) => ok(t, r, m) && !TOP.some((o) => o !== r && ok(t, o, m))).length;
@@ -82,13 +86,32 @@ function compute(ex, tasks, b, atlas) {
     for (const [su, L] of Object.entries(suitesH[k])) per[`snone6_${k}_${su}`] = QL(L, (x) => x.length - anyOf(x));
   }
   TOP.forEach((r, i) => { per[`hand_p_${i}`] = QL(bodiesH.p.hand, (L) => solved(L, r)); });
-  // the suites where the three strongest solve least: the top three by the share none of them solved, from MIN_HARD tests
   const suiteName = Object.fromEntries(ex.suites.map((x) => [x.id, x.name]));
-  const hard = (k) => Object.entries(suitesH[k]).filter(([, L]) => L.length >= MIN_HARD)
-    .sort(([, x], [, y]) => none3(y) / y.length - none3(x) / x.length || y.length - x.length).slice(0, 3)
-    .map(([su, L]) => `${suiteName[su] || su} ${QL(L, none3)}`);
   const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
-  per.hard_p = `none of them solves ${list(hard('p'))}`; per.hard_s = list(hard('s'));
+  // the hardest and the easiest benchmarks (from MIN_BENCH tests): the share none of the three solves, their mean rate
+  const benchName = (k) => (k === 'ikea' ? 'IKEA assembly' : suiteName[k] || k);
+  const rows = (k) => Object.entries(benchH[k]).filter(([, L]) => L.length >= MIN_BENCH);
+  const hardOf = (k, cut) => rows(k).filter(([, L]) => none3(L) / L.length >= cut).sort(([, x], [, y]) => none3(y) / y.length - none3(x) / x.length);
+  const easyOf = (k, cut) => rows(k).filter(([, L]) => mean3(L) / (3 * L.length) >= cut).sort(([, x], [, y]) => mean3(y) / y.length - mean3(x) / x.length);
+  for (const k of ['p', 's']) for (const [b, L] of rows(k)) {
+    per[`hn_${k}_${b}`] = QL(L, none3); per[`em_${k}_${b}`] = Q(mean3(L), 3 * L.length);
+  }
+  const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  const nw = (n) => words[n] || int(n);
+  const nb = (n) => (n === 1 ? 'one benchmark is' : `${nw(n)} benchmarks are`);
+  per.hard_p_n = nb(hardOf('p', 0.5).length); per.hard_s_n = nb(hardOf('s', 0.5).length);
+  per.hard_p_list = list(hardOf('p', 0.5).map(([b, L]) => `${benchName(b)} ${QL(L, none3)}`));
+  per.hard_s_list = list(hardOf('s', 0.5).map(([b, L]) => `${benchName(b)} ${QL(L, none3)}`));
+  per.easy_p_n = nb(easyOf('p', 0.7).length);
+  const es = easyOf('s', 0.6);
+  per.easy_s_n = nb(es.length);
+  per.easy_s_list = list(es.map(([b, L]) => `${benchName(b)} ${Q(mean3(L), 3 * L.length)}`)) || 'none';
+  // the tests the core set left out (set easy): what the three solve there, on the tests all six sat
+  const easySet = tasks.filter((t) => t.set !== 'core');
+  for (const k of ['p', 's']) {
+    const L = easySet.filter((t) => (t.modes || []).includes(MODES[k]) && runs.every((r) => graded(t, r, k))).map((t) => [t, k]);
+    per[`easy_set_${k}`] = Q(mean3(L), 3 * L.length);
+  }
   const allM = [...M.p, ...M.s, ...M.t];
   // what each of the three solves alone: by task type (privileged for GPT-6 Astra, standard for the other two, as the
   // analysis reads it), and for GPT-6 Astra the suites
@@ -112,8 +135,8 @@ function compute(ex, tasks, b, atlas) {
     ns_only: int(M.s.length),
     rsb_s_n: int(rsbS.length), a_s_norsb: Q(solved(M.s, TOP[0]) - solved(rsbS, TOP[0]), M.s.length - rsbS.length),
     a_p: Q(solved(M.p, TOP[0]), M.p.length), a_s: Q(solved(M.s, TOP[0]), M.s.length), a_t: Q(solved(M.t, TOP[0]), M.t.length),
-    order_note: sameOrder ? `In all three settings the order at the top is the same, ${TOP.map(name).join(', ')}, and the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% of any setting.`
-      : `The order at the top differs between the settings; the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% of any setting.`,
+    order_note: sameOrder ? `In all three settings the order at the top is the same: ${TOP.map(name).join(', ')}. The three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% in any setting.`
+      : `The order at the top differs between the settings; the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% in any setting.`,
     flash_any: int(anyOf(allM, flash)), astra_all: int(solved(allM, TOP[0])),
     budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
     none6_p: QL(M.p, (L) => L.length - anyOf(L)), none6_s: QL(M.s, (L) => L.length - anyOf(L)), none6_t: QL(M.t, (L) => L.length - anyOf(L)),
@@ -123,6 +146,7 @@ function compute(ex, tasks, b, atlas) {
     min_body: MIN_BODY,
     u_p_any: QL(M.p, (L) => anyOf(L, TOP)), u_p_astra: QL(M.p, (L) => solved(L, TOP[0])),
     u_s_any: QL(M.s, (L) => anyOf(L, TOP)), u_s_astra: QL(M.s, (L) => solved(L, TOP[0])),
+    astra_cover_p: Q(solved(M.p, TOP[0]), anyOf(M.p, TOP)),
     only_p_0: QL(M.p, (L) => only(L, TOP[0])), only_s_1: QL(M.s, (L) => only(L, TOP[1])), only_s_2: QL(M.s, (L) => only(L, TOP[2])),
     ...uniq,
     flash_rate: Q(flash.reduce((a, r) => a + solved(allM, r), 0), flash.length * allM.length), astra_rate: Q(solved(allM, TOP[0]), allM.length),
@@ -143,7 +167,7 @@ function compute(ex, tasks, b, atlas) {
     sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
     argon_filtered: int(b.argon_filtered), built: (ex.build?.at || '').slice(0, 10),
   };
-  return { S, H, M, board, ps, st, mix: b.crossbench?.approach_mix, types, bodiesH, all3, none3, overlap, bodies, safety: sf, name, tt: atlas?.taxonomy?.tt || {}, bodyName: ex.bodies || {} };
+  return { S, H, M, board, ps, st, mix: b.crossbench?.approach_mix, benchH, mean3, benchName, types, bodiesH, all3, none3, overlap, bodies, safety: sf, name, tt: atlas?.taxonomy?.tt || {}, bodyName: ex.bodies || {} };
 }
 
 function fill(S) {
@@ -158,7 +182,8 @@ const legend = (segs) => `<div class="legend">${segs.map(([, l, c]) => `<span><i
 function stackRows(rows, segs) {
   return `<div class="bars">${rows.map((r) => `<div class="bar-row"><div class="who">${r.label}</div><div class="stack">${segs.map(([k, l, c, lt]) => {
     const v = r[k] || 0, p = r.n ? (100 * v) / r.n : 0;
-    return v ? `<span class="${lt ? 'lt' : ''}" style="width:${p}%;background:var(${c})" title="${esc(`${l}: ${v} of ${r.n}`)}">${p >= 7 ? v : ''}</span>` : '';
+    // a segment in the ink colour (near-black, near-white in dark) takes the page's background for its number
+    return v ? `<span class="${lt ? 'lt' : c === '--ink' ? 'ink' : ''}" style="width:${p}%;background:var(${c})" title="${esc(`${l}: ${v} of ${r.n}`)}">${p >= 7 ? v : ''}</span>` : '';
   }).join('')}</div><div class="n">${int(r.n)}</div></div>`).join('')}</div>`;
 }
 
@@ -203,32 +228,26 @@ function figRealtime(el, R) {
     <p class="fig-note">Agents that solved none in either are left out.</p>`;
 }
 
-/** Finding 3: per group of tests (task type or body), how many of the three strongest solved them, in each setting. */
-function mixTable(el, R, groups, label, min) {
-  const segs = [['k3', 'All three', '--c-honest'], ['k12', 'One or two', '--f-possible'], ['k0', 'None of the three', '--c-other', 1]];
-  const cell = (L) => {
-    if (!L?.length) return '<td><small>no tests</small></td>';
-    const n = L.length, a = R.all3(L), z = R.none3(L), seg = { k3: a, k12: n - a - z, k0: z };
-    return `<td><div class="mix">${segs.map(([k, l, c, lt]) => (seg[k] ? `<span class="${lt ? 'lt' : ''}" style="width:${(100 * seg[k]) / n}%;background:var(${c})" title="${esc(`${l}: ${seg[k]} of ${n}`)}"></span>` : '')).join('')}</div><small>${pct(a, n)}% · ${pct(z, n)}% of ${n}</small></td>`;
+/** Findings 4 and 5: per benchmark, a value with its count, privileged and standard side by side. */
+function benchBars(el, R, title, value, keep, note) {
+  const col = (k, label, cls) => {
+    const rows = Object.entries(R.benchH[k]).filter(([, L]) => L.length >= MIN_BENCH).map(([b, L]) => ({ b, L, ...value(L) }))
+      .sort((x, y) => y.v / y.n - x.v / x.n).filter(keep[k]);
+    return `<div class="bb-col"><p class="bb-k ${cls}">${label}</p>${rows.map((r) => `<div class="nb-row"><div class="who">${esc(R.benchName(r.b))}</div><div class="nb-bars"><div class="nb-bar ${k}"><div class="t"><span style="width:${pct(r.v, r.n)}%"></span></div><small>${pct(r.v, r.n)}% · ${r.v}/${r.n}</small></div></div></div>`).join('')}</div>`;
   };
-  const keys = Object.keys({ ...groups.p, ...groups.s });
-  const big = keys.filter((k) => (groups.s[k]?.length || 0) >= min)
-    .sort((x, y) => R.none3(groups.s[x]) / groups.s[x].length - R.none3(groups.s[y]) / groups.s[y].length);
-  const small = keys.filter((k) => !big.includes(k));
-  return `${legend(segs)}<div class="ovt-wrap"><table class="ovt mixt"><thead><tr><th>${label}</th><th>Standard</th><th>Privileged</th></tr></thead>
-    <tbody>${big.map((k) => `<tr><td class="who">${esc(R.lab(k))}</td>${cell(groups.s[k])}${cell(groups.p[k])}</tr>`).join('')}</tbody></table></div>
-    <p class="fig-note">Under each bar: the share all three solved · the share none of them solved, of so many tests. Ordered by the standard share none solved.${small.length
-      ? ` Fewer than ${min} standard tests: ${small.map((k) => `${esc(R.lab(k))} (${groups.s[k]?.length || 0} standard, ${groups.p[k]?.length || 0} privileged)`).join(', ')}.` : ''}</p>`;
+  el.innerHTML = `<p class="fig-title">${title}</p><div class="bb">${col('p', 'Privileged', 'm-p')}${col('s', 'Standard', 'm-s')}</div><p class="fig-note">${note}</p>`;
 }
 
-function figTypes(el, R) {
-  el.innerHTML = `<p class="fig-title">Tests by task type: how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>`
-    + mixTable(el, { ...R, lab: (k) => R.tt[k] || k }, R.types, 'Task type', 1);
+function figHard(el, R) {
+  benchBars(el, R, 'The hardest benchmarks: share of tests none of the three strongest agents solves',
+    (L) => ({ v: R.none3(L), n: L.length }), { p: (r, i) => i < 4, s: (r) => r.v / r.n >= 0.5 },
+    `Benchmarks with at least ${MIN_BENCH} tests: privileged, the four hardest; standard, every one at half or more. The IKEA assembly tasks are counted apart from the rest of RoboARC.`);
 }
 
-function figBodies(el, R) {
-  el.innerHTML = `<p class="fig-title">Tests by body: how many of the three strongest agents solved them</p>`
-    + mixTable(el, { ...R, lab: (k) => R.bodyName[k] || k }, R.bodiesH, 'Body', MIN_BODY);
+function figEasy(el, R) {
+  benchBars(el, R, 'The easiest benchmarks: the three strongest agents’ mean success rate',
+    (L) => ({ v: R.mean3(L), n: 3 * L.length }), { p: (r) => r.v / r.n >= 0.7, s: (r, i) => r.v / r.n >= 0.6 || i < 2 },
+    `Benchmarks with at least ${MIN_BENCH} tests: privileged, every one at 70% or more; standard, the two highest. The rate counts each agent’s attempt: solved tests of the three ÷ (3 × tests).`);
 }
 
 /** Finding 2: which of the three strongest agents solved each test, in each setting. */
@@ -336,7 +355,7 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
   fill(R.S);
   const bodies = $('#bodies');
   if (bodies) bodies.textContent = Object.entries(R.bodies).sort((a, c) => c[1] - a[1]).map(([k, n]) => `${int(n)} ${(ex.bodies?.[k] || k).toLowerCase()}`).join(', ');
-  const figs = { overall: figOverall, modes: figModes, paired: figPaired, realtime: figRealtime, types: figTypes, bodies: figBodies, overlap: figOverlap, approach: figApproach, safety: figSafety };
+  const figs = { overall: figOverall, modes: figModes, paired: figPaired, realtime: figRealtime, hard: figHard, easy: figEasy, overlap: figOverlap, approach: figApproach, safety: figSafety };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
 }).catch((e) => {
   console.error(e);

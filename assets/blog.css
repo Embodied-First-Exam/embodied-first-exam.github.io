@@ -138,6 +138,7 @@ html[lang="zh"] .post p, html[lang="zh"] .post li { font-size: 17px; line-height
 .stack { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: var(--bg-2); }
 .stack > span { display: flex; align-items: center; justify-content: center; min-width: 0; font: 600 11px var(--mono); color: #fff; white-space: nowrap; overflow: hidden; transition: flex-grow .6s ease; }
 .stack > span.lt { color: var(--ink); }
+.stack > span.ink { color: var(--bg); }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 16px; font-size: 12.5px; color: var(--ink-2); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .legend i { width: 11px; height: 11px; border-radius: 3px; }
@@ -332,6 +333,7 @@ details.more > summary::-webkit-details-marker { display: none; }
 details.more > summary::before { content: "+"; display: inline-block; width: 1.2em; font-weight: 700; color: var(--accent, var(--ink)); }
 details.more[open] > summary::before { content: "−"; }
 details.more[open] > summary { border-bottom: 1px solid var(--line); }
+.post > details.more { margin-left: auto; margin-right: auto; }   /* a fold straight in the article sits on its column */
 details.more > :not(summary) { margin-left: 16px; margin-right: 16px; }
 details.more > :last-child { margin-bottom: 16px; }
 details.more h4 { margin: 18px 16px 6px; font: 650 15px/1.3 var(--display); }
@@ -341,3 +343,15 @@ details.more ul { padding-left: 20px; }
 details.more .cases { margin: 10px 16px 14px; }
 .fig > .cases { margin: 0 17px; }   /* the same column width as the cards inside an opened analysis (its border and margin) */
 @media (max-width: 560px) { .fig > .cases, details.more .cases { margin-left: 0; margin-right: 0; } details.more > :not(summary) { margin-left: 12px; margin-right: 12px; } }
+/* Findings 4 and 5: two columns of benchmark bars */
+.bb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; }
+.bb-k { margin: 0 0 6px !important; font: 600 12px/1.3 var(--mono) !important; letter-spacing: .06em; text-transform: uppercase; }
+.bb .nb-row { grid-template-columns: minmax(0, 130px) minmax(0, 1fr); }
+@media (max-width: 640px) { .bb { grid-template-columns: minmax(0, 1fr); } }
+/* a finding's representative case, shown before its fold */
+.cases.rep { grid-template-columns: minmax(0, 1fr); margin: 6px 17px 0; }
+.cases.rep .case { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: min-content; column-gap: 18px; row-gap: 4px; padding: 0; }
+.cases.rep .case > video, .cases.rep .case > img { grid-column: 1; grid-row: 1 / span 5; margin: 0; }
+.cases.rep .case > span, .cases.rep .case > b { grid-column: 2; padding: 0 16px 0 0; }
+.cases.rep .case > .case-k { padding-top: 16px; }
+@media (max-width: 560px) { .cases.rep { margin: 6px 0 0; } .cases.rep .case { display: flex; padding-bottom: 12px; } .cases.rep .case > span, .cases.rep .case > b { padding: 0 12px; } .cases.rep .case > .case-k { padding-top: 0; } }
