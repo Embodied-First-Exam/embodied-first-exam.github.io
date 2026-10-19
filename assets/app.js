@@ -1114,7 +1114,7 @@ function flowDiagram(el, ex) {
           <span class="fx-how">How it runs underneath →</span>
         </div>
       </div>
-      ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
+      ${layer(5, `<span class="fx-lname">Simulation backends<small>${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulation backend, behind the same interface')}
       <i class="fx-arrow out" style="grid-row:4"><em>recorded</em></i>
       <div class="fx-ver" title="Its own sandbox, no network">
         <span class="fx-vh">${ic('shield')}Verifier</span>
@@ -1124,9 +1124,9 @@ function flowDiagram(el, ex) {
         <div class="fx-res"><b>1</b><span>0</span></div>
         <div class="fx-rec" title="Every step, its tokens and cost, and a video">${ic('log')}steps · cost · video</div>
       </div>
-      <button type="button" class="fx-traj" title="The episode as a POMDP trajectory: at every step the simulator's state, what the robot observed and the action it took. Click for an example.">
+      <button type="button" class="fx-traj" title="The episode, step by step: the simulator's state, what the robot observed and the action it took (privileged mode reads the state; the standard settings see only the observation). Click for an example.">
         <span class="fx-vh">${ic('traj')}Episode trajectory</span>
-        <span class="fx-pomdp">a POMDP rollout</span>
+        <span class="fx-pomdp">recorded step by step</span>
         <span class="fx-seq">${soa(0)}<b>→</b>${soa(1)}<b>→</b><span class="fx-dots">…</span></span>
         <span class="fx-legend"><span><i>s</i>simulator state</span><span><i>o</i>RGB(-D)</span><span><i>a</i>action</span></span>
         <img class="fx-obs" src="${esc(site('media/ways/traj_frame.jpg?v=3bf6e22a'))}" title="Rendered from the reference solution" alt="Mid-episode: the two claw pieces sliding apart" loading="lazy">
@@ -1176,7 +1176,7 @@ const RUNTIME = {
     lead: 'The exam’s own mode. The simulator runs in a sidecar container the agent cannot open; the agent drives the robot over HTTP, as it would drive a real one, and the sidecar marks the episode it ran.',
     agent: ['the harness (Codex, Claude Code, …) calling its model', 'everything the agent writes: controller, planner, any model it trains', 'the shipped client, <code>rcb_client.py</code>', 'no simulator, no scene, no simulation code'],
     link: ['/spec', '/observe', '/submit', '/kinematics'],
-    sim: ['the simulator, the frozen scene, the seed and the success check', 'checks the start state when the episode begins and after every reset', 'runs each chunk of actions; resets within the budget <i>N</i>', 'keeps a journal of every call'],
+    sim: ['the simulator, the frozen scene, the seed and the success checker', 'checks the start state when the episode begins and after every reset', 'runs each chunk of actions; resets within the budget <i>N</i>', 'keeps a journal of every call'],
     stop: ['every process the agent left running is killed (<code>kill -9 -1</code>)', 'the monitor seals its record', 'the sidecar refuses any more physics and finalizes the episode: <code>final.json</code>, the journal, the trajectory'],
     verify: ['receives only the sidecar’s evidence', 'transcribes its verdict on the live episode: <code>graded_by_live = 1</code>, no replay', 'writes <code>reward.txt</code> (1 or 0) and <code>reward.json</code>', 'renders the video after the verdict, never from it'],
   },
@@ -1185,7 +1185,7 @@ const RUNTIME = {
     lead: 'Standard mode in real time. Once the episode starts the robot keeps moving whatever the agent is doing, so the agent’s controller has to run as a program in its own container, not as a chat.',
     agent: ['the harness calling its model', 'the agent’s controller: a program in this container that streams action chunks and reads observations', 'the shipped client, <code>rcb_client.py</code>', 'no simulator, no scene, no simulation code'],
     link: ['/spec', '/observe', '/submit', '/kinematics'],
-    sim: ['the simulator, the frozen scene, the seed and the success check', 'runs at 1/<i>S</i> of real speed from the first action, whatever the agent does', 'holds the last targets while the agent thinks', 'resets within the budget (10 by default); a journal of every call'],
+    sim: ['the simulator, the frozen scene, the seed and the success checker', 'runs at 1/<i>S</i> of real speed from the first action, whatever the agent does', 'holds the last targets while the agent thinks', 'resets within the budget (10 by default); a journal of every call'],
     stop: ['every process the agent left running is killed (<code>kill -9 -1</code>)', 'the monitor seals its record', 'the sidecar refuses any more physics and finalizes the episode: <code>final.json</code>, the journal, the trajectory'],
     verify: ['receives only the sidecar’s evidence', 'transcribes its verdict on the live episode: <code>graded_by_live = 1</code>, no replay', 'writes <code>reward.txt</code> (1 or 0) and <code>reward.json</code>', 'renders the video after the verdict, never from it'],
   },
@@ -1782,7 +1782,7 @@ function budgets(el, tasks) {
   const mins = (tasks || []).map((t) => t.budget_min).filter(Boolean);
   const h = (m) => (m % 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`);
   const lo = mins.length ? Math.min(...mins) : 30, hi = mins.length ? Math.max(...mins) : 240;
-  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulators (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in RoboOlympics-Fun and RoboEngineer offer one for training a policy.`;
+  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in RoboOlympics-Fun and RoboEngineer offer one for training a policy.`;
 }
 
 /** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags});

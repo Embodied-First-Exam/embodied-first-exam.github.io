@@ -421,8 +421,8 @@ details.more .cases { margin: 10px 16px 14px; }
 .wfs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
 .wf-ag { display: grid; grid-template-columns: 96px minmax(0, 1fr) 30px; align-items: center; gap: 8px; margin: 3px 0; font-size: 12.5px; }
 .wf-ag b { font: 600 12px var(--mono); text-align: right; }
-.wf-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; margin-top: 12px; }
-.wf-grid i { aspect-ratio: 1; border-radius: 3px; }
+.wf-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; max-width: 250px; margin-top: 14px; }
+.wf-grid i { aspect-ratio: 1; border-radius: 4px; }
 @media (max-width: 700px) { .wfs { grid-template-columns: minmax(0, 1fr); max-width: 320px; } }
 
 /* Finding 3 and the safety figure: stacked bars with a gap between segments */

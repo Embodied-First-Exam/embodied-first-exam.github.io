@@ -1671,3 +1671,4 @@ button.as-link:hover { color: var(--ink); }
 .pc-date { font: 500 11.5px var(--mono); color: var(--ink-3); }
 .pc-tags { display: flex; flex-wrap: wrap; gap: 6px; } .pc-tags i { font: 500 11px var(--mono); font-style: normal; padding: 2px 8px; border-radius: 999px; background: var(--bg-2); color: var(--ink-2); }
 .page-head .lede { max-width: 760px; margin: 14px 0 0; font-size: 18px; line-height: 1.55; color: var(--ink-2); }
+.fx-lname { line-height: 1.25; }
