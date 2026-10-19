@@ -418,9 +418,15 @@ function build(el, ex, atlas, tasks, set = 'all') {
         ctx.globalAlpha = mem ? (sl === SLOTS ? 0.32 * depth : Math.min(1, 0.25 + depth)) : dim ? 0.55 * depth : Math.min(1, 0.2 + depth);
         const r = (mem && sl !== SLOTS ? 3.3 : sl === SLOTS ? 2.0 : 2.8) * s * (0.72 + 0.28 * depth);
         const B = buckets[k];
-        ctx.beginPath();
-        for (let q = 0; q < n; q++) { const i = B[q]; ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, Math.PI * 2); }
-        ctx.fill();
+        if (dim) {
+          ctx.beginPath();
+          for (let q = 0; q < n; q++) { const i = B[q]; ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, Math.PI * 2); }
+          ctx.fill();
+          continue;
+        }
+        // each coloured dot with a thin rim in the page colour, so dots that crowd stay apart (owners, 2026-10-19)
+        ctx.strokeStyle = K.surface; ctx.lineWidth = Math.max(0.8, 0.9 * s);
+        for (let q = 0; q < n; q++) { const i = B[q]; ctx.beginPath(); ctx.arc(X[i], Y[i], r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
       }
     }
     ctx.globalAlpha = 1;

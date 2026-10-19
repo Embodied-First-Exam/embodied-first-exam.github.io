@@ -1824,7 +1824,7 @@ async function home(ex) {
   getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
-  import('./sphere.js?v=d88bc221').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=8f724915').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {
