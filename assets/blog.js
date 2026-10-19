@@ -285,22 +285,39 @@ function toc() {
   };
   const fnum = (h3) => h3.querySelector('.fn')?.textContent.replace(/\D+/g, '');
   const sub3 = (h3) => esc([...h3.childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
-  // the rail: section names, plus each finding by its short name; the current one marked
+  // the rail: section names, plus each finding by its short name, folded until the reader reaches the findings or
+  // opens them; the current one marked
   const fh = $$('.post .finding h3[id]');
   document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => {
     const s = subs(h).filter(fnum);
-    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol>${s.map((x) => `<li><a href="#${x.id}"><span class="k">${fnum(x)}</span>${esc(x.dataset.short || sub3(x))}</a></li>`).join('')}</ol>` : ''}</li>`;
+    if (!s.length) return `<li><a href="#${h.id}">${label(h)}</a></li>`;
+    return `<li class="fold"><div class="fold-head"><a href="#${h.id}">${label(h)}</a><button type="button" aria-expanded="false" aria-label="Show the findings">${s.length}</button></div>`
+      + `<div class="fold-body"><ol>${s.map((x) => `<li><a href="#${x.id}"><span class="k">${fnum(x)}</span>${esc(x.dataset.short || sub3(x))}</a></li>`).join('')}</ol></div></li>`;
   }).join('')}</ol></nav>`);
   const rail = $('.toc-rail'), first = heads[0];
   const marks = [...heads, ...fh].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
   const links = marks.map((h) => $(`a[href="#${h.id}"]`, rail));
+  const folds = $$('.fold', rail).map((li) => ({ li, h: document.getElementById($('a', li).getAttribute('href').slice(1)), manual: null, inside: false }));
+  const paint = () => folds.forEach((f) => {
+    const open = f.manual ?? f.inside;
+    f.li.classList.toggle('open', open);
+    $('button', f.li).setAttribute('aria-expanded', String(open));
+  });
+  folds.forEach((f) => {
+    $('button', f.li).addEventListener('click', () => { f.manual = !f.li.classList.contains('open'); paint(); });
+    $('a', f.li).addEventListener('click', () => { f.manual = true; paint(); });
+  });
   const onScroll = () => {
     // only once the page's title block has left the screen, so the rail never sits beside the title
     const head = $('.post-head');
     rail.classList.toggle('show', (!head || head.getBoundingClientRect().bottom < 0) && first.getBoundingClientRect().top < innerHeight * 0.5);
-    let cur = 0;
+    let cur = 0, s = 0;
     marks.forEach((h, k) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = k; });
+    heads.forEach((h, k) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) s = k; });
     links.forEach((a, k) => a.classList.toggle('on', k === cur));
+    // a fold is open while the reader is inside its section; entering or leaving the section undoes a click
+    folds.forEach((f) => { const inside = heads[s] === f.h; if (inside !== f.inside) { f.inside = inside; f.manual = null; } });
+    paint();
   };
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();

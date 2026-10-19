@@ -260,6 +260,14 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .toc-rail a { display: block; padding: 6px 0 6px 12px; border-left: 2px solid var(--line); font-size: 13px; line-height: 1.35; color: var(--ink-3); }
 .toc-rail a:hover { color: var(--ink); }
 .toc-rail a.on { color: var(--ink); border-left-color: var(--priv); font-weight: 600; }
+.toc-rail .fold-head { position: relative; }
+.toc-rail .fold-head button { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border: 1px solid var(--line-2); border-radius: 999px; background: none; font: 500 10.5px/1.5 var(--mono); color: var(--ink-3); cursor: pointer; }
+.toc-rail .fold-head button::after { content: ""; width: 5px; height: 5px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-1px) rotate(45deg); transition: transform .2s; }
+.toc-rail .fold.open .fold-head button::after { transform: translateY(1px) rotate(-135deg); }
+.toc-rail .fold-head button:hover { color: var(--ink); border-color: var(--ink-3); }
+.toc-rail .fold-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+.toc-rail .fold.open .fold-body { grid-template-rows: 1fr; }
+.toc-rail .fold-body > ol { overflow: hidden; }
 .toc-rail ol ol a { display: grid; grid-template-columns: 20px 1fr; padding: 3px 0 3px 12px; font-size: 12px; }
 .toc-rail ol ol a .k { font: 500 10.5px/1.6 var(--mono); color: var(--ink-3); }
 .toc-rail ol ol a.on .k { color: var(--priv-ink); }
