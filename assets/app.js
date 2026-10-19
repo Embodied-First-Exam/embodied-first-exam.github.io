@@ -186,10 +186,10 @@ const LB_SETTINGS = [
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
-  core: (n) => `We run each of the ${int(n)} core tasks once using the default settings. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
-  standard: (n) => `We evaluate the ${int(n)} core tasks that have standard settings. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
-  'standard-realtime': (n) => `We evaluate the ${int(n)} core tasks that have standard-realtime settings. Standard-realtime covers only a subset of tasks with dynamic environments, such as moving objects, opponents or balance, where reaction time matters. We use the standard settings, with the world continuing to run while the agent thinks.`,
-  privileged: (n) => `We evaluate the ${int(n)} core tasks that have privileged settings. The agent and simulator run in the same container, giving the agent access to the full simulator state and allowing it to reset the simulator as often as needed.`,
+  core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, standard-realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
+  standard: (n) => `The ${int(n)} core tasks that have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
+  'standard-realtime': (n) => `The ${int(n)} core tasks that have a standard-realtime mode, a subset with dynamic environments such as moving objects, opponents or balance. The rules are those of standard mode, except that the world keeps running while the agent thinks.`,
+  privileged: (n) => `The ${int(n)} core tasks that have a privileged mode. The agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
 
