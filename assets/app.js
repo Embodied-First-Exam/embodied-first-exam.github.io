@@ -458,8 +458,7 @@ function dots(ex, t, runs) {
 }
 /** The line above the cards that says how to read their squares. */
 const dotsKey = () => `<p class="dots-key"><span class="dk-lab">Squares</span> Each square is one ranked model in one setting, filled if it solved that test:
-  <span class="dk"><i class="S p"></i>privileged</span> <span class="dk"><i class="S s"></i>standard</span> <span class="dk"><i class="F"></i>not solved</span> <span class="dk"><i class="none"></i>not run</span>.
-  Models in leaderboard order; hover a square to see which.</p>`;
+  <span class="dk"><i class="S p"></i>privileged</span> <span class="dk"><i class="S s"></i>standard</span> <span class="dk"><i class="S t"></i>standard (real-time)</span> <span class="dk"><i class="F"></i>not solved</span> <span class="dk"><i class="none"></i>not run</span>.</p>`;
 /** The ranked runs, best first in the Core setting; hidden runs left out. */
 function boardRuns(ex) {
   const ids = (ex.leaderboard?.shared?.runs || []).filter((id) => !HIDDEN_RUNS.has(id));
