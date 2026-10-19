@@ -439,11 +439,32 @@ function thinSpots(el, ex, info) {
 
 /* ----------------------------------------------------------------------------------------------- tasks */
 
+// A card's squares: one per ranked model (columns, in leaderboard order) and per setting of the task (rows: privileged,
+// standard, standard-realtime), filled in the setting's colour when that model solved that test (owners, 2026-10-19)
+const RKEY = { privileged: 'p', standard: 's', 'standard-realtime': 't' };
+const RKEY_LABEL = { p: 'Privileged', s: 'Standard', t: 'Standard-realtime' };
+const cardKeys = (t) => { const ks = ['p', 's', 't'].filter((k) => (t.modes || []).some((m) => RKEY[m] === k)); return ks.length ? ks : ['p', 's']; };
 function dots(ex, t, runs) {
-  return `<span class="dots" title="${esc(runs.map((r) => `${r.model} ${r.effort}: ${MODES.map((m) => `${MODE_LABEL[m]} ${stateWord(t.results?.[r.id]?.[MK[m]]?.s)}`).join(', ')}`).join('\n'))}">${runs.map((r) => MODES.map((m) => {
-    const c = scored(t.results?.[r.id]?.[MK[m]]);
-    return `<i class="${GRADED.has(c) ? c + ' ' + MK[m] : 'none'}"></i>`;
-  }).join('')).join('')}</span>`;
+  const ks = cardKeys(t);
+  let won = 0;
+  const cells = runs.map((r) => ks.map((k) => {
+    const raw = t.results?.[r.id]?.[k], c = scored(raw);
+    won += c === 'S';
+    const word = raw?.r ? 'ran with resets, not counted' : stateWord(raw?.s);
+    return `<i class="${GRADED.has(c) ? c + ' ' + k : 'none'}" title="${esc(`${r.model} · ${RKEY_LABEL[k]}: ${word}`)}"></i>`;
+  }).join('')).join('');
+  return `<span class="dots" style="--rows:${ks.length}">${cells}</span><span class="sr-only">${won} of ${runs.length * ks.length} model-setting results solved</span>`;
+}
+/** The line above the cards that says how to read their squares. */
+const dotsKey = () => `<p class="dots-key"><span class="dk-lab">Squares</span> Each square is one ranked model in one setting, filled if it solved that test:
+  <span class="dk"><i class="S p"></i>privileged</span> <span class="dk"><i class="S s"></i>standard</span> <span class="dk"><i class="F"></i>not solved</span> <span class="dk"><i class="none"></i>not run</span>.
+  Models in leaderboard order; hover a square to see which.</p>`;
+/** The ranked runs, best first in the Core setting; hidden runs left out. */
+function boardRuns(ex) {
+  const ids = (ex.leaderboard?.shared?.runs || []).filter((id) => !HIDDEN_RUNS.has(id));
+  const sc = ex.leaderboard?.shared?.views?.core?.scores || {};
+  const v = (id) => (sc[id]?.[1] ? sc[id][0] / sc[id][1] : 0);
+  return ex.runs.filter((r) => ids.includes(r.id)).sort((a, b) => v(b.id) - v(a.id));
 }
 
 const STATE_WORD = { S: 'solved', F: 'not solved', E: 'error', Q: 'queued', N: 'not run', R: 'running', X: 'not counted', '-': 'no data' };
@@ -585,7 +606,7 @@ function openTask(ex, t, runs) {
     if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=53875b2c').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=fad66359').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -617,8 +638,9 @@ function resultOf(t) {
 }
 
 function taskBrowser(el, ex, tasks, opts = {}) {
-  const runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
+  const runs = boardRuns(ex);
   drawerShell();
+  if (runs.length && !$('.dots-key', el.parentElement)) el.insertAdjacentHTML('beforebegin', dotsKey());
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
   const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60,
     tags: (opts.suite ? '' : Q.get('tags') || '').split(',').filter((x) => ex._tags[x]) };
@@ -678,7 +700,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=53875b2c').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=fad66359').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -1751,7 +1773,7 @@ async function home(ex) {
   oneLine($('.ol-open'), ex);
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=53875b2c').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
   import('./sphere.js?v=99c133d0').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
@@ -1844,15 +1866,18 @@ async function suitePage(ex) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=53875b2c').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=fad66359').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
-  const el = $('#tasks'), runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
+  const el = $('#tasks'), runs = boardRuns(ex);
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
   drawerShell();
+  // the models of the results filter: the ranked runs, by name (with the harness when two share a name), with their marks
+  const named = (r) => runs.filter((x) => x.model === r.model).length > 1 ? `${r.model} (${r.harness})` : r.model;
   m.tasksSearch(el, ex, tasks, { card: (t) => taskCard(ex, t, runs), close: closeTask,
-    result: resultOf, bodies: BODY_ORDER });
+    result: resultOf, bodies: BODY_ORDER, legend: dotsKey(),
+    models: runs.map((r) => ({ id: r.id, name: named(r), title: [r.model, r.harness, r.effort].filter(Boolean).join(' · '), mark: makerMark(r.model) })) });
   el.addEventListener('click', (e) => { const b = e.target.closest('[data-task]'); if (b && index.has(b.dataset.task)) openTask(ex, index.get(b.dataset.task), runs); });
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);

@@ -24,7 +24,7 @@ function styles() {
   document.documentElement.classList.add('search-css-wait');
   styled.addEventListener('load', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
   styled.addEventListener('error', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
-  styled.href = new URL('./search.css?v=5c633d2c', import.meta.url).href;
+  styled.href = new URL('./search.css?v=c8838826', import.meta.url).href;
   document.head.append(styled);
 }
 
@@ -144,7 +144,8 @@ let pickTag = null;   // set by the Tasks page: a drawer's category chip filters
 
 /** The Tasks page. `grid` is #tasks; the box goes into #task-search and the filters into .filters, both above it.
  *  kit (from app.js): card(t) → the card's HTML, close() the drawer, mark(root) → watch marks,
- *  result(t) → 'solved' | 'unsolved' | 'unrun', bodies → the robot bodies in their order. */
+ *  result(t) → 'solved' | 'unsolved' | 'unrun', bodies → the robot bodies in their order, legend → the line on reading the
+ *  cards' squares, models → the ranked models [{id, name, title, mark}] for the results filter. */
 export function tasksSearch(grid, ex, tasks, kit) {
   styles();
   const box = document.getElementById('task-search'), f = grid.parentElement.querySelector('.filters');
@@ -169,7 +170,35 @@ export function tasksSearch(grid, ex, tasks, kit) {
     ...(domain ? [{ id: 'domain', more: true, any: `Any ${domain.name.toLowerCase().replace('task ', '')}`, opts: () => domain.tags.map((x) => ({ id: x.id, name: x.name })), test: (t, v) => (t.tags || []).includes(v) }] : []),
   ];
   for (const g of G) state[g.id] = Q.get(g.id) || '';
-  if (G.some((g) => g.more && state[g.id])) state.more = true;
+
+  // the results filter (owners, 2026-10-19): which ranked models solved a task, in one setting or in any. Only the core
+  // tests count, as on the leaderboard: a task without a core test in the setting matches no results filter.
+  // URL: setting=<setting id>, solved=<run ids>, notsolved=<run ids>, solvers=none|one|all
+  const MODELS = kit.models || [];
+  const RSET = [['', 'Any setting', ''], ['privileged', 'Privileged', 'p'], ['standard', 'Standard', 's'], ['standard-realtime', 'Standard-realtime', 't']];
+  const RN = [['none', 'Solved by no model'], ['one', 'Solved by exactly one'], ['all', 'Solved by every model']];
+  const runIds = (k) => [...new Set((Q.get(k) || '').split(',').filter((x) => MODELS.some((m) => m.id === x)))];
+  state.rset = RSET.some(([k]) => k && k === Q.get('setting')) ? Q.get('setting') : '';
+  state.by = runIds('solved');
+  state.notby = runIds('notsolved').filter((x) => !state.by.includes(x));
+  state.solvers = RN.some(([k]) => k === Q.get('solvers')) ? Q.get('solvers') : '';
+  const resOn = (r = state) => !!(MODELS.length && (r.rset || r.by.length || r.notby.length || r.solvers));
+  const coreKeys = (t, rset) => {
+    const core = t.core && t.core !== '-' ? t.core : '';
+    if (!rset) return [...core];
+    const k = RSET.find((x) => x[0] === rset)[2];
+    return core.includes(k) ? [k] : [];
+  };
+  const solvedIn = (t, id, ks) => ks.some((k) => { const c = t.results?.[id]?.[k]; return !!c && !c.r && c.s === 'S'; });
+  function resTest(t, r = state) {
+    if (!resOn(r)) return true;
+    const ks = coreKeys(t, r.rset);
+    if (!ks.length) return false;
+    const yes = new Set(MODELS.filter((m) => solvedIn(t, m.id, ks)).map((m) => m.id));
+    if (!r.by.every((id) => yes.has(id)) || r.notby.some((id) => yes.has(id))) return false;
+    return r.solvers === 'none' ? yes.size === 0 : r.solvers === 'one' ? yes.size === 1 : r.solvers === 'all' ? yes.size === MODELS.length : true;
+  }
+  if (G.some((g) => g.more && state[g.id]) || resOn()) state.more = true;
   const inSet = (t) => state.set === 'all' || (t.set || 'core') === state.set;
   // tasks: one scene with all its modes (owners, 2026-10-19), in the core set when any mode is
   const setCount = (k) => (k === 'all' ? tasks.length : tasks.filter((t) => (t.set || 'core') === k).length);
@@ -189,8 +218,51 @@ export function tasksSearch(grid, ex, tasks, kit) {
     + `<button type="button" class="chip ts-ftoggle" aria-expanded="false">Filters</button>`
     + G.map((g) => `<select data-f="${g.id}" aria-label="${esc(g.any)}"${g.more ? ' class="ts-more"' : ''}></select>`).join('')
     + `<button type="button" class="chip ts-moreb" aria-expanded="${state.more}">More filters</button>`
-    + `<span class="tagset" hidden></span><span class="ts-end"><button type="button" class="chip ts-one" aria-pressed="${state.one}" title="Show each task family once, by its best scene">One per family</button><span class="count"></span></span>`;
+    + `<span class="tagset" hidden></span><span class="ts-end"><button type="button" class="chip ts-one" aria-pressed="${state.one}" title="Show each task family once, by its best scene">One per family</button><span class="count"></span></span>`
+    + (MODELS.length ? resPanel() : '');
+  if (kit.legend) grid.insertAdjacentHTML('beforebegin', kit.legend);
   const sel = Object.fromEntries(G.map((g) => [g.id, f.querySelector(`[data-f="${g.id}"]`)]));
+
+  // the results panel, built once (its buttons keep their focus across redraws); drawRes updates it in place
+  function resPanel() {
+    const b = (r, label, title = '') => `<button type="button" class="ts-rb" data-r="${esc(r)}" aria-pressed="false"${title ? ` title="${esc(title)}"` : ''}>${label}<i class="ts-rn"></i></button>`;
+    const models = (kind) => MODELS.map((m) => b(`${kind}|${m.id}`, `${m.mark}<span class="ts-rm">${esc(m.name)}</span>`,
+      `${kind === 'by' ? 'Tasks solved by' : 'Tasks not solved by'} ${m.title}`)).join('');
+    return `<div class="ts-rf" role="group" aria-labelledby="ts-rf-h">
+      <div class="ts-rh"><b id="ts-rf-h">Model results</b><small>Ranked models on the core tests, as on the leaderboard; other tasks have no results here.</small>
+        <button type="button" class="ts-rclear" data-r="clear" hidden>Clear results filter</button></div>
+      <div class="ts-rrow" role="group" aria-label="Setting"><span class="ts-lab">Setting</span><div class="ts-rcs">${RSET.map(([k, name]) => b(`set|${k}`, esc(name), k ? `Count only the ${name.toLowerCase()} tests` : 'Solved in at least one of the task\'s core settings')).join('')}</div></div>
+      <div class="ts-rrow" role="group" aria-label="Solved by"><span class="ts-lab">Solved by</span><div class="ts-rcs">${models('by')}</div></div>
+      <div class="ts-rrow" role="group" aria-label="Not solved by"><span class="ts-lab">Not solved by</span><div class="ts-rcs">${models('notby')}</div></div>
+      <div class="ts-rrow" role="group" aria-label="How many models solved it"><span class="ts-lab">How many</span><div class="ts-rcs">${RN.map(([k, name]) => b(`n|${k}`, esc(name))).join('')}</div></div>
+    </div>`;
+  }
+  /** state after a click on a results button (r = its data-r), as a new object */
+  function resNext(r) {
+    const [kind, v] = r.split('|'), n = { rset: state.rset, by: [...state.by], notby: [...state.notby], solvers: state.solvers };
+    const flip = (a, x) => (a.includes(x) ? a.filter((y) => y !== x) : [...a, x]);
+    if (kind === 'clear') return { rset: '', by: [], notby: [], solvers: '' };
+    if (kind === 'set') n.rset = v;
+    if (kind === 'by') { n.by = flip(n.by, v); n.notby = n.notby.filter((y) => y !== v); }
+    if (kind === 'notby') { n.notby = flip(n.notby, v); n.by = n.by.filter((y) => y !== v); }
+    if (kind === 'n') n.solvers = n.solvers === v ? '' : v;
+    return n;
+  }
+  function drawRes(order) {
+    const panel = f.querySelector('.ts-rf');
+    if (!panel) return;
+    const base = order.filter((t) => passes(t, 'res'));
+    for (const btn of panel.querySelectorAll('[data-r]')) {
+      const r = btn.dataset.r, [kind, v] = r.split('|');
+      if (kind === 'clear') { btn.hidden = !resOn(); continue; }
+      const on = kind === 'set' ? state.rset === v : kind === 'n' ? state.solvers === v : state[kind].includes(v);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.classList.toggle('on', on);
+      // the count beside each button: the tasks shown with it pressed (as now when it is pressed), as the selects count
+      const n = on ? state : resNext(r);
+      btn.querySelector('.ts-rn').textContent = int(base.filter((t) => resTest(t, n)).length);
+    }
+  }
 
   // ---- one computation per change: rank, filter, count
   const mixed = (() => {   // the order without a query: the suites dealt in turn, as before
@@ -209,7 +281,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
     return tasks.filter((t) => { const h = `${t.title} ${t.sentence} ${t.family} ${t.id}`.toLowerCase(); return ws.every((w) => h.includes(w)); });
   }
   const passes = (t, skip) => inSet(t) && G.every((g) => g.id === skip || !state[g.id] || g.test(t, state[g.id]))
-    && (!state.tags.length || state.tags.every((x) => (t.tags || []).includes(x)));
+    && (!state.tags.length || state.tags.every((x) => (t.tags || []).includes(x))) && (skip === 'res' || resTest(t));
 
   function drawFilters(order) {
     for (const g of G) {
@@ -224,7 +296,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
       s.classList.toggle('on', !!state[g.id]);
       s.disabled = !opts.length;
     }
-    const on = G.filter((g) => state[g.id]).length + (state.tags.length ? 1 : 0);
+    const on = G.filter((g) => state[g.id]).length + (state.tags.length ? 1 : 0) + (resOn() ? 1 : 0);
     f.querySelector('.ts-ftoggle').textContent = on ? `Filters · ${on}` : 'Filters';
     const chip = f.querySelector('.tagset');
     chip.hidden = !state.tags.length;
@@ -256,6 +328,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
     read.hidden = !read.innerHTML;
   }
 
+  const anyF = () => G.some((g) => state[g.id]) || resOn() || !!state.tags.length;
   function draw() {
     const order = ranked();
     let hits = order.filter((t) => passes(t));
@@ -266,12 +339,13 @@ export function tasksSearch(grid, ex, tasks, kit) {
       hits = hits.filter((t) => { const k = `${t.suite}|${t.family}`; if (seen.has(k)) { more.set(seen.get(k), more.get(seen.get(k)) + 1); return false; } seen.set(k, keyOf(t)); more.set(keyOf(t), 1); return true; });
     }
     drawFilters(order);
+    drawRes(order);
     drawRead();
     const waiting = needsIndex() && !S && !failed;
     grid.innerHTML = waiting ? '<div class="empty-state">Loading the search…</div>'
       : hits.length ? `<div class="task-grid">${hits.slice(0, state.limit).map((t) => kit.card(t)).join('')}</div>`
         + (hits.length > state.limit ? `<div class="load-more"><button class="btn" data-more>Show ${Math.min(60, hits.length - state.limit)} more of ${int(hits.length - state.limit)}</button></div>` : '')
-      : `<div class="empty-state">No task matches ${state.q.trim() ? 'this search' : ''}${state.q.trim() && G.some((g) => state[g.id]) ? ' and ' : ''}${G.some((g) => state[g.id]) ? 'these filters' : ''}.</div>`;
+      : `<div class="empty-state">No task matches ${state.q.trim() ? 'this search' : ''}${state.q.trim() && anyF() ? ' and ' : ''}${anyF() ? 'these filters' : ''}.</div>`;
     if (more) for (const c of grid.querySelectorAll('.task-card')) {
       const m = more.get(c.dataset.task);
       if (m > 1) c.querySelector('.media')?.insertAdjacentHTML('beforeend', `<span class="ts-fam" title="This family has ${m} tasks in the result">${m} tasks</span>`);
@@ -282,11 +356,12 @@ export function tasksSearch(grid, ex, tasks, kit) {
     f.querySelectorAll('.ts-set button').forEach((b) => b.classList.toggle('on', b.dataset.set === state.set));
     f.classList.toggle('more', state.more);
     f.querySelector('.ts-moreb').setAttribute('aria-expanded', String(state.more));
-    f.querySelector('.ts-moreb').textContent = state.more ? 'Fewer filters' : `More filters${G.some((g) => g.more && state[g.id]) ? ' ·' : ''}`;
+    f.querySelector('.ts-moreb').textContent = state.more ? 'Fewer filters' : `More filters${G.some((g) => g.more && state[g.id]) || resOn() ? ' ·' : ''}`;
     if (res && !waiting) f.querySelector('.count').insertAdjacentHTML('beforeend', '<span class="ts-by"> · by relevance</span>');
     f.querySelector('.ts-one').setAttribute('aria-pressed', String(state.one));
     const u = new URL(location.href);
-    for (const [k, v] of [['q', state.q.trim()], ['set', state.set === 'core' ? '' : state.set], ...G.map((g) => [g.id, state[g.id]]), ['tags', state.tags.join(',')], ['one', state.one ? '' : '0']])
+    for (const [k, v] of [['q', state.q.trim()], ['set', state.set === 'core' ? '' : state.set], ...G.map((g) => [g.id, state[g.id]]), ['tags', state.tags.join(',')], ['one', state.one ? '' : '0'],
+      ['setting', state.rset], ['solved', state.by.join(',')], ['notsolved', state.notby.join(',')], ['solvers', state.solvers]])
       v ? u.searchParams.set(k, v) : u.searchParams.delete(k);
     history.replaceState(null, '', u);
   }
@@ -298,10 +373,12 @@ export function tasksSearch(grid, ex, tasks, kit) {
   clear.addEventListener('click', () => { input.value = state.q = ''; redraw(); input.focus(); });
   f.addEventListener('change', (e) => { const k = e.target.dataset?.f; if (k) { state[k] = e.target.value; redraw(); } });
   f.addEventListener('click', (e) => {
-    if (e.target.closest('.tagset button')) { state.tags = []; redraw(); }
+    const rb = e.target.closest('[data-r]');
+    if (rb) { Object.assign(state, resNext(rb.dataset.r)); redraw(); if (rb.dataset.r === 'clear') f.querySelector('.ts-rb')?.focus(); }
+    else if (e.target.closest('.tagset button')) { state.tags = []; redraw(); }
     else if (e.target.closest('.ts-one')) { state.one = !state.one; redraw(); }
     else if (e.target.closest('[data-set]')) { state.set = e.target.closest('[data-set]').dataset.set; redraw(); }
-    else if (e.target.closest('.ts-moreb')) { state.more = !state.more; if (!state.more) for (const g of G) if (g.more) state[g.id] = ''; redraw(); }
+    else if (e.target.closest('.ts-moreb')) { state.more = !state.more; if (!state.more) { for (const g of G) if (g.more) state[g.id] = ''; Object.assign(state, resNext('clear')); } redraw(); }
     else if (e.target.closest('.ts-ftoggle')) { const o = f.classList.toggle('open'); e.target.setAttribute('aria-expanded', String(o)); }
   });
   read.addEventListener('click', (e) => {
