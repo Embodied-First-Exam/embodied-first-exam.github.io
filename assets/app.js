@@ -53,7 +53,9 @@ const GITHUB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 const DISCORD_URL = 'https://discord.gg/TvscHrhDt';
 const DISCORD = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
 // the exam's WeChat group, an icon after Discord that opens its QR code (README badge, 2026-10-19). WeChat renews a group's
-// code every week: when the exam repository's docs/assets/wechat.jpg changes, copy it over assets/wechat-qr.jpg
+// code every week, so the popover shows the exam repository's own file: replacing docs/assets/wechat.jpg there is all it takes
+const WECHAT_QR_URL = 'https://raw.githubusercontent.com/mll-lab-nu/embodied-first-exam/main/docs/assets/wechat.jpg';
+// this site's copy, shown when that address fails (as it does while the repository is private)
 const WECHAT_QR = 'assets/wechat-qr.jpg';
 const WECHAT = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/></svg>';
 const DISCORD_ATTRS = /^https?:/.test(DISCORD_URL) ? ' target="_blank" rel="noopener"' : '';
@@ -142,8 +144,11 @@ function wechat() {
       pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'WeChat group'); pop.tabIndex = -1;
       pop.innerHTML = `<div class="wc-head"><span class="wc-ic" aria-hidden="true">${WECHAT}</span><b>WeChat group</b>
           <button class="wc-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-        <img src="${site(WECHAT_QR)}" width="540" height="816" alt="QR code of the Embodied First Exam WeChat group">
+        <img width="540" height="816" alt="QR code of the Embodied First Exam WeChat group">
         <p>Scan it in WeChat to join.</p>`;
+      const qr = pop.querySelector('img');
+      qr.addEventListener('error', () => { qr.src = site(WECHAT_QR); }, { once: true });
+      qr.src = WECHAT_QR_URL;
       pop.querySelector('.wc-x').addEventListener('click', () => close(true));
       document.body.append(pop);
     }
