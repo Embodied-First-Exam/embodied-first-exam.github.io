@@ -20,5 +20,38 @@
    "manual": 19
   }
  },
- "argon_filtered": 319
+ "argon_filtered": 319,
+ "crossbench": {
+  "snapshot": "2026-10-18 18:30",
+  "sample": 1489,
+  "interim": true,
+  "no_return": {
+   "p": [
+    1,
+    416
+   ],
+   "s": [
+    230,
+    592
+   ],
+   "t": [
+    46,
+    79
+   ]
+  },
+  "approach": {
+   "p": [
+    549,
+    672
+   ],
+   "s": [
+    438,
+    719
+   ],
+   "t": [
+    80,
+    98
+   ]
+  }
+ }
 }

@@ -303,3 +303,13 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .finding h3 .fn.ck { color: var(--std-ink); }
 .db-row .who small { display: block; font: 400 11.5px var(--mono); color: var(--ink-3); }
 .ovt th small, .ovt td.who small { font: 400 11px var(--mono); color: var(--ink-3); text-transform: none; letter-spacing: 0; }
+.mixt td { width: 38%; }
+.mixt td.who { width: auto; min-width: 120px; }
+.mix { display: flex; height: 10px; border-radius: 3px; background: var(--bg-2); overflow: hidden; margin-bottom: 4px; min-width: 80px; }
+.mix span { display: block; height: 100%; }
+@media (max-width: 560px) {
+  .mixt td, .mixt th { padding: 6px 4px; }
+  .mixt td { white-space: normal; }
+  .mixt td.who { min-width: 0; font-size: 12.5px; }
+  .mix { min-width: 0; }
+}
