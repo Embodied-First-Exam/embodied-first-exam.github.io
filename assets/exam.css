@@ -1159,6 +1159,25 @@ html.ol-lock { overflow: hidden; }
 .way-code code { background: none; padding: 0; color: inherit; font: inherit; }
 .way-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
 @media (max-width: 860px) { .way-body { grid-template-columns: minmax(0, 1fr); } .way-code pre { max-height: 220px; } }
+/* the way's definition under its title; the gutter is always kept so a scrollbar never changes the media's width (no
+   resize loop), and the video's height is capped by the viewport, never by the scrolling box */
+.way-card { scrollbar-gutter: stable; }
+.way-def { margin: 8px 0 0; font: 500 16.5px/1.45 var(--body); color: var(--ink); }
+.way-def + .ol-sub { margin-top: 4px; }
+.way-vid video { max-height: 56vh; }
+.way-body.log { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+/* direct control: the agent's own commands and looks, one per row, with their times in the run */
+.way-log { flex: 1; margin: 0; padding: 14px 16px; list-style: none; border-radius: 14px; background: #11161d; color: #e6eaef; font: 500 12px/1.5 var(--mono); overflow: auto; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+.way-log li { display: grid; grid-template-columns: 42px 16px minmax(0, 1fr); gap: 8px; align-items: start; }
+.way-log time { color: #6f7b8a; font-variant-numeric: tabular-nums; }
+.way-log svg { width: 15px; height: 15px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.way-log code, .way-log samp { font: inherit; background: none; padding: 0; color: inherit; overflow-wrap: anywhere; }
+.way-log .wl-type svg { color: #82aaff; }
+.way-log .wl-look { color: #ffcb6b; } .way-log .wl-look time { color: #6f7b8a; } .way-log .wl-look b { font-weight: 600; margin-right: 4px; }
+.way-log .wl-say { color: #b9c2cf; font-style: italic; } .way-log .wl-say time { font-style: normal; }
+.way-log .wl-say q { quotes: "\201C" "\201D"; font-family: var(--body); font-size: 13px; }
+.way-log .wl-out { color: #8b97a7; }
+@media (max-width: 860px) { .way-body.log { grid-template-columns: minmax(0, 1fr); } .way-log { justify-content: flex-start; font-size: 11.5px; } .way-log li { grid-template-columns: 38px 14px minmax(0, 1fr); gap: 6px; } }
 
 /* the leaderboard page: the home page's ranked rows, with a meta line, smaller runs and the board's controls */
 .lbh-page { margin-top: 18px; }

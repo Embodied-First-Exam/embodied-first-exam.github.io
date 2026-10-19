@@ -1127,7 +1127,7 @@ function flowDiagram(el, ex) {
   const t = ex?.totals || {};
   const ic = (n, cls = '') => `<svg class="fx-ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n]}</svg>`;
   const run = (slug) => `${exam('run/')}?r=${encodeURIComponent(slug)}`;
-  const way = (k) => `<a class="fx-way" href="${run(WAYS[k].slug)}" data-way="${k}" title="${esc(WAYS[k].line)} Click to see it in a real run.">${esc(WAYS[k].tab)}</a>`;
+  const way = (k) => `<a class="fx-way" href="${run(WAYS[k].slug)}" data-way="${k}" title="${esc(WAYS[k].def || WAYS[k].line)} Click to see it in a real run.">${esc(WAYS[k].tab)}</a>`;
   const layer = (row, name, icon, body, tip, cls = '') => `<div class="fx-layer ${cls}" style="grid-row:${row}" title="${esc(tip)}"><span class="fx-ln">${ic(icon)}${name}</span><div class="fx-lb">${body}</div></div>`;
   const sims = ['MuJoCo', 'Isaac Sim', 'OmniGibson', 'SAPIEN', 'Genesis'];
   const soa = (k) => `<span class="fx-soa"><i>s<sub>${k}</sub></i><i>o<sub>${k}</sub></i><i>a<sub>${k}</sub></i></span>`;
@@ -1332,33 +1332,48 @@ r.submit("joint_position", A, dt=0.1)</code></pre></figure>
   showModal(trajDlg, opener);
 }
 
-/** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay) beside a few
- *  lines of the code the agent wrote, quoted as it wrote them. */
+/** The four ways an agent answers, each shown by a real solved run: what the robot did (the run's replay, or for direct
+ *  control what the agent saw) beside the agent's own words, quoted as it wrote them: a few lines of its code, or for
+ *  direct control (`log`) the commands it typed and the looks it took, with their times in the run (owners, 2026-10-19:
+ *  direct control = the agent itself sends the final actions, look by look; code to control = the agent writes a
+ *  program that turns goals into actions through IK, planners or controllers and runs on its own). */
 const WAY_ORDER = ['a', 'b', 'c'];   // the owner's order (2026-10-18): direct control, code to control, train a model to control
+const wayMedia = (vid, ext) => site(`media/ways/${vid}.${ext}`);
 const WAYS = {
-  a: { tab: 'Direct Control', title: 'Direct control', vid: 'a_barkour_v2', step: 5,
-    line: 'A trot written by hand: a gait clock and swing-foot targets, then a small optimisation for the ground forces, turned into joint targets for every step.',
-    slug: 'mujoco_playground_barkour_joystick-privileged--ieyzivc', who: 'MuJoCo Playground · Barkour joystick · privileged · Codex · GPT-6 Astra',
-    code: `for t in range(1000):
-  ...
-  # Alternating diagonal swings, separated by four-foot support.
-  clock=t*.01-.10;half=p['period']/2
-  k=int(np.floor(max(clock,0)/half));u=(clock-k*half)/p['swing']
-  if clock>=0 and u<1:sw[[0,3] if k%2==0 else [1,2]]=True
-  ...
-  tau=dyn[6:]@x+bias[6:]` },
-  b: { tab: 'Code to Control', title: 'Code to control', vid: 'b_peg_insertion', step: 18,
-    line: 'Its own model of both arms’ kinematics, fitted from what the cameras saw, turns gripper goals into joint targets; after every move it measures the grip again and corrects.',
-    slug: 'mujoco_playground_aloha_single_peg_insertion-standard--cu9yhuj', who: 'MuJoCo Playground · ALOHA single peg insertion · standard · Codex · GPT-6 Astra',
-    code: `def plan_grips(goals, compensation=True):
-    actual=qp(); target=qt();q=target.copy()
-    for side,(p,R) in goals.items():
-        k=side*7
-        want=camera_for_grip(p,R)
-        q[k:k+6]=fk[side].ik(want,actual[k:k+6])
+  a: { tab: 'Direct Control', title: 'Direct control', def: 'The agent picks every action itself.', vid: 'a_put_bottles', aspect: '4 / 3',
+    cap: 'What the agent looked at, in order',
+    line: 'No controller is written in advance. The agent types one move or grip into a live robot session, looks at the camera image, and then picks the next target: 69 commands and 41 looks in 29 minutes.',
+    slug: 'robotwin_2_0_put_bottles_dustbin-standard--ydhsp73', who: 'RoboTwin 2.0 · Put bottles in dustbin · standard · Codex · GPT-6 Astra',
+    // steps 39-50 of the run; times are the steps' start times, a blank time is the same step as the row above
+    log: { cap: 'The agent’s own commands and looks, 06:08–08:00', rows: [
+      ['06:08', 'type', "move('r',[.102,.114,.88],qr,1)"],
+      ['06:22', 'type', "grip('r',0)"],
+      ['', 'look', 'world_camera1'],
+      ['06:40', 'look', 'world_camera1, head_camera'],
+      ['', 'type', "move('r',[.102,.114,1.04],qr,0)"],
+      ['07:02', 'look', 'world_camera1, head_camera'],
+      ['07:08', 'say', 'The cola bottle tipped during the grasp.'],
+      ['07:24', 'look', 'world_camera1, front_camera, right_camera'],
+      ['07:40', 'type', "points('front_camera',[(65,118),(85,109),…])"],
+      ['', 'out', '(65,118) depth 0.786 → world [-.208 .332 .776]'],
+      ['08:00', 'type', "move('r',[-.09,.325,.96],qdown,1)"]] } },
+  b: { tab: 'Code to Control', title: 'Code to control', def: 'The agent writes the controller; IK and planners turn its goals into actions.',
+    vid: 'b_bbq_sauce', cap: 'This run, replayed', step: 20,
+    line: 'Its own inverse kinematics, straight-line moves between IK waypoints, and pick and place on top. From then on the agent names only goals, and its code turns them into all 614 actions, replayed twice in fresh simulators.',
+    slug: 'robolab-bbq-sauce-in-bin-i00-privileged--4pbsnmo', who: 'RoboLab · BBQ sauce in bin · privileged · Claude Code · Claude Opus 5.5',
+    code: `def ik(pos, q):
+    seed = list(s.hold_action()[:7])
+    r = s.kinematics({"op":"ik","targets":{"tcp": list(pos)+list(q)},"seed":seed})
     ...
-        move(q,duration if it==0 else 1.,note)` },
-  c: { tab: 'Train Model to Control', title: 'Train a model to control', vid: 'c_hurdle', step: 10,
+def line(pos, q, step=0.01, max_dq=0.02, settle=8):
+    ...
+    for i in range(1, n+1):
+        p["move_joints"](ik(cur+(pos-cur)*i/n, q), max_dq=max_dq)
+def pick(xy, z_grasp, yaw=0.0, z_above=0.25):
+    ...
+    line([x, y, z_grasp], q)
+    p["close_gripper"](20)` },
+  c: { tab: 'Train Model to Control', title: 'Train a model to control', def: 'The agent trains a policy that produces the actions.', vid: 'c_hurdle', step: 10,
     line: 'A neural controller trained from scratch on parallel rollouts with taller and taller hurdles, then refined by rollout search.',
     slug: 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za', who: 'HumanoidBench · Hurdle · privileged · Codex · GPT-6 Astra',
     code: `class Agent(nn.Module):
@@ -1398,6 +1413,12 @@ function pyHL(src) {
     return out.join('');
   }).join('\n');
 }
+/** One row of a direct-control log: [time, kind, text]; kind is type (a line typed into the live session), look (the
+ *  camera images it viewed), say (its own words) or out (what the session printed). */
+const WAY_LOG_ICON = { type: '<path d="M5 7l5 5-5 5M12 17h7"/>', look: '<path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+  say: '<path d="M4 5.5h16v10H9.5L5 19.5v-4H4z"/>', out: '' };
+const wayLogRow = ([t, kind, text]) => `<li class="wl-${kind}"><time>${esc(t)}</time><svg viewBox="0 0 24 24" aria-hidden="true">${WAY_LOG_ICON[kind] || ''}</svg>${
+  kind === 'type' ? `<code>${pyHL(text)}</code>` : kind === 'look' ? `<span><b>look</b> ${esc(text)}</span>` : kind === 'say' ? `<q>${esc(text)}</q>` : `<samp>${esc(text)}</samp>`}</li>`;
 let wayDlg;
 async function wayDemo(k, opener) {
   const w = WAYS[k]; if (!w) return;
@@ -1424,11 +1445,13 @@ async function wayDemo(k, opener) {
       <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="way-tabs">${tabs}</div>
       <h3 id="way-title">${esc(w.title)}</h3>
+      ${w.def ? `<p class="way-def">${esc(w.def)}</p>` : ''}
       <p class="ol-sub">${esc(w.line)}</p>
-      <div class="way-body">
-        <figure class="way-vid"><video src="${esc(site(`media/ways/${w.vid}.mp4`))}" poster="${esc(site(`media/ways/${w.vid}.jpg`))}" autoplay muted loop playsinline></video>
-          <figcaption>This run, rendered</figcaption></figure>
-        <figure class="way-code"><pre><code>${pyHL(w.code)}</code></pre><figcaption>The agent’s own code, step ${w.step}</figcaption></figure>
+      <div class="way-body${w.log ? ' log' : ''}">
+        <figure class="way-vid"><video src="${esc(wayMedia(w.vid, 'mp4'))}" poster="${esc(wayMedia(w.vid, 'jpg'))}"${w.aspect ? ` style="aspect-ratio:${w.aspect}"` : ''} autoplay muted loop playsinline></video>
+          <figcaption>${esc(w.cap || 'This run, rendered')}</figcaption></figure>
+        ${w.log ? `<figure class="way-code"><ol class="way-log">${w.log.rows.map(wayLogRow).join('')}</ol><figcaption>${esc(w.log.cap)}</figcaption></figure>`
+    : `<figure class="way-code"><pre><code>${pyHL(w.code)}</code></pre><figcaption>The agent’s own code, step ${w.step}</figcaption></figure>`}
       </div>
       <div class="way-foot"><span>${esc(w.who)}</span><a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(w.slug)}">Watch the whole run <span class="arr">→</span></a></div>
     </div>`;
@@ -1821,7 +1844,7 @@ function suiteDialog(ex, s, opener) {
  *  2026-10-19: readers from language models do not know these terms). Drawn wherever an element #ways exists. */
 const CONTROL_WAYS = [
   ['Direct control', 'Agent', '⇄', 'Robot', 'The agent is the controller: it sends a command, reads what the robot sensed, and chooses the next command, step by step, inside its own reasoning loop. Most standard-mode attempts work this way.'],
-  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program, such as a motion planner, a feedback controller or a scripted trajectory, and the program drives the robot; between runs the agent reads the outcome and fixes the code. Most privileged and standard-realtime attempts work this way.'],
+  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program that turns goals into actions through tools such as inverse kinematics, a motion planner or a feedback controller, and the program drives the robot on its own; between runs the agent reads the outcome and fixes the code. Most privileged and standard-realtime attempts work this way.'],
   ['Train model to control', 'Model', '→', 'Robot', 'The agent trains a policy, for example with reinforcement learning in simulation, and lets the trained model drive the robot. The model can be any policy, not only a vision-language-action model. This is the rarest of the three.'],
 ];
 function ways(el) {
