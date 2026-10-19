@@ -269,12 +269,39 @@ function figWaysRt(el, d) {
 
 /* ------------------------------------------------------------------------------------------ the article */
 
-/** The contents: an ordinary list in the article, built from its section heads. */
+/** The contents: a block in the article (sections and their parts) and, where the margin has room, a rail beside it
+ *  that follows the reader. Both are built from the article's own heads. */
 function toc() {
   const heads = $$('.post h2[id]');
   const box = $('#toc');
-  if (!box || !heads.length) return;
-  box.innerHTML = `<p class="label">${ZH ? '目录' : 'Contents'}</p><ol>${heads.map((h) => `<li><a href="#${h.id}">${esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''))}</a></li>`).join('')}</ol>`;
+  if (!heads.length) return;
+  const label = (h) => esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''));
+  const subs = (h) => {
+    const out = [];
+    for (let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) {
+      const h3 = el.matches('h3[id]') ? el : el.querySelector?.(':scope > h3[id]');
+      if (h3) out.push(h3);
+    }
+    return out;
+  };
+  const sub3 = (h3) => esc(h3.textContent.replace(/^\s*\d+\.\s*/, (m) => m).trim());
+  if (box) box.innerHTML = `<p class="label">Contents</p><ol class="toc-l1">${heads.map((h) => {
+    const s = subs(h);
+    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol class="toc-l2">${s.map((x) => `<li><a href="#${x.id}">${sub3(x)}</a></li>`).join('')}</ol>` : ''}</li>`;
+  }).join('')}</ol>`;
+  // the rail: section names only, the current one marked
+  document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => `<li><a href="#${h.id}">${label(h)}</a></li>`).join('')}</ol></nav>`);
+  const rail = $('.toc-rail'), links = $$('a', rail), first = heads[0];
+  const onScroll = () => {
+    // only once the page's title block has left the screen, so the rail never sits beside the title
+    const head = $('.post-head');
+    rail.classList.toggle('show', (!head || head.getBoundingClientRect().bottom < 0) && first.getBoundingClientRect().top < innerHeight * 0.5);
+    let cur = 0;
+    heads.forEach((h, k) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = k; });
+    links.forEach((a, k) => a.classList.toggle('on', k === cur));
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 }
 
 /** Videos play only while on screen. */
