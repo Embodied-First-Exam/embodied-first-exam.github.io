@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=17c5aa12">
-<link rel="stylesheet" href="../assets/blog.css?v=3311319f">
+<link rel="stylesheet" href="../assets/exam.css?v=0ec97074">
+<link rel="stylesheet" href="../assets/blog.css?v=a40b4ee1">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=64fc4e4c"></script>
+<script type="module" src="../assets/app.js?v=84fc2293"></script>
 <script type="module" src="../assets/blog.js?v=9847e972"></script>
 </head>
 <body data-page="blog">
@@ -96,6 +96,9 @@
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
     </ol>
 
+    <h3 id="ways-h">Three ways to control the robot</h3>
+    <div class="cways" id="ways"></div>
+
     <h3 id="settings">Three settings</h3>
     <p>A task can be run in up to three settings, and each one is a separate test, scored on its own. The rest of this post uses these three names exactly as defined here.</p>
     <figure class="fig">
@@ -113,7 +116,9 @@
     </figure>
 
     <h3 id="contains">Tasks and tests</h3>
-    <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, using <span data-s="robots"></span> robots. A task is one fixed scene with one goal, and each of its settings is a test. Some suites are ports of widely used benchmarks (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); we built the others for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). We report results on the core set of <span data-s="core_tasks"></span> tasks (<span data-s="core_tests"></span> tests). You can <a href="../suites/">browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
+    <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, using <span data-s="robots"></span> robots. A task is one fixed scene with one goal, and each of its settings is a test. Some suites are ports of widely used benchmarks (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); we built the others for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). You can <a href="../suites/">browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
+    <p>A task in this exam is far larger than a question in a language benchmark. It asks for a complete behavior, such as assembling a piece of furniture or playing a whole match, that combines perception, planning, control and recovery from mistakes, and each attempt gets an engineer's budget: from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span> of agent time, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory, with a GPU where the simulator or the task needs one. Many tasks in the same benchmark also test nearly the same skills, so a few hard tasks cover what a benchmark measures.</p>
+    <p>We therefore report results on a core set of <span data-s="core_tasks"></span> tasks (<span data-s="core_tests"></span> tests), chosen in the open. We left out tasks that a screening run with the smallest GPT-6 model already solved, as well as tasks that we judged too easy or open to a shortcut, and we kept every task that a benchmark's authors asked us to keep. The other tasks stay in the exam and can be run with <code>harbor run -d embodied-first-exam@all</code>.</p>
 
     <h3 id="marking">Keeping the grading honest</h3>
     <p>Reference solutions never enter the agent’s container, and we remove the original benchmarks’ solutions from the images. Doing nothing must score 0 on every task, and the reference solution must score 1 wherever one exists (a full reference solution for <span data-s="oracle_full"></span> tasks, a partial one for <span data-s="oracle_partial"></span>). Tasks without one, like most of BEHAVIOR-1K, rely on the original benchmark’s success check. Before we add a benchmark, we tell an agent to try to pass without doing the task; if it succeeds anywhere, we hold the benchmark back until its verifier is fixed.</p>

@@ -1761,17 +1761,42 @@ function suiteDialog(ex, s, opener) {
   setTimeout(() => $('.ol-x', card).focus({ preventScroll: true }), 60);
 }
 
+/** The three ways an agent can control the robot, one row each, a + opening a sentence on it (owners' meeting,
+ *  2026-10-19: readers from language models do not know these terms). Drawn wherever an element #ways exists. */
+const CONTROL_WAYS = [
+  ['Direct control', 'Agent', '⇄', 'Robot', 'The agent is the controller: it sends a command, reads what the robot sensed, and chooses the next command, step by step, inside its own reasoning loop. Most standard-mode attempts work this way.'],
+  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program, such as a motion planner, a feedback controller or a scripted trajectory, and the program drives the robot; between runs the agent reads the outcome and fixes the code. Most privileged and standard-realtime attempts work this way.'],
+  ['Train model to control', 'Model', '→', 'Robot', 'The agent trains a policy, for example with reinforcement learning in simulation, and lets the trained model drive the robot. The model can be any policy, not only a vision-language-action model. This is the rarest of the three.'],
+];
+function ways(el) {
+  if (!el) return;
+  el.innerHTML = `<p class="cw-lead">An agent can steer the robot itself (direct control), write the code that controls it (code to control), or train a model that controls it (train model to control). The exam does not prescribe which, and agents mix them.</p>
+    <div class="cw-head"><span></span><span>While the robot acts</span><span></span></div>
+    ${CONTROL_WAYS.map(([n, a, ar, b, txt], i) => { const w = WAYS[WAY_ORDER[i]]; return `<details class="cw-row"><summary><span class="cw-n">${n}</span><span class="cw-f"><b>${a}</b><i>${ar}</i><b>${b}</b></span><span class="cw-x" aria-hidden="true"></span></summary><p>${txt}${w?.slug ? ` <a href="${exam('run/')}?r=${encodeURIComponent(w.slug)}">See it in a real run →</a>` : ''}</p></details>`; }).join('')}`;
+}
+
+/** Time and compute: what one attempt gets, from the tasks' own budgets (data/tasks.json) and their declared resources. */
+function budgets(el, tasks) {
+  if (!el) return;
+  const mins = (tasks || []).map((t) => t.budget_min).filter(Boolean);
+  const h = (m) => (m % 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`);
+  const lo = mins.length ? Math.min(...mins) : 30, hi = mins.length ? Math.max(...mins) : 240;
+  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulators (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in RoboOlympics-Fun and RoboEngineer offer one for training a policy.`;
+}
+
 async function home(ex) {
   const t = ex.totals || {};
   $('#hero-lead').textContent = ex.hero?.lead || ex.summary || '';
   heroWall(ex);
   bigNumbers($('#bignums'), ex);
   flowDiagram($('#flowfig'), ex);
+  ways($('#ways'));
   trustRow($('#trust'));
   homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   gallery($('#gallery'), ex);
+  getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
   import('./sphere.js?v=99c133d0').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
@@ -2237,7 +2262,7 @@ loadExam().then(async (raw) => {
   footer(ex);
   headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
-    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blog: async (ex) => flowDiagram($('#flowfig'), ex), notfound: async () => {} };
+    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blog: async (ex) => { flowDiagram($('#flowfig'), ex); ways($('#ways')); }, notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
   fillIcons();
   reveal();

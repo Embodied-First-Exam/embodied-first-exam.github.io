@@ -618,3 +618,4 @@ table.heat thead th:first-child { width: 26%; text-align: left; }
 .fig .fig-cap b, .fig figcaption b { color: var(--ink); font-weight: 650; }
 .fig .fig-cap .fc-t { color: var(--ink); font-weight: 600; }
 .fig figcaption.fig-ext { margin-top: 6px !important; color: var(--ink-3) !important; }
+.post .cw-lead { margin: 0 0 18px !important; } .post .cw-row p { font-size: 15.5px; }

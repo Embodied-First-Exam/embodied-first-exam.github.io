@@ -1636,3 +1636,28 @@ button.as-link:hover { color: var(--ink); }
 /* the leaderboard: one line on what the setting shown measures */
 .lb-desc { max-width: 860px; margin: 12px 0 4px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 .lbh .lb-desc { margin: 14px 2px 2px; }
+
+/* the three ways to control the robot (home, blog): rows that open on + */
+.cways { max-width: 980px; margin: 34px auto 0; }
+.cw-lead { margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+.cw-head { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 24px; gap: 16px; padding: 0 4px 6px; font-size: 12.5px; color: var(--ink-3); }
+.cw-row { border-top: 1px solid var(--line); }
+.cw-row:last-child { border-bottom: 1px solid var(--line); }
+.cw-row summary { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 24px; gap: 16px; align-items: center; padding: 14px 4px; cursor: pointer; list-style: none; }
+.cw-row summary::-webkit-details-marker { display: none; }
+.cw-n { font: 600 16px/1.3 var(--display); color: var(--ink); }
+.cw-f { display: inline-flex; align-items: center; gap: 12px; font: 500 13px var(--mono); color: var(--ink-2); }
+.cw-f b { font-weight: 500; } .cw-f i { font-style: normal; color: var(--ink-3); font-size: 15px; }
+.cw-x { position: relative; width: 14px; height: 14px; justify-self: end; }
+.cw-x::before, .cw-x::after { content: ""; position: absolute; left: 0; top: 6px; width: 14px; height: 1.5px; background: var(--ink-3); transition: transform .2s; }
+.cw-x::after { transform: rotate(90deg); }
+.cw-row[open] .cw-x::after { transform: rotate(0deg); }
+.cw-row summary:hover .cw-n { text-decoration: underline; text-underline-offset: 3px; }
+.cw-row p { margin: 0 0 16px; padding: 0 4px 0 calc(min(220px, 30%) + 20px); font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.budgets { max-width: 980px; margin: 26px auto 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.budgets b { color: var(--ink); }
+@media (max-width: 640px) {
+  .cw-head { display: none; }
+  .cw-row summary { grid-template-columns: 1fr 20px; } .cw-f { grid-column: 1; grid-row: 2; }
+  .cw-row p { padding-left: 4px; }
+}
