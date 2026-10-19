@@ -284,20 +284,30 @@ function toc() {
     }
     return out;
   };
-  const sub3 = (h3) => esc(h3.textContent.replace(/^\s*\d+\.\s*/, (m) => m).trim());
+  const fnum = (h3) => h3.querySelector('.fn')?.textContent.replace(/\D+/g, '');
+  const sub3 = (h3) => esc([...h3.childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
   if (box) box.innerHTML = `<p class="label">Contents</p><ol class="toc-l1">${heads.map((h) => {
     const s = subs(h);
-    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol class="toc-l2">${s.map((x) => `<li><a href="#${x.id}">${sub3(x)}</a></li>`).join('')}</ol>` : ''}</li>`;
+    // the findings are the core of the article: each gets its own line, numbered, with its one-sentence conclusion
+    const isF = s.some(fnum);
+    const item = (x) => isF ? `<li><span class="k">${fnum(x)}</span><a href="#${x.id}">${sub3(x)}</a></li>` : `<li><a href="#${x.id}">${sub3(x)}</a></li>`;
+    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol class="toc-l2${isF ? ' toc-f' : ''}">${s.map(item).join('')}</ol>` : ''}</li>`;
   }).join('')}</ol>`;
-  // the rail: section names only, the current one marked
-  document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => `<li><a href="#${h.id}">${label(h)}</a></li>`).join('')}</ol></nav>`);
-  const rail = $('.toc-rail'), links = $$('a', rail), first = heads[0];
+  // the rail: section names, plus each finding by its short name; the current one marked
+  const fh = $$('.post .finding h3[id]');
+  document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => {
+    const s = subs(h).filter(fnum);
+    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol>${s.map((x) => `<li><a href="#${x.id}"><span class="k">${fnum(x)}</span>${esc(x.dataset.short || sub3(x))}</a></li>`).join('')}</ol>` : ''}</li>`;
+  }).join('')}</ol></nav>`);
+  const rail = $('.toc-rail'), first = heads[0];
+  const marks = [...heads, ...fh].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  const links = marks.map((h) => $(`a[href="#${h.id}"]`, rail));
   const onScroll = () => {
     // only once the page's title block has left the screen, so the rail never sits beside the title
     const head = $('.post-head');
     rail.classList.toggle('show', (!head || head.getBoundingClientRect().bottom < 0) && first.getBoundingClientRect().top < innerHeight * 0.5);
     let cur = 0;
-    heads.forEach((h, k) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = k; });
+    marks.forEach((h, k) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = k; });
     links.forEach((a, k) => a.classList.toggle('on', k === cur));
   };
   addEventListener('scroll', onScroll, { passive: true });
