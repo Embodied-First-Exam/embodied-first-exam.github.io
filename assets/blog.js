@@ -193,7 +193,6 @@ function compute(ex, tasks, b, atlas) {
     none6_p: `${int(M.p.length - anyOf(M.p))} of ${int(M.p.length)} privileged (${P(M.p.length - anyOf(M.p), M.p.length)})`,
     none6_s: `${int(M.s.length - anyOf(M.s))} of ${int(M.s.length)} standard (${P(M.s.length - anyOf(M.s), M.s.length)})`,
     none6_t: `${int(M.t.length - anyOf(M.t))} of the ${int(M.t.length)} standard-realtime tests (${P(M.t.length - anyOf(M.t), M.t.length)})`,
-    nr_p: cb.no_return?.p ? F(...cb.no_return.p) : null, nr_s: sample(cb.no_return?.s), nr_t: sample(cb.no_return?.t),
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s),
     ap_t_code: mix.t ? Q(mix.t.code, mix.t.n) : null, ap_t_closed: kinds.t ? `${int(kinds.t.closed)} of the ${int(mix.t?.code)}` : null,
     h_ap_p: cb.approach?.p ? HQ(...cb.approach.p) : null, h_ap_s: cb.approach?.s ? HQ(...cb.approach.s) : null, h_ap_t: mix.t ? HQ(mix.t.code, mix.t.n) : null,
