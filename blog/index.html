@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../assets/exam.css?v=17c5aa12">
 <link rel="stylesheet" href="../assets/blog.css?v=3311319f">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=24a5ea68"></script>
+<script type="module" src="../assets/app.js?v=64fc4e4c"></script>
 <script type="module" src="../assets/blog.js?v=9847e972"></script>
 </head>
 <body data-page="blog">
@@ -90,7 +90,7 @@
       <li><b>Question.</b> A test starts from a goal written in words, as you would explain the job to a person, with every convention the agent cannot guess (frames, units, the action layout, the time limit), and from a frozen scene. The scene is rebuilt bit for bit, its start state is checked before the agent begins, and both modes of a task start from the same scene.</li>
       <li><b>Model and harness.</b> Any model can run in any harness, such as Codex or Claude Code. The harness runs unchanged and receives the goal as its prompt. It works in a sandboxed container through a command-line shell and can reach only its model’s API and the package registries, with web search off; the RoboOlympics-Fun tasks are the exception, with open network access.</li>
       <li><b>The coding agent is the policy.</b> Whatever the agent writes turns what the robot senses into actions. It can control the robot directly, sending commands and choosing the next one after it sees the result; write code that controls the robot, such as a planner or a feedback controller; or train a model, such as a reinforcement-learning policy, that controls it. The exam leaves the choice to the agent.</li>
-      <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. Standard-realtime also allows a few resets (10 by default), whereas standard allows none except in a few tasks. The three settings are defined below the list.</li>
+      <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. In both standard settings the agent cannot reset the episode by default, although a task’s author can allow a fixed number of resets. The three settings are defined below the list.</li>
       <li><b>Simulators.</b> Each suite keeps its own simulator behind the same interface, among them MuJoCo, Isaac Sim, OmniGibson, SAPIEN and Genesis, and together they run <span data-s="robots"></span> robots.</li>
       <li><b>Episode trajectory.</b> The episode is recorded as a POMDP rollout: at every step, the simulator’s state <i>s</i>, what the robot observed <i>o</i> (its camera images) and the action <i>a</i> it took.</li>
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
@@ -105,7 +105,7 @@
           <tr><th scope="row">Reaches</th><td>the simulator directly, in the agent’s container</td><td>the robot only, through its API</td><td>the robot only, through its API</td></tr>
           <tr><th scope="row">Sees</th><td>the full state, every object pose</td><td>RGB, depth and joints; no object poses</td><td>as in standard</td></tr>
           <tr><th scope="row">Sends</th><td>a <code>trajectory.npz</code></td><td>action chunks <code>(T, dim)</code></td><td>action chunks, often from a running program</td></tr>
-          <tr><th scope="row">Resets</th><td>unlimited</td><td>none (a few tasks allow some)</td><td>10</td></tr>
+          <tr><th scope="row">Resets</th><td>unlimited</td><td>0 by default; the task’s author can allow more</td><td>0 by default; the task’s author can allow more</td></tr>
           <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
           <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
         </tbody></table></div>

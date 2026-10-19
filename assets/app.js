@@ -168,7 +168,7 @@ const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0]
 const LB_DESC = {
   core: (n) => `Each of the ${int(n)} core tasks once, in its default setting. The core set is the harder part of the exam: tasks judged easy or already solved by an early screening run are left out.`,
   standard: (n) => `Real-robot rules: the agent reaches the robot only through its API and sees camera images and joint readings, never object poses (${int(n)} core tests).`,
-  'standard-realtime': (n) => `Standard rules on a running clock: the world keeps moving while the agent thinks, and the agent may reset a few times (${int(n)} core tests, mostly dynamic tasks).`,
+  'standard-realtime': (n) => `Standard rules on a running clock: the world keeps moving while the agent thinks (${int(n)} core tests, mostly dynamic tasks).`,
   privileged: (n) => `Full simulator access: the agent sees the whole state and can reset as often as it likes (${int(n)} core tests; some tasks have no privileged setting).`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
