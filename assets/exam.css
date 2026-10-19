@@ -812,7 +812,7 @@ a.st::after { content: "log ↗"; font-weight: 500; opacity: .75; }
 
 /* ---------- footer ---------- */
 .footer { border-top: 1px solid var(--line-2); padding: 40px var(--gutter) 52px; }
-.footer-grid { max-width: calc(var(--maxw) - 2 * var(--gutter)); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); gap: 28px; }
+.footer-grid { max-width: calc(var(--maxw) - 2 * var(--gutter)); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 28px; }
 .footer p { margin: 12px 0 0; max-width: 460px; font-size: 13.5px; color: var(--ink-3); }
 .footer h5 { margin: 0 0 10px; font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 .footer ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; font-size: 13.5px; }
@@ -1529,8 +1529,27 @@ html.ol-lock { scrollbar-gutter: stable; }
 .lbh-nl { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .lbh-nl b { flex: none; }
 .lbh-set { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 14px/1.25 var(--body); color: var(--ink-3); }
-/* the bar: Discord after GitHub */
+/* the bar: Discord and WeChat after GitHub */
 .dc-btn svg { width: 20px; height: 20px; }
+.wc-btn svg { width: 19px; height: 19px; }
+.wc-btn[aria-expanded="true"] { background: var(--bg-3); color: var(--ink); }
+/* a button that reads as a link (the footer's WeChat group, Contribute) */
+button.as-link { padding: 0; border: 0; background: none; font: inherit; color: var(--ink-2); cursor: pointer; text-align: left; }
+button.as-link:hover { color: var(--ink); }
+.note button.as-link { color: var(--ink); border-bottom: 1px solid var(--line-2); line-height: inherit; }
+/* the WeChat group's QR code, in a small card beside the button that opened it */
+.wc-pop { position: fixed; z-index: 60; width: 248px; max-width: calc(100vw - 24px); padding: 12px 12px 14px; border-radius: 18px;
+  border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); color: var(--ink); outline: none; }
+.wc-pop[hidden] { display: none; }
+.wc-head { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font: 600 14px/1.2 var(--body); }
+.wc-ic { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #07c160; color: #fff; }
+.wc-ic svg { width: 15px; height: 15px; }
+.wc-x { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-left: auto; padding: 0; border: 0; border-radius: 50%;
+  background: var(--bg-2); color: var(--ink-2); cursor: pointer; }
+.wc-x:hover { background: var(--bg-3); color: var(--ink); }
+.wc-x svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.wc-pop img { display: block; width: 100%; height: auto; max-height: calc(100vh - 140px); object-fit: contain; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
+.wc-pop p { margin: 10px 0 0; font-size: 13px; color: var(--ink-3); text-align: center; }
 /* contribute: the ways to contribute, side by side */
 .routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .routes .route { max-width: none; gap: 14px; background: var(--surface); }
@@ -1549,7 +1568,7 @@ html.ol-lock { scrollbar-gutter: stable; }
 .lbh-pair .x b { color: var(--ink-2); font-weight: 650; }
 .lbh-dh .lbh-nl b { font: 600 16px/1.25 var(--body); }
 .lbh-dh > div.lbh-nl:first-of-type { display: flex; }
-/* a phone: room for GitHub, Discord, the menu and the theme beside the wordmark */
+/* a phone: room for GitHub, Discord, WeChat, the menu and the theme beside the wordmark */
 @media (max-width: 520px) {
   .nav { gap: 6px; padding-left: 12px; }
   .nav .wordmark { gap: 7px; font-size: 15px; }
@@ -1558,6 +1577,12 @@ html.ol-lock { scrollbar-gutter: stable; }
   .nav .gh-btn:not(.dc-btn) { margin-left: auto; }
   .nav .menu-btn { margin-left: 0; }
   .nav .menu-btn + .icon-btn { margin-left: 0; }
+}
+/* five icons beside the wordmark on a 390 px phone: a little tighter */
+@media (max-width: 440px) {
+  .nav { gap: 4px; padding-right: 6px; }
+  .nav .wordmark { font-size: 14px; gap: 6px; }
+  .nav .icon-btn { width: 30px; height: 30px; }
 }
 @media (max-width: 374px) { .nav .wordmark { font-size: 0; } }
 
