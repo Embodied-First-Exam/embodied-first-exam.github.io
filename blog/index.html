@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Can a coding agent program a robot? · Embodied First Exam</title>
+<title>The first exam for code agents in the physical world · Embodied First Exam</title>
 <meta name="description" content="What happens when the coding agents that write our software have to program a robot: the Embodied First Exam, what agents can do on it, how they fail, and what would help.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=eabfbc85">
+<link rel="stylesheet" href="../assets/blog.css?v=0646c957">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=375dac10"></script>
-<script type="module" src="../assets/blog.js?v=0d45066f"></script>
+<script type="module" src="../assets/blog.js?v=6c6b587e"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -22,7 +22,7 @@
 
   <header class="page-head post-head">
     <p class="kicker">Blog · Embodied First Exam</p>
-    <h1>Can a coding agent program a robot?</h1>
+    <h1 class="post-q"><span>Code agents have passed many exams in the digital world.</span> <em>What is their first exam to enter the physical world?</em></h1>
     <p class="lead">Embodied First Exam maps how coding agents succeed and fail, from reasoning and planning to contact, control, and recovery.</p>
     <p class="byline"><span>Embodied First Exam Team</span><span>October 2026</span></p>
   </header>
@@ -32,7 +32,7 @@
     <p class="statement">One line of code. <b data-s="tasks"></b> tasks. <b data-s="suites"></b> benchmarks, <b data-s="robots"></b> robots.</p>
     <ol class="qs">
       <li><h3>What can it connect, and what can it do?</h3><p>With one line of code, connect coding agents to <span data-s="tasks"></span> tasks (<span data-s="tests"></span> tests) across <span data-s="suites"></span> benchmark suites, spanning robot arms, dexterous hands, humanoids, quadrupeds, and musculoskeletal systems.</p></li>
-      <li><h3>When it fails, is it thinking or moving?</h3><p>Every run is public with its trace and replay, so you can see what happened. A hand-checked failure taxonomy is next (<a href="#future">§05</a>).</p></li>
+      <li><h3>When it fails, is it thinking or moving?</h3><p>Every run is public with its trace and replay, so you can see what happened. A hand-checked failure taxonomy is next (<a href="#future">§06</a>).</p></li>
       <li><h3>How does a coding agent become an effective robot controller?</h3><p>We compare three ways agents control a robot (write a program, send commands step by step, train a model) and three settings, up to a world that keeps moving while the agent thinks.</p></li>
     </ol>
 
@@ -55,7 +55,7 @@
     </figure>
 
     <!-- ===================================================================================== 1 -->
-    <h2 id="motivation" data-short="Why this exam"><span class="num">01</span>Why an exam for coding agents in robotics</h2>
+    <h2 id="motivation" data-short="Motivation"><span class="num">01</span>Motivation</h2>
     <p>Coding agents now fix real repositories, drive terminals and tune kernels. Robots are still driven in two main ways: a policy trained on many demonstrations, such as a vision-language-action model, or a controller that an engineer writes, tunes and debugs for one robot and one job. A coding agent could do the engineer’s job at the speed of software: read the robot’s interface, write a controller, run it, look at what happened, and fix it. If that works, any robot with a programmatic interface becomes something you can ask for a new behaviour in plain language.</p>
     <figure class="fig">
       <div class="cards">
@@ -79,7 +79,7 @@
     <p>Whether a coding agent can do these today, and where it breaks, is an empirical question. Answering it needs many robots, many kinds of task and a marking procedure an agent cannot game, which is what the Embodied First Exam provides.</p>
 
     <!-- ===================================================================================== 2 -->
-    <h2 id="framework" data-short="How it works"><span class="num">02</span>How the exam works</h2>
+    <h2 id="framework" data-short="Introduction"><span class="num">02</span>Introduction</h2>
     <p>Every task in the exam is packaged the same way, so one command evaluates any agent on any of them. A benchmark that joins brings its simulator, scenes and success check; the exam wraps them into tasks with a goal written for a person, the robot’s interface and a verifier, and the agent needs nothing but a terminal.</p>
 
     <h3 id="contains">Tasks and tests</h3>
@@ -141,20 +141,25 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
       </div>
     </figure>
 
-    <!-- ===================================================================================== 4 -->
-    <h2 id="findings" data-short="What we found"><span class="num">03</span>What we found</h2>
-    <p><span data-s="n_runs_word"></span> agents sat the core set, each a model in its own harness at high reasoning effort: GPT-6 Astra (Codex), Claude Opus 5.5 (Claude Code) and Gemini 4 Argon (Antigravity CLI), and three Flash-class models: Gemini 3.8 Flash (Antigravity CLI), GLM 5.3 Flash (Claude Code) and DeepSeek V4.1 Flash (DeepSeek’s own harness). Six findings follow, each with its conclusion, the numbers and figure behind it and a representative run; the rest of the evidence opens under each.</p>
+    <!-- ===================================================================================== 3 -->
+    <h2 id="overview" data-short="Overview"><span class="num">03</span>Overview</h2>
+    <p><span data-s="n_runs_word"></span> agents sat the core set, each a model running in its own harness at high reasoning effort. GPT-6 Astra runs in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI. The other three are Flash-class models: Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek’s own harness.</p>
+    <p>On the leaderboard’s Core view, which runs each of the <span data-s="core_tasks"></span> core tasks once in its default setting, the top three are <span data-s="core_top3"></span>. None of the Flash-class models gets above <span data-s="core_rest_max"></span>. The <a href="../leaderboard/">leaderboard</a> also shows each setting on its own, with every agent per suite.</p>
     <div class="aside">
       <p class="label">How we count</p>
       <p>The unit is a test: one task in one setting. Results are the latest finished attempt of each agent on all the core set’s tests, as on the leaderboard, with the three settings kept apart: <span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime tests; a test without a finished result counts as failed. The leaderboard keeps the settings apart too, one at a time, and opens on Core: each core task once, in its default mode (<span data-s="default_run"></span> tests). Every share is given with its count. The core set leaves out tests judged easy and tests an early screening run solved, so it is hard by construction. Site data of <span data-s="built"></span>.</p>
       <p>The six findings and their figures are those of our cross-benchmark analysis of the evaluation, recomputed here from the site’s data. A few numbers, how agents worked and where an attempt became lost, exist only in the analysis’s random sample of about a third of the attempts (<span data-s="cb_sample"></span> analysed, snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent reading each run’s logs and not yet checked by hand; they are marked as such. Each case is a real run: its clip is that run’s replay, and it opens step by step.</p>
     </div>
 
+    <!-- ===================================================================================== 4 -->
+    <h2 id="findings" data-short="Findings"><span class="num">04</span>Findings</h2>
+    <p>Six findings follow. Each opens with its conclusion, the numbers and figure behind it and a representative run; the rest of the evidence sits underneath.</p>
+
     <div class="finding">
-      <h3 id="f1" data-short="Far from good enough"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Agents are far from good enough: the best solves <span data-s="h_a_p"></span> of privileged tests, but only <span data-s="h_a_s"></span> of standard and <span data-s="h_a_t"></span> of realtime ones.</button></h3>
+      <h3 id="f1" data-short="Most tasks still fail"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Even the best agent fails <span data-s="a_s_fail_word"></span> of its tasks when it has only the robot’s own cameras and sensors.</button></h3>
       <div class="finding-body" id="f1-body" hidden="until-found">
         <ul class="claims">
-            <li>The best agent, <span data-s="best"></span>, still fails most standard and realtime tests: it solves <span data-s="a_p"></span> of the privileged tests, <span data-s="a_s"></span> of the standard tests and <span data-s="a_t"></span> of the realtime tests.</li>
+            <li>The best agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of its tests when it has full access to the simulator (privileged). With only the robot’s cameras and sensors (standard), it solves <span data-s="a_s"></span>. When the world also keeps moving while it thinks (standard-realtime), it solves <span data-s="a_t"></span>.</li>
             <li><span data-s="order_note"></span></li>
         </ul>
         <figure class="fig">
@@ -191,10 +196,10 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <div class="finding">
-      <h3 id="f2" data-short="Astra covers most; others complement"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>GPT-6 Astra solves <span data-s="h_astra_cover_p"></span> of what the three strongest agents solve with privileged access; under standard rules the other two add <span data-s="u_s_extra"></span> tests it fails.</button></h3>
+      <h3 id="f2" data-short="Who solves what"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>With full access to the simulator, GPT-6 Astra solves nearly everything its rivals do; with only cameras, they solve <span data-s="u_s_extra"></span> tasks it misses.</button></h3>
       <div class="finding-body" id="f2-body" hidden="until-found">
         <ul class="claims">
-            <li>With privileged access, <span data-s="astra_cover_p"></span> of the tests that any of the three strongest agents solves are among GPT-6 Astra’s.</li>
+            <li>With full access to the simulator, GPT-6 Astra solves <span data-s="astra_cover_p"></span> of the tests that at least one of the three strongest agents solves.</li>
             <li>Under standard rules Claude Opus 5.5 and Gemini 4 Argon each solve tests GPT-6 Astra fails: the three together solve <span data-s="u_s_any"></span>, GPT-6 Astra alone <span data-s="u_s_astra"></span>.</li>
             <li>What each solves alone differs: GPT-6 Astra most often <span data-s="uniq_types_0"></span>; Claude Opus 5.5 most often <span data-s="uniq_types_1"></span>; Gemini 4 Argon most often <span data-s="uniq_types_2"></span>.</li>
         </ul>
@@ -239,10 +244,10 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <div class="finding">
-      <h3 id="f3" data-short="The biggest drop"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Losing privileged access is the biggest drop: GPT-6 Astra keeps only <span data-s="ps_astra_keep"></span> tasks it solved with it, and a running clock takes more.</button></h3>
+      <h3 id="f3" data-short="Full access matters most"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Take away full access to the simulator and <span data-s="ps_lose_n"></span> loses <span data-s="ps_lose_all"></span> of the tasks it could solve.</button></h3>
       <div class="finding-body" id="f3-body" hidden="until-found">
         <ul class="claims">
-            <li>Same task: most of what an agent solves with privileged access, it fails under standard rules. All six agents drop this way.</li>
+            <li>An agent that solves a task with full access to the simulator (privileged) usually fails the same task with only cameras and sensors (standard). GPT-6 Astra, for instance, solves <span data-s="ps_astra_a"></span> tasks with full access but only <span data-s="ps_astra_both"></span> of them without it.</li>
             <li>A running clock is harder still: on the <span data-s="st_n"></span> tasks with both a standard and a realtime test, each of the three strongest agents solves fewer on the clock (GPT-6 Astra <span data-s="st_astra"></span>, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>); too few tasks to generalise.</li>
             <li>In an agent-labelled sample, <span data-s="nr_s"></span> of failed standard attempts and <span data-s="nr_t"></span> of failed realtime ones passed a point of no return, against <span data-s="nr_p"></span> with privileged access, where resets make such a point almost impossible (not yet hand-checked).</li>
         </ul>
@@ -286,10 +291,11 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <div class="finding">
-      <h3 id="f4" data-short="Still very hard"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>Under standard rules, none of the three strongest agents solves even half the tests in <span data-s="hard_s_frac"></span> benchmarks; with privileged access, in <span data-s="hard_p_frac"></span>.</button></h3>
+      <h3 id="f4" data-short="Where agents struggle"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>Agents struggle most with fine work on tools and parts, keeping a body balanced, and long household chores.</button></h3>
       <div class="finding-body" id="f4-body" hidden="until-found">
         <ul class="claims">
-            <li>Under standard rules, <span data-s="hard_s_frac"></span> benchmarks with at least 5 tests have at least half their tests solved by none of the three strongest agents. <span data-s="hard_groups"></span></li>
+            <li>With only cameras and sensors, at least half the tests beat all three of the strongest agents in <span data-s="hard_s_frac"></span> benchmarks (counting those with at least five tests).</li>
+            <li><span data-s="hard_groups"></span></li>
             <li>With privileged access, <span data-s="hard_p_frac"></span>: <span data-s="hard_p_list"></span>.</li>
         </ul>
         <figure class="fig">
@@ -335,10 +341,10 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <div class="finding">
-      <h3 id="f5" data-short="Relatively easy"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>With privileged access, the three strongest agents’ mean success rate is 70% or more in <span data-s="easy_p_frac"></span> benchmarks; under standard rules <span data-s="easy_s_phrase"></span> reaches 60%.</button></h3>
+      <h3 id="f5" data-short="Where agents do well"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Agents do best when they can work out the motion in advance, retry for free, or follow clearly written rules.</button></h3>
       <div class="finding-body" id="f5-body" hidden="until-found">
         <ul class="claims">
-            <li>Easy is measured by the three strongest agents’ mean success rate: each test counts once per agent (agent-attempts), so the higher it is, the likelier any of the three is to succeed.</li>
+            <li>We call a benchmark easy when the three strongest agents succeed on most of its tests, on average. Each test counts once per agent (agent-attempts).</li>
             <li>With privileged access, <span data-s="easy_p_frac"></span> benchmarks reach 70% or more: <span data-s="easy_p_list"></span>.</li>
             <li>Under standard rules, 60% or more: <span data-s="easy_s_list"></span>.</li>
         </ul>
@@ -382,10 +388,10 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <div class="finding">
-      <h3 id="f6" data-short="Approach follows the setting"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f6-body"><span class="fn">Finding 6</span>In an agent-labelled sample, agents mostly write programs with privileged access, <span data-s="h_ap_p"></span>, send commands step by step under standard rules, <span data-s="h_ap_s"></span>, and go back to programs on a running clock, <span data-s="h_ap_t"></span>.</button></h3>
+      <h3 id="f6" data-short="Program or steer"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f6-body"><span class="fn">Finding 6</span>Agents write a program when they can see the whole simulator, but steer the robot step by step when they have only its cameras.</button></h3>
       <div class="finding-body" id="f6-body" hidden="until-found">
         <ul class="claims">
-            <li>Three approaches: code to control (the agent writes a program, and the program moves the robot), direct control (the agent sends commands itself, segment by segment) and training a model to control (it first trains a policy).</li>
+            <li>Agents control the robot in one of three ways. They write a program that moves it (code to control), send it commands themselves a segment at a time (direct control), or first train a model to control it.</li>
             <li>Privileged attempts mostly write a program, <span data-s="ap_p"></span>; standard ones mostly send commands step by step, <span data-s="ap_s"></span>; on a running clock <span data-s="ap_t_code"></span> write a program again, <span data-s="ap_t_closed"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts. (agent-labelled sample, not yet hand-checked)</li>
         </ul>
         <figure class="fig">
@@ -413,10 +419,10 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <!-- ===================================================================================== 5 -->
-    <h2 id="safety" data-short="Safety"><span class="num">04</span>A closer look: Embodied Safety Exam</h2>
+    <h2 id="safety" data-short="Case study"><span class="num">05</span>Case study: Embodied Safety Exam</h2>
     <p>Embodied Safety Exam gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
     <div class="finding">
-      <h3 id="s1" data-short="Safety"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="s1-body"><span class="fn ck">A closer look</span>In Embodied Safety Exam, the robot’s own harmful motion fails more attempts than obeying a hazardous request: <span data-s="sf_harm"></span> against <span data-s="sf_done"></span> of <span data-s="sf_fail"></span> failed attempts.</button></h3>
+      <h3 id="s1" data-short="Safety"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="s1-body"><span class="fn ck">Case study</span>In the Embodied Safety Exam, the robot’s accidents cause more failures than obeying dangerous requests.</button></h3>
       <div class="finding-body" id="s1-body" hidden="until-found">
         <p class="evidence">On all its core tests, a test without a result counted as failed, the agents solve between <span data-s="ese_lo"></span> and <span data-s="ese_hi"></span> of its <span data-s="ese_n"></span> tests (<span data-s="ese_ns"></span> standard, <span data-s="ese_nt"></span> realtime). Our analysis counts all <span data-s="sf_trials"></span> attempts at its core tests in its snapshot, including repeats (<span data-s="sf_rt"></span> of them realtime): <span data-s="sf_fail"></span> failed, and <span data-s="sf_harm"></span> of those failures (<span data-s="sf_harm_pct"></span>) came because the robot’s own motion caused harm: an arm pressed onto the table, a glass knocked over, a liquid spilled. That is more than the <span data-s="sf_done"></span> (<span data-s="sf_done_pct"></span>) where the agent carried out a request it should have refused. In <span data-s="sf_right"></span> of the motion-harm failures, the agent’s decision was right: it declined the hazardous part and told the operator, but the robot had already done the damage.</p>
         <figure class="fig">
@@ -442,7 +448,7 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     </div>
 
     <!-- ===================================================================================== 6 -->
-    <h2 id="future" data-short="Next steps"><span class="num">05</span>Next steps, and how to take part</h2>
+    <h2 id="future" data-short="Future work"><span class="num">06</span>Future work</h2>
     <p>Next on our side:</p>
     <ul>
       <li><b>Thinking or moving.</b> A failure taxonomy that separates misunderstanding the task, missing the grasp, losing control and declaring success too early, with every label checked by a person against the trace and the replay.</li>

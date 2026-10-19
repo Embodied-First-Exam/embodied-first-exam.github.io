@@ -24,6 +24,10 @@ const MIN_BENCH = 5;   // a benchmark counts among the hardest or the easiest fr
 const HARD = 0.5, EASY_P = 0.7, EASY_S = 0.6;
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
 const nw = (n) => WORDS[n] || int(n);
+// a share in plain words: about(0.66) = 'about two thirds'; moreThan(0.6) = 'more than half'
+const FRACS = [[1 / 4, 'a quarter'], [1 / 3, 'a third'], [1 / 2, 'half'], [2 / 3, 'two thirds'], [3 / 4, 'three quarters'], [9 / 10, 'nine in ten']];
+const about = (x) => { const [f, w] = FRACS.reduce((a, z) => (Math.abs(z[0] - x) < Math.abs(a[0] - x) ? z : a)); return Math.abs(f - x) <= 0.04 ? `about ${w}` : `${Math.round(100 * x)}%`; };
+const moreThan = (x) => { const f = [...FRACS].reverse().find(([v]) => x > v); return f ? `more than ${f[1]}` : `${Math.round(100 * x)}%`; };
 const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
 // Finding 4's groups of hard benchmarks, as the analysis groups them; a hard benchmark outside them is named after them
 const HARD_GROUPS = [
@@ -106,7 +110,7 @@ function compute(ex, tasks, b, atlas) {
   const inGroups = new Set(groups.flatMap(([, rs]) => rs.map((r) => r.id)));
   const rest = hard.s.filter((r) => !inGroups.has(r.id));
   const nIn = hard.s.length - rest.length;
-  per.hard_groups = `${nIn === hard.s.length ? 'They' : `${nw(nIn)[0].toUpperCase()}${nw(nIn).slice(1)} of them`} fall into ${nw(groups.length)} groups: ${groups.map(([g, rs]) => `${g}, ${list(rs.map(hn))}`).join('; ')}${rest.length ? `; the other ${nw(rest.length)} ${rest.length === 1 ? 'is' : 'are'} ${list(rest.map(hn))}` : ''}.`;
+  per.hard_groups = `${nIn === hard.s.length ? 'They' : `${nw(nIn)[0].toUpperCase()}${nw(nIn).slice(1)} of them`} fall into ${nw(groups.length)} groups. ${groups.map(([g, rs]) => `${g[0].toUpperCase()}${g.slice(1)}: ${list(rs.map(hn))}.`).join(' ')}${rest.length ? ` The other ${nw(rest.length)} ${rest.length === 1 ? 'is' : 'are'} ${list(rest.map(hn))}.` : ''} Each share is the part of a benchmark’s tests that none of the three solves.`;
   const nextBelow = (rows, cut, f) => rows.find((r) => f(r) < cut);
   const hpNext = nextBelow(hardRows('p'), HARD, (r) => r.none / r.n);
   per.hard_p_list = list(hard.p.map(hn)) + (hpNext ? `; the next, ${hn(hpNext)}, is just below half` : '');
@@ -200,6 +204,14 @@ function compute(ex, tasks, b, atlas) {
     sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
     dusty_s_others: (() => { const n = othersSolved('maniguard', 'dusty_transfer_i03', 's', TOP[0]); return n == null ? null : `${nw(n)} other agent${n === 1 ? '' : 's'}`; })(),
     built: (ex.build?.at || '').slice(0, 10),
+    // plain words for the headings: the best agent's standard failure share, what every agent loses without privileged
+    // access, and the leaderboard's Core view for the overview
+    a_s_fail_word: about(1 - solved(M.s, TOP[0]) / (M.s.length || 1)),
+    ps_lose_all: moreThan(Math.min(...ps.filter((x) => x.a).map((x) => (x.a - x.both) / x.a))),
+    ps_lose_n: ps.filter((x) => x.a).length === runs.length ? 'every agent' : `each of the ${nw(ps.filter((x) => x.a).length)} agents that solves any`,
+    ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
+    core_top3: list(board.slice(0, 3).map((x) => `${x.name} at ${Q(x.c, CORE.length)}`)),
+    core_rest_max: P(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
   };
   return { S, M, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, safety: sf, name, short, ok, solved };

@@ -32,6 +32,11 @@ html[lang="zh"] body { font-family: var(--body), "PingFang SC", "Hiragino Sans G
 /* the header: the site's page head (app.js adds the moving wall beside it), on the article's column */
 .page-head.post-head { max-width: calc(880px + 2 * var(--gutter)); }
 .page-head.post-head h1 { font-size: clamp(40px, 5.6vw, 72px); }
+/* the title is the home page's two-line question (exam.css .hero-q), set at the size of a post title */
+.page-head.post-head h1.post-q { width: min(960px, calc(50vw + 440px - var(--gutter))); max-width: none; font: 700 clamp(28px, 2.5vw, 36px)/1.16 var(--display); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+@media (max-width: 960px) { .page-head.post-head h1.post-q { width: auto; } }
+.post-q span, .post-q em { display: block; }
+.post-q em { margin-top: .12em; font-style: normal; color: var(--priv-ink); }
 .byline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 26px 0 0; font: 500 13px/1.5 var(--mono); color: var(--ink-3); }
 .byline a { color: var(--ink); border-bottom: 1px solid var(--line-2); }
 .lang-switch { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; }
