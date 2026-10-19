@@ -1340,8 +1340,8 @@ r.submit("joint_position", A, dt=0.1)</code></pre></figure>
 const WAY_ORDER = ['a', 'b', 'c'];   // the owner's order (2026-10-18): direct control, code to control, train a model to control
 const wayMedia = (vid, ext) => site(`media/ways/${vid}.${ext}`);
 const WAYS = {
-  a: { tab: 'Direct Control', title: 'Direct control', def: 'The agent picks every action itself.', vid: 'a_put_bottles', aspect: '4 / 3',
-    cap: 'What the agent looked at, in order',
+  a: { tab: 'Direct Control', title: 'Direct control', def: 'The agent picks every action itself.', vid: 'a_put_bottles_cola', aspect: '16 / 9',
+    cap: 'This run, 06:00–08:45, every command marked',
     line: 'No controller is written in advance. The agent types one move or grip into a live robot session, looks at the camera image, and then picks the next target: 69 commands and 41 looks in 29 minutes.',
     slug: 'robotwin_2_0_put_bottles_dustbin-standard--ydhsp73', who: 'RoboTwin 2.0 · Put bottles in dustbin · standard · Codex · GPT-6 Astra',
     // steps 39-50 of the run; times are the steps' start times, a blank time is the same step as the row above
