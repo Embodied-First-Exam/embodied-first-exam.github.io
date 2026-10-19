@@ -1,7 +1,7 @@
 /* The blog's figures and numbers. The results are computed here from data/exam.json and data/tasks.json, the files the
    leaderboard reads, with the leaderboard's own rules (the core set; the latest finished attempt per model and test; head to
-   head on the tests every ranked model sat), so the blog and the site cannot disagree. data/blog.json
-   (scripts/export_blog.py) adds the few numbers the site does not hold. Numbers in the text are <span data-s="key">, filled
+   head on the tests every ranked model sat), so the blog and the site cannot disagree; task types come from data/atlas.json,
+   as on the task pages. data/blog.json (scripts/export_blog.py) adds the few numbers the site does not hold. Numbers in the text are <span data-s="key">, filled
    from the same computation. app.js draws the navigation and the footer. */
 
 const BASE = new URL('../', import.meta.url).pathname;
@@ -14,13 +14,13 @@ const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (
 
 const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
-const MIN_SUITE = 5;   // a suite gets its own row in the suite chart from this many head-to-head tests
+const MIN_BODY = 20;   // a body gets its own row in the body chart from this many standard tests
 
 /* ---------------------------------------------------------------------------------------------- numbers */
 
 /** Everything the article says about results, from the site's data. A test is one task in one setting; standard counts
  *  standard-realtime in, as the leaderboard does. */
-function compute(ex, tasks, b) {
+function compute(ex, tasks, b, atlas) {
   const runs = ex.leaderboard.shared.runs;
   const run = Object.fromEntries(ex.runs.map((r) => [r.id, r]));
   const name = (id) => run[id]?.model || id;
@@ -43,29 +43,68 @@ function compute(ex, tasks, b) {
       both: L.filter((t) => ok(t, r, a) && ok(t, r, c)).length };
   });
   const ps = paired('p', 's'), st = paired('s', 't');
-  // suites: share of head-to-head tests solved by at least one agent
-  const suiteName = Object.fromEntries(ex.suites.map((s) => [s.id, s.name]));
-  const bySuite = {};
-  for (const k of ['p', 's']) for (const [t, m] of H[k]) ((bySuite[t.suite] ??= { p: [], s: [] })[k]).push([t, m]);
-  const suites = Object.entries(bySuite).map(([id, L]) => ({ id, name: suiteName[id] || id, p: [anyOf(L.p), L.p.length], s: [anyOf(L.s), L.s.length] }));
-  // one suite, one body: how many of the agents solved each RoboOlympics-Fun family with privileged access
-  const fam = (id) => { const t = core.find((x) => x.suite === 'roboolympics-fun' && x.id === id); return t ? runs.filter((r) => ok(t, r, 'p')).length : 0; };
+  // the findings keep the three settings apart: standard here is standard alone
+  const M = { p: H.p, s: h2h('s'), t: H.t };
+  const all3 = (L) => L.filter(([t, m]) => TOP.every((r) => ok(t, r, m))).length;
+  const none3 = (L) => L.length - anyOf(L, TOP);
+  const flash = runs.filter((r) => !TOP.includes(r));
+  const ranked = (L) => [...runs].sort((x, y) => solved(L, y) - solved(L, x));
+  const sameOrder = ['p', 's', 't'].every((k) => ranked(M[k]).slice(0, 3).join() === TOP.join());
+  const flashTop = Math.max(...flash.map((r) => Math.max(...['p', 's', 't'].map((k) => solved(M[k], r) / (M[k].length || 1)))));
+  // groups of tests: by task type (a task can have several), by body, by suite
+  const group = (L, keys) => { const g = {}; for (const x of L) for (const k of keys(x[0])) (g[k] ??= []).push(x); return g; };
+  const ttOf = (t) => atlas?.tasks?.[`${t.suite}/${t.id}`]?.tt || [];
+  const types = { p: group(M.p, ttOf), s: group(M.s, ttOf) };
+  const bodiesH = { p: group(M.p, (t) => [t.body]), s: group(M.s, (t) => [t.body]) };
+  const suitesH = { p: group(M.p, (t) => [t.suite]), s: group(M.s, (t) => [t.suite]) };
   // the three strongest: how many of them solved each test
   const overlap = (L) => [3, 2, 1, 0].map((k) => L.filter(([t, m]) => TOP.filter((r) => ok(t, r, m)).length === k).length);
-  const astraFails = H.s.filter(([t, m]) => !ok(t, TOP[0], m));
+  const only = (L, r) => L.filter(([t, m]) => ok(t, r, m) && !TOP.some((o) => o !== r && ok(t, o, m))).length;
+  const flashFill = (L) => L.filter(([t, m]) => !TOP.some((r) => ok(t, r, m)) && flash.some((r) => ok(t, r, m))).length;
+  const budgets = core.map((t) => t.budget_min).filter(Boolean);
+  const dur = (min) => (min % 60 ? `${min} minutes` : `${['', 'one', 'two', 'three', 'four', 'five', 'six'][min / 60] || min / 60} hour${min > 60 ? 's' : ''}`);
+  const cb = b.crossbench || {};
   const rsb = board.map((r) => solved(H.s.filter(([t]) => t.suite === 'embodied-safety-exam'), r.id));
   const sf = b.safety;
   const coreModes = (m) => core.filter((t) => (t.core || '').includes(m)).length;
   const bodies = {};
   for (const t of tasks) bodies[t.body] = (bodies[t.body] || 0) + 1;
   const tot = ex.totals;
-  const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`;
+  const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`, Q = (a, n) => `${a && !pct(a, n) ? '<1' : pct(a, n)}% (${int(a)}/${int(n)})`;
+  const QL = (L, f) => Q(f(L || []), (L || []).length);
+  const sample = (x) => (x ? Q(x[0], x[1]) : null);
+  // per group: all3_<mode>_<type>, none3_<mode>_<type>, bnone3_<mode>_<body>, snone6_<mode>_<suite>, hand_p_<i> for TOP[i]
+  const per = {};
+  for (const k of ['p', 's']) {
+    for (const [tt, L] of Object.entries(types[k])) { per[`all3_${k}_${tt}`] = QL(L, all3); per[`none3_${k}_${tt}`] = QL(L, none3); }
+    for (const [bd, L] of Object.entries(bodiesH[k])) per[`bnone3_${k}_${bd}`] = QL(L, none3);
+    for (const [su, L] of Object.entries(suitesH[k])) per[`snone6_${k}_${su}`] = QL(L, (x) => x.length - anyOf(x));
+  }
+  TOP.forEach((r, i) => { per[`hand_p_${i}`] = QL(bodiesH.p.hand, (L) => solved(L, r)); });
+  const allM = [...M.p, ...M.s, ...M.t];
+  const rsbS = M.s.filter(([t]) => t.suite === 'embodied-safety-exam');
   const S = {
     tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots),
     core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs),
     core_p: int(coreModes('p')), core_s: int(coreModes('s')), core_t: int(coreModes('t')),
     n_runs: runs.length, n_runs_word: ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'][runs.length] || int(runs.length), np: int(H.p.length), ns: int(H.s.length), nt: int(H.t.length),
     best: best.name, best_s: F(best.s, H.s.length), best_s_pct: P(best.s, H.s.length), best_p: F(best.p, H.p.length), best_p_pct: P(best.p, H.p.length),
+    ...per,
+    ns_only: int(M.s.length),
+    rsb_s_n: int(rsbS.length), a_s_norsb: Q(solved(M.s, TOP[0]) - solved(rsbS, TOP[0]), M.s.length - rsbS.length),
+    a_p: Q(solved(M.p, TOP[0]), M.p.length), a_s: Q(solved(M.s, TOP[0]), M.s.length), a_t: Q(solved(M.t, TOP[0]), M.t.length),
+    order_note: sameOrder ? `In all three settings the order at the top is the same, ${TOP.map(name).join(', ')}, and the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% of any setting.`
+      : `The order at the top differs between the settings; the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% of any setting.`,
+    flash_any: int(anyOf(allM, flash)), astra_all: int(solved(allM, TOP[0])),
+    budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
+    none6_p: QL(M.p, (L) => L.length - anyOf(L)), none6_s: QL(M.s, (L) => L.length - anyOf(L)), none6_t: QL(M.t, (L) => L.length - anyOf(L)),
+    nr_p: sample(cb.no_return?.p), nr_s: sample(cb.no_return?.s), nr_t: sample(cb.no_return?.t),
+    ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s), ap_t: sample(cb.approach?.t),
+    cb_sample: cb.sample == null ? null : int(cb.sample), cb_snapshot: (cb.snapshot || '').slice(0, 10) || null,
+    min_body: MIN_BODY,
+    u_p_any: int(anyOf(M.p, TOP)), u_p_astra: int(solved(M.p, TOP[0])), u_s_any: int(anyOf(M.s, TOP)), u_s_astra: int(solved(M.s, TOP[0])),
+    only_s_1: int(only(M.s, TOP[1])), only_s_2: int(only(M.s, TOP[2])),
+    ff_p: F(flashFill(M.p), none3(M.p)), ff_s: F(flashFill(M.s), none3(M.s)),
     second: board[1].name, third: board[2].name, flash_max: P(Math.max(...board.slice(3).map((r) => r.s)), H.s.length),
     any_s: int(anyOf(H.s)), none_s: int(H.s.length - anyOf(H.s)), none_s_pct: P(H.s.length - anyOf(H.s), H.s.length),
     none_p: F(H.p.length - anyOf(H.p), H.p.length),
@@ -74,17 +113,13 @@ function compute(ex, tasks, b) {
     st_n: int(Math.max(...st.map((r) => r.n))),
     st_astra: `${st[runs.indexOf(TOP[0])].a} and ${st[runs.indexOf(TOP[0])].c}`, st_argon: `${st[runs.indexOf(TOP[2])].a} and ${st[runs.indexOf(TOP[2])].c}`,
     st_opus: `${st[runs.indexOf(TOP[1])].a} and ${st[runs.indexOf(TOP[1])].c}`,
-    min_suite: MIN_SUITE,
-    fam_backflip: `${fam('backflip')}`, fam_dunk: `${fam('dunk')}`, fam_pole: fam('pole_vault') ? `${fam('pole_vault')}` : 'none',
-    ov3: int(overlap(H.s)[0]), ov2: int(overlap(H.s)[1]), ov1: int(overlap(H.s)[2]), ov0: int(overlap(H.s)[3]),
-    astra_fails: int(astraFails.length), astra_fails_other: int(astraFails.filter(([t, m]) => TOP.slice(1).some((r) => ok(t, r, m))).length),
     rsb_n: int(H.s.filter(([t]) => t.suite === 'embodied-safety-exam').length), rsb_lo: int(Math.min(...rsb)), rsb_hi: int(Math.max(...rsb)),
     sf_trials: int(sf.trials), sf_fail: int(sf.failures), sf_harm: int(sf.by_outcome.harm), sf_harm_pct: P(sf.by_outcome.harm, sf.failures),
     sf_done: int(sf.by_outcome.done), sf_done_pct: P(sf.by_outcome.done, sf.failures), sf_right: int(sf.harm_right_call),
     sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
     argon_filtered: int(b.argon_filtered), built: (ex.build?.at || '').slice(0, 10),
   };
-  return { S, H, board, ps, st, suites, overlap, bodies, safety: sf, name };
+  return { S, H, M, board, ps, st, types, bodiesH, all3, none3, overlap, bodies, safety: sf, name, tt: atlas?.taxonomy?.tt || {}, bodyName: ex.bodies || {} };
 }
 
 function fill(S) {
@@ -112,9 +147,11 @@ function figOverall(el, R) {
     <tbody>${board.map((r) => `<tr><td class="who">${esc(r.name)} <small>· ${esc(r.harness)}</small></td>${cell(r.s, H.s.length, '--std')}${cell(r.p, H.p.length, '--priv')}</tr>`).join('')}</tbody></table></div>`;
 }
 
+const ROWS = [['s', '<span class="m-s">Standard</span>'], ['t', '<span class="m-r">Realtime</span>'], ['p', '<span class="m-p">Privileged</span>']];
+
 /** Finding 1: how much of each setting is solved by the best agent, by another agent only, or by none. */
 function figReach(el, R) {
-  const { H, board, name } = R;
+  const { M, board, name } = R;
   const best = board[0].id;
   const ok = (t, r, m) => t.results?.[r]?.[m]?.s === 'S';
   const row = (L, label) => {
@@ -124,7 +161,7 @@ function figReach(el, R) {
   };
   const segs = [['best', `Solved by ${name(best)}`, '--ink'], ['other', 'Solved only by another agent', '--flash'], ['none', 'Solved by no agent', '--c-other', 1]];
   el.innerHTML = `<p class="fig-title">Core tests by who solved them</p>${legend(segs)}
-    ${stackRows([row(H.s, '<span class="m-s">Standard</span>'), row(H.p, '<span class="m-p">Privileged</span>')], segs)}`;
+    ${stackRows(ROWS.map(([k, l]) => row(M[k], l)), segs)}`;
 }
 
 /** Finding 2: the same task in both settings, per agent (privileged -> standard). */
@@ -150,17 +187,32 @@ function figRealtime(el, R) {
     <p class="fig-note">Agents that solved none in either are left out.</p>`;
 }
 
-/** Finding 3: per suite, the share of its head-to-head tests that at least one agent solved. */
-function figSuites(el, R) {
-  const big = R.suites.filter((s) => s.s[1] >= MIN_SUITE).sort((x, y) => y.s[0] / y.s[1] - x.s[0] / x.s[1] || y.s[1] - x.s[1]);
-  const small = R.suites.filter((s) => s.s[1] < MIN_SUITE).sort((x, y) => x.name.localeCompare(y.name));
-  const bar = (k, [a, n]) => (n ? `<div class="nb-bar ${k}"><div class="t"><span style="width:${pct(a, n)}%"></span></div><small>${pct(a, n)}% · ${a}/${n}</small></div>`
-    : `<div class="nb-bar ${k}"><div class="t"></div><small>no tests</small></div>`);
-  el.innerHTML = `<p class="fig-title">Share of each suite’s core tests solved by at least one agent</p>
-    <div class="legend"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--priv)"></i>Privileged</span></div>
-    ${big.map((s) => `<div class="nb-row"><div class="who">${esc(s.name)}</div><div class="nb-bars">${bar('s', s.s)}${bar('p', s.p)}</div></div>`).join('')}
-    <p class="fig-note">Suites with at least ${MIN_SUITE} standard core tests, ordered by the standard share. With fewer:
-      ${small.map((s) => `${esc(s.name)} ${s.s[0]}/${s.s[1]}`).join(', ')} (standard).</p>`;
+/** Finding 3: per group of tests (task type or body), how many of the three strongest solved them, in each setting. */
+function mixTable(el, R, groups, label, min) {
+  const segs = [['k3', 'All three', '--c-honest'], ['k12', 'One or two', '--f-possible'], ['k0', 'None of the three', '--c-other', 1]];
+  const cell = (L) => {
+    if (!L?.length) return '<td><small>no tests</small></td>';
+    const n = L.length, a = R.all3(L), z = R.none3(L), seg = { k3: a, k12: n - a - z, k0: z };
+    return `<td><div class="mix">${segs.map(([k, l, c, lt]) => (seg[k] ? `<span class="${lt ? 'lt' : ''}" style="width:${(100 * seg[k]) / n}%;background:var(${c})" title="${esc(`${l}: ${seg[k]} of ${n}`)}"></span>` : '')).join('')}</div><small>${pct(a, n)}% · ${pct(z, n)}% of ${n}</small></td>`;
+  };
+  const keys = Object.keys({ ...groups.p, ...groups.s });
+  const big = keys.filter((k) => (groups.s[k]?.length || 0) >= min)
+    .sort((x, y) => R.none3(groups.s[x]) / groups.s[x].length - R.none3(groups.s[y]) / groups.s[y].length);
+  const small = keys.filter((k) => !big.includes(k));
+  return `${legend(segs)}<div class="ovt-wrap"><table class="ovt mixt"><thead><tr><th>${label}</th><th>Standard</th><th>Privileged</th></tr></thead>
+    <tbody>${big.map((k) => `<tr><td class="who">${esc(R.lab(k))}</td>${cell(groups.s[k])}${cell(groups.p[k])}</tr>`).join('')}</tbody></table></div>
+    <p class="fig-note">Under each bar: the share all three solved · the share none of them solved, of so many tests. Ordered by the standard share none solved.${small.length
+      ? ` Fewer than ${min} standard tests: ${small.map((k) => `${esc(R.lab(k))} (${groups.s[k]?.length || 0} standard, ${groups.p[k]?.length || 0} privileged)`).join(', ')}.` : ''}</p>`;
+}
+
+function figTypes(el, R) {
+  el.innerHTML = `<p class="fig-title">Tests by task type: how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>`
+    + mixTable(el, { ...R, lab: (k) => R.tt[k] || k }, R.types, 'Task type', 1);
+}
+
+function figBodies(el, R) {
+  el.innerHTML = `<p class="fig-title">Tests by body: how many of the three strongest agents solved them</p>`
+    + mixTable(el, { ...R, lab: (k) => R.bodyName[k] || k }, R.bodiesH, 'Body', MIN_BODY);
 }
 
 /** Open question: of the three strongest agents, how many solved each test. */
@@ -168,7 +220,7 @@ function figOverlap(el, R) {
   const segs = [['k3', 'All three', '--c-honest'], ['k2', 'Two', '--f-possible'], ['k1', 'One', '--rt'], ['k0', 'None', '--c-other', 1]];
   const row = (L, label) => { const [k3, k2, k1, k0] = R.overlap(L); return { label, n: L.length, k3, k2, k1, k0 }; };
   el.innerHTML = `<p class="fig-title">Core tests by how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>${legend(segs)}
-    ${stackRows([row(R.H.s, '<span class="m-s">Standard</span>'), row(R.H.p, '<span class="m-p">Privileged</span>')], segs)}`;
+    ${stackRows(ROWS.map(([k, l]) => row(R.M[k], l)), segs)}`;
 }
 
 /** Embodied Safety Exam: failed core tests by the benchmark's verdict. */
@@ -249,12 +301,12 @@ function clips() {
   });
 }
 
-Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json')]).then(([ex, tasks, b]) => {
-  const R = compute(ex, tasks, b);
+Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json'), getJSON('data/atlas.json')]).then(([ex, tasks, b, atlas]) => {
+  const R = compute(ex, tasks, b, atlas);
   fill(R.S);
   const bodies = $('#bodies');
   if (bodies) bodies.textContent = Object.entries(R.bodies).sort((a, c) => c[1] - a[1]).map(([k, n]) => `${int(n)} ${(ex.bodies?.[k] || k).toLowerCase()}`).join(', ');
-  const figs = { overall: figOverall, reach: figReach, paired: figPaired, realtime: figRealtime, suites: figSuites, overlap: figOverlap, safety: figSafety };
+  const figs = { overall: figOverall, reach: figReach, paired: figPaired, realtime: figRealtime, types: figTypes, bodies: figBodies, overlap: figOverlap, safety: figSafety };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
 }).catch((e) => {
   console.error(e);
