@@ -265,7 +265,7 @@ function toc() {
     const s = subs(h).filter(fnum);
     if (!s.length) return `<li><a href="#${h.id}">${label(h)}</a></li>`;
     return `<li class="fold"><div class="fold-head"><a href="#${h.id}">${label(h)}</a><button type="button" aria-expanded="false" aria-label="Show the findings">${s.length}</button></div>`
-      + `<div class="fold-body"><ol>${s.map((x) => `<li><a href="#${x.id}"><span class="k">${fnum(x)}</span>${esc(x.dataset.short || sub3(x))}</a></li>`).join('')}</ol></div></li>`;
+      + `<div class="fold-body"><ol>${s.map((x, i) => `<li><a href="#${x.id}"><span class="k">${i + 1}</span>${esc(x.dataset.short || sub3(x))}</a></li>`).join('')}</ol></div></li>`;
   }).join('')}</ol></nav>`);
   const rail = $('.toc-rail'), first = heads[0];
   const marks = [...heads, ...fh].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
