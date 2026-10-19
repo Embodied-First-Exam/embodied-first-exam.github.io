@@ -6,6 +6,8 @@
 const BASE = new URL('../', import.meta.url).pathname;
 const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
+// the Embodied Safety Exam's earlier suite id, in links from before 2026-10-19
+for (const k of ['suite', 'id', 'task']) { const v = Q.get(k); if (v && /^robosafe(\/|$)/.test(v)) Q.set(k, v.replace(/^robosafe/, 'embodied-safety-exam')); }
 const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
@@ -523,7 +525,7 @@ function openTask(ex, t, runs) {
     if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=0f3e018c').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=916167f2').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -616,7 +618,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=0f3e018c').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=916167f2').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -625,7 +627,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
 
 /** The suites the exam's team built and releases with the exam (owners, 2026-10-18): first everywhere, in this order,
  *  each with the EFE Original tag beside its name. */
-const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics-fun', 'roboolympics-match', 'robosafe', 'dexhand', 'roboengineer'];
+const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics-fun', 'roboolympics-match', 'embodied-safety-exam', 'dexhand', 'roboengineer'];
 const isOurs = (s) => OUR_RELEASE.includes(s?.id);
 // beside the name, small (nameTag), and on the picture's top right corner, as a frosted chip (owners, 2026-10-18)
 const nameTag = (s) => (isOurs(s) ? `<span class="name-tag" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
@@ -1705,7 +1707,7 @@ async function home(ex) {
   if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests of the core set that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=0f3e018c').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=916167f2').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
   import('./sphere.js?v=481d5d3f').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
@@ -1788,7 +1790,7 @@ async function suitePage(ex) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=0f3e018c').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=916167f2').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
@@ -1839,7 +1841,7 @@ const runIcon = (k) => `<svg class="rk-ic" viewBox="0 0 24 24" fill="none" strok
 const clock = (s) => { s = Math.max(0, Math.round(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; };
 const kTok = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
 // the evaluation's bench names that differ from the site's suite ids
-const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'robosafe', rsb: 'robosafe', ikea: 'roboarc' };
+const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'embodied-safety-exam', rsb: 'embodied-safety-exam', ese: 'embodied-safety-exam', ikea: 'roboarc' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
 const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5',
