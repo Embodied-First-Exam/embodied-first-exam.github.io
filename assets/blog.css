@@ -287,3 +287,19 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
   .ci-row { grid-template-columns: 110px 1fr 40px; }
 }
 @media (prefers-reduced-motion: reduce) { .stack > span, svg.chart path { transition: none; } }
+
+/* the kinds of task (motivation) */
+.kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kinds > div { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.kinds b { display: block; font: 650 16px/1.3 var(--display); }
+.kinds p { margin: 6px 0 0 !important; font-size: 14px !important; line-height: 1.5 !important; color: var(--ink-2) !important; }
+.kinds span { display: block; margin-top: 10px; font: 500 11px/1.45 var(--mono); color: var(--ink-3); }
+@media (max-width: 760px) { .kinds { grid-template-columns: 1fr; } }
+
+/* a finding's parts: the scope note, the open question, small counts in figures */
+.finding .scope { margin-top: 22px !important; padding: 12px 16px; border-radius: 12px; background: var(--bg-2); font-size: 15px !important; line-height: 1.6 !important; color: var(--ink-2) !important; }
+.finding .scope b { color: var(--ink); }
+.finding.open h3 .fn { color: var(--rt-ink); }
+.finding h3 .fn.ck { color: var(--std-ink); }
+.db-row .who small { display: block; font: 400 11.5px var(--mono); color: var(--ink-3); }
+.ovt th small, .ovt td.who small { font: 400 11px var(--mono); color: var(--ink-3); text-transform: none; letter-spacing: 0; }

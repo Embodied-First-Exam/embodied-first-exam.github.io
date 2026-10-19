@@ -1,10 +1,10 @@
-/* The blog's figures and numbers, drawn from data/blog.json (scripts/export_blog.py: the counts of the cross-benchmark
-   analysis, frozen) and data/exam.json (the exam's totals). One script for both languages: the page's <html lang> picks
-   the labels. Numbers in the text are <span data-f="key" data-fmt="pct|frac|num|den"> and are filled from the same data,
-   so the English and Chinese pages cannot drift apart. app.js draws the navigation, the footer and the wall. */
+/* The blog's figures and numbers. The results are computed here from data/exam.json and data/tasks.json, the files the
+   leaderboard reads, with the leaderboard's own rules (the core set; the latest finished attempt per model and test; head to
+   head on the tests every ranked model sat), so the blog and the site cannot disagree. data/blog.json
+   (scripts/export_blog.py) adds the few numbers the site does not hold. Numbers in the text are <span data-s="key">, filled
+   from the same computation. app.js draws the navigation and the footer. */
 
 const BASE = new URL('../', import.meta.url).pathname;
-const ZH = document.documentElement.lang.startsWith('zh');
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -12,259 +12,172 @@ const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
 
-const T = ZH ? {
-  of: (a, b) => `${a}/${b}`, tasks: '个任务', trials: '次', failures: '次失败',
-  priv: 'Privileged', std: 'Standard', rt: 'Realtime',
-  ways: { code: 'Code to Control', direct: 'Direct Control', train: 'Train Model to Control', mixed: '混合', none: '没有形成控制' },
-  layers: { thought: '想法错了（为主）', before: '先想错，引出失误', after: '先失误，没能挽回', motor: '纯动作失误', external: '外部原因' },
-  claims: { claimed: '声称成功', honest: '如实说失败', silent: '没有表态', mismatch: '与现场一致、评分不同', other: '其他' },
-  fixes: { likely: '很可能翻盘', possible: '可能翻盘', unlikely: '不太可能' },
-  reachS: '成功的 trial', reachF: '失败的 trial', reachX: '已用时限', reachY: '已做成关键动作的比例',
-  after: { stopped: '停下', kept: '继续做无用功' }, left: (p) => `出事时还剩 ${p}% 时间`,
-  small: '样本少', copy: '复制', copied: '已复制',
-} : {
-  of: (a, b) => `${int(a)} of ${int(b)}`, tasks: 'tasks', trials: 'trials', failures: 'failures',
-  priv: 'Privileged', std: 'Standard', rt: 'Realtime',
-  ways: { code: 'Code to Control', direct: 'Direct Control', train: 'Train Model to Control', mixed: 'Mixed', none: 'No control formed' },
-  layers: { thought: 'Wrong idea (mainly)', before: 'Wrong idea, then a slip', after: 'A slip, not recovered', motor: 'Motor slip only', external: 'External' },
-  claims: { claimed: 'Claimed success', honest: 'Said it failed', silent: 'Said nothing', mismatch: 'Saw success, graded otherwise', other: 'Other' },
-  fixes: { likely: 'Likely saved', possible: 'Possibly saved', unlikely: 'Unlikely' },
-  reachS: 'Successful trials', reachF: 'Failed trials', reachX: 'Share of the time limit used', reachY: 'Share that had done the key step once',
-  after: { stopped: 'Stopped', kept: 'Kept going in vain' }, left: (p) => `${p}% of the time left`,
-  small: 'few trials', copy: 'Copy', copied: 'Copied',
-};
-const AGENT = (d, a) => d.agents[a]?.[ZH ? 'zh' : 'en'] || a;
-const FAMILY = (d, a) => d.agents[a]?.family || 'flash';
+const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
+const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
+const MIN_SUITE = 5;   // a suite gets its own row in the suite chart from this many head-to-head tests
 
 /* ---------------------------------------------------------------------------------------------- numbers */
 
-/** data-f="key" reads data.facts (counts a/b); data-f="b.key" reads the bottleneck analysis's facts (values as stated). */
-function fillFacts(d) {
-  $$('[data-f]').forEach((el) => {
-    const k = el.dataset.f;
-    const v = k.startsWith('b.') ? d.bottleneck?.facts[k.slice(2)] : k.startsWith('r.') ? [d.repo?.[k.slice(2)]] : k.startsWith('w.') ? [d.where?.[k.slice(2)]] : d.facts[k];
-    if (!v || v[0] == null) { el.textContent = '?'; return; }
-    const [a, b] = v;
-    el.textContent = { pct: `${pct(a, b)}%`, frac: T.of(a, b), num: int(a), den: int(b), raw: `${a}`, rawpct: `${a}%`,
-      vs: `${a}% ${ZH ? '对' : 'vs'} ${b}%`, second: `${b}` }[el.dataset.fmt || 'pct'];
+/** Everything the article says about results, from the site's data. A test is one task in one setting; standard counts
+ *  standard-realtime in, as the leaderboard does. */
+function compute(ex, tasks, b) {
+  const runs = ex.leaderboard.shared.runs;
+  const run = Object.fromEntries(ex.runs.map((r) => [r.id, r]));
+  const name = (id) => run[id]?.model || id;
+  const core = tasks.filter((t) => t.set === 'core');
+  const v = (t, r, m) => t.results?.[r]?.[m]?.s;
+  const graded = (t, r, m) => v(t, r, m) === 'S' || v(t, r, m) === 'F';
+  const ok = (t, r, m) => v(t, r, m) === 'S';
+  // head to head: the core tests every ranked run sat, as [task, mode] pairs
+  const h2h = (m) => core.filter((t) => (t.core || '').includes(m) && runs.every((r) => graded(t, r, m))).map((t) => [t, m]);
+  const H = { p: h2h('p'), s: [...h2h('s'), ...h2h('t')], t: h2h('t') };
+  const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
+  const anyOf = (L, rs = runs) => L.filter(([t, m]) => rs.some((r) => ok(t, r, m))).length;
+  const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(H.p, r), s: solved(H.s, r) }))
+    .sort((x, y) => y.s - x.s || y.p - x.p);
+  const best = board[0];
+  // the same task in two settings, per agent: tasks whose two tests are both in the core set and both graded for it
+  const paired = (a, c) => runs.map((r) => {
+    const L = core.filter((t) => (t.core || '').includes(a) && (t.core || '').includes(c) && graded(t, r, a) && graded(t, r, c));
+    return { id: r, name: name(r), n: L.length, a: L.filter((t) => ok(t, r, a)).length, c: L.filter((t) => ok(t, r, c)).length,
+      both: L.filter((t) => ok(t, r, a) && ok(t, r, c)).length };
   });
+  const ps = paired('p', 's'), st = paired('s', 't');
+  // suites: share of head-to-head tests solved by at least one agent
+  const suiteName = Object.fromEntries(ex.suites.map((s) => [s.id, s.name]));
+  const bySuite = {};
+  for (const k of ['p', 's']) for (const [t, m] of H[k]) ((bySuite[t.suite] ??= { p: [], s: [] })[k]).push([t, m]);
+  const suites = Object.entries(bySuite).map(([id, L]) => ({ id, name: suiteName[id] || id, p: [anyOf(L.p), L.p.length], s: [anyOf(L.s), L.s.length] }));
+  // one suite, one body: how many of the agents solved each RoboOlympics-Fun family with privileged access
+  const fam = (id) => { const t = core.find((x) => x.suite === 'roboolympics-fun' && x.id === id); return t ? runs.filter((r) => ok(t, r, 'p')).length : 0; };
+  // the three strongest: how many of them solved each test
+  const overlap = (L) => [3, 2, 1, 0].map((k) => L.filter(([t, m]) => TOP.filter((r) => ok(t, r, m)).length === k).length);
+  const astraFails = H.s.filter(([t, m]) => !ok(t, TOP[0], m));
+  const rsb = board.map((r) => solved(H.s.filter(([t]) => t.suite === 'robosafe'), r.id));
+  const sf = b.safety;
+  const coreModes = (m) => core.filter((t) => (t.core || '').includes(m)).length;
+  const bodies = {};
+  for (const t of tasks) bodies[t.body] = (bodies[t.body] || 0) + 1;
+  const tot = ex.totals;
+  const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`;
+  const S = {
+    tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots),
+    core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs),
+    core_p: int(coreModes('p')), core_s: int(coreModes('s')), core_t: int(coreModes('t')),
+    n_runs: runs.length, n_runs_word: ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'][runs.length] || int(runs.length), np: int(H.p.length), ns: int(H.s.length), nt: int(H.t.length),
+    best: best.name, best_s: F(best.s, H.s.length), best_s_pct: P(best.s, H.s.length), best_p: F(best.p, H.p.length), best_p_pct: P(best.p, H.p.length),
+    second: board[1].name, third: board[2].name, flash_max: P(Math.max(...board.slice(3).map((r) => r.s)), H.s.length),
+    any_s: int(anyOf(H.s)), none_s: int(H.s.length - anyOf(H.s)), none_s_pct: P(H.s.length - anyOf(H.s), H.s.length),
+    none_p: F(H.p.length - anyOf(H.p), H.p.length),
+    ps_astra: `${int(ps[runs.indexOf(TOP[0])].a)} of ${int(ps[runs.indexOf(TOP[0])].n)}`, ps_astra_s: int(ps[runs.indexOf(TOP[0])].c),
+    ps_astra_both: F(ps[runs.indexOf(TOP[0])].both, ps[runs.indexOf(TOP[0])].a), ps_astra_both_pct: P(ps[runs.indexOf(TOP[0])].both, ps[runs.indexOf(TOP[0])].a),
+    st_n: int(Math.max(...st.map((r) => r.n))),
+    st_astra: `${st[runs.indexOf(TOP[0])].a} and ${st[runs.indexOf(TOP[0])].c}`, st_argon: `${st[runs.indexOf(TOP[2])].a} and ${st[runs.indexOf(TOP[2])].c}`,
+    st_opus: `${st[runs.indexOf(TOP[1])].a} and ${st[runs.indexOf(TOP[1])].c}`,
+    min_suite: MIN_SUITE,
+    fam_backflip: `${fam('backflip')}`, fam_dunk: `${fam('dunk')}`, fam_pole: fam('pole_vault') ? `${fam('pole_vault')}` : 'none',
+    ov3: int(overlap(H.s)[0]), ov2: int(overlap(H.s)[1]), ov1: int(overlap(H.s)[2]), ov0: int(overlap(H.s)[3]),
+    astra_fails: int(astraFails.length), astra_fails_other: int(astraFails.filter(([t, m]) => TOP.slice(1).some((r) => ok(t, r, m))).length),
+    rsb_n: int(H.s.filter(([t]) => t.suite === 'robosafe').length), rsb_lo: int(Math.min(...rsb)), rsb_hi: int(Math.max(...rsb)),
+    sf_trials: int(sf.trials), sf_fail: int(sf.failures), sf_harm: int(sf.by_outcome.harm), sf_harm_pct: P(sf.by_outcome.harm, sf.failures),
+    sf_done: int(sf.by_outcome.done), sf_done_pct: P(sf.by_outcome.done, sf.failures), sf_right: int(sf.harm_right_call),
+    sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
+    argon_filtered: int(b.argon_filtered), built: (ex.build?.at || '').slice(0, 10),
+  };
+  return { S, H, board, ps, st, suites, overlap, bodies, safety: sf, name };
 }
 
-function command(el) {
-  if (!el) return;
-  const cmd = 'harbor run -d embodied-first-exam -a claude-code -m anthropic/claude-opus-5-5';
-  el.innerHTML = `<span class="pr" aria-hidden="true">$</span><code>${esc(cmd)}</code><button type="button">${T.copy}</button>`;
-  const b = $('button', el);
-  b.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(cmd); } catch { return; }
-    b.textContent = T.copied; setTimeout(() => { b.textContent = T.copy; }, 1500);
-  });
+function fill(S) {
+  $$('[data-s]').forEach((el) => { const v = S[el.dataset.s]; el.textContent = v == null ? '?' : v; });
 }
 
 /* --------------------------------------------------------------------------------------------- figures */
 
-/** Privileged -> standard on the same tasks, one row per agent. */
-function figSame(el, d) {
-  if (!el) return;
-  const rows = Object.entries(d.same_tasks).map(([a, v]) => ({ a, p: pct(...v.privileged), s: pct(...v.standard), pv: v.privileged, sv: v.standard }))
-    .sort((x, y) => y.p - x.p);
-  const n = Object.values(d.same_tasks)[0];
-  el.innerHTML = `<p class="fig-title">${ZH ? `同一批任务上的成功率（privileged ${n.privileged[1]} 个，standard ${n.standard[1]} 个）` : `Success on the same tasks (${n.privileged[1]} privileged, ${n.standard[1]} standard)`}</p>
-    <div class="legend"><span><i style="background:var(--priv)"></i>${T.priv}</span><span><i style="background:var(--std)"></i>${T.std}</span></div>
-    <div class="db">${rows.map((r) => `<div class="db-row ${FAMILY(d, r.a)}"><div class="who">${esc(AGENT(d, r.a))}</div><div class="db-track"
-        title="${esc(`${T.priv} ${r.pv[0]}/${r.pv[1]} · ${T.std} ${r.sv[0]}/${r.sv[1]}`)}">
-      <span class="db-line" style="left:${r.s}%;width:${r.p - r.s}%"></span>
-      <span class="db-dot s" style="left:${r.s}%"></span><span class="db-dot p" style="left:${r.p}%"></span>
-      ${r.p - r.s >= 9 ? `<span class="db-lab s" style="left:${r.s}%">${r.s}%</span><span class="db-lab p" style="left:${r.p}%">${r.p}%</span>`
-        : `<span class="db-lab p" style="left:${r.p}%">${r.p}% → ${r.s}%</span>`}</div></div>`).join('')}</div>
+const legend = (segs) => `<div class="legend">${segs.map(([, l, c]) => `<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join('')}</div>`;
+
+/** A stacked bar per row; segs = [[key, label, colour var, light text?], ...]. */
+function stackRows(rows, segs) {
+  return `<div class="bars">${rows.map((r) => `<div class="bar-row"><div class="who">${r.label}</div><div class="stack">${segs.map(([k, l, c, lt]) => {
+    const v = r[k] || 0, p = r.n ? (100 * v) / r.n : 0;
+    return v ? `<span class="${lt ? 'lt' : ''}" style="width:${p}%;background:var(${c})" title="${esc(`${l}: ${v} of ${r.n}`)}">${p >= 7 ? v : ''}</span>` : '';
+  }).join('')}</div><div class="n">${int(r.n)}</div></div>`).join('')}</div>`;
+}
+
+/** The head-to-head: standard first, as on the leaderboard. */
+function figOverall(el, R) {
+  const { board, H } = R;
+  const cell = (s, n, c) => `<td><div class="ov"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${c})"></span></div><b>${pct(s, n)}%</b><small>${s}/${n}</small></td>`;
+  el.innerHTML = `<p class="fig-title">Tests solved, head to head on the core set</p>
+    <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent · harness</th><th>Standard <small>(${H.s.length} tests)</small></th><th>Privileged <small>(${H.p.length} tests)</small></th></tr></thead>
+    <tbody>${board.map((r) => `<tr><td class="who">${esc(r.name)} <small>· ${esc(r.harness)}</small></td>${cell(r.s, H.s.length, '--std')}${cell(r.p, H.p.length, '--priv')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+/** Finding 1: how much of each setting is solved by the best agent, by another agent only, or by none. */
+function figReach(el, R) {
+  const { H, board, name } = R;
+  const best = board[0].id;
+  const ok = (t, r, m) => t.results?.[r]?.[m]?.s === 'S';
+  const row = (L, label) => {
+    const b = L.filter(([t, m]) => ok(t, best, m)).length;
+    const o = L.filter(([t, m]) => !ok(t, best, m) && board.some((r) => ok(t, r.id, m))).length;
+    return { label, n: L.length, best: b, other: o, none: L.length - b - o };
+  };
+  const segs = [['best', `Solved by ${name(best)}`, '--ink'], ['other', 'Solved only by another agent', '--flash'], ['none', 'Solved by no agent', '--c-other', 1]];
+  el.innerHTML = `<p class="fig-title">Head-to-head tests by who solved them</p>${legend(segs)}
+    ${stackRows([row(H.s, '<span class="m-s">Standard</span>'), row(H.p, '<span class="m-p">Privileged</span>')], segs)}`;
+}
+
+/** Finding 2: the same task in both settings, per agent (privileged -> standard). */
+function figPaired(el, R) {
+  const rows = R.ps.map((r) => ({ ...r, pa: pct(r.a, r.n), pc: pct(r.c, r.n) })).sort((x, y) => y.pa - x.pa);
+  el.innerHTML = `<p class="fig-title">Tasks solved by the same agent in each setting (tasks whose privileged and standard tests are both in the core set)</p>
+    <div class="legend"><span><i style="background:var(--priv)"></i>Privileged</span><span><i style="background:var(--std)"></i>Standard</span></div>
+    <div class="db">${rows.map((r) => `<div class="db-row"><div class="who">${esc(r.name)}<small>${r.a} → ${r.c} of ${r.n}</small></div><div class="db-track"
+        title="${esc(`privileged ${r.a} of ${r.n} · standard ${r.c} of ${r.n} · both ${r.both}`)}">
+      <span class="db-line" style="left:${r.pc}%;width:${r.pa - r.pc}%"></span>
+      <span class="db-dot s" style="left:${r.pc}%"></span><span class="db-dot p" style="left:${r.pa}%"></span>
+      ${r.pa - r.pc >= 9 ? `<span class="db-lab s" style="left:${r.pc}%">${r.pc}%</span><span class="db-lab p" style="left:${r.pa}%">${r.pa}%</span>`
+        : `<span class="db-lab p" style="left:${r.pa}%">${r.pa}% → ${r.pc}%</span>`}</div></div>`).join('')}</div>
     <div class="db-axis"><span></span><div class="ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</div></div>`;
 }
 
-/** The share of question-and-mode cells that no agent solved, per task type, privileged against standard. */
-function figNobody(el, d) {
-  if (!el) return;
-  const order = ['all', ...Object.keys(d.types).sort((x, y) => {
-    const g = (k) => pct(...d.nobody[k].standard) - pct(...d.nobody[k].privileged);
-    return g(y) - g(x);
-  })];
-  const name = (k) => (k === 'all' ? (ZH ? '全部' : 'All tasks') : d.types[k][ZH ? 'zh' : 'en']);
-  const bar = (m, v) => `<div class="nb-bar ${m}"><div class="t"><span style="width:${pct(...v)}%"></span></div><small>${pct(...v)}% · ${v[0]}/${v[1]}</small></div>`;
-  el.innerHTML = `<p class="fig-title">${ZH ? '没有一个 agent 做成的比例（至少 3 个 agent 跑过）' : 'Share that no agent solved (cells run by at least three agents)'}</p>
-    <div class="legend"><span><i style="background:var(--priv)"></i>${T.priv}</span><span><i style="background:var(--std)"></i>${T.std}</span></div>
-    ${order.filter((k) => d.nobody[k]).map((k) => `<div class="nb-row${k === 'all' ? ' all' : ''}"><div class="who">${esc(name(k))}</div>
-      <div class="nb-bars">${bar('p', d.nobody[k].privileged)}${bar('s', d.nobody[k].standard)}</div></div>`).join('')}`;
+/** Finding 2: standard against standard-realtime, the same tasks, as counts (few tasks). */
+function figRealtime(el, R) {
+  const rows = R.st.filter((r) => r.a || r.c);
+  el.innerHTML = `<p class="fig-title">Tasks with a standard and a standard-realtime test: solved in each (${Math.max(...R.st.map((r) => r.n))} tasks)</p>
+    <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent</th><th>Standard</th><th>Standard-realtime</th><th>Both</th></tr></thead>
+    <tbody>${rows.map((r) => `<tr><td class="who">${esc(r.name)}</td><td><b>${r.a}</b><small>of ${r.n}</small></td><td><b>${r.c}</b><small>of ${r.n}</small></td><td><b>${r.both}</b></td></tr>`).join('')}</tbody></table></div>
+    <p class="fig-note">Agents that solved none in either are left out.</p>`;
 }
 
-/** A stacked bar per row; segs = [[key, label, colour var, light text?], ...]. */
-function stackRows(rows, segs, { total = (r) => r.n, label = (r) => r.label, counts = false } = {}) {
-  return `<div class="bars">${rows.map((r) => {
-    const n = total(r);
-    return `<div class="bar-row"><div class="who">${label(r)}${r.n < 20 ? `<small>${esc(T.small)}</small>` : ''}</div><div class="stack">${segs.map(([k, l, c, lt]) => {
-      const v = r[k] || 0, p = n ? (100 * v) / n : 0;
-      return v ? `<span class="${lt ? 'lt' : ''}" style="width:${p}%;background:var(${c})" title="${esc(`${l}: ${v}/${r.n}`)}">${p >= 9 ? (counts ? v : `${Math.round(p)}%`) : ''}</span>` : '';
-    }).join('')}</div><div class="n">${r.n}</div></div>`;
-  }).join('')}</div>`;
-}
-const legend = (segs) => `<div class="legend">${segs.map(([, l, c]) => `<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join('')}</div>`;
-
-function figWays(el, d) {
-  if (!el) return;
-  const segs = [['code', T.ways.code, '--w-code'], ['direct', T.ways.direct, '--w-direct'], ['train', T.ways.train, '--w-train'],
-    ['mixed', T.ways.mixed, '--w-mixed'], ['none', T.ways.none, '--w-none', 1]];
-  const rows = ['privileged', 'standard', 'realtime'].map((m) => ({ ...d.ways[m], label: `<span class="m-${m[0]}">${T[m === 'privileged' ? 'priv' : m === 'standard' ? 'std' : 'rt']}</span>` }));
-  el.innerHTML = `<p class="fig-title">${ZH ? '谁决定每一步动作 · 按模式（分析过的 trial，成败都算）' : 'Who decides each move, by mode (analysed trials, success and failure)'}</p>
-    ${legend(segs)}${stackRows(rows, segs)}`;
+/** Finding 3: per suite, the share of its head-to-head tests that at least one agent solved. */
+function figSuites(el, R) {
+  const big = R.suites.filter((s) => s.s[1] >= MIN_SUITE).sort((x, y) => y.s[0] / y.s[1] - x.s[0] / x.s[1] || y.s[1] - x.s[1]);
+  const small = R.suites.filter((s) => s.s[1] < MIN_SUITE).sort((x, y) => x.name.localeCompare(y.name));
+  const bar = (k, [a, n]) => (n ? `<div class="nb-bar ${k}"><div class="t"><span style="width:${pct(a, n)}%"></span></div><small>${pct(a, n)}% · ${a}/${n}</small></div>`
+    : `<div class="nb-bar ${k}"><div class="t"></div><small>no tests</small></div>`);
+  el.innerHTML = `<p class="fig-title">Share of each suite’s head-to-head tests solved by at least one agent</p>
+    <div class="legend"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--priv)"></i>Privileged</span></div>
+    ${big.map((s) => `<div class="nb-row"><div class="who">${esc(s.name)}</div><div class="nb-bars">${bar('s', s.s)}${bar('p', s.p)}</div></div>`).join('')}
+    <p class="fig-note">Suites with at least ${MIN_SUITE} standard tests in the head-to-head, ordered by the standard share. With fewer:
+      ${small.map((s) => `${esc(s.name)} ${s.s[0]}/${s.s[1]}`).join(', ')} (standard).</p>`;
 }
 
-function figLayers(el, d) {
-  if (!el) return;
-  const segs = [['thought', T.layers.thought, '--l-thought'], ['before', T.layers.before, '--l-before'], ['after', T.layers.after, '--l-after', 1],
-    ['motor', T.layers.motor, '--l-motor'], ['external', T.layers.external, '--l-ext', 1]];
-  const rows = d.layers.map((r) => ({ ...r, label: esc(AGENT(d, r.agent)) }));
-  el.innerHTML = `<p class="fig-title">${ZH ? '失败背后有没有想法上的错 · 按 agent（抽样的失败 trial）' : 'Was there a wrong idea behind the failure? By agent (sampled failures)'}</p>
-    ${legend(segs)}${stackRows(rows, segs)}`;
+/** Open question: of the three strongest agents, how many solved each test. */
+function figOverlap(el, R) {
+  const segs = [['k3', 'All three', '--c-honest'], ['k2', 'Two', '--f-possible'], ['k1', 'One', '--rt'], ['k0', 'None', '--c-other', 1]];
+  const row = (L, label) => { const [k3, k2, k1, k0] = R.overlap(L); return { label, n: L.length, k3, k2, k1, k0 }; };
+  el.innerHTML = `<p class="fig-title">Head-to-head tests by how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>${legend(segs)}
+    ${stackRows([row(R.H.s, '<span class="m-s">Standard</span>'), row(R.H.p, '<span class="m-p">Privileged</span>')], segs)}`;
 }
 
-/** Share of trials that had done the task's key step once (progress level 3) by each point of the time limit. */
-function figReach(el, d) {
-  if (!el) return;
-  const xs = d.reach3.at;
-  const W = Math.max(340, Math.min(900, el.clientWidth - 8 || 900)), H = W < 600 ? 300 : 340, L = 44, R = 16, Tp = 16, B = 46;
-  const x = (v) => L + ((W - L - R) * v) / 100, y = (v) => Tp + ((H - Tp - B) * (100 - v)) / 100;
-  const path = (vs) => `M${x(0)},${y(0)} ` + vs.map((v, i) => `L${x(xs[i])},${y(v)}`).join(' ');
-  const draw = (mode) => {
-    const m = d.reach3.modes[mode];
-    const lines = [['success', T.reachS, 'var(--c-honest)'], ['failure', T.reachF, 'var(--c-claim)']];
-    $('svg', el).innerHTML = `${[0, 25, 50, 75, 100].map((v) => `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`).join('')}
-      ${xs.map((v) => `<text class="ax" x="${x(v)}" y="${H - B + 18}" text-anchor="middle">${v}%</text>`).join('')}
-      <text class="ax" x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle">${esc(T.reachX)}</text>
-      ${lines.map(([k, l, c]) => {
-        const vs = m[k].at, last = vs[vs.length - 1];
-        return `<path d="${path(vs)}" style="stroke:${c}"/>${vs.map((v, i) => `<circle cx="${x(xs[i])}" cy="${y(v)}" r="5" style="fill:${c}"><title>${esc(`${l} · ${xs[i]}% → ${v}%`)}</title></circle>
-          <text class="val" x="${x(xs[i])}" y="${y(v) + (k === 'success' ? -12 : 22)}" text-anchor="middle" style="fill:${c}">${v}%</text>`).join('')}`;
-      }).join('')}`;
-    $('.legend', el).innerHTML = lines.map(([k, l, c]) => `<span><i style="background:${c}"></i>${esc(l)} <em>n=${m[k].n}</em></span>`).join('');
-    $$('.chart-tabs button', el).forEach((b) => b.classList.toggle('on', b.dataset.m === mode));
-  };
-  el.innerHTML = `<p class="fig-title">${esc(T.reachY)}</p>
-    <div class="chart-tabs">${['privileged', 'standard'].map((m) => `<button type="button" data-m="${m}">${m === 'privileged' ? T.priv : T.std}</button>`).join('')}</div>
-    <div class="legend"></div>
-    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(T.reachY)}"></svg>`;
-  $$('.chart-tabs button', el).forEach((b) => b.addEventListener('click', () => draw(b.dataset.m)));
-  draw('standard');
-}
-
-function figAfter(el, d) {
-  if (!el) return;
-  const segs = [['kept', T.after.kept, '--c-claim'], ['stopped', T.after.stopped, '--c-silent', 1]];
-  const rows = d.after_point.filter((r) => d.agents[r.agent]).map((r) => ({ ...r, label: `${esc(AGENT(d, r.agent))}<small>${esc(T.left(r.left))}</small>` }));
-  el.innerHTML = `<p class="fig-title">${ZH ? '过了不可挽回点、还剩一分钟以上时，agent 怎么做' : 'After the point of no return, with more than a minute left'}</p>
-    ${legend(segs)}${stackRows(rows, segs)}`;
-}
-
-function figClaims(el, d) {
-  if (!el) return;
-  const segs = [['claimed', T.claims.claimed, '--c-claim'], ['honest', T.claims.honest, '--c-honest'], ['silent', T.claims.silent, '--c-silent', 1],
-    ['mismatch', T.claims.mismatch, '--c-other', 1], ['other', T.claims.other, '--c-other', 1]];
-  const rows = d.claims.filter((r) => d.agents[r.agent]).map((r) => ({ ...r, label: esc(AGENT(d, r.agent)) }));
-  el.innerHTML = `<p class="fig-title">${ZH ? '失败时的最后一句话 · 按 agent（自己结束的失败，不含被时限截断的）' : 'The last word on a failure, by agent (failures the agent ended itself; cut-off runs left out)'}</p>
-    ${legend(segs.slice(0, 3))}${stackRows(rows, segs)}`;
-}
-
-function figFixes(el, d) {
-  if (!el) return;
-  const segs = [['likely', T.fixes.likely, '--f-likely'], ['possible', T.fixes.possible, '--f-possible', 1], ['unlikely', T.fixes.unlikely, '--f-unlikely', 1]];
-  const rows = d.fixes.map((r) => ({ ...r, label: esc(r[ZH ? 'zh' : 'en']) }));
-  el.innerHTML = `<p class="fig-title">${ZH ? '失败最缺的那一步（每次失败只记一步）' : 'The one step a failure most lacked (one per failure)'}</p>
-    ${legend(segs)}${stackRows(rows, segs, { total: () => Math.max(...rows.map((r) => r.n)), counts: true })}`;
-  // bars share one scale, so the longest row is the most common missing step; the numbers are failures
-  $$('.stack', el).forEach((st) => { st.style.background = 'none'; });
-}
-
-
-/** Estimates from a random sample with their 95% intervals, one bar each: rows = [{en, zh, share, lo, hi}]. */
-function ciBars(rows, colour) {
-  const max = Math.max(...rows.map((r) => r.hi)) * 1.05;
-  return `<div class="ci">${rows.map((r) => `<div class="ci-row"><div class="who">${esc(r[ZH ? 'zh' : 'en'])}</div>
-    <div class="ci-track"><span class="ci-bar" style="width:${(100 * r.share) / max}%;background:var(${colour})"></span>
-      ${r.hi > r.lo ? `<span class="ci-whisk" style="left:${(100 * r.lo) / max}%;width:${(100 * (r.hi - r.lo)) / max}%"></span>` : ''}</div>
-    <div class="n">${Math.round(100 * r.share)}%</div></div>`).join('')}</div>`;
-}
-
-function figRoots(el, d) {
-  if (!el || !d.bottleneck) return;
-  const b = d.bottleneck;
-  el.innerHTML = `<p class="fig-title">${ZH ? `失败的根本原因（随机抽 ${b.facts.sample_fail[0]} 个失败逐条阅读，按组加权）` : `Root cause of a failure (a random ${b.facts.sample_fail[0]} failures read one by one, weighted by group)`}</p>
-    ${ciBars(b.roots.slice(0, 8), '--l-motor')}
-    <p class="fig-note">${ZH ? '细线是 95% 置信区间。' : 'Thin lines are 95% intervals.'}</p>`;
-}
-
-function figSubtasks(el, d) {
-  if (!el || !d.bottleneck) return;
-  const rows = [...d.bottleneck.subtasks].sort((a, b) => b.time - a.time);
-  const max = Math.max(...rows.flatMap((r) => [r.time, r.stuck])) * 1.05;
-  const bar = (cls, v) => `<div class="nb-bar ${cls}"><div class="t"><span style="width:${(100 * v) / max}%"></span></div><small>${(100 * v).toFixed(1)}%</small></div>`;
-  el.innerHTML = `<p class="fig-title">${ZH ? '每个子任务占全部时间的比例，和卡在这一步的失败比例' : 'Share of all agent time spent on each subtask, and share of failures that got stuck there'}</p>
-    <div class="legend"><span><i style="background:var(--w-code)"></i>${ZH ? '占全部时间' : 'Share of time'}</span><span><i style="background:var(--c-claim)"></i>${ZH ? '失败卡在这里' : 'Failures stuck here'}</span></div>
-    ${rows.map((r) => `<div class="nb-row"><div class="who">${esc(r[ZH ? 'zh' : 'en'])}</div><div class="nb-bars">${bar('t1', r.time)}${bar('t2', r.stuck)}</div></div>`).join('')}`;
-}
-
-/** P(a run succeeds in the end | it has not succeeded by τ), per agent. */
-function figEventual(el, d) {
-  if (!el || !d.bottleneck) return;
-  const ev = d.bottleneck.eventual, taus = ev.taus;
-  const COL = ['var(--ink)', 'var(--w-code)', 'var(--w-direct)', 'var(--w-train)', 'var(--flash)', 'var(--flash)', 'var(--flash)'];
-  const draw = () => {
-    const W = Math.max(340, Math.min(900, el.clientWidth - 8 || 900)), H = W < 600 ? 280 : 320, L = 44, R = 16, Tp = 14, B = 46;
-    const ymax = 0.6;
-    const x = (t) => L + (W - L - R) * t, y = (p) => Tp + (H - Tp - B) * (1 - p / ymax);
-    $('svg', el).setAttribute('viewBox', `0 0 ${W} ${H}`);
-    $('svg', el).innerHTML = `${[0, 0.2, 0.4, 0.6].map((v) => `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(100 * v)}%</text>`).join('')}
-      ${[0, 0.25, 0.5, 0.75, 1].map((t) => `<text class="ax" x="${x(t)}" y="${H - B + 18}" text-anchor="middle">${Math.round(100 * t)}%</text>`).join('')}
-      <text class="ax" x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle">${esc(T.reachX)}</text>
-      ${ev.lines.map((l, i) => `<path d="${l.p.map((p, j) => `${j ? 'L' : 'M'}${x(taus[j])},${y(p)}`).join(' ')}" style="stroke:${COL[i]};stroke-width:${i ? 2.2 : 3.2};${i > 3 ? 'stroke-dasharray:4 4' : ''}"><title>${esc(l[ZH ? 'zh' : 'en'])}</title></path>`).join('')}`;
-  };
-  el.innerHTML = `<p class="fig-title">${ZH ? '到这个时刻还没成功的 run，最后成功的概率（核心题）' : 'Chance that a run not yet successful at this point still succeeds (core questions)'}</p>
-    <div class="legend">${ev.lines.map((l, i) => `<span><i style="background:${COL[i]}"></i>${esc(l[ZH ? 'zh' : 'en'])}</span>`).join('')}</div>
-    <svg class="chart" role="img" aria-label="${esc(ZH ? '最终成功的概率' : 'Chance of eventual success')}"></svg>`;
-  draw();
-  addEventListener('resize', draw);
-}
-
-function figBreaks(el, d) {
-  if (!el || !d.bottleneck) return;
-  const b = d.bottleneck;
-  el.innerHTML = `<p class="fig-title">${ZH ? `卡了很久、最后成功的 run 是怎么突破的（随机抽 ${b.facts.sample_break[0]} 个）` : `How long-stalled runs that succeeded broke through (a random ${b.facts.sample_break[0]})`}</p>
-    ${ciBars(b.breaks, '--c-honest')}
-    <p class="fig-note">${ZH ? '每个 run 只记主要的突破方式；细线是 95% 置信区间。' : 'Each run counts once, by its main breakthrough; thin lines are 95% intervals.'}</p>`;
-}
-
-
-/** Core-set results per agent and mode (data.overall, from the results index). */
-function figOverall(el, d) {
-  if (!el || !d.overall) return;
-  const o = d.overall, M = [['privileged', 'privileged', '--priv'], ['standard', 'standard', '--std'], ['standard-realtime', 'standard-realtime', '--rt'], ['all', 'all modes', '--ink']];
-  const cell = ([s, n], c) => `<td><div class="ov"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${c})"></span></div><b>${pct(s, n)}%</b><small>${s}/${n}</small></td>`;
-  el.innerHTML = `<p class="fig-title">Success on the core set, by agent and mode</p>
-    <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent · harness</th>${M.map(([, l]) => `<th>${l}</th>`).join('')}</tr></thead>
-    <tbody>${o.runs.map((r) => `<tr class="${r.run.includes('luna') ? 'ref' : ''}"><td class="who">${esc(r.name)}</td>${M.map(([m, , c]) => cell(r[m], c)).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="fig-note">Core set: the ${o.core} task dirs in docs/core_set.toml. Each cell counts the latest graded trial of each core task dir the agent sat; success means the verifier passed it. Results index snapshot ${esc(o.snapshot)}.</p>`;
-}
-
-/** For each agent, the tasks it ran in both modes: solved in both, only privileged, only standard, neither. */
-function figKept(el, d) {
-  if (!el) return;
-  const segs = [['both', 'Solved in both modes', '--c-honest'], ['priv_only', 'Only with privileged access', '--priv'], ['std_only', 'Only under standard rules', '--std'], ['neither', 'Neither', '--c-silent', 1]];
-  const rows = d.kept.filter((r) => d.agents[r.agent]).map((r) => ({ ...r, label: esc(AGENT(d, r.agent)) }));
-  el.innerHTML = `<p class="fig-title">Tasks each agent ran in both modes, by outcome</p>${legend(segs)}${stackRows(rows, segs)}`;
-}
-
-function figWaysRt(el, d) {
-  if (!el) return;
-  const segs = [['code', T.ways.code, '--w-code'], ['direct', T.ways.direct, '--w-direct'], ['train', T.ways.train, '--w-train'],
-    ['mixed', T.ways.mixed, '--w-mixed'], ['none', T.ways.none, '--w-none', 1]];
-  const rows = ['privileged', 'standard', 'realtime'].map((m) => ({ ...d.ways_rt_benches[m], label: `<span class="m-${m[0]}">${T[m === 'privileged' ? 'priv' : m === 'standard' ? 'std' : 'rt']}</span>` }));
-  el.innerHTML = `<p class="fig-title">Who decides each move on the benchmarks that have a realtime mode (BiGym 2.0, Panda Dynamic, RoboOlympics, HumanoidBench)</p>${legend(segs)}${stackRows(rows, segs)}`;
+/** RoboSafeExam: failed core tests by the benchmark's verdict. */
+function figSafety(el, R) {
+  const f = R.safety, o = f.by_outcome;
+  const segs = [['right', 'Harm from the robot’s motion, though the agent declined the hazard', '--c-claim'], ['harm', 'Other harm from the robot’s motion', '--l-before'],
+    ['done', 'Carried out a hazardous request', '--l-thought'], ['gave', 'Gave up', '--c-silent', 1], ['other', 'Other or no verdict', '--c-other', 1]];
+  const row = { label: 'Failed attempts', n: f.failures, right: f.harm_right_call, harm: o.harm - f.harm_right_call, done: o.done, gave: o.gave_up, other: o.other };
+  el.innerHTML = `<p class="fig-title">How the agents’ failed attempts at RoboSafeExam’s core tests failed, by the benchmark’s verdict</p>${legend(segs)}${stackRows([row], segs)}`;
 }
 
 /* ------------------------------------------------------------------------------------------ the article */
@@ -283,11 +196,11 @@ function toc() {
     }
     return out;
   };
-  const fnum = (h3) => h3.querySelector('.fn')?.textContent.replace(/\D+/g, '');
+  const fnum = (h3) => { const t = h3.querySelector('.fn:not(.ck)')?.textContent; return t && (t.replace(/\D+/g, '') || '?'); };
   const sub3 = (h3) => esc([...h3.childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
   // the rail: section names, plus each finding by its short name, folded until the reader reaches the findings or
   // opens them; the current one marked
-  const fh = $$('.post .finding h3[id]');
+  const fh = $$('.post .finding h3[id]').filter(fnum);
   document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => {
     const s = subs(h).filter(fnum);
     if (!s.length) return `<li><a href="#${h.id}">${label(h)}</a></li>`;
@@ -336,30 +249,14 @@ function clips() {
   });
 }
 
-getJSON('data/blog.json').then((d) => {
-  fillFacts(d);
-  command($('#blog-cmd'));
-  figOverall($('#fig-overall'), d);
-  figKept($('#fig-kept'), d);
-  figWaysRt($('#fig-ways-rt'), d);
-  figSame($('#fig-same'), d);
-  figNobody($('#fig-nobody'), d);
-  figWays($('#fig-ways'), d);
-  figLayers($('#fig-layers'), d);
-  figReach($('#fig-reach'), d);
-  figAfter($('#fig-after'), d);
-  figClaims($('#fig-claims'), d);
-  figFixes($('#fig-fixes'), d);
-  figRoots($('#fig-roots'), d);
-  figSubtasks($('#fig-subtasks'), d);
-  figEventual($('#fig-eventual'), d);
-  figBreaks($('#fig-breaks'), d);
-  $$('[data-snapshot-a]').forEach((el) => { el.textContent = d.snapshot; });
-  $$('[data-snapshot-b]').forEach((el) => { el.textContent = d.bottleneck?.snapshot || ''; });
-  $$('[data-snapshot]').forEach((el) => { el.textContent = [d.snapshot.slice(0, 10), d.bottleneck?.snapshot].filter(Boolean).join(ZH ? ' 与 ' : ' and '); });
-  toc();
-  clips();
-}).catch((err) => {
-  console.error(err);
-  $$('.fig-body').forEach((el) => { el.innerHTML = `<p class="fig-note">${esc(err.message)}</p>`; });
-});
+Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json')]).then(([ex, tasks, b]) => {
+  const R = compute(ex, tasks, b);
+  fill(R.S);
+  const bodies = $('#bodies');
+  if (bodies) bodies.textContent = Object.entries(R.bodies).sort((a, c) => c[1] - a[1]).map(([k, n]) => `${int(n)} ${(ex.bodies?.[k] || k).toLowerCase()}`).join(', ');
+  const figs = { overall: figOverall, reach: figReach, paired: figPaired, realtime: figRealtime, suites: figSuites, overlap: figOverlap, safety: figSafety };
+  for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
+}).catch((e) => {
+  console.error(e);
+  $$('.fig-body').forEach((el) => { el.innerHTML = '<p class="fig-note">This figure could not be loaded.</p>'; });
+}).finally(() => { toc(); clips(); });
