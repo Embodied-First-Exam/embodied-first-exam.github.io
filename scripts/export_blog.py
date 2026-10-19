@@ -11,7 +11,9 @@ bottleneck analysis of the batch evaluation (its data/ folder: runs_analysis.csv
 
 and from the cross-benchmark analysis page (its built index.html, which carries its data as `const DATA = {...}`), two numbers
 from its random sample of trials that the site cannot hold: failed trials with a point of no return, and the approach each
-trial was graded on, per setting. Each is read from the page's own count (numerator, denominator), not recomputed.
+trial was graded on, per setting (with the three kinds of program inside code to control), the snapshot's own denominators
+for Gemini 4 Argon without the sessions its provider's filter stopped, and the short tag the analysis's benchmark figures
+give each benchmark (translated here). Each count is read from the page's own count (numerator, denominator), not recomputed.
 
     python3 scripts/export_blog.py [--bottleneck <analysis data folder>] [--crossbench <analysis page>] [--out data/blog.json]
 
@@ -47,6 +49,17 @@ def safety(rows):
 
 
 MODE = {'privileged': 'p', 'standard': 's', 'realtime': 't'}
+# the analysis's benchmark ids -> the site's suite ids (the IKEA assembly tasks are their own row in both)
+BENCH = {'behavior': 'behavior-1k', 'mujoco_playground': 'mujoco-playground', 'robotwin_2_0': 'robotwin-2', 'rsb': 'embodied-safety-exam'}
+# the short tags of the analysis's benchmark figures, in English
+TAGS = {'长程家务': 'long household tasks', '人形双臂家务': 'humanoid, two-arm chores', '灵巧手+用工具': 'dexterous hand + tools',
+        '人形全身控制': 'humanoid whole-body control', '双臂精密装配': 'two-arm precision assembly', '桌面操作+安全约束': 'tabletop + safety rules',
+        '四足/人形控制': 'quadruped / humanoid control', '肌骨手': 'musculoskeletal hand', '动态操作': 'dynamic manipulation',
+        '精细操作+推理': 'fine manipulation + reasoning', '厨房多步': 'multi-step kitchen', '双臂长序列': 'two-arm long sequences',
+        '控制器调参': 'controller tuning', '书画笔画': 'brush strokes', '安全判断': 'safety judgement', '双臂+物理推理': 'two arms + physical reasoning'}
+# the approach figure's segments: group and kind (code to control has three kinds of program)
+WAYS = {'Code to Control（开环）': 'open', 'Code to Control（闭环）': 'closed', 'Code to Control（搜索参数）': 'search',
+        'Direct Control': 'direct', 'Train Model to Control': 'train', '混合': 'mixed', '无': 'none'}
 
 
 def crossbench(page):
@@ -77,11 +90,24 @@ def crossbench(page):
     # Claude Opus 5.5 on the same snapshot
     li = next((x for x in re.split(r'<li>', d['findings'].get('1.1', {}).get('html', '')) if '不算被掐断' in x), '')
     fr = [[int(n), int(m)] for n, m in re.findall(r'（(\d+)/(\d+)）', re.sub(r'<[^>]+>', '', li))]
+    # the same figure's segments: per setting, sampled trials by kind of approach
+    kinds = {}
+    for t in re.findall(r'<span class="seg"[^>]*data-tip="([^"]*)"', t16):
+        m = re.match(r'(privileged|standard|realtime) · [^·]+ · (.+) (\d+)/(\d+)$', html.unescape(t))
+        if m and m.group(2) in WAYS:
+            kinds.setdefault(MODE[m.group(1)], {'n': int(m.group(4))})[WAYS[m.group(2)]] = int(m.group(3))
+    # the benchmark figures' short tags, keyed by the site's suite id
+    ids = {v: BENCH.get(k, k) for k, v in d['results']['names'].items()}
+    tags = {}
+    for f in d['findings'].values():
+        for nm, tag in re.findall(r'<span class="cl" title="([^"：]+)：([^"]+)"', f['html']):
+            if nm in ids and tag in TAGS:
+                tags[ids[nm]] = TAGS[tag]
     site = d['site']
     return {
         'argon_unfiltered': {'p': fr[0], 's': fr[1]} if len(fr) >= 2 else None,
         'opus_same_snapshot': {'p': fr[2], 's': fr[3]} if len(fr) >= 4 else None,
-        'approach_mix': mix,
+        'approach_mix': mix, 'approach_kinds': kinds, 'bench_tags': tags,
         'snapshot': site['snapshot'], 'sample': site.get('n_sample'), 'interim': bool(site.get('interim')),
         'no_return': count({k: ('有不可挽回点',) for k in 'pst'}),
         'approach': count({'p': ('做法标注', 'Code to Control（开环）'), 's': ('做法标注', '「Direct Control」的'),
