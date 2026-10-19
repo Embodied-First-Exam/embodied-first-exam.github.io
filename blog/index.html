@@ -6,17 +6,15 @@
 <meta name="robots" content="noindex">
 <title>Can a coding agent program a robot? · Embodied First Exam</title>
 <meta name="description" content="What happens when the coding agents that write our software have to program a robot: the Embodied First Exam, what agents can do on it, how they fail, and what would help.">
-<link rel="alternate" hreflang="en" href="./">
-<link rel="alternate" hreflang="zh" href="zh/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=6df2af59">
-<link rel="stylesheet" href="../assets/blog.css?v=ad4b7ded">
+<link rel="stylesheet" href="../assets/blog.css?v=d4f0dd9e">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=a779799c"></script>
-<script type="module" src="../assets/blog.js?v=713e026a"></script>
+<script type="module" src="../assets/blog.js?v=2a6af8ae"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -25,31 +23,37 @@
   <header class="page-head post-head">
     <p class="kicker">Blog · Embodied First Exam</p>
     <h1>Can a coding agent program a robot?</h1>
-    <p class="lead">We gave the coding agents that already write our software (Claude Code, Codex and their peers) a robot exam in simulation, and watched them sit it. Here is what they can do, how they fail, and what would help.</p>
-    <p class="byline"><span>Embodied First Exam Team</span><span>October 2026</span>
-      <span class="lang-switch"><span>EN</span><a href="zh/">中文</a></span></p>
+    <p class="lead">Embodied First Exam maps how coding agents succeed and fail, from reasoning and planning to contact, control, and recovery.</p>
+    <p class="byline"><span>Embodied First Exam Team</span><span>October 2026</span></p>
   </header>
 
-  <nav class="toc" id="toc" aria-label="Contents"></nav>
 
   <article class="post">
 
-    <h2 id="bowl" data-short="The bowl that fell off the table">The bowl that fell off the table</h2>
-    <p>A Franka arm stands at a wooden table with a red bowl, a red cup and a grey bin. The instruction is one sentence: put both red dishes in the bin. The agent, GPT-6 Astra running in Codex, has no trained policy for this. It has a terminal, a Python client for the robot, and an hour or more.</p>
-    <p>In the first room the agent owns the simulator: it can read where every object is and reset the scene whenever it likes. It used that freedom. The bowl is wider than the gripper opens, and over about 100 resets it slipped out of grasp after grasp. Each time nothing was lost; the scene simply came back. It even got the bowl into the bin once, at minute 72, too late to pair it with the cup before its 90 minutes ran out.</p>
-    <p>In the second room the same scene runs under a real robot’s rules: cameras, depth and the arm’s own joint readings, and no reset. The agent put the cup in the bin at minute 19. At minute 23, tilting the gripper deep under the bowl’s rim, it flicked the bowl off the table; it landed about 1.7&nbsp;m away, out of reach. The task was lost at that moment. The agent did not stop: trying to recover, it pushed the bin and the cup off the table as well, and ended the session at minute 47 of its 60.</p>
+    <p class="statement">One line of code. <b data-f="r.simulators" data-fmt="num"></b> simulators. <b data-f="r.benchmarks" data-fmt="num"></b> benchmarks, <b data-f="r.robots" data-fmt="num"></b> bodies.</p>
+    <ol class="qs">
+      <li><h3>What can it connect, and what can it do?</h3><p>With one line of code, connect coding agents to <span data-f="r.tasks" data-fmt="num"></span> tasks across <span data-f="r.simulators" data-fmt="num"></span> simulators, spanning robot arms, dexterous hands, humanoids, quadrupeds, and musculoskeletal systems. <a href="#exam">The exam →</a></p></li>
+      <li><h3>When it fails, is it thinking or moving?</h3><p>Our failure taxonomy reveals whether agents misunderstand the task, miss the grasp, lose control, or declare success before the job is done, with traces and replays showing what happened. <a href="#failures">Thinking or moving →</a></p></li>
+      <li><h3>How does a coding agent become an effective robot controller?</h3><p>We test when agents should choose each action, write a controller, or run experiments to improve one, and whether they can detect and recover from trouble when the simulator cannot pause or reset. <a href="#ways-finding">Ways of control →</a></p></li>
+    </ol>
 
-    <figure class="fig wide">
-      <div class="duo">
-        <div class="clip p" style="--ar: 1200 / 336"><video data-auto preload="none" poster="../media/blog/bowl_privileged.jpg" src="../media/blog/bowl_privileged.mp4" muted loop playsinline></video>
-          <p class="clip-tag"><i></i>Privileged</p><p>About 100 resets. The bowl keeps slipping, and nothing is ever lost; the run still times out.</p></div>
-        <div class="clip s" style="--ar: 1200 / 336"><video data-auto preload="none" poster="../media/blog/bowl_standard.jpg" src="../media/blog/bowl_standard.mp4" muted loop playsinline></video>
-          <p class="clip-tag"><i></i>Standard</p><p>No resets. At minute 23 the bowl leaves the table, and the task goes with it.</p></div>
+    <figure class="fig">
+      <div class="wall4">
+        <div class="clip ag"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboolympics/dunk.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboolympics/dunk.mp4" muted loop playsinline></video><p><b>RoboOlympics · Dunk</b>GPT-6 Astra · privileged</p></div>
+        <div class="clip ag"><video data-auto preload="none" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics/backflip/video.mp4" muted loop playsinline></video><p><b>RoboOlympics · Backflip</b>GPT-6 Astra · standard</p></div>
+        <div class="clip ag"><video data-auto preload="none" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics/tabletennis_g1/video.mp4" muted loop playsinline></video><p><b>RoboOlympics-Match · Table tennis</b>GPT-6 Astra · a match</p></div>
+        <div class="clip ag"><video data-auto preload="none" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics-fun/juggle-three/video.mp4" muted loop playsinline></video><p><b>RoboOlympics-Fun · Juggle three balls</b>GPT-6 Astra · privileged</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/knot_untying_01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/knot_untying_01.mp4" muted loop playsinline></video><p><b>RoboARC · Untie a knot</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/hedgehog_in_cage_01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/hedgehog_in_cage_01.mp4" muted loop playsinline></video><p><b>RoboARC · Hedgehog in a cage</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/ikea-mujoco/lack/video.mp4" muted loop playsinline></video><p><b>IKEA MuJoCo · Assemble a LACK table</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/assemble_hamburger.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/assemble_hamburger.mp4" muted loop playsinline></video><p><b>DexHand · Assemble a hamburger</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/d09_lever_launch_catch_reload.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/d09_lever_launch_catch_reload.mp4" muted loop playsinline></video><p><b>Panda Dynamic · Launch, catch, reload</b>reference solution</p></div>
+        <div class="clip demo"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/behavior-1k/make_pizza.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/behavior-1k/make_pizza.mp4" muted loop playsinline></video><p><b>BEHAVIOR-1K · Make a pizza</b>official demonstration</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/kaishu_linfengguilong.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/kaishu_linfengguilong.mp4" muted loop playsinline></video><p><b>RoboPaint · Regular-script calligraphy</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/oil_starrynight_i01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/oil_starrynight_i01.mp4" muted loop playsinline></video><p><b>RoboPaint · Oil, The Starry Night</b>reference solution</p></div>
       </div>
-      <figcaption><b>One task, two sets of rules.</b> GPT-6 Astra (Codex) on RoboLab’s red dishes. Both are the graded episodes; the standard one plays 6.7× faster. Step through them: <a href="../run/?r=robolab-red-dishes-in-bin-i00-privileged--zeojfj6">privileged</a>, <a href="../run/?r=robolab-red-dishes-in-bin-i00-standard--ipmg9wb">standard</a>.</figcaption>
+      <figcaption><b>Questions from the suites we built for this exam.</b> The RoboOlympics clips are coding agents’ own solutions, each from a goal written for a person, a terminal and the robot’s interface. The others show the reference solution that proves the question can be solved (the official demonstration, for BEHAVIOR-1K). All from the exam’s <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</figcaption>
     </figure>
-
-    <p>This one task holds most of this post. Coding agents are good at the physical world when it forgives them. What separates them from a working robot is what happens after a mistake that cannot be undone, and whether they notice the clock, the drop or the point of no return in time.</p>
 
     <div class="tldr">
       <p class="label">In four findings</p>
@@ -61,11 +65,15 @@
       </ol>
     </div>
 
+    <nav class="toc" id="toc" aria-label="Contents"></nav>
+
+    <p class="part"><span>Part I</span><b>What can it connect, and what can it do?</b></p>
+
     <h2 id="why" data-short="Why a robot exam for coding agents"><span class="num">01</span>Why give coding agents a robot exam?</h2>
     <p>Code agents have passed many exams in the digital world: fixing real repositories, driving terminals, tuning kernels. The physical world is the next one, and it does not grade like a test suite. Objects slip, cameras mislead, and the clock keeps running.</p>
     <p>Robots today are driven in two main ways. One is a policy trained on many demonstrations, such as a vision-language-action model. The other is a controller that an engineer writes, tunes and debugs for one robot and one job. A coding agent can do the engineer’s job at the speed of software: read the robot’s interface, write a controller, run it, look at what happened, and fix it. If that works, any robot with a programmatic interface becomes something you can ask for a new behaviour in plain language.</p>
 
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="cards">
         <div class="card muted"><span class="k">Today</span><h4>Train a policy</h4><p>Learn from many demonstrations. Strong within the skills it was trained on; a new task means new data.</p></div>
         <div class="card muted"><span class="k">Today</span><h4>An engineer writes a controller</h4><p>Kinematics, waypoints, feedback, tuning. Works for one robot and one job, after days or weeks.</p></div>
@@ -75,16 +83,14 @@
 
     <p>The Embodied First Exam asks whether that works today. Each question is a frozen simulation scene with a goal written for a person: stack these blocks, turn two walnuts in one hand, dunk this ball, write this character with a brush. The agent gets a terminal in a container with the robot’s interface, and nothing else: no demonstrations, no reference solution, and by default no internet beyond its own model and package installs. An independent verifier marks what it produced.</p>
 
-    <dl class="bignums" id="blog-nums"></dl>
-
-    <p>The questions come from benchmark suites the community already uses (BEHAVIOR-1K, RoboCasa, LIBERO, Meta-World, RoboTwin, MuJoCo Playground and more) and from suites we built for this exam, such as humanoid sports at official settings, topological puzzles like untying a knot, and Chinese calligraphy with a simulated brush. The bodies range from one arm and two-arm rigs to dexterous hands, humanoids, quadrupeds, drones and a human arm driven one muscle at a time. <a href="../tasks/">Browse every question</a> or <a href="../suites/">the suites</a>.</p>
+    <p>The <span data-f="r.tasks" data-fmt="num"></span> tasks (<span data-f="r.scenes" data-fmt="num"></span> scenes, each in two or three modes) come from <span data-f="r.benchmarks" data-fmt="num"></span> benchmarks: suites the community already uses (BEHAVIOR-1K, RoboCasa, LIBERO, Meta-World, RoboTwin, MuJoCo Playground and more) and suites we built for this exam, such as humanoid sports at official settings, topological puzzles like untying a knot, and Chinese calligraphy with a simulated brush. <span data-f="r.robots" data-fmt="num"></span> bodies range from one arm and two-arm rigs to dexterous hands, humanoids, quadrupeds, drones and a human arm driven one muscle at a time, on <span data-f="r.simulators" data-fmt="num"></span> simulators. <a href="../tasks/">Browse every question</a> or <a href="../suites/">the suites</a>.</p>
     <p>Sitting the exam is one line with <a href="https://github.com/harbor-framework/harbor">Harbor</a>, and any agent with a terminal works unchanged:</p>
     <div class="cmd" id="blog-cmd"></div>
 
     <h2 id="exam" data-short="Two rooms and a clock"><span class="num">02</span>Two rooms and a clock</h2>
     <p>Every scene is sat in two modes. Scenes where something besides the robot moves, such as a thrown ball or a conveyor, get a third.</p>
 
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="cards">
         <div class="card p"><span class="k">Privileged</span><h4>You own the simulator</h4>
           <dl><dt>Sees</dt><dd>the full state: every pose, the planner, the scene’s own helpers</dd><dt>Resets</dt><dd>unlimited</dd>
@@ -99,35 +105,52 @@
       <figcaption><b>Same scene, same instruction.</b> Privileged is an upper bound: what can the agent do when nothing is hidden and every mistake is free? Standard asks what is left under the rules a real robot imposes. <a href="../how/">How a question is marked</a>.</figcaption>
     </figure>
 
+    <h3 id="bowl">The same scene under both rules</h3>
+    <p>A Franka arm stands at a wooden table with a red bowl, a red cup and a grey bin; the instruction is one sentence, put both red dishes in the bin. GPT-6 Astra (Codex) sat it in both rooms.</p>
+    <p>With privileged access it could read where every object was and reset whenever it liked. The bowl is wider than the gripper opens, and over about 100 resets it slipped out of grasp after grasp; each time nothing was lost. It got the bowl into the bin once, at minute 72, too late to pair it with the cup before its 90 minutes ran out.</p>
+    <p>Under standard rules (cameras, depth, joint readings, no reset) it put the cup in the bin at minute 19. At minute 23, tilting the gripper deep under the bowl’s rim, it flicked the bowl off the table; it landed about 1.7&nbsp;m away, out of reach, and the task was lost. The agent did not stop: trying to recover, it pushed the bin and the cup off the table too, and ended the session at minute 47 of its 60.</p>
+    <figure class="fig">
+      <div class="duo" style="grid-template-columns: minmax(0, 1fr)">
+        <div class="clip p" style="--ar: 2570 / 480"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-red-dishes-in-bin-i00-privileged--zeojfj6/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-red-dishes-in-bin-i00-privileged--zeojfj6/replay.mp4" muted loop playsinline></video>
+          <p class="clip-tag"><i></i>Privileged</p><p>About 100 resets. The bowl keeps slipping, and nothing is ever lost; the run still times out.</p></div>
+        <div class="clip s" style="--ar: 2570 / 480"><video data-auto data-rate="6" preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-red-dishes-in-bin-i00-standard--ipmg9wb/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-red-dishes-in-bin-i00-standard--ipmg9wb/replay.mp4" muted loop playsinline></video>
+          <p class="clip-tag"><i></i>Standard</p><p>No resets. At minute 23 the bowl leaves the table, and the task goes with it.</p></div>
+      </div>
+      <figcaption><b>One task, two sets of rules.</b> RoboLab’s red dishes. The graded episodes, three cameras each; the standard one plays 6× faster. Step through them: <a href="../run/?r=robolab-red-dishes-in-bin-i00-privileged--zeojfj6">privileged</a>, <a href="../run/?r=robolab-red-dishes-in-bin-i00-standard--ipmg9wb">standard</a>.</figcaption>
+    </figure>
+    <p>Coding agents do well when the world forgives them. What separates them from a working robot is what happens after a mistake that cannot be undone, and whether they notice the clock, the drop or the point of no return in time.</p>
+
     <h3 id="ways">Three ways to drive a robot</h3>
     <p>Reading the agents’ transcripts, their solutions fall into three families. In <b>Code to Control</b> the agent writes a program and the program produces the actions: waypoints and inverse kinematics, a closed loop that reads the state every step, or a search over parameters across many resets. In <b>Direct Control</b> the agent drives the robot itself, one short chunk of motion at a time, looking at the cameras before deciding the next. In <b>Train Model to Control</b> it first trains a controller, for example with reinforcement learning in parallel simulations, and lets that drive.</p>
 
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="duo three">
-        <div class="clip p" style="--ar: 2 / 1"><video data-auto preload="none" poster="../media/blog/bottles_privileged.jpg" src="../media/blog/bottles_privileged.mp4" muted loop playsinline></video>
+        <div class="clip p" style="--ar: 16 / 9"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robotwin-2/put_bottles_dustbin.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robotwin-2/put_bottles_dustbin.mp4" muted loop playsinline></video>
           <p class="clip-tag"><i></i>Code to Control · privileged</p><p>Calls the scene’s grasp and hand-over helpers in a fixed order, saves the trajectory at 3:21 and has checked it by replay at 4.9 minutes.</p></div>
-        <div class="clip s" style="--ar: 2 / 1"><video data-auto preload="none" poster="../media/blog/bottles_standard.jpg" src="../media/blog/bottles_standard.mp4" muted loop playsinline></video>
-          <p class="clip-tag"><i></i>Direct Control · standard</p><p>One end-effector command at a time, a look at the cameras after each. Done at 29:31 of a 30-minute limit.</p></div>
-        <div class="clip p" style="--ar: 2 / 1"><video data-auto preload="none" poster="../media/ways/c_hurdle.jpg" src="../media/ways/c_hurdle.mp4" muted loop playsinline></video>
+        <div class="clip s" style="--ar: 16 / 9"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robotwin_2_0_put_bottles_dustbin-standard--qmhefaq/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robotwin_2_0_put_bottles_dustbin-standard--qmhefaq/replay.mp4" muted loop playsinline></video>
+          <p class="clip-tag"><i></i>Direct Control · standard</p><p>One end-effector move at a time, a look at the cameras after each; all three bottles in the bin at minute 12.</p></div>
+        <div class="clip p" style="--ar: 16 / 9"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/humanoidbench/loco_hurdle.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/humanoidbench/loco_hurdle.mp4" muted loop playsinline></video>
           <p class="clip-tag"><i></i>Train Model to Control · privileged</p><p>Trains a neural controller from scratch on parallel rollouts with taller and taller hurdles.</p></div>
       </div>
-      <figcaption><b>One agent, three ways.</b> All three are GPT-6 Astra. The first two are the same RoboTwin task (put three bottles in a bin) in the two modes; the third is HumanoidBench’s hurdle.</figcaption>
+      <figcaption><b>One agent, three ways.</b> All three are GPT-6 Astra. The first two are the same RoboTwin task (put three bottles in a bin) in the two modes; the third is HumanoidBench’s hurdle. Step through the <a href="../run/?r=robotwin_2_0_put_bottles_dustbin-standard--qmhefaq">standard run</a> or the <a href="../run/?r=humanoidbench-loco-hurdle-i00-privileged--ev8v9za">hurdle</a>.</figcaption>
     </figure>
 
     <h3 id="honest">Why the marks can be trusted</h3>
     <p>A benchmark for agents that write and run code is also a benchmark they can game, so the exam is run like one with a proctor. The verifier runs in its own sandbox without network and sees only the answer. Reference solutions never enter the agent’s container. Doing nothing must score 0 and a reference solution 1. Before a suite joins, an agent is told to pass without doing the task, and any success blocks the suite until its verifier is fixed. Two things we learned on the way:</p>
 
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="cards two">
         <div class="story"><span class="k">Deleting the answer is not hiding it</span><p>Scrubbing upstream reference code from the image is not enough. Claude Opus 5.5 rewrote a removed RoboTwin solution from memory, 26 of its 28 lines identical. Both Opus and GPT-6 Astra rebuilt a deleted HumanoidBench reward with the same constants; Opus’s own score for one run matched the grader’s to every digit. Questions built on public benchmarks have to be judged with that in mind.</p></div>
         <div class="story"><span class="k">The tool outside the box</span><p>One agent harness offered tools that ran on the provider’s side, outside the container and outside the exam’s network rules, and agents found them. Every such tool is now off, and the gateway in front of the model forwards nothing but model calls.</p></div>
       </div>
     </figure>
 
-    <h2 id="results" data-short="Same tasks, real-robot rules"><span class="num">03</span>Same tasks, real-robot rules</h2>
+    <h2 id="results" data-short="Where we are"><span class="num">03</span>Where we are</h2>
+    <p>The strongest agent so far, GPT-6 Astra in Codex, solves <span data-f="w.core_solved" data-fmt="num"></span> of the <span data-f="w.core_sat" data-fmt="num"></span> core tasks it sat. Across every task it sat, its <span data-f="w.solved" data-fmt="num"></span> solutions span <span data-f="w.robots" data-fmt="num"></span> robots, <span data-f="w.benchmarks" data-fmt="num"></span> benchmarks and <span data-f="w.simulators" data-fmt="num"></span> simulators. Most of those successes, though, lean on the simulator’s state.</p>
+    <h3 id="same">Same tasks, real-robot rules</h3>
     <p>On the same set of tasks, GPT-6 Astra solves three in four with privileged access and one in four under standard rules. Claude Opus 5.5 and Gemini 4 Argon fall from about half to about a fifth. Pooled over every task they ran, the three strongest agents keep about a third of their privileged successes, <span data-f="pooled_priv" data-fmt="frac"></span> against <span data-f="pooled_std" data-fmt="frac"></span>. The three “Flash” models stay far behind: at most 18% with privileged access and 2% under standard rules.</p>
 
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-same"></div>
       <figcaption><b>Losing the simulator’s state costs about two-thirds of the successes, for every strong agent alike.</b> These are the exam’s core questions: tasks our reference run (GPT-6 Luna in Codex) failed, plus a few chosen by hand. They are hard on purpose, so the levels are low by construction, and Luna is not ranked on them. One trial per task; each model in its own harness (Codex, Claude Code, Antigravity CLI, DeepSeek’s harness) at high reasoning effort. Full results on the <a href="../leaderboard/">leaderboard</a>.</figcaption>
     </figure>
@@ -141,61 +164,83 @@
     <p class="fig-note">Realtime has only a handful of successes; read it as “about half of standard”, not as a precise rate.</p>
 
     <h3 id="nobody">Where nobody succeeds</h3>
-    <p>Of the task-and-mode cells that at least three agents attempted, no agent solved 44% (realtime cells included). Most of them are standard. Precise contact (inserting, aligning, pressing) shows the gap most sharply: someone solves 90% of its privileged cells but only 32% of its standard ones. Tool use is unsolved even more often under standard rules (80%).</p>
-    <figure class="fig wide">
+    <p>Of the task-and-mode cells that at least three agents attempted, no agent solved <span data-f="nobody_all"></span> (realtime cells included). Most of them are standard. Precise contact (inserting, aligning, pressing) shows the gap most sharply: someone solves 90% of its privileged cells but only 32% of its standard ones. Tool use is unsolved even more often under standard rules (80%).</p>
+    <figure class="fig">
       <div class="fig-body" id="fig-nobody"></div>
       <figcaption><b>Without the simulator’s state, contact-rich work is where everyone stops.</b> The core questions were chosen from failures, so these shares run high, and a few unsolved cells may be the task’s fault rather than the agents’.</figcaption>
     </figure>
+
+    <p class="part"><span>Part II</span><b>When it fails, is it thinking or moving?</b></p>
 
     <div class="aside">
       <p class="label">How the rest was measured</p>
       <p>The findings below come from two analyses of the trials, both done by language-model agents that read the logs end to end. The first read a random 30% (<span data-f="clock_looked" data-fmt="den"></span> trials) and labelled each one’s approach, cause of failure, progress and final claim. The second read random samples of failures and of hard-won successes and reports each share with a 95% interval. Neither was checked line by line by people, so treat the shares as estimates; numbers that rest on these labels carry an <span class="llm-tag">LLM-labelled</span> tag. Snapshots of <span data-snapshot></span>.</p>
     </div>
 
-    <h2 id="ways-finding" data-short="The mode decides how"><span class="num">04</span>The mode decides how they drive; the agent decides whether it works</h2>
-    <p>Given the simulator’s state, agents overwhelmingly write a program: 80% of privileged trials are Code to Control. Given only cameras, 61% switch to Direct Control and drive the robot a chunk at a time, looking after each. A running clock pushes them back to code, mostly a closed loop (about four in five realtime trials), because the loop has to run faster than a model can think. When that program stalls, there is no time to take over.</p>
-    <figure class="fig wide">
-      <div class="fig-body" id="fig-ways"></div>
-      <figcaption><b>The rules choose the way of control.</b> <span class="llm-tag">LLM-labelled</span> Each trial counts once, by the approach that was finally graded.</figcaption>
-    </figure>
-    <p>Which way works better? Within one agent, the success rate barely changes with the way. Most of the difference between the pooled numbers is who is driving, not how.</p>
-
-    <h2 id="failures" data-short="Thinking or moving?"><span class="num">05</span>Thinking or moving?</h2>
+    <h2 id="failures" data-short="Thinking or moving?"><span class="num">04</span>Thinking or moving?</h2>
     <p>Start with what is not the problem: the code. Agents have their first simulator code running within seconds, unbroken runs of errors take <span data-f="b.error_time" data-fmt="rawpct"></span> of the wall clock, and in a random sample of <span data-f="b.sample_fail" data-fmt="raw"></span> failures read one by one, not a single one was stuck at debugging code. About three in four were stuck in physical execution, and the root causes are physical: grasp and contact, balance, reaching, placement.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-roots"></div>
       <figcaption><b>Two-thirds of failures come down to four physical skills.</b> <span class="llm-tag">LLM-labelled · random sample</span> From the second analysis.</figcaption>
     </figure>
     <p>More than half of failures (<span data-f="action_primary" data-fmt="frac"></span>) end in a motor mistake: a grasp that misses, an object dropped mid-air, a collision, a fall. A lost grasp alone is the most common cause, and the strongest agents mostly lose objects they already hold: about half of their grasp failures are drops while lifting, carrying or placing.</p>
     <p>But a slip is rarely the whole story. Behind most of them the analysis finds a decision that went wrong. Either an untested idea went straight into the attempt that counted, or there was still time, a reset or a retry left when the slip happened, and the agent did not use it well. With privileged access the second kind is the most common; under standard rules, the first.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-layers"></div>
       <figcaption><b>For every agent, a wrong idea or a missed recovery lies behind most failures; pure motor slips are a small share (at most 16%).</b> <span class="llm-tag">LLM-labelled</span></figcaption>
     </figure>
     <p>Seeing is a problem of its own. Errors of perception and interface, such as positions misread from depth or two coordinate frames mixed up, cause <span data-f="percept_std"></span> of standard failures against <span data-f="percept_priv"></span> of privileged ones, and among their standard failures the three strongest agents have them at about a third the rate of the rest.</p>
     <h3 id="hours">Where the hours go</h3>
     <p>Splitting every run into the subtask it was working on shows the same picture in time and tokens. Grasping and carrying take almost half of all agent time and more than half of the tokens, and they are where most failures get stuck. Time spent and getting stuck do not always line up: perception takes 8% of the time but holds up few failures, while reaching and planning take 12% and hold up more. Successful runs spend far more of their time checking and delivering what they did.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-subtasks"></div>
       <figcaption><b>The hours go where the hands are.</b> <span class="llm-tag">LLM-labelled · weighted sample</span> Each run’s timeline was cut into about ten pieces and each piece labelled with the subtask it was attacking; the stuck share covers every failure. From the second analysis.</figcaption>
     </figure>
 
-    <h2 id="clock" data-short="The clock and the point of no return"><span class="num">06</span>They look at the clock, but don’t plan with it</h2>
+    <h2 id="claims" data-short="Honest about failure, mostly"><span class="num">05</span>Honest about failure, mostly</h2>
+    <p><span data-f="honest"></span> of failures end with the agent saying plainly that it did not succeed, and <span data-f="claimed"></span> claim a success. Most of the false claims come from one place: when it ended a failed run itself, Gemini 3.8 Flash claimed success in <span data-f="claimed_flash" data-fmt="frac"></span> cases, and Gemini 4 Argon in 5 of 17, against <span data-f="claimed_rest" data-fmt="frac"></span> for the other eight agents together. Both Gemini models run in the Antigravity CLI, so this may be the harness’s habit as much as the model’s.</p>
+    <figure class="fig">
+      <div class="fig-body" id="fig-claims"></div>
+      <figcaption><b>An agent’s last message is usually a fair report; for some agents it is not.</b> <span class="llm-tag">LLM-labelled</span> “Claimed success” includes implying it.</figcaption>
+    </figure>
+    <figure class="fig">
+      <div class="duo">
+        <div class="clip s" style="--ar: 3 / 2"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-collecting-childrens-toys-i00-standard--zrnklum/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-collecting-childrens-toys-i00-standard--zrnklum/replay.mp4" muted loop playsinline></video>
+          <p class="clip-tag"><i></i>Claude Opus 5.5</p></div>
+        <div>
+          <p>Two falls in the same BEHAVIOR-1K task (collecting children’s toys, standard), two reports. Claude Opus 5.5’s own hold-pose command let the trunk sag, and the robot tipped over at minute 12, before touching a toy. Its summary says so: “My own code caused the fall”.</p>
+          <p>Gemini 3.8 Flash shelved two dice, then tipped the robot over near a wall at minute 72. Its own log noted a possible collision; its summary read “Successfully executed pick-and-place trajectories”.</p>
+        </div>
+      </div>
+      <figcaption><b>Two falls, two reports.</b> <a href="../run/?r=behavior-collecting-childrens-toys-i00-standard--zrnklum">Step through the Opus run</a>.</figcaption>
+    </figure>
+
+    <p class="part"><span>Part III</span><b>How does a coding agent become an effective robot controller?</b></p>
+
+    <h2 id="ways-finding" data-short="The mode decides how"><span class="num">06</span>The mode decides how they drive; the agent decides whether it works</h2>
+    <p>Given the simulator’s state, agents overwhelmingly write a program: <span data-f="ways_priv_code"></span> of privileged trials are Code to Control. Given only cameras, <span data-f="ways_std_direct"></span> switch to Direct Control and drive the robot a chunk at a time, looking after each. A running clock pushes them back to code (<span data-f="ways_rt_code"></span> of realtime trials), mostly a closed loop, because the loop has to run faster than a model can think. When that program stalls, there is no time to take over.</p>
+    <figure class="fig">
+      <div class="fig-body" id="fig-ways"></div>
+      <figcaption><b>The rules choose the way of control.</b> <span class="llm-tag">LLM-labelled</span> Each trial counts once, by the approach that was finally graded.</figcaption>
+    </figure>
+    <p>Which way works better? Within one agent, the success rate barely changes with the way. Most of the difference between the pooled numbers is who is driving, not how.</p>
+
+    <h2 id="clock" data-short="The clock and the point of no return"><span class="num">07</span>They look at the clock, but don’t plan with it</h2>
     <div class="pair">
       <div><b data-f="clock_looked"></b><span>of trials checked how much time was used or left</span></div>
       <div class="hi"><b data-f="clock_planned"></b><span>planned by the time left: a budget per step, a saved answer before the end</span></div>
     </div>
     <p>Time is the main cause of only a tenth of failures, but it plays a part in most. What separates success is how early the task’s key step happens. By half the time limit, nearly every successful trial had already done it once, for example the first grasp that held or the first stable step; many failures were still getting there.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-reach"></div>
       <figcaption><b>Successes get the key step done early; failures get there late or never.</b> <span class="llm-tag">LLM-labelled</span> The key step is level 3 of the analysis’s six progress levels: the step the task depends on, done once.</figcaption>
     </figure>
 
     <h3 id="walnuts">Anatomy of a long run</h3>
     <p>GPT-6 Astra had an hour to turn two walnuts in one dexterous hand, under standard rules. Each step up took longer than the last, and most of the hour went into refining a contact model one experiment at a time. It ended with the first walnut turned about 71°, short of the 90° the first stage asks for.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="duo">
-        <div class="clip s" style="--ar: 4 / 3"><video data-auto preload="none" poster="../media/blog/walnuts_standard.jpg" src="../media/blog/walnuts_standard.mp4" muted loop playsinline></video>
+        <div class="clip s" style="--ar: 4 / 3"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/dexhand-essential-two-object-i00-standard--us8gpyh/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/dexhand-essential-two-object-i00-standard--us8gpyh/replay.mp4" muted loop playsinline></video>
           <p class="clip-tag"><i></i>Standard · the graded episode</p></div>
         <div>
           <ol class="tl">
@@ -211,51 +256,35 @@
 
     <h3 id="no-return">The point of no return</h3>
     <p>Privileged mode has no point of no return by design: a reset undoes anything. Under standard rules, <span data-f="nr_std"></span> of failures pass one (a fall, an object knocked out of reach, a rule broken), and in realtime <span data-f="nr_rt"></span>. What agents do next is telling. With more than a minute left, <span data-f="kept_going" data-fmt="frac"></span> kept working on a task that could no longer be passed, although almost all of them (109 of 123) had noticed what happened, by the analysis’s reading. The red bowl was one of them.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-after"></div>
       <figcaption><b>Noticing is not the problem; letting go is.</b> <span class="llm-tag">LLM-labelled</span> Small samples per agent; the share of the time limit still left when it happened is under each name.</figcaption>
     </figure>
 
     <h3 id="more-time">Is more time worth it?</h3>
     <p>If the key step comes early, should a run that has not succeeded by half time stop? Not across the board. The chance that a run not yet successful still succeeds falls steadily, from 19% at the start to 12% at half time and 8% with a fifth of the time left, but some agents keep converting late: GPT-6 Astra still succeeds 29% of the time from that point. About <span data-f="b.late_success" data-fmt="rawpct"></span> of core successes come in the second half. A blanket stop rule that saved <span data-f="b.stop_loss" data-fmt="rawpct"></span> of the compute would cost <span data-f="b.stop_loss" data-fmt="second"></span>% of the successes. The cheap saving is the targeted one: stop when the episode is already lost.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-eventual"></div>
       <figcaption><b>Late success is real for the strong agents and rare for the rest.</b> Standard-mode success times are exact; privileged ones are counted at the end of the run, so late success is overstated there. From the second analysis.</figcaption>
     </figure>
 
-    <h2 id="breakthroughs" data-short="How the successes broke through"><span class="num">07</span>How the successes broke through</h2>
+    <h2 id="breakthroughs" data-short="How the successes broke through"><span class="num">08</span>How the successes broke through</h2>
     <p>The second analysis also read a random <span data-f="b.sample_break" data-fmt="raw"></span> runs that stalled for a long time and then succeeded. Many “stalls” were not stalls at all: progress was steady but invisible to the logs. Where an agent really was stuck, the way out was rarely more of the same. It switched to another approach (grasp from the other side, tilt the wrist, push instead of pick, add camera feedback), or it measured the physics and found the cause. Tuning the same approach until it worked was the rarest route; yet failed runs spent <span data-f="b.fail_tuning" data-fmt="rawpct"></span> of their time after their last progress doing exactly that. Once the right change was found, success followed in a median of <span data-f="b.after_change_s" data-fmt="raw"></span> seconds: the hard part is finding what to change, not doing it.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-breaks"></div>
       <figcaption><b>Change the approach, or find the physical cause; don’t keep turning the same knob.</b> <span class="llm-tag">LLM-labelled · random sample</span></figcaption>
     </figure>
     <p>Some habits also go with success. They are correlations, not proof, but they are cheap to adopt:</p>
-    <div class="habits wide">
+    <div class="habits">
       <div class="habit"><b><span data-f="b.self_verify" data-fmt="vs"></span></b><p>BEHAVIOR successes against failures that checked their answer the way the grader will, in a fresh process.</p></div>
       <div class="habit"><b><span data-f="b.snap" data-fmt="vs"></span></b><p>DexToolBench privileged success with and without saving and restoring simulator state to search one stage at a time.</p></div>
       <div class="habit"><b><span data-f="b.persist_sim" data-fmt="vs"></span></b><p>RoboARC success with and without one long-lived simulator instead of restarting it.</p></div>
       <div class="habit"><b><span data-f="b.look_first" data-fmt="vs"></span></b><p>RoboSafeBench success when the agent looked at the evidence before acting, against not; asking the operator: <span data-f="b.ask_op" data-fmt="vs"></span>.</p></div>
     </div>
 
-    <h2 id="claims" data-short="Honest about failure, mostly"><span class="num">08</span>Honest about failure, mostly</h2>
-    <p><span data-f="honest"></span> of failures end with the agent saying plainly that it did not succeed, and <span data-f="claimed"></span> claim a success. Most of the false claims come from one place: when it ended a failed run itself, Gemini 3.8 Flash claimed success in <span data-f="claimed_flash" data-fmt="frac"></span> cases, and Gemini 4 Argon in 5 of 17, against <span data-f="claimed_rest" data-fmt="frac"></span> for the other eight agents together. Both Gemini models run in the Antigravity CLI, so this may be the harness’s habit as much as the model’s.</p>
-    <figure class="fig wide">
-      <div class="fig-body" id="fig-claims"></div>
-      <figcaption><b>An agent’s last message is usually a fair report; for some agents it is not.</b> <span class="llm-tag">LLM-labelled</span> “Claimed success” includes implying it.</figcaption>
-    </figure>
-    <figure class="fig wide">
-      <div class="duo">
-        <div class="clip s" style="--ar: 3 / 2"><video data-auto preload="none" poster="../media/blog/toys_gemini_flash.jpg" src="../media/blog/toys_gemini_flash.mp4" muted loop playsinline></video>
-          <p class="clip-tag"><i></i>Gemini 3.8 Flash</p><p>Two dice shelved, then at minute 72 the robot tips over near the wall. The summary: “Successfully executed pick-and-place trajectories”.</p></div>
-        <div class="clip s" style="--ar: 3 / 2"><video data-auto preload="none" poster="../media/blog/toys_opus.jpg" src="../media/blog/toys_opus.mp4" muted loop playsinline></video>
-          <p class="clip-tag"><i></i>Claude Opus 5.5</p><p>Its own hold-pose command lets the trunk sag, and the robot tips over at minute 12, before touching a toy. The summary says so: “My own code caused the fall”.</p></div>
-      </div>
-      <figcaption><b>Two falls, two reports.</b> BEHAVIOR-1K, collecting children’s toys, standard. The first clip plays 13× faster. <a href="../run/?r=behavior-collecting-childrens-toys-i00-standard--zrnklum">Step through the Opus run</a>.</figcaption>
-    </figure>
-
     <h2 id="fixes" data-short="One step from success"><span class="num">09</span>One step from success</h2>
     <p>For each failure the analysis named the single change most likely to have rescued it. About half (<span data-f="fix_possible" data-fmt="frac"></span>) are judged likely or possibly fixable by one step the agent itself could have taken. That is an estimate from reading the logs, not a rerun. The most common are plain habits: plan by the clock and keep a gradeable answer saved; switch method after a few tries without progress; choose the grasp from the object’s size and centre of mass; check the result in the real scene before the attempt that counts.</p>
-    <figure class="fig wide">
+    <figure class="fig">
       <div class="fig-body" id="fig-fixes"></div>
       <figcaption><b>The cheapest fixes are about time and judgement, not dexterity.</b> <span class="llm-tag">LLM-labelled</span> The four most common missing steps; each failure counts once.</figcaption>
     </figure>

@@ -828,6 +828,22 @@
   }
  ],
  "facts": {
+  "nobody_all": [
+   314,
+   716
+  ],
+  "ways_priv_code": [
+   599,
+   753
+  ],
+  "ways_std_direct": [
+   491,
+   801
+  ],
+  "ways_rt_code": [
+   115,
+   122
+  ],
   "pooled_priv": [
    504,
    817
@@ -1464,5 +1480,26 @@
     37
    ]
   }
+ },
+ "repo": {
+  "tasks": 2648,
+  "scenes": 1536,
+  "benchmarks": 32,
+  "core": 843,
+  "simulators": 20,
+  "robots": 44,
+  "privileged": 1022,
+  "standard": 1519,
+  "realtime": 107
+ },
+ "where": {
+  "run": "codex-gpt6_astra-high",
+  "core_sat": 817,
+  "core_solved": 422,
+  "solved": 785,
+  "sat": 1238,
+  "robots": 39,
+  "benchmarks": 32,
+  "simulators": 20
  }
 }

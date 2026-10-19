@@ -15,7 +15,6 @@ const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (
 const T = ZH ? {
   of: (a, b) => `${a}/${b}`, tasks: '个任务', trials: '次', failures: '次失败',
   priv: 'Privileged', std: 'Standard', rt: 'Realtime',
-  big: ['道题', '个 benchmark', '种机器人', '个模拟器'],
   ways: { code: 'Code to Control', direct: 'Direct Control', train: 'Train Model to Control', mixed: '混合', none: '没有形成控制' },
   layers: { thought: '想法错了（为主）', before: '先想错，引出失误', after: '先失误，没能挽回', motor: '纯动作失误', external: '外部原因' },
   claims: { claimed: '声称成功', honest: '如实说失败', silent: '没有表态', mismatch: '与现场一致、评分不同', other: '其他' },
@@ -26,7 +25,6 @@ const T = ZH ? {
 } : {
   of: (a, b) => `${int(a)} of ${int(b)}`, tasks: 'tasks', trials: 'trials', failures: 'failures',
   priv: 'Privileged', std: 'Standard', rt: 'Realtime',
-  big: ['questions', 'benchmark suites', 'robots', 'simulators'],
   ways: { code: 'Code to Control', direct: 'Direct Control', train: 'Train Model to Control', mixed: 'Mixed', none: 'No control formed' },
   layers: { thought: 'Wrong idea (mainly)', before: 'Wrong idea, then a slip', after: 'A slip, not recovered', motor: 'Motor slip only', external: 'External' },
   claims: { claimed: 'Claimed success', honest: 'Said it failed', silent: 'Said nothing', mismatch: 'Saw success, graded otherwise', other: 'Other' },
@@ -44,19 +42,12 @@ const FAMILY = (d, a) => d.agents[a]?.family || 'flash';
 function fillFacts(d) {
   $$('[data-f]').forEach((el) => {
     const k = el.dataset.f;
-    const v = k.startsWith('b.') ? d.bottleneck?.facts[k.slice(2)] : d.facts[k];
-    if (!v) { el.textContent = '?'; return; }
+    const v = k.startsWith('b.') ? d.bottleneck?.facts[k.slice(2)] : k.startsWith('r.') ? [d.repo?.[k.slice(2)]] : k.startsWith('w.') ? [d.where?.[k.slice(2)]] : d.facts[k];
+    if (!v || v[0] == null) { el.textContent = '?'; return; }
     const [a, b] = v;
     el.textContent = { pct: `${pct(a, b)}%`, frac: T.of(a, b), num: int(a), den: int(b), raw: `${a}`, rawpct: `${a}%`,
       vs: `${a}% ${ZH ? '对' : 'vs'} ${b}%`, second: `${b}` }[el.dataset.fmt || 'pct'];
   });
-}
-
-function bigNumbers(el, ex) {
-  if (!el) return;
-  const t = ex.totals || {};
-  const vals = [t.instances, t.suites, t.robots, t.simulators];
-  el.innerHTML = vals.map((v, i) => `<div><dt>${int(v)}</dt><dd>${esc(T.big[i])}</dd></div>`).join('');
 }
 
 function command(el) {
@@ -250,21 +241,12 @@ function figBreaks(el, d) {
 
 /* ------------------------------------------------------------------------------------------ the article */
 
+/** The contents: an ordinary list in the article, built from its section heads. */
 function toc() {
   const heads = $$('.post h2[id]');
-  const rail = $('#toc');
-  if (!rail || !heads.length) return;
-  rail.innerHTML = `<p>${ZH ? '目录' : 'Contents'}</p><ol>${heads.map((h) => `<li><a href="#${h.id}">${esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''))}</a></li>`).join('')}</ol>`;
-  const links = $$('a', rail);
-  const first = heads[0];
-  const onScroll = () => {
-    rail.classList.toggle('show', first.getBoundingClientRect().top < innerHeight * 0.6);
-    let cur = 0;
-    heads.forEach((h, i) => { if (h.getBoundingClientRect().top < innerHeight * 0.35) cur = i; });
-    links.forEach((a, i) => a.classList.toggle('on', i === cur));
-  };
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  const box = $('#toc');
+  if (!box || !heads.length) return;
+  box.innerHTML = `<p class="label">${ZH ? '目录' : 'Contents'}</p><ol>${heads.map((h) => `<li><a href="#${h.id}">${esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''))}</a></li>`).join('')}</ol>`;
 }
 
 /** Videos play only while on screen. */
@@ -273,12 +255,15 @@ function clips() {
     const v = e.target;
     if (e.isIntersecting) { v.play?.().catch(() => {}); } else v.pause?.();
   }), { threshold: 0.35 });
-  $$('video[data-auto]').forEach((v) => { v.muted = true; v.loop = true; v.playsInline = true; io.observe(v); });
+  $$('video[data-auto]').forEach((v) => {
+    v.muted = true; v.loop = true; v.playsInline = true;
+    if (v.dataset.rate) { const r = +v.dataset.rate; v.defaultPlaybackRate = r; v.addEventListener('play', () => { v.playbackRate = r; }); }
+    io.observe(v);
+  });
 }
 
-Promise.all([getJSON('data/blog.json'), getJSON('data/exam.json')]).then(([d, ex]) => {
+getJSON('data/blog.json').then((d) => {
   fillFacts(d);
-  bigNumbers($('#blog-nums'), ex);
   command($('#blog-cmd'));
   figSame($('#fig-same'), d);
   figNobody($('#fig-nobody'), d);

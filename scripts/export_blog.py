@@ -5,7 +5,7 @@ The analysis is a page with its data embedded as `const DATA = {...}` (the core-
 one of its data tables ("看数字"), so the blog shows exactly the counts the analysis reports; this script only picks the
 tables, turns their cells into numbers and gives the rows English and Chinese labels. Nothing else is computed here.
 
-    python3 scripts/export_blog.py --analysis <core.html or core.json> --bottleneck <atlas data folder> [--out data/blog.json]
+    python3 scripts/export_blog.py --analysis <core.html or core.json> --bottleneck <atlas data folder> --repo <task repo> --db <trials.sqlite> [--out data/blog.json]
 
 The second source, the bottleneck atlas (its data/ folder: summary.json, subtask.json, report.md), gives the random-sample
 estimates with 95% intervals, the chance of eventual success by time used, and where the time goes by subtask.
@@ -134,9 +134,43 @@ def bottleneck(root):
     }
 
 
+def repo_counts(root):
+    """The exam in numbers, from the task repository itself: task dirs, the scenes they come from, benchmarks, the core
+    set, and the distinct simulators and robots the tasks declare (docs/TAXONOMY.md)."""
+    import tomllib
+    dirs = [p for p in (root / 'tasks').glob('*/*') if (p / 'task.toml').is_file()]
+    meta = [tomllib.loads((p / 'task.toml').read_text(encoding='utf8')).get('metadata', {}) for p in dirs]
+    scene = lambda name: re.sub(r'-(standard-realtime|privileged|standard)$', '', name)
+    core = sum(1 for line in (root / 'docs' / 'core_set.toml').read_text(encoding='utf8').splitlines() if line.startswith('[['))
+    modes = [m.get('mode') for m in meta]
+    return {'tasks': len(dirs), 'scenes': len({(p.parent.name, scene(p.name)) for p in dirs}), 'benchmarks': len({p.parent.name for p in dirs}),
+            'core': core, 'simulators': len({m.get('simulator') for m in meta}), 'robots': len({m.get('robot') for m in meta}),
+            'privileged': modes.count('privileged'), 'standard': modes.count('standard'), 'realtime': modes.count('standard-realtime')}
+
+
+def where_we_are(db, root, run='codex-gpt6_astra-high'):
+    """One agent's standing, from the results index (read-only): core tasks sat and solved, and the robots, benchmarks and
+    simulators its solved tasks (all sets) span, by the task repository's own metadata."""
+    import sqlite3
+    import tomllib
+    meta = {p.parent.name: tomllib.loads(p.read_text(encoding='utf8')).get('metadata', {}) | {'bench': p.parent.parent.name}
+            for p in (root / 'tasks').glob('*/*/task.toml')}
+    core = set(re.findall(r'"(?:[^"/]+/)?([^"/]+)"', '\n'.join(l for l in (root / 'docs' / 'core_set.toml').read_text(encoding='utf8').splitlines()
+                                                              if re.match(r'\s*(task|dir)\s*=', l))))
+    con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
+    rows = con.execute("select task, state from cells where run=? and state in ('success','failed')", (run,)).fetchall()
+    solved = [meta[t] for t, st in rows if st == 'success' and t in meta]
+    sat_core = [st for t, st in rows if t in core]
+    return {'run': run, 'core_sat': len(sat_core), 'core_solved': sat_core.count('success'), 'solved': len(solved), 'sat': len(rows),
+            'robots': len({m.get('robot') for m in solved}), 'benchmarks': len({m['bench'] for m in solved}),
+            'simulators': len({m.get('simulator') for m in solved})}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--analysis', required=True)
+    ap.add_argument('--repo', help='the task repository checkout, for the exam in numbers')
+    ap.add_argument('--db', help="the results index (batch_eval_live's trials.sqlite), for where the strongest agent stands; needs --repo")
     ap.add_argument('--bottleneck', help='the bottleneck atlas data folder (summary.json, subtask.json, report.md)')
     ap.add_argument('--out', default=str(Path(__file__).resolve().parent.parent / 'data' / 'blog.json'))
     a = ap.parse_args()
@@ -238,7 +272,12 @@ def main():
         'fix_action': ('2', r'属抓取与接触、闭环与安全两组的 (\d+)/(\d+)'),
         'fix_thinking': ('2', r'属思考类四组的 (\d+)/(\d+)'),
     }
-    out['facts'] = {}
+    out['facts'] = {
+        'nobody_all': [sum(v[0] for v in out['nobody']['all'].values()), sum(v[1] for v in out['nobody']['all'].values())],
+        'ways_priv_code': [out['ways']['privileged']['code'], out['ways']['privileged']['n']],
+        'ways_std_direct': [out['ways']['standard']['direct'], out['ways']['standard']['n']],
+        'ways_rt_code': [out['ways']['realtime']['code'], out['ways']['realtime']['n']],
+    }
     for key, (src, pat) in facts.items():
         hits = re.findall(pat, text(src))
         if len(set(hits)) != 1:
@@ -247,6 +286,10 @@ def main():
 
     if a.bottleneck:
         out['bottleneck'] = bottleneck(Path(a.bottleneck))
+    if a.repo:
+        out['repo'] = repo_counts(Path(a.repo))
+    if a.db and a.repo:
+        out['where'] = where_we_are(a.db, Path(a.repo))
 
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf8')
     print(f'wrote {a.out} (snapshot {out["snapshot"]}, set {out["set"]})')
