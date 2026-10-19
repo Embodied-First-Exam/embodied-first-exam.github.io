@@ -1700,3 +1700,4 @@ button.as-link:hover { color: var(--ink); }
 .post-card.featured .pc-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pc-read { margin-top: 6px; font: 600 14px var(--body); color: var(--priv); }
 @media (max-width: 860px) { .post-card.featured { grid-template-columns: minmax(0, 1fr); padding: 22px; } .post-card.featured .pc-media { order: -1; } }
+.core-only-view .task-card .core-mark { display: none; }

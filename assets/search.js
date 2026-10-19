@@ -330,6 +330,8 @@ export function tasksSearch(grid, ex, tasks, kit) {
 
   const anyF = () => G.some((g) => state[g.id]) || resOn() || !!state.tags.length;
   function draw() {
+    // a core task's mark only where it tells something: in the All set (owners, 2026-10-19)
+    grid.closest('section, main')?.classList.toggle('core-only-view', state.set !== 'all');
     const order = ranked();
     let hits = order.filter((t) => passes(t));
     let more = null;
