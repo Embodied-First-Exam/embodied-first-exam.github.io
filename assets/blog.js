@@ -15,6 +15,7 @@ const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (
 const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const MIN_BODY = 20;   // a body gets its own row in the body chart from this many standard tests
+const MIN_HARD = 8;   // a suite counts among the hardest from this many tests in the setting
 
 /* ---------------------------------------------------------------------------------------------- numbers */
 
@@ -81,6 +82,13 @@ function compute(ex, tasks, b, atlas) {
     for (const [su, L] of Object.entries(suitesH[k])) per[`snone6_${k}_${su}`] = QL(L, (x) => x.length - anyOf(x));
   }
   TOP.forEach((r, i) => { per[`hand_p_${i}`] = QL(bodiesH.p.hand, (L) => solved(L, r)); });
+  // the suites where the three strongest solve least: the top three by the share none of them solved, from MIN_HARD tests
+  const suiteName = Object.fromEntries(ex.suites.map((x) => [x.id, x.name]));
+  const hard = (k) => Object.entries(suitesH[k]).filter(([, L]) => L.length >= MIN_HARD)
+    .sort(([, x], [, y]) => none3(y) / y.length - none3(x) / x.length || y.length - x.length).slice(0, 3)
+    .map(([su, L]) => `${suiteName[su] || su} ${QL(L, none3)}`);
+  const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
+  per.hard_p = `none of them solves ${list(hard('p'))}`; per.hard_s = list(hard('s'));
   const allM = [...M.p, ...M.s, ...M.t];
   const rsbS = M.s.filter(([t]) => t.suite === 'embodied-safety-exam');
   const S = {
