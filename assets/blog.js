@@ -266,7 +266,9 @@ function fill(S) {
 /* --------------------------------------------------------------------------------------------- figures */
 
 /** A figure's head, as in the analysis: what it shows in one sentence, what it is, how to read it. */
-const head = (say, cap, how) => `<p class="fig-say">${say}</p><p class="fig-cap">${cap}</p>${how ? `<p class="fig-how"><b>How to read</b>${how}</p>` : ''}`;
+const cap1 = (x) => `${x[0].toUpperCase()}${x.slice(1)}`.replace(/\.?\s*$/, '.');
+/** A figure's caption, under it as in a paper: what it shows, the finding in one sentence, how to read it. */
+const head = (say, cap, how) => `<p class="fig-cap"><span class="fc-t">${cap1(cap)}</span> ${say}${how ? ` ${cap1(how)}` : ''}</p>`;
 const sw = (c, extra = '') => `<i class="sw${extra}" style="background:${c.startsWith('--') ? `var(${c})` : c}"></i>`;
 /** The numbers behind a figure, folded under it (a table scrolls sideways on a narrow screen). */
 const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</summary><div class="tscroll"><table class="nt"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead>

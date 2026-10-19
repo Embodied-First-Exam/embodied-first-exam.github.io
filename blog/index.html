@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=ba782e03">
+<link rel="stylesheet" href="../assets/blog.css?v=3311319f">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
-<script type="module" src="../assets/blog.js?v=49bd6c8a"></script>
+<script type="module" src="../assets/blog.js?v=9847e972"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -124,12 +124,14 @@
     <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set leaves out tests that we judged easy and tests that an early screening run solved, so it is hard by design.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
+      <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</figcaption>
     </figure>
-    <p>Figure 6 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</p>
+    
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-types" data-fig="7"></div>
+      <figcaption class="fig-ext">The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>.</figcaption>
     </figure>
-    <p>Broken down by task type (Figure 7), the three strongest agents do best on <span data-s="types_best"></span> and worst on <span data-s="types_worst"></span>. The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>. Figure 8 breaks the Core view down by suite. No single agent is best everywhere: of the <span data-s="suites_n"></span> suites with at least five core tasks, GPT-6 Astra leads or ties in <span data-s="suites_astra"></span>, Claude Opus 5.5 in <span data-s="suites_opus"></span> and Gemini 4 Argon in <span data-s="suites_argon"></span>.</p>
+    
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-suites" data-fig="8"></div>
     </figure>
@@ -169,7 +171,7 @@
               <span class="case-k">Privileged: none of six</span><b>RoboDojo · Store laptop and headphones</b><span class="case-m">Claude Opus 5.5 · privileged · failed · 2× speed</span><span class="case-t">It did only the first of four steps: it hung the headphones on the stand, 0.052 m from the cradle where 0.05 m was needed, then knocked them onto the table while returning the arm. It stopped at minute 12, saying it had run out of time, with 48 of its 60 minutes left.</span></a>
             <a class="case s" href="../run/?r=dexhand-essential-two-object-i00-standard--wnsuynf"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/dexhand-essential-two-object-i00-standard--wnsuynf/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/dexhand-essential-two-object-i00-standard--wnsuynf/replay.mp4"></video>
               <span class="case-k">Standard: none of six</span><b>DexHandExam · Two objects in one hand</b><span class="case-m">Claude Opus 5.5 · standard · failed</span><span class="case-t">Every probe script began with a reset and failed within seconds, so it used 18 of its 20 resets in about 10 minutes. Curling the index finger turned one walnut about the right axis, but each episode failed after 0.2–0.5 rad. It stopped at minute 14 without solving the test.</span></a>
-            <a class="case t" href="../run/?r=roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx/replay.mp4"></video>
+            <a class="case t" href="../run/?r=roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-catch-and-shoot-i00-standard-realtime--3eudcdx/video.mp4"></video>
               <span class="case-k">Standard-realtime: none of six</span><b>RoboOlympics-Fun · Catch and shoot</b><span class="case-m">GPT-6 Astra · standard-realtime · failed</span><span class="case-t">After it corrected its palm estimate from depth images, it caught the ball every time from the fourth episode on, but all six of its shots fell short. With one reset left, it spent about 53 minutes on a new controller tested only offline; in the last episode the robot fell during a practice swing.</span></a>
           </div>
           <p>The drop is not limited to one benchmark: in <span data-s="gap_bench"></span> benchmarks with at least 5 tests in both settings, <span data-s="best"></span> solves a smaller share of the tests in standard mode than in privileged mode.</p>
