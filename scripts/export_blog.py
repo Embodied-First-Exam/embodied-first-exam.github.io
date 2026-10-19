@@ -65,8 +65,23 @@ def crossbench(page):
             if m and all(n in t for n in needles[MODE[m.group(2)]]):
                 out[MODE[m.group(2)]] = [int(m.group(3)), int(m.group(1))]
         return out
+    # the approach table of finding 1.6: per setting, sampled trials by approach
+    t16 = d['findings'].get('1.6', {}).get('html', '')
+    cols = ['code', 'direct', 'train', 'mixed', 'none']
+    mix = {}
+    for row in re.findall(r'<tr><td>(privileged|standard|realtime)</td>(.*?)</tr>', t16):
+        nums = re.findall(r'<td class=num>(\d+)(?:/\d+)?</td>', row[1])
+        if len(nums) == 1 + len(cols):
+            mix[MODE[row[0]]] = {'n': int(nums[0]), **{c: int(v) for c, v in zip(cols, nums[1:])}}
+    # finding 1.1: Gemini 4 Argon without the runs its provider's content filter stopped, privileged and standard, and
+    # Claude Opus 5.5 on the same snapshot
+    li = next((x for x in re.split(r'<li>', d['findings'].get('1.1', {}).get('html', '')) if '不算被掐断' in x), '')
+    fr = [[int(n), int(m)] for n, m in re.findall(r'（(\d+)/(\d+)）', re.sub(r'<[^>]+>', '', li))]
     site = d['site']
     return {
+        'argon_unfiltered': {'p': fr[0], 's': fr[1]} if len(fr) >= 2 else None,
+        'opus_same_snapshot': {'p': fr[2], 's': fr[3]} if len(fr) >= 4 else None,
+        'approach_mix': mix,
         'snapshot': site['snapshot'], 'sample': site.get('n_sample'), 'interim': bool(site.get('interim')),
         'no_return': count({k: ('有不可挽回点',) for k in 'pst'}),
         'approach': count({'p': ('做法标注', 'Code to Control（开环）'), 's': ('做法标注', '「Direct Control」的'),

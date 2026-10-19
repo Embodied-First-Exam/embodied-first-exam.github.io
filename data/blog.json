@@ -22,6 +22,52 @@
  },
  "argon_filtered": 319,
  "crossbench": {
+  "argon_unfiltered": {
+   "p": [
+    126,
+    238
+   ],
+   "s": [
+    101,
+    320
+   ]
+  },
+  "opus_same_snapshot": {
+   "p": [
+    184,
+    342
+   ],
+   "s": [
+    119,
+    432
+   ]
+  },
+  "approach_mix": {
+   "p": {
+    "n": 672,
+    "code": 549,
+    "direct": 61,
+    "train": 0,
+    "mixed": 13,
+    "none": 49
+   },
+   "s": {
+    "n": 719,
+    "code": 223,
+    "direct": 438,
+    "train": 4,
+    "mixed": 43,
+    "none": 11
+   },
+   "t": {
+    "n": 98,
+    "code": 95,
+    "direct": 0,
+    "train": 2,
+    "mixed": 1,
+    "none": 0
+   }
+  },
   "snapshot": "2026-10-18 18:30",
   "sample": 1489,
   "interim": true,

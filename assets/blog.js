@@ -90,6 +90,17 @@ function compute(ex, tasks, b, atlas) {
   const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
   per.hard_p = `none of them solves ${list(hard('p'))}`; per.hard_s = list(hard('s'));
   const allM = [...M.p, ...M.s, ...M.t];
+  // what each of the three solves alone: by task type (privileged for GPT-6 Astra, standard for the other two, as the
+  // analysis reads it), and for GPT-6 Astra the suites
+  const uniq = {};
+  [['p', 0], ['s', 1], ['s', 2]].forEach(([k, i]) => {
+    const L = M[k].filter(([t, m]) => ok(t, TOP[i], m) && !TOP.some((o) => o !== TOP[i] && ok(t, o, m)));
+    const by = (keys) => { const c = {}; for (const [t] of L) for (const x of keys(t)) c[x] = (c[x] || 0) + 1; return Object.entries(c).sort((a, b) => b[1] - a[1]); };
+    const tt = by(ttOf), lab = (x) => (atlas?.taxonomy?.tt?.[x] || x).toLowerCase();
+    uniq[`uniq_types_${i}`] = list(tt.slice(0, 2).map(([x]) => lab(x)));
+    uniq[`uniq_list_${i}`] = list(tt.slice(0, 2).map(([x, n]) => `${lab(x)} ${n}`));
+    if (i === 0) uniq.uniq_suites_0 = list(by((t) => [t.suite]).slice(0, 2).map(([x, n]) => `${suiteName[x] || x} (${n})`));
+  });
   const rsbS = M.s.filter(([t]) => t.suite === 'embodied-safety-exam');
   const S = {
     tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots),
@@ -110,8 +121,13 @@ function compute(ex, tasks, b, atlas) {
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s), ap_t: sample(cb.approach?.t),
     cb_sample: cb.sample == null ? null : int(cb.sample), cb_snapshot: (cb.snapshot || '').slice(0, 10) || null,
     min_body: MIN_BODY,
-    u_p_any: int(anyOf(M.p, TOP)), u_p_astra: int(solved(M.p, TOP[0])), u_s_any: int(anyOf(M.s, TOP)), u_s_astra: int(solved(M.s, TOP[0])),
-    only_s_1: int(only(M.s, TOP[1])), only_s_2: int(only(M.s, TOP[2])),
+    u_p_any: QL(M.p, (L) => anyOf(L, TOP)), u_p_astra: QL(M.p, (L) => solved(L, TOP[0])),
+    u_s_any: QL(M.s, (L) => anyOf(L, TOP)), u_s_astra: QL(M.s, (L) => solved(L, TOP[0])),
+    only_p_0: QL(M.p, (L) => only(L, TOP[0])), only_s_1: QL(M.s, (L) => only(L, TOP[1])), only_s_2: QL(M.s, (L) => only(L, TOP[2])),
+    ...uniq,
+    flash_rate: Q(flash.reduce((a, r) => a + solved(allM, r), 0), flash.length * allM.length), astra_rate: Q(solved(allM, TOP[0]), allM.length),
+    argon_uf_p: sample(cb.argon_unfiltered?.p), argon_uf_s: sample(cb.argon_unfiltered?.s),
+    opus_cb_p: sample(cb.opus_same_snapshot?.p), opus_cb_s: sample(cb.opus_same_snapshot?.s),
     ff_p: F(flashFill(M.p), none3(M.p)), ff_s: F(flashFill(M.s), none3(M.s)),
     second: board[1].name, third: board[2].name, flash_max: P(Math.max(...board.slice(3).map((r) => r.s)), H.s.length),
     any_s: int(anyOf(H.s)), none_s: int(H.s.length - anyOf(H.s)), none_s_pct: P(H.s.length - anyOf(H.s), H.s.length),
@@ -127,7 +143,7 @@ function compute(ex, tasks, b, atlas) {
     sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
     argon_filtered: int(b.argon_filtered), built: (ex.build?.at || '').slice(0, 10),
   };
-  return { S, H, M, board, ps, st, types, bodiesH, all3, none3, overlap, bodies, safety: sf, name, tt: atlas?.taxonomy?.tt || {}, bodyName: ex.bodies || {} };
+  return { S, H, M, board, ps, st, mix: b.crossbench?.approach_mix, types, bodiesH, all3, none3, overlap, bodies, safety: sf, name, tt: atlas?.taxonomy?.tt || {}, bodyName: ex.bodies || {} };
 }
 
 function fill(S) {
@@ -157,33 +173,25 @@ function figOverall(el, R) {
 
 const ROWS = [['s', '<span class="m-s">Standard</span>'], ['t', '<span class="m-r">Realtime</span>'], ['p', '<span class="m-p">Privileged</span>']];
 
-/** Finding 1: how much of each setting is solved by the best agent, by another agent only, or by none. */
-function figReach(el, R) {
-  const { M, board, name } = R;
-  const best = board[0].id;
-  const ok = (t, r, m) => t.results?.[r]?.[m]?.s === 'S';
-  const row = (L, label) => {
-    const b = L.filter(([t, m]) => ok(t, best, m)).length;
-    const o = L.filter(([t, m]) => !ok(t, best, m) && board.some((r) => ok(t, r.id, m))).length;
-    return { label, n: L.length, best: b, other: o, none: L.length - b - o };
-  };
-  const segs = [['best', `Solved by ${name(best)}`, '--ink'], ['other', 'Solved only by another agent', '--flash'], ['none', 'Solved by no agent', '--c-other', 1]];
-  el.innerHTML = `<p class="fig-title">Core tests by who solved them</p>${legend(segs)}
-    ${stackRows(ROWS.map(([k, l]) => row(M[k], l)), segs)}`;
+const solvedBy = (t, r, m) => t.results?.[r]?.[m]?.s === 'S';
+
+/** Finding 1: each agent's share of the core tests every agent sat, in each of the three settings. */
+function figModes(el, R) {
+  const { M, board } = R;
+  const cell = (L, r, c) => { const s = L.filter(([t, m]) => solvedBy(t, r, m)).length, n = L.length;
+    return `<td><div class="ov"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${c})"></span></div><b>${pct(s, n)}%</b><small>${s}/${n}</small></td>`; };
+  el.innerHTML = `<p class="fig-title">Each agent’s share of the core tests every agent sat, by setting</p>
+    <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent</th><th>Privileged <small>(${M.p.length})</small></th><th>Standard <small>(${M.s.length})</small></th><th>Realtime <small>(${M.t.length})</small></th></tr></thead>
+    <tbody>${board.map((r) => `<tr><td class="who">${esc(r.name)}</td>${cell(M.p, r.id, '--priv')}${cell(M.s, r.id, '--std')}${cell(M.t, r.id, '--rt')}</tr>`).join('')}</tbody></table></div>`;
 }
 
-/** Finding 2: the same task in both settings, per agent (privileged -> standard). */
+/** Finding 3: the same task in both settings, per agent: solved in both, only with privileged access, only under
+ *  standard rules, in neither. */
 function figPaired(el, R) {
-  const rows = R.ps.map((r) => ({ ...r, pa: pct(r.a, r.n), pc: pct(r.c, r.n) })).sort((x, y) => y.pa - x.pa);
-  el.innerHTML = `<p class="fig-title">Tasks solved by the same agent in each setting (tasks whose privileged and standard tests are both in the core set)</p>
-    <div class="legend"><span><i style="background:var(--priv)"></i>Privileged</span><span><i style="background:var(--std)"></i>Standard</span></div>
-    <div class="db">${rows.map((r) => `<div class="db-row"><div class="who">${esc(r.name)}<small>${r.a} → ${r.c} of ${r.n}</small></div><div class="db-track"
-        title="${esc(`privileged ${r.a} of ${r.n} · standard ${r.c} of ${r.n} · both ${r.both}`)}">
-      <span class="db-line" style="left:${r.pc}%;width:${r.pa - r.pc}%"></span>
-      <span class="db-dot s" style="left:${r.pc}%"></span><span class="db-dot p" style="left:${r.pa}%"></span>
-      ${r.pa - r.pc >= 9 ? `<span class="db-lab s" style="left:${r.pc}%">${r.pc}%</span><span class="db-lab p" style="left:${r.pa}%">${r.pa}%</span>`
-        : `<span class="db-lab p" style="left:${r.pa}%">${r.pa}% → ${r.pc}%</span>`}</div></div>`).join('')}</div>
-    <div class="db-axis"><span></span><div class="ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</div></div>`;
+  const segs = [['both', 'Solved in both', '--ink'], ['onlyP', 'Only with privileged access', '--priv'], ['onlyS', 'Only under standard rules', '--std'], ['neither', 'In neither', '--c-other', 1]];
+  const rows = R.ps.map((r) => ({ label: esc(r.name), n: r.n, both: r.both, onlyP: r.a - r.both, onlyS: r.c - r.both, neither: r.n - r.a - r.c + r.both }))
+    .sort((x, y) => y.onlyP + y.both - x.onlyP - x.both);
+  el.innerHTML = `<p class="fig-title">The same task in two settings: what each agent solved (tasks whose privileged and standard tests are both in the core set)</p>${legend(segs)}${stackRows(rows, segs)}`;
 }
 
 /** Finding 2: standard against standard-realtime, the same tasks, as counts (few tasks). */
@@ -223,12 +231,26 @@ function figBodies(el, R) {
     + mixTable(el, { ...R, lab: (k) => R.bodyName[k] || k }, R.bodiesH, 'Body', MIN_BODY);
 }
 
-/** Open question: of the three strongest agents, how many solved each test. */
+/** Finding 2: which of the three strongest agents solved each test, in each setting. */
 function figOverlap(el, R) {
-  const segs = [['k3', 'All three', '--c-honest'], ['k2', 'Two', '--f-possible'], ['k1', 'One', '--rt'], ['k0', 'None', '--c-other', 1]];
-  const row = (L, label) => { const [k3, k2, k1, k0] = R.overlap(L); return { label, n: L.length, k3, k2, k1, k0 }; };
-  el.innerHTML = `<p class="fig-title">Core tests by how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>${legend(segs)}
-    ${stackRows(ROWS.map(([k, l]) => row(R.M[k], l)), segs)}`;
+  const [A, O, G] = TOP, nm = (r) => R.name(r).replace(/^Claude /, '');
+  const segs = [['k', 'All three', '--ink'], ['ao', `${nm(A)} + ${nm(O)}`, '--std'], ['ag', `${nm(A)} + ${nm(G)}`, '--f-possible'], ['a', `Only ${nm(A)}`, '--rt'],
+    ['go', `${nm(G)} + ${nm(O)}`, '--l-thought'], ['o', `Only ${nm(O)}`, '--c-claim'], ['g', `Only ${nm(G)}`, '--f-likely'], ['z', 'None of the three', '--c-other', 1]];
+  const key = (t, m) => { const s = TOP.map((r) => solvedBy(t, r, m)); return s[0] && s[1] && s[2] ? 'k' : s[0] && s[1] ? 'ao' : s[0] && s[2] ? 'ag' : s[0] ? 'a'
+    : s[1] && s[2] ? 'go' : s[1] ? 'o' : s[2] ? 'g' : 'z'; };
+  const row = (L, label) => { const r = { label, n: L.length }; for (const [t, m] of L) { const k = key(t, m); r[k] = (r[k] || 0) + 1; } return r; };
+  el.innerHTML = `<p class="fig-title">Core tests by which of the three strongest agents solved them</p>${legend(segs)}
+    ${stackRows([['p', '<span class="m-p">Privileged</span>'], ['s', '<span class="m-s">Standard</span>'], ['t', '<span class="m-r">Realtime</span>']].map(([k, l]) => row(R.M[k], l)), segs)}`;
+}
+
+/** Finding 6: the approach each sampled attempt was judged on, per setting (the analysis's sample). */
+function figApproach(el, R) {
+  const mix = R.mix || {};
+  const segs = [['code', 'Code to control', '--ink'], ['direct', 'Direct control', '--rt'], ['train', 'Train a model to control', '--priv'], ['mixed', 'Mixed', '--f-possible'], ['none', 'No control plan', '--c-other', 1]];
+  const rows = [['p', '<span class="m-p">Privileged</span>'], ['s', '<span class="m-s">Standard</span>'], ['t', '<span class="m-r">Realtime</span>']]
+    .filter(([k]) => mix[k]).map(([k, l]) => ({ label: l, ...mix[k] }));
+  el.innerHTML = `<p class="fig-title">How the sampled attempts controlled the robot, by setting</p>${legend(segs)}${stackRows(rows, segs)}
+    <p class="fig-note">Sampled attempts, each counted once by the approach it was judged on; labelled by an agent reading the logs, not yet checked by hand.</p>`;
 }
 
 /** Embodied Safety Exam: failed core tests by the benchmark's verdict. */
@@ -314,7 +336,7 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
   fill(R.S);
   const bodies = $('#bodies');
   if (bodies) bodies.textContent = Object.entries(R.bodies).sort((a, c) => c[1] - a[1]).map(([k, n]) => `${int(n)} ${(ex.bodies?.[k] || k).toLowerCase()}`).join(', ');
-  const figs = { overall: figOverall, reach: figReach, paired: figPaired, realtime: figRealtime, types: figTypes, bodies: figBodies, overlap: figOverlap, safety: figSafety };
+  const figs = { overall: figOverall, modes: figModes, paired: figPaired, realtime: figRealtime, types: figTypes, bodies: figBodies, overlap: figOverlap, approach: figApproach, safety: figSafety };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
 }).catch((e) => {
   console.error(e);
