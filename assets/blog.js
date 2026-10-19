@@ -298,7 +298,7 @@ function toc() {
     return out;
   };
   const fnum = (h3) => { const t = h3.querySelector('.fn:not(.ck)')?.textContent; return t && (t.replace(/\D+/g, '') || '?'); };
-  const sub3 = (h3) => esc([...h3.childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
+  const sub3 = (h3) => esc([...(h3.querySelector('button') || h3).childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
   // the rail: section names, plus each finding by its short name, folded until the reader reaches the findings or
   // opens them; the current one marked
   const fh = $$('.post .finding h3[id]').filter(fnum);
@@ -337,6 +337,39 @@ function toc() {
   onScroll();
 }
 
+/** The findings fold: each shows its label and its conclusion, and the button that is its heading opens the rest (the
+ *  body is hidden="until-found", so the browser's find in page opens it too). A link to a finding or into one, from the
+ *  contents, the text or the address (#f3), opens it; printing opens every finding (blog.css) and every inner fold. */
+function findings() {
+  const set = (b, open) => {
+    b.setAttribute('aria-expanded', String(open));
+    const body = document.getElementById(b.getAttribute('aria-controls'));
+    if (open) body.removeAttribute('hidden'); else body.setAttribute('hidden', 'until-found');
+  };
+  const btns = $$('.finding > h3 > .finding-toggle');
+  btns.forEach((b) => {
+    b.addEventListener('click', () => set(b, b.getAttribute('aria-expanded') !== 'true'));
+    document.getElementById(b.getAttribute('aria-controls'))?.addEventListener('beforematch', () => set(b, true));
+  });
+  const reveal = (id) => {
+    let el = null;
+    try { if (id) el = document.getElementById(decodeURIComponent(id)); } catch { /* a malformed hash */ }
+    const b = el?.closest('.finding')?.querySelector(':scope > h3 > .finding-toggle');
+    if (b) set(b, true);
+    return b ? el : null;
+  };
+  // a click on an in-page link opens the finding first, so the browser then scrolls to it with its body laid out
+  document.addEventListener('click', (e) => { const a = e.target.closest?.('a[href^="#"]'); if (a) reveal(a.getAttribute('href').slice(1)); });
+  addEventListener('hashchange', () => reveal(location.hash.slice(1))?.scrollIntoView());
+  const target = reveal(location.hash.slice(1));
+  target?.scrollIntoView({ behavior: 'instant' });
+  let shut = [];
+  addEventListener('beforeprint', () => { shut = $$('.post details:not([open])'); shut.forEach((d) => { d.open = true; }); });
+  addEventListener('afterprint', () => { shut.forEach((d) => { d.open = false; }); shut = []; });
+  // the numbers and figures above fill in later: then put the finding back at the top, unless the reader has moved on
+  return () => { const t = target?.getBoundingClientRect().top; if (t > 0 && t < 200) target.scrollIntoView({ behavior: 'instant' }); };
+}
+
 /** Videos play only while on screen. */
 function clips() {
   const io = new IntersectionObserver((es) => es.forEach((e) => {
@@ -350,6 +383,7 @@ function clips() {
   });
 }
 
+const settle = findings();
 Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json'), getJSON('data/atlas.json')]).then(([ex, tasks, b, atlas]) => {
   const R = compute(ex, tasks, b, atlas);
   fill(R.S);
@@ -360,4 +394,4 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
 }).catch((e) => {
   console.error(e);
   $$('.fig-body').forEach((el) => { el.innerHTML = '<p class="fig-note">This figure could not be loaded.</p>'; });
-}).finally(() => { toc(); clips(); });
+}).finally(() => { toc(); clips(); settle(); });

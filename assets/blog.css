@@ -355,3 +355,21 @@ details.more .cases { margin: 10px 16px 14px; }
 .cases.rep .case > span, .cases.rep .case > b { grid-column: 2; padding: 0 16px 0 0; }
 .cases.rep .case > .case-k { padding-top: 16px; }
 @media (max-width: 560px) { .cases.rep { margin: 6px 0 0; } .cases.rep .case { display: flex; padding-bottom: 12px; } .cases.rep .case > span, .cases.rep .case > b { padding: 0 12px; } .cases.rep .case > .case-k { padding-top: 0; } }
+/* a finding folds to its label and its conclusion: the heading is the button that opens the rest (blog.js), its state in
+   the pill on the label's row */
+.finding-toggle { position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; }
+.finding-toggle::after { content: "Show"; content: "Show" / ""; position: absolute; right: 0; top: -6px; padding: 3px 26px 3px 11px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 11px/1.4 var(--mono); letter-spacing: .04em; color: var(--ink-3); transition: color .2s, border-color .2s; }
+.finding-toggle[aria-expanded="true"]::after { content: "Hide"; content: "Hide" / ""; }
+.finding-toggle::before { content: ""; position: absolute; right: 12px; top: 1px; width: 5px; height: 5px; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); transition: transform .2s, border-color .2s; }
+.finding-toggle[aria-expanded="true"]::before { transform: translateY(3px) rotate(-135deg); }
+.finding-toggle:hover::after { color: var(--ink); border-color: var(--ink-3); }
+.finding-toggle:hover::before { border-color: var(--ink); }
+.finding-toggle:focus-visible { outline: 2px solid var(--std); outline-offset: 6px; }
+.finding .fn { padding-right: 84px; }
+.post .finding { margin-top: 0 !important; padding: 26px 0; border-top: 1px solid var(--line); }
+.post :not(.finding) + .finding { margin-top: 40px !important; }
+.post .finding:not(:has(+ .finding)) { border-bottom: 1px solid var(--line); }
+@media print {
+  .finding-body[hidden] { display: block !important; content-visibility: visible !important; }
+  .finding-toggle::before, .finding-toggle::after { display: none; }
+}
