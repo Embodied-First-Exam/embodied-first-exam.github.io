@@ -29,7 +29,8 @@ TAGS = {'长程家务': 'long household tasks', '人形双臂家务': 'humanoid,
         '人形全身控制': 'humanoid whole-body control', '双臂精密装配': 'two-arm precision assembly', '桌面操作+安全约束': 'tabletop + safety rules',
         '四足/人形控制': 'quadruped / humanoid control', '肌骨手': 'musculoskeletal hand', '动态操作': 'dynamic manipulation',
         '精细操作+推理': 'fine manipulation + reasoning', '厨房多步': 'multi-step kitchen', '双臂长序列': 'two-arm long sequences',
-        '控制器调参': 'controller tuning', '书画笔画': 'brush strokes', '安全判断': 'safety judgement', '双臂+物理推理': 'two arms + physical reasoning'}
+        '控制器调参': 'controller tuning', '书画笔画': 'brush strokes', '安全判断': 'safety judgement', '双臂+物理推理': 'two arms + physical reasoning',
+        '人形体育动作': 'humanoid sports'}
 # the approach figure's segments: group and kind (code to control has three kinds of program)
 WAYS = {'Code to Control（开环）': 'open', 'Code to Control（闭环）': 'closed', 'Code to Control（搜索参数）': 'search',
         'Direct Control': 'direct', 'Train Model to Control': 'train', '混合': 'mixed', '无': 'none'}
@@ -51,8 +52,8 @@ def crossbench(page):
             if m and all(n in t for n in needles[MODE[m.group(2)]]):
                 out[MODE[m.group(2)]] = [int(m.group(3)), int(m.group(1))]
         return out
-    # the approach table of finding 1.6: per setting, sampled trials by approach
-    t16 = d['findings'].get('1.6', {}).get('html', '')
+    # the approach finding (1.6, later 1.5; found by its figure, not by its number): per setting, sampled trials by approach
+    t16 = next((f['html'] for f in d['findings'].values() if 'Train Model to Control' in f['html'] and '<span class="seg"' in f['html']), '')
     cols = ['code', 'direct', 'train', 'mixed', 'none']
     mix = {}
     for row in re.findall(r'<tr><td>(privileged|standard|realtime)</td>(.*?)</tr>', t16):
