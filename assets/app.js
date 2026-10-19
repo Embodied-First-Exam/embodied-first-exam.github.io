@@ -189,7 +189,8 @@ function lbBoard(ex, tasks, onDraw) {
   const minSuites = lb.min_suites || 10;
   const board = $('#lb-board');
   const harnesses = [...new Set(ex.runs.filter((r) => (r.kind || 'agent') === 'agent').map((r) => r.harness))];
-  const state = { view: Q.get('view') === 'all' ? 'all' : 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
+  // head to head only: the core tests every ranked model sat (owners, 2026-10-19: one view, no 'everything each sat')
+  const state = { view: 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
   // no small line of suites and tests under a row (owner, 2026-10-19: the leaderboard carries no small print)
   const rowHTML = (r, sc, rank, part, best) => {
@@ -224,19 +225,17 @@ function lbBoard(ex, tasks, onDraw) {
     if (onDraw) onDraw({ state, main, scores });
   }
   function sync() {
-    $$('#lb-view button').forEach((b) => b.classList.toggle('on', b.dataset.view === state.view));
     $$('#lb-mode button').forEach((b) => b.classList.toggle('on', b.dataset.mode === state.sort));
 
     $('#lb-harness').value = state.harness;
     const u = new URL(location.href);
-    u.searchParams.set('view', state.view); u.searchParams.set('mode', state.sort);
+    u.searchParams.set('mode', state.sort);
     history.replaceState(null, '', u);
     draw();
   }
   // the harness: one choice from a list (owners, 2026-10-19)
   $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<option value="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</option>`).join('');
   $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
-  $('#lb-view').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) { state.view = b.dataset.view; sync(); } });
   $('#lb-mode').addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) { state.sort = b.dataset.mode; sync(); } });
   // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
