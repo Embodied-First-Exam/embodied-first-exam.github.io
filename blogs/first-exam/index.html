@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../../assets/exam.css?v=cca4b3cd">
 <link rel="stylesheet" href="../../assets/blog.css?v=b6e7104f">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=03debb97"></script>
+<script type="module" src="../../assets/app.js?v=59d18a90"></script>
 <script type="module" src="../../assets/blog.js?v=5dbd114a"></script>
 </head>
 <body data-page="blogpost">
@@ -84,7 +84,7 @@
 
     <!-- ===================================================================================== 2 -->
     <h2 id="introduction" data-short="Introduction"><span class="num">02</span>Introduction</h2>
-    <p>Every task in the exam is packaged the same way and runs through <a href="https://github.com/harbor-framework/harbor">Harbor</a>, so one command can evaluate any agent on any task. For each benchmark we integrate its simulation backend, scenes and success checkers, and the exam turns them into tests. The agent takes a test from inside a sandboxed container, where its only interface is a command-line shell: it reads files, writes and runs code, and calls the robot through the interface of the setting. The figure shows how one test runs, and the list below walks through it.</p>
+    <p>Every task in the exam is packaged the same way and runs through <a href="https://github.com/harbor-framework/harbor">Harbor</a>, so one command can evaluate any agent on any task. For each benchmark we integrate its simulation environment, including scenes and success checkers, and the exam turns them into tests. The agent takes a test from inside a sandboxed container, where its only interface is a command-line shell: it reads files, writes and runs code, and calls the robot through the interface of the setting. The figure shows how one test runs, and the list below walks through it.</p>
     <figure class="fig fig-flow">
       <div class="flowfig" id="flowfig"></div>
       <figcaption><b>Figure 4.</b> How one test runs. Hover over a part for details, or click a control approach, a mode or the episode trajectory to see an example.</figcaption>
@@ -94,7 +94,7 @@
       <li><b>Model and harness.</b> Any model can run in any harness, such as Codex or Claude Code. The harness runs unchanged and receives the goal as its prompt. It works in a sandboxed container through a command-line shell and can reach only its model’s API and the package registries, with web search off; the Embodied Olympics - Fun tasks are the exception, with open network access.</li>
       <li><b>The coding agent is the policy.</b> Whatever the agent writes turns what the robot senses into actions. It can control the robot directly, sending commands and choosing the next one after it sees the result; write code that controls the robot, such as a planner or a feedback controller; or train a model, such as a reinforcement-learning policy, that controls it. The exam leaves the choice to the agent.</li>
       <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. In both standard settings the agent cannot reset the episode by default, although a task’s author can allow a fixed number of resets. The three settings are defined below the list.</li>
-      <li><b>Simulation backends.</b> Each suite keeps its own simulation backend behind the same interface, among them MuJoCo, Isaac Sim, OmniGibson, SAPIEN and Genesis, and together they run <span data-s="robots"></span> robots.</li>
+      <li><b>Simulators.</b> Each suite keeps its original simulation setup behind the same interface. The exam covers various simulators, including MuJoCo, Isaac Sim, OmniGibson (built on Isaac Sim), SAPIEN and Genesis, with <span data-s="robots"></span> different robot models running across them.</li>
       <li><b>Episode trajectory.</b> Every episode is recorded step by step as a rollout: the full simulator state <i>s</i>, the robot’s observation <i>o</i> (camera images and joint readings) and the action <i>a</i>. What the agent itself can read depends on the setting: in privileged mode it reads the full state <i>s</i>, while in the two standard settings it sees only the observation <i>o</i>, as with a real robot. The verifier always works from the recorded state.</li>
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
     </ol>
