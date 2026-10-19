@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=ab8a2df0">
+<link rel="stylesheet" href="../assets/blog.css?v=12cc88a2">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
-<script type="module" src="../assets/blog.js?v=ecb510a9"></script>
+<script type="module" src="../assets/blog.js?v=35bb32dc"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -99,32 +99,16 @@
     <h3 id="settings">Three settings</h3>
     <p>A task can be run in up to three settings, and each one is a separate test, scored on its own. The rest of this post uses these three names exactly as defined here.</p>
     <figure class="fig">
-      <div class="cards">
-        <div class="card p"><span class="k">privileged</span><h4>Inside the simulator</h4>
-          <dl><dt>Reaches</dt><dd>the simulator directly; agent and simulator share one container</dd>
-            <dt>Sees</dt><dd>the full simulator state, including every object pose, and the suite’s own tools</dd>
-            <dt>Sends</dt><dd>a <code>trajectory.npz</code> (for a few tasks, a program)</dd>
-            <dt>Resets</dt><dd>unlimited</dd>
-            <dt>Time</dt><dd>the agent plans offline, within the task’s time limit</dd>
-            <dt>Graded</dt><dd>by replaying the answer in a fresh simulator from the same start</dd>
-            <dt>Core tests</dt><dd><span data-s="core_p"></span></dd></dl></div>
-        <div class="card s"><span class="k">standard</span><h4>Real-robot rules</h4>
-          <dl><dt>Reaches</dt><dd>the robot only through its API; the simulator runs in a service the agent cannot open</dd>
-            <dt>Sees</dt><dd>RGB images, depth and joint readings; never object poses or the success check</dd>
-            <dt>Sends</dt><dd>action chunks, arrays of shape <code>(T, dim)</code> with T rows of joint or end-effector targets</dd>
-            <dt>Resets</dt><dd>none by default; a task may allow a fixed number (HumanoidBench 50, DexToolBench 20)</dd>
-            <dt>Time</dt><dd>the robot moves only when the agent sends a chunk; the time limit runs on the wall clock</dd>
-            <dt>Graded</dt><dd>on the live episode, by the service the agent cannot open</dd>
-            <dt>Core tests</dt><dd><span data-s="core_s"></span></dd></dl></div>
-        <div class="card r"><span class="k">standard-realtime</span><h4>Real-robot rules on a running clock</h4>
-          <dl><dt>Reaches</dt><dd>as in standard</dd>
-            <dt>Sees</dt><dd>as in standard</dd>
-            <dt>Sends</dt><dd>as in standard, usually from a program running in the agent’s container</dd>
-            <dt>Resets</dt><dd>10 by default</dd>
-            <dt>Time</dt><dd>once the episode starts, the robot runs at a fixed fraction of real speed whatever the agent does, and holds its last target while the agent thinks, so slow decisions cost</dd>
-            <dt>Graded</dt><dd>on the live episode, as in standard</dd>
-            <dt>Core tests</dt><dd><span data-s="core_t"></span></dd></dl></div>
-      </div>
+      <div class="tscroll"><table class="settings">
+        <thead><tr><th></th><th class="m-p">Privileged<small>inside the simulator</small></th><th class="m-s">Standard<small>real-robot rules</small></th><th class="m-r">Standard-realtime<small>on a running clock</small></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Reaches</th><td>the simulator, in its own container</td><td>the robot only, through its API</td><td>the robot only, through its API</td></tr>
+          <tr><th scope="row">Sees</th><td>the full state, every object pose</td><td>RGB, depth and joints; no object poses</td><td>as in standard</td></tr>
+          <tr><th scope="row">Sends</th><td>a <code>trajectory.npz</code></td><td>action chunks <code>(T, dim)</code></td><td>action chunks, often from a running program</td></tr>
+          <tr><th scope="row">Resets</th><td>unlimited</td><td>none (a few tasks allow some)</td><td>10</td></tr>
+          <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
+          <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
+        </tbody></table></div>
       <figcaption><b>Figure 5.</b> The three settings. Most tasks have a privileged and a standard test. Standard-realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and standard-realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../how/">how a test is graded</a>.</figcaption>
     </figure>
 
@@ -317,8 +301,8 @@
               <span class="case-k">RoboDojo: a long sequence</span><b>RoboDojo · Insert key</b><span class="case-m">Claude Opus 5.5 · standard · failed · 4× speed</span><span class="case-t">It located the key and the lock from depth images but dropped the key at least nine times during hand-overs and large joint moves. Its closest attempt at insertion, at minute 36, was about 9 mm off and hit the face of the lock.</span></a>
             <a class="case s" href="../run/?r=pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/video.mp4"></video>
               <span class="case-k">RoboDynamicExam: fast reactions</span><b>RoboDynamicExam · Toss, recatch, deliver</b><span class="case-m">GPT-6 Astra · standard · failed</span><span class="case-t">It caught the ball using depth images, but its first episodes ended early, one when the cup grazed a moving box, and its 3 allowed resets were gone. In the last episode it caught and tossed the ball, but on the second catch, at minute 14, the ball’s contact with the tilted cup was flagged as a limit violation.</span></a>
-            <a class="case s" href="../run/?r=robopaint-xingshu-yong-i00-standard--uwljaji"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robopaint-xingshu-yong-i00-standard--uwljaji/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robopaint-xingshu-yong-i00-standard--uwljaji/replay.mp4"></video>
-              <span class="case-k">RoboPaint: millimeter strokes</span><b>RoboPaint · Running script “yong”</b><span class="case-m">GPT-6 Astra · standard · failed · 2× speed</span><span class="case-t">With no resets available, it calibrated stroke width on a practice sheet, wrote five strokes and then retouched in one long stroke for 38 minutes. Overlap (0.856) and edge score passed, but one of nine regions was only 0.657 covered against the required 0.80, a check its own scoring never computed.</span></a>
+            <a class="case s" href="../run/?r=robopaint-xingshu-yong-i00-standard--uwljaji"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-xingshu-yong-i00-standard--uwljaji/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-xingshu-yong-i00-standard--uwljaji/video.mp4"></video>
+              <span class="case-k">RoboPaint: millimeter strokes</span><b>RoboPaint · Running script “yong”</b><span class="case-m">GPT-6 Astra · standard · failed</span><span class="case-t">With no resets available, it calibrated stroke width on a practice sheet, wrote five strokes and then retouched in one long stroke for 38 minutes. Overlap (0.856) and edge score passed, but one of nine regions was only 0.657 covered against the required 0.80, a check its own scoring never computed.</span></a>
             <a class="case s" href="../run/?r=roboarc-rope-threading-08-i01-standard--8sdpvcn"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/roboarc-rope-threading-08-i01-standard--8sdpvcn/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/roboarc-rope-threading-08-i01-standard--8sdpvcn/replay.mp4"></video>
               <span class="case-k">RoboARC: reasoning before contact</span><b>RoboARC · Rope threading</b><span class="case-m">Claude Opus 5.5 · standard · failed · 4× speed</span><span class="case-t">It mapped the wall, its holes and the coiled rope from depth point clouds, but the rope slipped from the gripper whenever it turned the wrist, dragged sideways or lifted and moved. It threaded none of the six holes and stopped at minute 83, with about 95 minutes left.</span></a>
           </div>
