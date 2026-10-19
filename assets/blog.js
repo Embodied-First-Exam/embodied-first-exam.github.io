@@ -269,11 +269,10 @@ function figWaysRt(el, d) {
 
 /* ------------------------------------------------------------------------------------------ the article */
 
-/** The contents: a block in the article (sections and their parts) and, where the margin has room, a rail beside it
- *  that follows the reader. Both are built from the article's own heads. */
+/** The contents: a rail in the left margin that follows the reader, built from the article's own heads: the sections,
+ *  and under Findings each finding by its short name. */
 function toc() {
   const heads = $$('.post h2[id]');
-  const box = $('#toc');
   if (!heads.length) return;
   const label = (h) => esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''));
   const subs = (h) => {
@@ -286,13 +285,6 @@ function toc() {
   };
   const fnum = (h3) => h3.querySelector('.fn')?.textContent.replace(/\D+/g, '');
   const sub3 = (h3) => esc([...h3.childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
-  if (box) box.innerHTML = `<p class="label">Contents</p><ol class="toc-l1">${heads.map((h) => {
-    const s = subs(h);
-    // the findings are the core of the article: each gets its own line, numbered, with its one-sentence conclusion
-    const isF = s.some(fnum);
-    const item = (x) => isF ? `<li><span class="k">${fnum(x)}</span><a href="#${x.id}">${sub3(x)}</a></li>` : `<li><a href="#${x.id}">${sub3(x)}</a></li>`;
-    return `<li><a href="#${h.id}">${label(h)}</a>${s.length ? `<ol class="toc-l2${isF ? ' toc-f' : ''}">${s.map(item).join('')}</ol>` : ''}</li>`;
-  }).join('')}</ol>`;
   // the rail: section names, plus each finding by its short name; the current one marked
   const fh = $$('.post .finding h3[id]');
   document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${heads.map((h) => {
