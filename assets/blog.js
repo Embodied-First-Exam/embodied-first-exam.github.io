@@ -247,7 +247,7 @@ function figModes(el, R) {
     return `<div class="hb-row${TOP.includes(r) ? '' : ' fl'}" title="${esc(`${R.name(r)} · ${MODE_LABEL[k].toLowerCase()}: ${s} of ${n} solved`)}"><span class="who">${esc(R.name(r))}</span>`
       + `<span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${agc(r)})"></span></span><span class="val"><b>${pct(s, n)}%</b> ${frac(s, n)}</span></div>`;
   }).join('')}</div>`;
-  el.innerHTML = head('In every setting GPT-6 Astra solves the most tests and the three Flash-class models the fewest.', 'Share of the core tests each agent solves, by setting (a test without a result counts as failed)',
+  el.innerHTML = head('In every setting GPT-6 Astra solves the most tests and the three Flash-class models the fewest.', 'Share of the core tests each agent solves, by setting',
     'each bar is the share of a setting’s tests that one agent solved; the verifier decides pass or fail.')
     + agentLegend(R) + `<div class="hbs">${['p', 's', 't'].map(block).join('')}</div>`
     + numbers(['Agent', 'Privileged', 'Standard', 'Realtime'], R.order.map((r) => [esc(R.name(r)), ...['p', 's', 't'].map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
@@ -289,7 +289,7 @@ function figPaired(el, R) {
   const rows = R.ps.map((r) => ({ id: r.id, name: r.name, n: r.n, both: r.both, onlyP: r.a - r.both, onlyS: r.c - r.both, neither: r.n - r.a - r.c + r.both }));
   el.innerHTML = head('Every agent solves far more tasks only with privileged access than only under standard rules.',
     'The same task in two settings: each agent’s outcome on the tasks that have both a privileged and a standard test',
-    `each row is one agent on the ${R.S.ps_n} core tasks that have both tests (a test without a result counts as failed); each segment is the share of tasks with that pair of outcomes.`)
+    `each row is one agent on the ${R.S.ps_n} core tasks that have both tests; each segment is the share of tasks with that pair of outcomes.`)
     + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
     + `<div class="sb">${rows.map((r) => `<div class="sb-row"><span class="who">${esc(r.name)}</span><span class="sb-trk">${segs.map(([k, l, c]) => (r[k]
       ? `<span style="flex:${r[k]} 1 0;background:${c}" title="${esc(`${r.name} · ${l}: ${r[k]} of ${r.n} tasks`)}">${(100 * r[k]) / r.n >= 9 ? `<em${k === 'neither' ? ' class="dk"' : ''}>${r[k]}</em>` : ''}</span>` : '')).join('')}</span><span class="n">${int(r.n)}</span></div>`).join('')}
