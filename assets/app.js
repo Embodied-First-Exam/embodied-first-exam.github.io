@@ -1353,12 +1353,12 @@ function fillIcons(root = document) {
 /** The one line under the title: the command that sits the whole exam, typed out once, with a copy button. */
 function heroRun(el, ex) {
   if (!el) return;
-  const cmd = 'harbor run -a codex -m openai/gpt-6-luna';   // the repository's README (2026-10-18): the core set by default
+  const cmd = 'harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra';   // the repository's README (2026-10-19): the core set, each task in its default mode
   const paint = (s) => esc(s).replace(/(^|\s)(-\w)(?=\s|$)/g, '$1<span class="f">$2</span>');
   el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
-    <p class="hr-note">One line runs the core set: ${tasksTests(ex.totals?.core_tasks, ex.totals?.core_dirs)}. <button type="button" class="ol-open" aria-haspopup="dialog">
+    <p class="hr-note">One line runs the core set: ${int(ex.totals?.core_tasks)} tasks, each in its default mode. <button type="button" class="ol-open" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Change one argument</button></p>`;
   const code = $('.hr-cmd', el);
   code.setAttribute('aria-label', cmd);
@@ -1383,23 +1383,27 @@ function heroRun(el, ex) {
  *  mode are written as one pattern per suite. */
 function oneLine(opener, ex) {
   if (!opener) return;
-  // the flags of the repository's README (2026-10-18): the core set by default, --all for every task, a mode flag,
-  // -p tasks/<benchmark> for one benchmark, -a oracle for the reference solutions; counts from the exam's own numbers
+  // the flags of the repository's README (2026-10-19): -d embodied-first-exam is the core set, each task in its default
+  // mode; a mode flag runs the core tasks that have that mode; -d embodied-first-exam@all is every task dir, and one
+  // benchmark (-p tasks/<benchmark>) is taken from it; -a oracle for the reference solutions. Counts from the exam's own numbers
   const F = ex.folders || {};
-  const AGENTS = { codex: '-a codex -m openai/gpt-6-luna', claude: '-a claude-code -m anthropic/claude-opus-5-5', oracle: '-a oracle' };
+  const AGENTS = { codex: '-a codex -m openai/gpt-6-astra', claude: '-a claude-code -m anthropic/claude-opus-5-5', oracle: '-a oracle' };
   const st = { set: '', mode: '', bench: '', agent: 'codex' };
-  const parts = () => [['base', 'harbor run'], ['set', st.set ? '--all' : ''], ['mode', st.mode ? `--${st.mode}` : ''],
+  const all = () => !!(st.set || st.bench);
+  const parts = () => [['base', 'harbor run'], ['set', `-d embodied-first-exam${all() ? '@all' : ''}`], ['mode', st.mode ? `--${st.mode}` : ''],
     ['bench', st.bench ? `-p tasks/${st.bench}` : ''], ['agent', AGENTS[st.agent]]].filter(([, t]) => t);
   const command = () => parts().map(([, t]) => t).join(' ');
   const tally = () => {
     const pool = st.bench ? [st.bench] : Object.keys(F);
     const modes = st.mode ? [st.mode] : ['privileged', 'standard', 'standard-realtime'];
     // tasks (a scene with all its modes); with a mode chosen, the tasks that have that mode
-    const i = st.set ? 1 : 0;
+    const i = all() ? 1 : 0;
     const at = (f) => (st.mode ? F[f]?.modes?.[st.mode] : F[f]?.tasks) || [0, 0];
     const n = pool.reduce((a, f) => a + at(f)[i], 0);
-    const tests = pool.reduce((a, f) => a + modes.reduce((b, m) => b + (F[f]?.modes?.[m] || [0, 0])[i], 0), 0);
-    return { n, tests, k: pool.filter((f) => at(f)[i]).length, modes };
+    // the core set without a mode flag runs each task once, in its default mode; otherwise every chosen mode of each task
+    const tests = !all() && !st.mode ? n : pool.reduce((a, f) => a + modes.reduce((b, m) => b + (F[f]?.modes?.[m] || [0, 0])[i], 0), 0);
+    // benchmarks as the site counts suites: the repository's ikea-mujoco folder is part of RoboARC
+    return { n, tests, k: new Set(pool.filter((f) => at(f)[i]).map((f) => (f === 'ikea-mujoco' ? 'roboarc' : f))).size, modes: !all() && !st.mode ? ['each in its default mode'] : modes };
   };
   const opt = (g, v, label, note) => `<button type="button" class="ol-opt" data-g="${g}" data-v="${v}" aria-pressed="false"><b>${label}</b><small>${note}</small></button>`;
   const dlg = document.createElement('div');
@@ -1414,7 +1418,7 @@ function oneLine(opener, ex) {
           <button type="button" class="ol-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg><span>Copy</span></button></div>
         <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
       <div class="ol-groups">
-        <div class="ol-g"><span class="ol-k">Tasks</span>${opt('set', 'all', 'Every task', '--all, not only the core set')}${opt('bench', 'roboarc', 'RoboARC', '-p tasks/roboarc')}${opt('bench', 'robocasa365', 'RoboCasa365', '-p tasks/robocasa365')}</div>
+        <div class="ol-g"><span class="ol-k">Tasks</span>${opt('set', 'all', 'Every task', '@all, not only the core set')}${opt('bench', 'roboarc', 'RoboARC', '@all -p tasks/roboarc')}${opt('bench', 'robocasa365', 'RoboCasa365', '@all -p tasks/robocasa365')}</div>
         <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'standard-realtime', 'Real-time', 'a clock that does not stop')}</div>
         <div class="ol-g"><span class="ol-k">Agent</span>${opt('agent', 'claude', 'Claude Code', 'Opus 5.5')}${opt('agent', 'oracle', 'Reference solution', '-a oracle')}</div>
       </div></div>`;
@@ -1422,7 +1426,7 @@ function oneLine(opener, ex) {
   const card = $('.ol-card', dlg), cmdEl = $('.cmd', dlg), outEl = $('.out', dlg), copy = $('.ol-copy', dlg);
   const out = () => {
     const t = tally();
-    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${st.set ? '' : ' of the core set'} · ${t.k} benchmark${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
+    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${all() ? '' : ' of the core set'} · ${t.k} benchmark${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
       + `<span class="ok">▸</span> ${st.agent === 'oracle' ? 'the reference solutions, marked like any answer' : 'each answer marked by a fresh simulator'}`;
   };
   let prev = {};

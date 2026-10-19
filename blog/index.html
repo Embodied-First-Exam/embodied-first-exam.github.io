@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=2e79e044">
+<link rel="stylesheet" href="../assets/exam.css?v=36f41f6a">
 <link rel="stylesheet" href="../assets/blog.css?v=9c5ef5e5">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=6c0d785c"></script>
+<script type="module" src="../assets/app.js?v=c150070f"></script>
 <script type="module" src="../assets/blog.js?v=c9a3432f"></script>
 </head>
 <body data-page="blog">
@@ -86,13 +86,21 @@
     <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, with <span data-s="robots"></span> robots. A task is one frozen scene and goal; each of its settings (below) is a separate test, scored apart. Some suites are ports of benchmarks the community already uses (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); others were built for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). Results are reported on the core set: <span data-s="core_tasks"></span> tasks, <span data-s="core_tests"></span> tests. <a href="../suites/">Browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
 
     <h3 id="running">Running it, with your own model or harness</h3>
-    <p>The exam runs on <a href="https://github.com/harbor-framework/harbor">Harbor</a>. From a checkout of the exam’s repository:</p>
-    <pre class="cite">uv tool install --force -e . --with-executables-from harbor
-harbor run -a codex -m openai/gpt-6-luna                 # the core set
-harbor run --all -a codex -m openai/gpt-6-luna           # every task
-harbor run --standard -a codex -m openai/gpt-6-luna      # one setting: --privileged / --standard / --standard-realtime
-harbor run -p tasks/roboarc -a codex -m openai/gpt-6-luna   # one benchmark
-harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, solved by its reference solution</pre>
+    <p>The exam runs on <a href="https://github.com/harbor-framework/harbor">Harbor</a>. Clone it, install, and run one line:</p>
+    <pre class="cite">git clone --recurse-submodules git@github.com:mll-lab-nu/embodied-first-exam.git &amp;&amp; cd embodied-first-exam
+uv tool install --force -e . --with-executables-from harbor
+cp .env.example .env                                                                   # API keys
+
+harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra                       # the core set, each task in its default mode
+harbor run -d embodied-first-exam --privileged -a codex -m openai/gpt-6-astra          # the core set in one setting (also --standard / --standard-realtime)
+harbor run -d embodied-first-exam@all -a codex -m openai/gpt-6-astra                   # every task, in all its settings
+harbor run -d embodied-first-exam@all -p tasks/roboarc -a codex -m openai/gpt-6-astra  # one benchmark
+harbor run -d embodied-first-exam@all -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle            # one task, solved by its reference solution
+
+codex login                                                                            # a ChatGPT subscription instead of an API key
+CODEX_FORCE_AUTH_JSON=1 harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra
+claude setup-token                                                                     # a Claude subscription: its token as CLAUDE_CODE_OAUTH_TOKEN in .env
+CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthropic/claude-opus-5-5</pre>
     <p>To test another model, change <code>-m</code>. To test another harness, change <code>-a</code>: Harbor ships Claude Code, Codex, the Antigravity CLI and many other agents, takes any agent that speaks the Agent Client Protocol (<code>-a acp:&lt;agent&gt;</code>), and loads your own agent class from an import path (<code>-a my_package.agent:MyAgent</code>). The agent works in a container with a terminal; it reaches only its model’s API and the package registries.</p>
     <p class="fig-note">Commands from the repository’s README. <span class="todo">to verify</span> The repository is not public yet, so these work only for its members until it is released.</p>
 
