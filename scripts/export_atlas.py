@@ -36,8 +36,10 @@ MODES = ("privileged", "standard", "standard-realtime", "realtime")
 PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco-playground": ["mujoco_playground_"],
           "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "embodied-safety-exam": ["ese-", "rsb-"]}
 # directory prefixes renamed in the repository after the Atlas package was built (new -> the Atlas's): RoboOlympics split
-# into -fun and -match (2026-10-18); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19)
-FORMER_PREFIX = [("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-")]
+# into -fun and -match (2026-10-18), then became Embodied Olympics' embodied-olympics-fun-* / -match-* (exam #442,
+# 2026-10-19); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19)
+FORMER_PREFIX = [("embodied-olympics-fun-", "roboolympics-"), ("embodied-olympics-match-", "roboolympics-"),
+                 ("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-")]
 CJK = re.compile(r"[\u2e80-\u2fff\u3000-\u303f\u3040-\u9fff\uf900-\ufaff\uff00-\uffef]+")
 # Chinese text inside English summaries, said in English (anything else in Chinese is dropped)
 CJK_EN = {"\u672c\u6240\u7acb\u5ddd": "Honjo Tatekawa"}   # a painting's title in a VLABench task
