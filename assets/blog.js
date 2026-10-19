@@ -1,6 +1,6 @@
 /* The blog's figures and numbers. The results are computed here from data/exam.json and data/tasks.json, the files the
    leaderboard reads, with the leaderboard's own rules (the core set; the latest finished attempt per model and test; only
-   the tests every ranked model sat), so the blog and the site cannot disagree; task types come from data/atlas.json, as on
+   all the core tests of each setting, a test without a finished result counted as failed), so the blog and the site cannot disagree; task types come from data/atlas.json, as on
    the task pages. The figures follow the designs of our cross-benchmark analysis (same definitions, groupings, orderings
    and encodings), drawn from the site's data. data/blog.json (scripts/export_blog.py) adds the few numbers that exist only
    in the analysis's sample. Numbers in the text are <span data-s="key">, filled from the same computation; a key that
@@ -45,18 +45,21 @@ function compute(ex, tasks, b, atlas) {
   const v = (t, r, m) => t.results?.[r]?.[m]?.s;
   const graded = (t, r, m) => v(t, r, m) === 'S' || v(t, r, m) === 'F';
   const ok = (t, r, m) => v(t, r, m) === 'S';
-  // the core tests every ranked run sat, as [task, mode] pairs
-  const sat = (m) => core.filter((t) => (t.core || '').includes(m) && runs.every((r) => graded(t, r, m))).map((t) => [t, m]);
+  // all the core tests of a setting, as [task, mode] pairs: the denominator is fixed and a test without a finished result
+  // counts as failed (owners, 2026-10-19)
+  const sat = (m) => core.filter((t) => (t.core || '').includes(m)).map((t) => [t, m]);
   const M = { p: sat('p'), s: sat('s'), t: sat('t') };
-  const LB = [...M.s, ...M.t];   // the leaderboard's standard column folds realtime in
+  const LB = [...M.s, ...M.t];   // standard and realtime together (the Embodied Safety Exam's tests)
+  // the leaderboard's default view, Core: each core task once, in its default mode
+  const CORE = core.filter((t) => t.default && (t.core || '').includes(t.default)).map((t) => [t, t.default]);
   const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
   const anyOf = (L, rs = runs) => L.filter(([t, m]) => rs.some((r) => ok(t, r, m))).length;
-  const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(M.p, r), s: solved(LB, r) }))
-    .sort((x, y) => y.s - x.s || y.p - x.p);
+  const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(M.p, r), s: solved(LB, r), c: solved(CORE, r) }))
+    .sort((x, y) => y.c - x.c || y.p - x.p);
   const order = board.map((x) => x.id);   // every figure lists the agents in the leaderboard's order
-  // the same task in two settings, per agent: tasks whose two tests are both in the core set and both graded for it
+  // the same task in two settings, per agent: tasks whose two tests are both in the core set (a missing result is a failure)
   const paired = (a, c) => order.map((r) => {
-    const L = core.filter((t) => (t.core || '').includes(a) && (t.core || '').includes(c) && graded(t, r, a) && graded(t, r, c));
+    const L = core.filter((t) => (t.core || '').includes(a) && (t.core || '').includes(c));
     return { id: r, name: name(r), n: L.length, a: L.filter((t) => ok(t, r, a)).length, c: L.filter((t) => ok(t, r, c)).length,
       both: L.filter((t) => ok(t, r, a) && ok(t, r, c)).length };
   });
@@ -187,7 +190,7 @@ function compute(ex, tasks, b, atlas) {
     argon_f_p: filt(cb.argon_unfiltered?.p, cb.opus_same_snapshot?.p), argon_f_s: filt(cb.argon_unfiltered?.s, cb.opus_same_snapshot?.s),
     ff_p: F(flashFill(M.p), none3(M.p)), ff_s: F(flashFill(M.s), none3(M.s)),
     ps_astra_keep: `${int(pr(TOP[0]).both)} of the ${int(pr(TOP[0]).a)}`,
-    ps_n_lo: int(Math.min(...ps.map((r) => r.n))), ps_n_hi: int(Math.max(...ps.map((r) => r.n))),
+    ps_n: int(Math.max(...ps.map((r) => r.n))), ps_n_lo: int(Math.min(...ps.map((r) => r.n))), ps_n_hi: int(Math.max(...ps.map((r) => r.n))),
     st_n: int(Math.max(...st.map((r) => r.n))), st_astra: st3(TOP[0]), st_opus: st3(TOP[1]), st_argon: st3(TOP[2]),
     rt_mix: Object.entries(rtBy).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(', '),
     ese_n: int(esS.length), ese_ns: int(esS.filter(([, m]) => m === 's').length), ese_nt: int(esS.filter(([, m]) => m === 't').length),
@@ -222,7 +225,7 @@ const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</su
 const frac = (a, n) => `${int(a)}/${int(n)}`;
 const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The three Flash-class models</span></div>`;
 
-/** Finding 1 (the analysis's figure 1.1): each agent's share of the core tests every agent sat, one block per setting,
+/** Finding 1 (the analysis's figure 1.1): each agent's share of all the core tests of a setting, one block per setting,
  *  the three strongest in their colours, the Flash-class models in grey. */
 function figModes(el, R) {
   const block = (k) => `<div class="hb"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(R.M[k].length)} tests</small></p>${R.order.map((r) => {
@@ -230,7 +233,7 @@ function figModes(el, R) {
     return `<div class="hb-row${TOP.includes(r) ? '' : ' fl'}" title="${esc(`${R.name(r)} · ${MODE_LABEL[k].toLowerCase()}: ${s} of ${n} solved`)}"><span class="who">${esc(R.name(r))}</span>`
       + `<span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${agc(r)})"></span></span><span class="val"><b>${pct(s, n)}%</b> ${frac(s, n)}</span></div>`;
   }).join('')}</div>`;
-  el.innerHTML = head('In every setting GPT-6 Astra solves the most and the three Flash-class models the fewest.', 'Success rate on the same tests: the core tests all six agents sat',
+  el.innerHTML = head('In every setting GPT-6 Astra solves the most and the three Flash-class models the fewest.', 'Success rate on all the core tests of each setting (a test without a result counts as failed)',
     'each bar is the share of the tests one agent solved; the verifier decides pass or fail.')
     + agentLegend(R) + `<div class="hbs">${['p', 's', 't'].map(block).join('')}</div>`
     + numbers(['Agent', 'Privileged', 'Standard', 'Realtime'], R.order.map((r) => [esc(R.name(r)), ...['p', 's', 't'].map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
@@ -259,7 +262,7 @@ function figOverlap(el, R) {
       return `<div class="wf-ag"><span>${esc(R.short(r))}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${AG[r]})"></span></span><b>${int(s)}</b></div>`; }).join('')}
       <div class="wf-grid" role="img" aria-label="${esc(`${MODE_LABEL[k]}: ${cats.map(([c, l]) => `${l} ${counts[k][c]}`).join(', ')}`)}">${cells(k)}</div></div>`; };
   el.innerHTML = head('With privileged access most of what the three solve includes GPT-6 Astra; under standard rules the other two each add a share of their own.',
-    'Which of the three strongest agents solved each test (the core tests all six agents sat)', 'each cell is about 1% of a setting’s tests; its colour says which of the three solved it, a split cell two of them.')
+    'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its colour says which of the three solved it, a split cell two of them.')
     + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
       `<tr><th scope="row"><i class="sw" style="background:${bg(col)}"></i>${esc(l)}</th>${['p', 's', 't'].map((k) => `<td>${int(counts[k][c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
     + `<div class="wfs">${['p', 's', 't'].map(panel).join('')}</div>`;
@@ -272,7 +275,7 @@ function figPaired(el, R) {
   const rows = R.ps.map((r) => ({ id: r.id, name: r.name, n: r.n, both: r.both, onlyP: r.a - r.both, onlyS: r.c - r.both, neither: r.n - r.a - r.c + r.both }));
   el.innerHTML = head('For every agent, “only with privileged access” is far larger than “only under standard rules”.',
     'The same task in two settings: each agent’s outcome on the tasks with both a privileged and a standard test',
-    `each row is one agent on the tasks graded in both settings for it (${R.S.ps_n_lo}–${R.S.ps_n_hi} tasks); each segment is the share with that pair of outcomes.`)
+    `each row is one agent on the ${R.S.ps_n} core tasks with both tests (a test without a result counts as failed); each segment is the share with that pair of outcomes.`)
     + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
     + `<div class="sb">${rows.map((r) => `<div class="sb-row"><span class="who">${esc(r.name)}</span><span class="sb-trk">${segs.map(([k, l, c]) => (r[k]
       ? `<span style="flex:${r[k]} 1 0;background:${c}" title="${esc(`${r.name} · ${l}: ${r[k]} of ${r.n} tasks`)}">${(100 * r[k]) / r.n >= 9 ? `<em${k === 'neither' ? ' class="dk"' : ''}>${r[k]}</em>` : ''}</span>` : '')).join('')}</span><span class="n">${int(r.n)}</span></div>`).join('')}
@@ -284,7 +287,7 @@ function figPaired(el, R) {
 function figSteps(el, R) {
   el.innerHTML = `<div class="steps3">${['p', 's', 't'].map((k) => { const n = 3 * R.M[k].length, s = R.mean3(R.M[k]);
     return `<div class="${k === 't' ? 'r' : k}"><b>${pct(s, n)}%</b><span>${MODE_LABEL[k]} · ${int(s)}/${int(n)}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%"></span></span></div>`; }).join('')}</div>
-    <p class="fig-note">The three strongest agents together, in agent-attempts: their solved tests summed, out of three times the tests all six agents sat in each setting.</p>`;
+    <p class="fig-note">The three strongest agents together, in agent-attempts: their solved tests summed, out of three times the core tests of each setting.</p>`;
 }
 
 /** Findings 4 and 5 (the analysis's figures 1.4 and 1.5): a dot plot per setting, one row per benchmark (from MIN_BENCH
@@ -317,7 +320,7 @@ function figHard(el, R) {
     rows: (k) => R.hardRows(k), past: (k, r) => r.none / r.n >= HARD, value: (r) => [r.none, r.n], valueName: 'None of the three solves',
     valueText: (a, n) => `${a}/${n}`, cutLabel: () => 'below half',
     say: `With privileged access ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'benchmark has' : 'benchmarks have'} at least half their tests unsolved by all three; under standard rules, ${R.S.hard_s_word}.`,
-    cap: 'Each of the three strongest agents’ success rate, by benchmark (the core tests all six agents sat)',
+    cap: 'Each of the three strongest agents’ success rate, by benchmark (all the core tests of the setting)',
     how: 'each dot is one agent’s share of a benchmark’s tests; the grey bar on the right is the share none of the three solves.',
     note: `Hardest first. Benchmarks with at least ${MIN_BENCH} tests in the setting; each column lists those with at least half their tests unsolved by all three, then the next one below the dashed line. The tag after a name is the kind of task. The IKEA assembly tasks are counted apart from the rest of RoboARC.`,
   });
@@ -328,7 +331,7 @@ function figEasy(el, R) {
     rows: (k) => R.easyRows(k), past: (k, r) => r.sum / (3 * r.n) >= (k === 'p' ? EASY_P : EASY_S), value: (r) => [r.sum, 3 * r.n], valueName: 'Mean success rate',
     valueText: (a, n) => `${pct(a, n)}%`, cutLabel: (k) => `below ${k === 'p' ? 70 : 60}%`,
     say: `With privileged access the three strongest agents’ mean success rate is 70% or more in ${R.S.easy_p_frac.split(' of ')[0]} benchmarks; under standard rules ${R.S.easy_s_phrase} ${easyVerb(R.S.easy_s_phrase)} 60%.`,
-    cap: 'Each of the three strongest agents’ success rate, by benchmark (the core tests all six agents sat)',
+    cap: 'Each of the three strongest agents’ success rate, by benchmark (all the core tests of the setting)',
     how: 'each dot is one agent’s share of a benchmark’s tests; the grey bar on the right is the three agents’ mean success rate.',
     note: `Easiest first. Benchmarks with at least ${MIN_BENCH} tests in the setting; privileged lists those at 70% or more, standard those at 60% or more, then the next one below the dashed line. Mean success rate = the three agents’ solved tests ÷ (3 × the benchmark’s tests), so its unit is agent-attempts.`,
   });

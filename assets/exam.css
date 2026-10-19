@@ -485,6 +485,7 @@ main { min-height: 70vh; }
 .hr-copy.ok { background: #2f7f6f; color: #fff; }
 .hr-note { margin: 10px 0 0 2px; font-size: 13.5px; color: var(--ink-3); }
 .hr-note a { color: var(--ink-2); border-bottom: 1px solid var(--line-2); }
+.hr-note .ol-open { margin-left: 0; }
 @media (max-width: 1100px) { .hr-cmd { white-space: normal; overflow-wrap: anywhere; } .hr-bar .caret { display: none; } }
 @media (max-width: 760px) { .hr-bar { font-size: 12px; } }
 @media (prefers-reduced-motion: reduce) { .hr-bar .caret { animation: none; } }
@@ -1172,14 +1173,15 @@ html.ol-lock { overflow: hidden; }
 .seg.lb-set { flex-wrap: wrap; max-width: 100%; }
 .seg.lb-set button { padding: 9px 16px; font-size: 14px; font-weight: 600; }
 .seg.lb-set button:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 1px; }
-.lb-basis { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+.lbh-n { padding-right: 6px; text-align: right; font: 600 12px/1 var(--mono); color: var(--ink-2); white-space: nowrap; }
 .lbh-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .lbh-row.lb1 { grid-template-columns: 22px 26px minmax(150px, 210px) minmax(0, 1fr) 128px; }
 .lbh-axis.lb1 { grid-template-columns: calc(22px + 26px + 20px + clamp(150px, 20vw, 210px) + 6px) minmax(0, 1fr) 138px; }
 .lbh-row.lb1 .lbh-val em { min-width: 64px; }
 .lbh-minis .lbh-mini { grid-template-columns: minmax(0, 1fr) minmax(90px, 1.1fr) 92px; }
 .rv-modes { flex-wrap: wrap; }
-@media (max-width: 760px) { .lbh-row.lb1 { grid-template-columns: 20px 24px minmax(0, 1fr) auto; } }
+@media (max-width: 760px) { .lbh-row.lb1 { grid-template-columns: 20px 24px minmax(0, 1fr) auto; }
+  .lbh-axis.lb1 { display: flex; justify-content: flex-end; } .lbh-axis.lb1 > span:not(.lbh-n) { display: none; } }
 @media (max-width: 640px) { .lbh-minis .lbh-mini { grid-template-columns: minmax(0, 1fr) 92px; } }
 @media (max-width: 480px) { .seg.lb-set button { padding: 8px 7px; font-size: 12.5px; } }
 @media (max-width: 640px) { .lb-pre { display: block; } .lb-pre svg { display: none; } .lb-pre a { display: inline-block; margin-top: 6px; } }
