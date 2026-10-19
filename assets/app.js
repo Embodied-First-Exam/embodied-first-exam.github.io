@@ -1703,7 +1703,7 @@ async function home(ex) {
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   const sh = ex.leaderboard?.shared;
-  if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests of the core set that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
+  if (sh) $('#bars-note').innerHTML = `On the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests of the core set that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=916167f2').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
