@@ -202,7 +202,7 @@ function build(el, ex, atlas, tasks, set = 'all') {
   // a hint that it moves (it would read as a still picture otherwise), gone after the first touch
   const hint = el$('p', 'sph-hint');
   hint.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11.5V4a1.5 1.5 0 0 1 3 0v7.5M14 11.5V6a1.5 1.5 0 0 1 3 0v8c0 4-2.5 7-6.5 7S5 18.5 4 15l-1.2-3.4a1.4 1.4 0 0 1 2.5-1.2L8 13"/></svg>`
-    + `<span>${coarse ? 'Drag to rotate · pinch to zoom · tap a dot' : 'Drag to rotate · scroll to zoom · click a dot'}</span>`;
+    + `<span>${coarse ? 'Drag to rotate · pinch to zoom · tap a dot' : 'Drag to rotate · pinch or + / − to zoom · click a dot'}</span>`;
   // zoom, inside the stage only: the canvas is the window, the globe grows behind it
   const zoomEl = el$('div', 'sph-zoom');
   zoomEl.innerHTML = `<button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button>`
@@ -569,8 +569,10 @@ function build(el, ex, atlas, tasks, set = 'all') {
     touched(); kick();
     return true;
   }
-  // the wheel zooms only while there is room to zoom; at either end it scrolls the page as usual
+  // a plain wheel always scrolls the page (owners, 2026-10-19: scrolling past the sphere kept zooming it); only a
+  // trackpad pinch or ctrl/cmd + wheel zooms, and the +/- buttons
   cv.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
     const f = Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0018));
     if ((f > 1 && zoom >= ZMAX) || (f < 1 && zoom <= ZMIN)) return;
     e.preventDefault();

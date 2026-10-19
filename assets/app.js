@@ -63,7 +63,7 @@ const MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
 
 function chrome() {
-  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['run', 'run/', 'Runs'], ['blog', 'blog/', 'Blogs'], ['contribute', 'contribute/', 'Contribute']];
+  const links = [['leaderboard', 'leaderboard/', 'Leaderboard'], ['suites', 'suites/', 'Suites'], ['tasks', 'tasks/', 'Tasks'], ['run', 'run/', 'Runs'], ['blog', 'blogs/', 'Blogs'], ['contribute', 'contribute/', 'Contribute']];
   const active = (n) => PAGE === n || (PAGE === 'suite' && n === 'suites') || (PAGE === 'blogpost' && n === 'blog');
   const nav = $('#nav');
   if (nav) {
@@ -108,7 +108,7 @@ function footer(ex) {
       <li><a href="${exam('leaderboard/')}">Leaderboard</a></li><li><a href="${exam('suites/')}">Suites</a></li>
       <li><a href="${exam('tasks/')}">Tasks</a></li><li><a href="${exam('run/')}">Runs</a></li></ul></div>
     <div><h5>About</h5><ul>
-      <li><a href="${exam('blog/')}">Blogs</a></li>
+      <li><a href="${exam('blogs/')}">Blogs</a></li>
       <li><a href="${exam('how/')}">How it is marked</a></li><li><a href="${exam('contribute/')}">Contribute</a></li></ul></div>
     <div><h5>Community</h5><ul>
       ${GITHUB_URL ? `<li><a href="${GITHUB_URL}">GitHub</a></li>` : ''}<li><a data-discord href="${DISCORD_URL}"${DISCORD_ATTRS}>Discord</a></li>
@@ -1786,14 +1786,14 @@ function budgets(el, tasks) {
 }
 
 /** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags});
- *  each lives at blog/<slug>/. */
+ *  each lives at blogs/<slug>/. */
 async function blogPage() {
   const el = $('#posts');
   if (!el) return;
   let posts = [];
   try { posts = await getJSON('data/blogs.json'); } catch (e) { /* none yet */ }
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card" href="${exam(`blog/${encodeURIComponent(p.slug)}/`)}">
+  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}">
       <span class="pc-date">${esc([p.kind, p.date].filter(Boolean).join(' · '))}</span><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
       ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}</a>`).join('')
     : '<div class="empty-state">The first posts are on their way.</div>';
@@ -1824,7 +1824,7 @@ async function home(ex) {
   getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
-  import('./sphere.js?v=99c133d0').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=d88bc221').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {

@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The first exam for code agents in the physical world · Embodied First Exam</title>
+<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how six agents do on it, and where they fail.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../assets/exam.css?v=8f67d07a">
+<link rel="stylesheet" href="../../assets/blog.css?v=8973d195">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../../assets/app.js?v=16e79572"></script>
+<script type="module" src="../../assets/blog.js?v=9847e972"></script>
+</head>
+<body data-page="blogpost">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head post-head">
+    <p class="kicker"><a href="../">Blogs</a> · Embodied First Exam</p>
+    <h1 class="post-q"><span>Code agents have passed many exams in the digital world.</span> <em>What is their first exam to enter the physical world?</em></h1>
+    <p class="byline"><span>Embodied First Exam Team</span><span>October 2026</span></p>
+  </header>
+
+  <article class="post">
+
+    <p class="statement">One line of code. <b data-s="tasks"></b> tasks. <b data-s="suites"></b> benchmarks, <b data-s="robots"></b> robots.</p>
+    <ol class="qs">
+      <li><h3>What can it connect, and what can it do?</h3><p>One command connects a coding agent to <span data-s="tasks"></span> tasks (<span data-s="tests"></span> tests) from <span data-s="suites"></span> benchmark suites, on robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models.</p></li>
+      <li><h3>When it fails, is it thinking or moving?</h3><p>Every run is published with its full trace and a replay, so you can see where it went wrong. A hand-checked classification of the failures is planned (<a href="#future">§05</a>).</p></li>
+      <li><h3>How does a coding agent become an effective robot controller?</h3><p>We compare the three ways agents control a robot (write a program, send commands step by step, or train a model) under three settings, the hardest of which keeps the world moving while the agent thinks.</p></li>
+    </ol>
+
+    <figure class="fig">
+      <div class="wall4">
+        <div class="clip ag"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics-fun/catch_and_shoot_realgrasp/poster.png" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics-fun/catch_and_shoot_realgrasp/video.mp4" muted loop playsinline></video><p><b>RoboOlympics-Fun · Catch and shoot</b>GPT-6 Astra · privileged</p></div>
+        <div class="clip ag"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics-match/fencing_bout_i01/poster.png" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/roboolympics-match/fencing_bout_i01/video.mp4" muted loop playsinline></video><p><b>RoboOlympics-Match · Fencing</b>Claude Opus 5.5 · wins 15:14</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/knot_untying_01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/knot_untying_01.mp4" muted loop playsinline></video><p><b>RoboARC · Untie a knot</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/hedgehog_in_cage_01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/roboarc/hedgehog_in_cage_01.mp4" muted loop playsinline></video><p><b>RoboARC · Hedgehog in a cage</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/ikea-mujoco/lack/poster.png" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/ikea-mujoco/lack/video.mp4" muted loop playsinline></video><p><b>RoboARC · Assemble an IKEA LACK table</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/assemble_hamburger.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/assemble_hamburger.mp4" muted loop playsinline></video><p><b>DexHandExam · Assemble a hamburger</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/essential_cube_reorient.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/dexhand/essential_cube_reorient.mp4" muted loop playsinline></video><p><b>DexHandExam · Reorient a cube in hand</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/d09_lever_launch_catch_reload.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/d09_lever_launch_catch_reload.mp4" muted loop playsinline></video><p><b>RoboDynamicExam · Launch, catch, reload</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/s09_toss_recatch_delivery.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/pandadyn/s09_toss_recatch_delivery.mp4" muted loop playsinline></video><p><b>RoboDynamicExam · Toss and re-catch</b>reference solution</p></div>
+        <div class="clip demo"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/behavior-1k/make_pizza.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/behavior-1k/make_pizza.mp4" muted loop playsinline></video><p><b>BEHAVIOR-1K · Make a pizza</b>official demonstration</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/scenes/kaishu_linfengguilong.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/kaishu_linfengguilong.mp4" muted loop playsinline></video><p><b>RoboPaint · Regular-script calligraphy</b>reference solution</p></div>
+        <div class="clip ref"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/oil_starrynight_i01.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/web/robopaint/oil_starrynight_i01.mp4" muted loop playsinline></video><p><b>RoboPaint · Oil, The Starry Night</b>reference solution</p></div>
+      </div>
+      <figcaption><b>Figure 1. Tasks from the exam, mostly from suites we built for it.</b> Two clips are coding agents’ own solutions, written with only a plain-language goal, a command-line shell and the robot’s interface: the RoboOlympics-Fun catch and shoot, where the H1-2 humanoid catches a chest pass between its palms and shoots it through the hoop, and a RoboOlympics-Match épée bout between two Unitree G1 humanoids, which Claude Opus 5.5 wins 15:14 against a scripted fencer. The other clips are reference solutions, which show that these tasks can be solved (for BEHAVIOR-1K, the benchmark’s official demonstration). All clips are from the exam’s <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</figcaption>
+    </figure>
+
+    <!-- ===================================================================================== 1 -->
+    <h2 id="motivation" data-short="Motivation"><span class="num">01</span>Motivation</h2>
+    <p>Code agents now handle a wide range of software work. They resolve issues in real repositories<sup class="ref"><a href="#ref-1" data-refs="1">1</a></sup>, complete hard tasks in the terminal<sup class="ref"><a href="#ref-2" data-refs="2">2</a></sup> and write efficient GPU kernels<sup class="ref"><a href="#ref-3" data-refs="3">3</a></sup>. All of these exams, however, take place in the digital world. Robots remain largely outside the reach of code agents: a robot behavior today comes either from a policy trained on many demonstrations, such as a vision-language-action model<sup class="ref"><a href="#ref-4" data-refs="4,5,6">4–6</a></sup>, or from a controller that an engineer writes, tunes and debugs for one robot and one task.</p>
+    <p>The second route is, to a large extent, software engineering. The engineer reads the interface of the robot, writes a controller, runs it, observes what happens and revises the code. Prior work has shown that language models can write short robot programs from instructions<sup class="ref"><a href="#ref-7" data-refs="7">7</a></sup>; a code agent can go further and carry out the whole loop. If it succeeds, any robot that exposes a programming interface could acquire a new behavior from a plain-language instruction, with no new demonstrations and no engineer in the loop (Figure 2).</p>
+    <figure class="fig">
+      <div class="cards">
+        <div class="card muted"><span class="k">Today</span><h4>Train a policy</h4><p>Learns from many demonstrations. Good at the skills it was trained on, but a new task needs new data.</p></div>
+        <div class="card muted"><span class="k">Today</span><h4>An engineer writes a controller</h4><p>Kinematics, waypoints, feedback loops and tuning, for one robot and one job.</p></div>
+        <div class="card hi"><span class="k">This exam</span><h4>A coding agent writes, runs and fixes one</h4><p>The same engineering loop, run by an agent from a plain-language instruction.</p></div>
+      </div>
+      <figcaption><b>Figure 2.</b> Three ways to give a robot a new behavior. A trained policy needs new demonstrations for each new task, and an engineer writes a controller for one robot and one task; in this exam, a code agent writes, runs and fixes the controller from a plain-language instruction.</figcaption>
+    </figure>
+    <p>Whether code agents can do this remains an open question, and answering it requires more than simply testing them on pick-and-place tasks. Most robot benchmarks ask an arm to move objects on a table, whereas a robotics engineer also faces dynamic interaction, whole-body control of humanoids and quadrupeds, dexterous manipulation with tools, physical puzzles and long household activities (Figure 3).</p>
+    <figure class="fig">
+      <div class="kinds">
+        <div><b>Dynamic interaction</b><p>Catch a thrown object, return a ball, play a match against an opponent.</p><span>RoboDynamicExam · RoboOlympics-Match</span></div>
+        <div><b>Locomotion and whole-body skills</b><p>Sprint, jump, dunk and backflip with a humanoid; walk and balance on four legs; control muscles instead of motors.</p><span>RoboOlympics-Fun · HumanoidBench · MuJoCo Playground · MyoSuite</span></div>
+        <div><b>Puzzles and physical reasoning</b><p>Untie a knot, free a ring from a cage, pick up a ruler or a funnel when the task calls for one.</p><span>RoboARC · RoboWits · KinDER</span></div>
+        <div><b>Dexterous hands and tools</b><p>Rotate a cube in the fingers, swing a hammer, flip food with a spatula, assemble a hamburger.</p><span>DexHandExam · DexToolBench · DexJoCo</span></div>
+        <div><b>Long household activities</b><p>Make a pizza or set a table with a mobile robot in a full-size house.</p><span>BEHAVIOR-1K · RoboCasa365 · BiGym 2.0</span></div>
+        <div><b>Safety and judgment</b><p>Carry out harmless requests, refuse ones that would hurt someone, and explain why.</p><span>Embodied Safety Exam · ManiGuard</span></div>
+      </div>
+      <figcaption><b>Figure 3.</b> Some of the kinds of task in the exam, with suites that contain them. The <span data-s="tasks"></span> tasks use <span data-s="robots"></span> robots of <span id="body-kinds">eight</span> kinds: <span id="bodies"></span>.</figcaption>
+    </figure>
+    <p>An answer also needs a common interface that runs any agent on any task, and a verifier that judges what physically happened in the simulator rather than what the agent reports. The Embodied First Exam is built to meet these requirements, and it serves as a first exam for code agents that are about to enter the physical world.</p>
+
+    <!-- ===================================================================================== 2 -->
+    <h2 id="introduction" data-short="Introduction"><span class="num">02</span>Introduction</h2>
+    <p>Every task in the exam is packaged the same way and runs through <a href="https://github.com/harbor-framework/harbor">Harbor</a>, so one command can evaluate any agent on any task. For each benchmark we integrate its simulation backend, scenes and success checkers, and the exam turns them into tests. The agent takes a test from inside a sandboxed container, where its only interface is a command-line shell: it reads files, writes and runs code, and calls the robot through the interface of the setting. The figure shows how one test runs, and the list below walks through it.</p>
+    <figure class="fig fig-flow">
+      <div class="flowfig" id="flowfig"></div>
+      <figcaption><b>Figure 4.</b> How one test runs. Hover over a part for details, or click a control approach, a mode or the episode trajectory to see an example.</figcaption>
+    </figure>
+    <ol class="walk">
+      <li><b>Question.</b> A test starts from a goal written in words, as you would explain the job to a person, with every convention the agent cannot guess (frames, units, the action layout, the time limit), and from a frozen scene. The scene is rebuilt bit for bit, its start state is checked before the agent begins, and both modes of a task start from the same scene.</li>
+      <li><b>Model and harness.</b> Any model can run in any harness, such as Codex or Claude Code. The harness runs unchanged and receives the goal as its prompt. It works in a sandboxed container through a command-line shell and can reach only its model’s API and the package registries, with web search off; the RoboOlympics-Fun tasks are the exception, with open network access.</li>
+      <li><b>The coding agent is the policy.</b> Whatever the agent writes turns what the robot senses into actions. It can control the robot directly, sending commands and choosing the next one after it sees the result; write code that controls the robot, such as a planner or a feedback controller; or train a model, such as a reinforcement-learning policy, that controls it. The exam leaves the choice to the agent.</li>
+      <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. In both standard settings the agent cannot reset the episode by default, although a task’s author can allow a fixed number of resets. The three settings are defined below the list.</li>
+      <li><b>Simulation backends.</b> Each suite keeps its own simulation backend behind the same interface, among them MuJoCo, Isaac Sim, OmniGibson, SAPIEN and Genesis, and together they run <span data-s="robots"></span> robots.</li>
+      <li><b>Episode trajectory.</b> Every episode is recorded step by step as a rollout: the full simulator state <i>s</i>, the robot’s observation <i>o</i> (camera images and joint readings) and the action <i>a</i>. What the agent itself can read depends on the setting: in privileged mode it reads the full state <i>s</i>, while in the two standard settings it sees only the observation <i>o</i>, as with a real robot. The verifier always works from the recorded state.</li>
+      <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
+    </ol>
+
+    <h3 id="ways-h">Three ways to control the robot</h3>
+    <div class="cways" id="ways"></div>
+
+    <h3 id="settings">Three settings</h3>
+    <p>A task can be run in up to three settings, and each one is a separate test, scored on its own. The rest of this post uses these three names exactly as defined here.</p>
+    <figure class="fig">
+      <div class="tscroll"><table class="settings">
+        <thead><tr><th></th><th class="m-p">Privileged<small>inside the simulator</small></th><th class="m-s">Standard<small>real-robot rules</small></th><th class="m-r">Standard-realtime<small>on a running clock</small></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Reaches</th><td>the simulator directly, in the agent’s container</td><td>the robot only, through its API</td><td>the robot only, through its API</td></tr>
+          <tr><th scope="row">Sees</th><td>the full state, every object pose</td><td>RGB, depth and joints; no object poses</td><td>as in standard</td></tr>
+          <tr><th scope="row">Sends</th><td>a <code>trajectory.npz</code></td><td>action chunks <code>(T, dim)</code></td><td>action chunks, often from a running program</td></tr>
+          <tr><th scope="row">Resets</th><td>unlimited</td><td>0 by default; the task’s author can allow more</td><td>0 by default; the task’s author can allow more</td></tr>
+          <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
+          <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
+        </tbody></table></div>
+      <figcaption><b>Figure 5.</b> The three settings. Most tasks have a privileged and a standard test. Standard-realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and standard-realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../../how/">how a test is graded</a>.</figcaption>
+    </figure>
+
+    <h3 id="contains">Tasks and tests</h3>
+    <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, using <span data-s="robots"></span> robots. A task is one fixed scene with one goal, and each of its settings is a test. Some suites are ports of widely used benchmarks (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); we built the others for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). You can <a href="../../suites/">browse the suites</a> or <a href="../../tasks/">the tasks</a>.</p>
+    <p>A task in this exam is far larger than a question in a language benchmark. It asks for a complete behavior, such as assembling a piece of furniture or playing a whole match, that combines perception, planning, control and recovery from mistakes, and each attempt gets an engineer's budget: from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span> of agent time, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory, with a GPU where the simulation backend or the task needs one. Many tasks in the same benchmark also test nearly the same skills, so a few hard tasks cover what a benchmark measures.</p>
+    <p>We therefore report results on a core set of <span data-s="core_tasks"></span> tasks (<span data-s="core_tests"></span> tests), chosen in the open. We left out tasks that a screening run with the smallest GPT-6 model already solved, as well as tasks that we judged too easy or open to a shortcut, and we kept every task that a benchmark's authors asked us to keep. The other tasks stay in the exam and can be run with <code>harbor run -d embodied-first-exam@all</code>.</p>
+
+    <h3 id="marking">Keeping the grading honest</h3>
+    <p>Reference solutions never enter the agent’s container, and we remove the original benchmarks’ solutions from the images. Doing nothing must score 0 on every task, and the reference solution must score 1 wherever one exists (a full reference solution for <span data-s="oracle_full"></span> tasks, a partial one for <span data-s="oracle_partial"></span>). Tasks without one, like most of BEHAVIOR-1K, rely on the original benchmark’s success checker. Before we add a benchmark, we tell an agent to try to pass without doing the task; if it succeeds anywhere, we hold the benchmark back until its verifier is fixed.</p>
+    <p>Two observations from this testing affect how the results should be read. First, models remember deleted solutions: Claude Opus 5.5 rewrote a deleted RoboTwin reference solution from memory, with 26 of its 28 lines identical to the original, and both Opus and GPT-6 Astra rebuilt a deleted HumanoidBench reward function with its original constants, so results on tasks built from public benchmarks may partly reflect memorization. Second, one harness offered tools that ran on the provider's servers, outside the container and its network rules, and agents found and used them; these tools are now turned off, and the gateway in front of the model forwards only model calls.</p>
+
+    <!-- ===================================================================================== 3 -->
+    <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
+    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set leaves out tests that we judged easy and tests that an early screening run solved, so it is hard by design.</p>
+    <figure class="fig fig-wide">
+      <div class="fig-body" id="fig-modes" data-fig="6"></div>
+      <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</figcaption>
+    </figure>
+    
+    <figure class="fig fig-wide">
+      <div class="fig-body" id="fig-types" data-fig="7"></div>
+      <figcaption class="fig-ext">The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>.</figcaption>
+    </figure>
+    
+    <figure class="fig fig-wide">
+      <div class="fig-body" id="fig-suites" data-fig="8"></div>
+    </figure>
+    <p class="fig-note">Data as of <span data-s="built"></span>. The approach labels in Finding 5 come from a random sample of <span data-s="cb_sample"></span> attempts (snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent that read the logs of each run and not yet checked by hand. Every clip in this post shows the run it names, and clicking it opens a step-by-step view of that run. The <a href="../../leaderboard/">leaderboard</a> lists the same results for every suite.</p>
+
+    <!-- ===================================================================================== 4 -->
+    <h2 id="findings" data-short="Findings"><span class="num">04</span>Findings</h2>
+    <p>Click a finding to open it. Each one shows the main numbers, a figure and one representative run, followed by a section you can expand with more evidence, more cases and caveats.</p>
+
+    <div class="finding">
+      <h3 id="f1" data-short="Standard mode is far from solved"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard mode is far from solved, and no single agent covers it.</button></h3>
+      <p class="finding-sum">GPT-6 Astra, the strongest agent, solves only about a third of the standard and standard-realtime tests. In privileged mode it solves nearly every test that Claude Opus 5.5 or Gemini 4 Argon solves, but in standard mode those two solve dozens of tests that it fails.</p>
+      <div class="finding-body" id="f1-body" hidden="until-found">
+        <ul class="claims">
+            <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
+            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 9).</li>
+            <li>In privileged mode, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves.</li>
+            <li>In standard mode, Claude Opus 5.5 and Gemini 4 Argon solve <span data-s="rival_s_extra"></span> tests that GPT-6 Astra fails. Between them, the three solve <span data-s="u_s_any"></span> of the standard tests; GPT-6 Astra solves <span data-s="u_s_astra"></span>.</li>
+            <li>In standard-realtime, GPT-6 Astra again solves <span data-s="rival_t"></span> of the tests its rivals solve; they add <span data-s="rival_t_extra"></span> that it fails.</li>
+        </ul>
+        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 9.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
+        <figure class="fig">
+          <div class="fig-body" id="fig-overlap" data-fig="10"></div>
+        </figure>
+          <div class="cases rep">
+            <a class="case s" href="../../run/?r=maniguard-jar-transport-i25-standard--kz3tvs9"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay.mp4"></video>
+              <span class="case-k">Only Claude Opus 5.5</span><b>ManiGuard · Glass jar</b><span class="case-m">Claude Opus 5.5 · standard · solved · 2× speed</span><span class="case-t">It estimated the shape of the jar’s square body and the position of the lid’s hinge from the depth point cloud, slid its closed fingers under the lid and swung the lid shut about the hinge. It then gripped one edge of the jar, lifted it 1 cm as a test and carried it to the goal without breaking a rule. GPT-6 Astra knocked the jar over while pushing the lid.</span></a>
+          </div>
+        <details class="more">
+          <summary>Evidence, more cases and scope</summary>
+          <h4>Evidence</h4>
+          <p>Even in privileged mode, the strongest agent did not finish a long assembly: on IKEA Stegesund, GPT-6 Astra took 40 minutes to drive one bolt and ran out of time on the second (the run is in <a href="#f3">Finding 3</a>).</p>
+          <p>Across all three settings together, the three Flash-class models solve <span data-s="flash_rate"></span> of their tests (counting each model’s tests separately), compared with <span data-s="astra_rate"></span> for <span data-s="best"></span>.</p>
+          <p>The drop is not limited to one benchmark: in <span data-s="gap_bench"></span> benchmarks with at least 5 tests in both settings, <span data-s="best"></span> solves a smaller share of the tests in standard mode than in privileged mode.</p>
+          <p><a href="../../leaderboard/">The leaderboard</a> has every agent’s results for each suite and each trial.</p>
+
+          <p>In privileged mode, at least one of the three solves <span data-s="u_p_any"></span> of the tests; GPT-6 Astra solves <span data-s="u_p_astra"></span>.</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=robopaint-acrylic-vision-i00-privileged--tvzr6sk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/video.mp4"></video>
+              <span class="case-k">Only GPT-6 Astra</span><b>RoboPaint · Acrylic copy</b><span class="case-m">GPT-6 Astra · privileged · solved</span><span class="case-t">After it fitted 380 strokes, its color error plateaued at 2.1–2.8. It switched to optimizing each stroke against the brush’s actual footprint and, after about six full runs, reached 1.98, just under the passing threshold, in 47 minutes.</span></a>
+          </div>
+          <p>In standard mode, at least one of the three solves <span data-s="u_s_any"></span>; GPT-6 Astra solves <span data-s="u_s_astra"></span>.</p>
+          <div class="cases">
+            <a class="case s" href="../../run/?r=robolab-utensils-in-mug-i00-standard--6tth8tk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-utensils-in-mug-i00-standard--6tth8tk/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robolab-utensils-in-mug-i00-standard--6tth8tk/replay.mp4"></video>
+              <span class="case-k">Only Gemini 4 Argon</span><b>RoboLab · Utensils in a mug</b><span class="case-m">Gemini 4 Argon · standard · solved</span><span class="case-t">It located the spoon, fork and mug with three depth cameras, planned waypoints with inverse kinematics and sent them as six segments, succeeding on the first try. In Claude Opus 5.5’s run, the fork slipped.</span></a>
+          </div>
+          <p>Tests that only one of the three solves, by task type (a task can have several types). Of the privileged tests, <span data-s="only_0"></span> are solved by GPT-6 Astra alone, mostly <span data-s="uniq_list_0"></span>, and mostly in <span data-s="uniq_suites_0"></span>. Of the standard tests, <span data-s="only_1"></span> are solved by Claude Opus 5.5 alone, mostly <span data-s="uniq_list_1"></span>, and <span data-s="only_2"></span> by Gemini 4 Argon alone, mostly <span data-s="uniq_list_2"></span>. (For each agent we use the setting where it has the most such tests.)</p>
+          <p>The three Flash-class models add little: of the tests that none of the three strongest agents solves, they solve <span data-s="ff_p"></span> in privileged mode and <span data-s="ff_s"></span> in standard mode.</p>
+          <div class="cases">
+            <a class="case s" href="../../run/?r=dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/video.mp4"></video>
+              <span class="case-k">None of the three</span><b>DexToolBench · Red brush, sweep right</b><span class="case-m">Claude Opus 5.5 · standard · failed</span><span class="case-t">It pushed the brush until it stuck out over the table edge, grasped it and reached goals 0 to 4. The next goal needed a 90° turn about the brush’s long axis, which its palm-down grasp could not make. It stalled at goal 5 of 38, and the brush flew out of the hand as the arm changed configuration.</span></a>
+          </div>
+          <h4>Interpretation <small>(inferred)</small></h4>
+          <ul>
+            <li>Since the gap shows up across benchmarks, it is unlikely to come from one kind of task.</li>
+            <li>In privileged mode, with the full state and unlimited resets, GPT-6 Astra can do most of what the other two can. In standard mode, most tests defeat all three, and each solves some tests that the others fail.</li>
+          </ul>
+          <h4>Scope</h4>
+          <ul>
+            <li>One attempt per test, on a core set that leaves out easy tests by design.</li>
+            <li>The verifier alone decides pass or fail. Time limits differ by benchmark, from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span>.</li>
+            <li>There are only <span data-s="nt"></span> standard-realtime tests, so a single test shifts a standard-realtime success rate by about 2 percentage points.</li>
+            <li>With one attempt per test, we cannot yet tell whether these differences come from the models or from the luck of a single attempt; that needs repeated attempts.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="finding">
+      <h3 id="f2" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
+      <p class="finding-sum">For every agent, most tasks solved in privileged mode become failures when rerun in standard mode.</p>
+      <div class="finding-body" id="f2-body" hidden="until-found">
+        <ul class="claims">
+            <li>On the <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test, each agent fails in standard mode between <span data-s="ps_lose_lo"></span> (<span data-s="ps_lose_lo_who"></span>) and <span data-s="ps_lose_hi"></span> (<span data-s="ps_lose_hi_who"></span>) of the tasks it solves in privileged mode. GPT-6 Astra, for example, solves <span data-s="ps_astra_a"></span> of these tasks in privileged mode and only <span data-s="ps_astra_both"></span> of those in standard mode.</li>
+            <li>Standard-realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a standard-realtime test, each of the three strongest agents solves fewer in standard-realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
+        </ul>
+        <figure class="fig">
+          <div class="fig-body" id="fig-paired" data-fig="11"></div>
+        </figure>
+          <div class="cases rep">
+            <a class="case s" href="../../run/?r=behavior-bringing-in-wood-i00-standard--myaibvy"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay.mp4"></video>
+              <span class="case-k">One tip-over ends it</span><b>BEHAVIOR-1K · Bringing in wood</b><span class="case-m">Claude Opus 5.5 · standard · failed · 2× speed</span><span class="case-t">It found and picked up two boards. Then a single command drove the base backwards and sideways at 0.4 m/s without looking; the robot hit the curb and tipped over at minute 20, and no board reached the hallway.</span></a>
+          </div>
+        <details class="more">
+          <summary>Evidence, more cases and scope</summary>
+          <h4>Evidence</h4>
+          <p>None of the six agents solves <span data-s="none6_t"></span>, compared with <span data-s="none6_s"></span> and <span data-s="none6_p"></span> tests.</p>
+          <p>In privileged mode, an agent that breaks a rule can reset and try again; in standard mode, one broken rule can be a point of no return. GPT-6 Astra on ManiGuard’s dusty transfer task shows both:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=maniguard-dusty-transfer-i03-privileged--vzjgftp"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-privileged--vzjgftp/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-privileged--vzjgftp/replay.mp4"></video>
+              <span class="case-k">A rule broken, then a retry</span><b>ManiGuard · Dusty transfer</b><span class="case-m">GPT-6 Astra · privileged · solved · 2× speed</span><span class="case-t">It wiped the box clean and poured the potato in from a tray without touching the potato. Its first two pours broke the “never touch the food” rule and the third flung the potato off the tray, but in privileged mode it could simply reset and try again; the fourth, with a new wrist angle, passed.</span></a>
+            <a class="case s" href="../../run/?r=maniguard-dusty-transfer-i03-standard--ijqtbjo"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-standard--ijqtbjo/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-standard--ijqtbjo/replay.mp4"></video>
+              <span class="case-k">One broken rule ends it</span><b>ManiGuard · Dusty transfer</b><span class="case-m">GPT-6 Astra · standard · failed · 2× speed</span><span class="case-t">While it regrasped the tray, a finger touched the potato once, breaking the rule “never touch the food”. Because standard mode grades the live episode, the test was lost, even though the potato later reached the box. In standard mode, <span data-s="dusty_s_others"></span> passed this test.</span></a>
+          </div>
+          <p>In privileged mode, Claude Opus 5.5 solved the Bringing in wood task that it failed above in standard mode:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=behavior-bringing-in-wood-i00-privileged--yqhtlno"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-privileged--yqhtlno/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-privileged--yqhtlno/replay.mp4"></video>
+              <span class="case-k">Tested in stages</span><b>BEHAVIOR-1K · Bringing in wood</b><span class="case-m">Claude Opus 5.5 · privileged · solved · 2× speed</span><span class="case-t">It kept its own copy of the simulator running, wrote separate scripts for grasping, opening the door and carrying, and tested each stage there, where a tip-over cost only a reset. At minute 72 it submitted a 3,067-step answer that passed.</span></a>
+          </div>
+          <p>Gemini 4 Argon on RoboOlympics-Fun’s dribble slalom shows the same gap:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=roboolympics-fun-dribble-slalom-i00-privileged--chghisq"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-dribble-slalom-i00-privileged--chghisq/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-dribble-slalom-i00-privileged--chghisq/video.mp4"></video>
+              <span class="case-k">Search from saved states</span><b>RoboOlympics-Fun · Dribble slalom</b><span class="case-m">Gemini 4 Argon · privileged · solved</span><span class="case-t">It saved and restored exact simulator states to try candidate kicks in eight parallel processes, advancing pole by pole and rolling back to checkpoints. It passed all 13 stages in 81 s of the 90 s allowed, and a fresh replay confirmed it at minute 48.</span></a>
+            <a class="case s" href="../../run/?r=roboolympics-fun-dribble-slalom-i00-standard--angcjt9"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-dribble-slalom-i00-standard--angcjt9/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-fun-dribble-slalom-i00-standard--angcjt9/video.mp4"></video>
+              <span class="case-k">No states, no rollback</span><b>RoboOlympics-Fun · Dribble slalom</b><span class="case-m">Gemini 4 Argon · standard · failed</span><span class="case-t">It estimated the robot’s and the ball’s positions from a fixed camera’s pixels, about 9 cm off sideways, and kicked with one foot. Over 16 episodes its best run passed four poles, later runs did worse, and the 120 minutes ran out.</span></a>
+          </div>
+          <h4>Interpretation <small>(inferred)</small></h4>
+          <ul>
+            <li>In privileged mode, the agent can read the state and reset for free, so a mistake can be undone. In standard mode the episode is graded live, and a single slip can end it.</li>
+          </ul>
+          <h4>Scope</h4>
+          <ul>
+            <li>Each agent’s row covers all <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test.</li>
+            <li>Time limits differ by benchmark.</li>
+            <li>There are <span data-s="nt"></span> standard-realtime tests: <span data-s="rt_mix"></span>.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="finding">
+      <h3 id="f3" data-short="Dexterity, dynamic control and long-horizon execution are common failure points"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Dexterity, dynamic control and long-horizon execution are common failure points.</button></h3>
+      <p class="finding-sum">In both privileged and standard mode, many of the benchmarks that the strongest agents fail most often involve tool use and assembly, balance and rapid reactions, or long household chores, although hard tasks are not limited to these kinds.</p>
+      <div class="finding-body" id="f3-body" hidden="until-found">
+        <ul class="claims">
+            <li>In standard mode, in <span data-s="hard_s_frac"></span> benchmarks (counting benchmarks with at least five tests), at least half of the tests are solved by none of the three strongest agents.</li>
+            <li><span data-s="hard_groups"></span></li>
+            <li>In privileged mode, that is true of <span data-s="hard_p_frac"></span> benchmarks: <span data-s="hard_p_list"></span>. The next two, <span data-s="hard_p_more"></span>, <span data-s="hard_p_more_in"></span>.</li>
+            <li>Standard-realtime has too few tests per benchmark for the figure. In the <span data-s="hard_t_n"></span> benchmarks with at least five, the share of tests that none of the three solves is <span data-s="hard_t_list"></span>.</li>
+        </ul>
+        <figure class="fig">
+          <div class="fig-body" id="fig-hard" data-fig="12"></div>
+        </figure>
+          <div class="cases rep">
+            <a class="case s" href="../../run/?r=humanoidbench-manip-door-i00-standard--cfxzsqf"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-door-i00-standard--cfxzsqf/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-door-i00-standard--cfxzsqf/video.mp4"></video>
+              <span class="case-k">HumanoidBench: balance and contact</span><b>HumanoidBench · Open a door</b><span class="case-m">Claude Opus 5.5 · standard · failed</span><span class="case-t">It kept the humanoid standing with ankle feedback and located the handle with stereo cameras. Over more than ten approaches (pressing, hooking, pushing up, both hands) it hooked the handle and pulled back up to 26 cm, but the door never opened; it used 45 resets in 27 minutes.</span></a>
+          </div>
+        <details class="more">
+          <summary>Evidence, more cases and scope</summary>
+          <h4>Evidence</h4>
+          <p>One case from each benchmark:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=myosuite-dex-hammer-use-i00-privileged--3tyvler"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/myosuite-dex-hammer-use-i00-privileged--3tyvler/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/myosuite-dex-hammer-use-i00-privileged--3tyvler/video.mp4"></video>
+              <span class="case-k">MyoSuite: 45 muscles</span><b>MyoSuite · Hammer use</b><span class="case-m">GPT-6 Astra · privileged · failed</span><span class="case-t">It optimized commands for 45 muscles against the simulator for 90 minutes. Not until minute 72 did a candidate keep the hammer in hand the whole way, and the final answer matched the reference motion in 40 of 99 steps, off by up to 0.187 m.</span></a>
+            <a class="case p" href="../../run/?r=behavior-setting-the-table-i00-privileged--f4sfeg2"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-setting-the-table-i00-privileged--f4sfeg2/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-setting-the-table-i00-privileged--f4sfeg2/replay.mp4"></video>
+              <span class="case-k">BEHAVIOR-1K: a long household task</span><b>BEHAVIOR-1K · Setting the table</b><span class="case-m">GPT-6 Astra · privileged · failed · 4× speed</span><span class="case-t">It spent 62 minutes putting two plates on the dining table. At minute 64, on the way to the fridge, it hit the kitchen island and tipped over; the episode ended with a score of 0.25.</span></a>
+            <a class="case s" href="../../run/?r=dextoolbench_screwdriver_short_screwdriver_spin_vertical-standard--djcqwmk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/dextoolbench_screwdriver_short_screwdriver_spin_vertical-standard--djcqwmk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/dextoolbench_screwdriver_short_screwdriver_spin_vertical-standard--djcqwmk/video.mp4"></video>
+              <span class="case-k">DexToolBench: a tool in the hand</span><b>DexToolBench · Short screwdriver, spin vertical</b><span class="case-m">Claude Opus 5.5 · standard · failed</span><span class="case-t">It estimated the screwdriver’s axis from the point cloud but could not tell how far the handle had rolled about that axis. It used up its 20 allowed resets in 27 minutes and reached 0 of 76 goals.</span></a>
+            <a class="case p" href="../../run/?r=ikea-stegesund-i00-privileged--ywisczk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/ikea-stegesund-i00-privileged--ywisczk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/ikea-stegesund-i00-privileged--ywisczk/video.mp4"></video>
+              <span class="case-k">IKEA assembly: one bolt, 40 minutes</span><b>RoboARC · IKEA Stegesund</b><span class="case-m">GPT-6 Astra · privileged · failed</span><span class="case-t">With the full state, it pressed the halves together, slid in the shelf and drove the first bolt. But its hex key turned only 120° per insertion, so one bolt took 40 minutes, and at the three-hour limit the second bolt was still 3.7 mm short. None of the three strongest agents solved this task.</span></a>
+            <a class="case s" href="../../run/?r=robodojo-insert-key-i00-standard--xbc32tq"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robodojo-insert-key-i00-standard--xbc32tq/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robodojo-insert-key-i00-standard--xbc32tq/replay.mp4"></video>
+              <span class="case-k">RoboDojo: a long sequence</span><b>RoboDojo · Insert key</b><span class="case-m">Claude Opus 5.5 · standard · failed · 4× speed</span><span class="case-t">It located the key and the lock from depth images but dropped the key at least nine times during hand-overs and large joint moves. Its closest attempt at insertion, at minute 36, was about 9 mm off and hit the face of the lock.</span></a>
+            <a class="case s" href="../../run/?r=pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/video.mp4"></video>
+              <span class="case-k">RoboDynamicExam: fast reactions</span><b>RoboDynamicExam · Toss, recatch, deliver</b><span class="case-m">GPT-6 Astra · standard · failed</span><span class="case-t">It caught the ball using depth images, but its first episodes ended early, one when the cup grazed a moving box, and its 3 allowed resets were gone. In the last episode it caught and tossed the ball, but on the second catch, at minute 14, the ball’s contact with the tilted cup was flagged as a limit violation.</span></a>
+            <a class="case s" href="../../run/?r=robopaint-xingshu-yong-i00-standard--uwljaji"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-xingshu-yong-i00-standard--uwljaji/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-xingshu-yong-i00-standard--uwljaji/video.mp4"></video>
+              <span class="case-k">RoboPaint: millimeter strokes</span><b>RoboPaint · Running script “yong”</b><span class="case-m">GPT-6 Astra · standard · failed</span><span class="case-t">With no resets available, it calibrated stroke width on a practice sheet, wrote five strokes and then retouched in one long stroke for 38 minutes. Overlap (0.856) and edge score passed, but that long stroke took the inked path to 2,048 mm against a 1,450 mm limit, and one of nine regions was only 0.657 covered against the required 0.80.</span></a>
+            <a class="case s" href="../../run/?r=roboarc-rope-threading-08-i01-standard--8sdpvcn"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboarc-rope-threading-08-i01-standard--8sdpvcn/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboarc-rope-threading-08-i01-standard--8sdpvcn/video.mp4"></video>
+              <span class="case-k">RoboARC: reasoning before contact</span><b>RoboARC · Rope threading</b><span class="case-m">Claude Opus 5.5 · standard · failed</span><span class="case-t">It mapped the wall, its holes and the coiled rope from depth point clouds, but the rope slipped from the gripper whenever it turned the wrist, dragged sideways or lifted and moved. It threaded none of the six holes and stopped at minute 83, with about 95 minutes left.</span></a>
+          </div>
+          <h4>Interpretation <small>(inferred)</small></h4>
+          <ul>
+            <li>The difficulty lies in the control itself: many joints or muscles must move together, and a small error breaks contact. In standard mode the agent must also estimate poses from camera images and depth first, with no reset to fall back on.</li>
+            <li>In precise manipulation and assembly, a tool’s pose in the hand, a millimeter alignment or a brush stroke is hard to judge from cameras alone. In balance and fast dynamics, one fall or one wrong touch often ends the test, with few chances to retry. In long multi-step tasks, one slip partway through often decides the outcome. In the reasoning tasks, the agent must work out how the parts fit together or come apart before the precise contact even starts.</li>
+          </ul>
+          <h4>Scope</h4>
+          <ul>
+            <li>A benchmark counts as hard when at least half of its tests are solved by none of the three; only benchmarks with at least 5 tests in the setting are counted. On the site the IKEA assembly tasks belong to RoboARC; here they are counted separately.</li>
+            <li>The core set removed easy tests and tests solved during screening, more from some benchmarks than from others, so per-benchmark rates partly reflect that selection.</li>
+            <li>The groups, and the reasons given for them, follow what each benchmark’s own page says makes it hard; time limits differ by benchmark.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="finding">
+      <h3 id="f4" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>Planning, retries, and explicit rules favor success.</button></h3>
+      <p class="finding-sum">Agents perform best when motions can be planned in advance, privileged access allows unrestricted resets and retries, or task rules are explicitly specified.</p>
+      <div class="finding-body" id="f4-body" hidden="until-found">
+        <ul class="claims">
+            <li>We call a benchmark easy when the three strongest agents’ mean success rate on it is high: 70% or more in privileged mode, 60% or more in standard mode. Each test counts once per agent (agent-attempts).</li>
+            <li>In privileged mode, <span data-s="easy_p_frac"></span> benchmarks reach a mean success rate of 70% or more: <span data-s="easy_p_list"></span>.</li>
+            <li>In standard mode, <span data-s="easy_s_claim"></span>. In standard-realtime, no benchmark with at least five tests comes close; the best is <span data-s="easy_t_best"></span>.</li>
+        </ul>
+        <figure class="fig">
+          <div class="fig-body" id="fig-easy" data-fig="13"></div>
+        </figure>
+          <div class="cases rep">
+            <a class="case p" href="../../run/?r=mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/video.mp4"></video>
+              <span class="case-k">MuJoCo Playground: a script in minutes</span><b>MuJoCo Playground · ALOHA peg insertion</b><span class="case-m">GPT-6 Astra · privileged · solved</span><span class="case-t">In 3.3 minutes it wrote a script for both arms to grasp the peg and insert it, using damped least-squares inverse kinematics and gravity compensation. A fresh replay passed, with the peg tip 2.58 mm off the axis.</span></a>
+          </div>
+        <details class="more">
+          <summary>Evidence, more cases and scope</summary>
+          <h4>Evidence</h4>
+          <p>These rates are on the core set, which already leaves out the easier tests. On those left-out tests, the three strongest agents’ mean success rate is <span data-s="easy_set_p"></span> in privileged mode and <span data-s="easy_set_s"></span> in standard mode.</p>
+          <p>One case from each benchmark:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=maniguard-dusty-transfer-i03-privileged--nqgrych"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-privileged--nqgrych/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-dusty-transfer-i03-privileged--nqgrych/replay.mp4"></video>
+              <span class="case-k">ManiGuard: done in 26 minutes</span><b>ManiGuard · Dusty transfer</b><span class="case-m">Gemini 4 Argon · privileged · solved</span><span class="case-t">Working in a copy of the simulator that it kept running, it wiped 18 dust particles from the box, then tilted the tray so the potato rolled in without being touched. It finished at minute 26, and two fresh replays passed.</span></a>
+            <a class="case p" href="../../run/?r=pandadyn-s09-toss-recatch-delivery-i00-privileged--p9uv6sr"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-privileged--p9uv6sr/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-privileged--p9uv6sr/video.mp4"></video>
+              <span class="case-k">RoboDynamicExam: worked out in advance</span><b>RoboDynamicExam · Toss, recatch, deliver</b><span class="case-m">Claude Opus 5.5 · privileged · solved</span><span class="case-t">Using the Jacobian, it worked out that the launch point could accelerate downward at only about 10.5–12 m/s², chose its toss to fit, and searched for the step at which to switch. It saved the trajectory at minute 14, and three fresh replays succeeded.</span></a>
+            <a class="case p" href="../../run/?r=robopaint-caoshu-zhen-i00-privileged--rssckls"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-caoshu-zhen-i00-privileged--rssckls/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robopaint-caoshu-zhen-i00-privileged--rssckls/video.mp4"></video>
+              <span class="case-k">RoboPaint: the brush rebuilt</span><b>RoboPaint · Cursive “zhen”</b><span class="case-m">GPT-6 Astra · privileged · solved</span><span class="case-t">It read how the brush model draws a stroke, wrote its own brush renderer in C++ and fitted three strokes. The first execution passed every check, and it submitted after four minutes.</span></a>
+            <a class="case p" href="../../run/?r=bigym2-dishwasher-close-i00-privileged--nfkkn2w"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/bigym2-dishwasher-close-i00-privileged--nfkkn2w/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/bigym2-dishwasher-close-i00-privileged--nfkkn2w/video.mp4"></video>
+              <span class="case-k">BiGym 2.0: read the colliders</span><b>BiGym 2.0 · Close the dishwasher</b><span class="case-m">Gemini 4 Argon · privileged · solved</span><span class="case-t">It read the dishwasher’s code and collision shapes, pushed both racks in, then crouched, hooked the door’s front edge and swung it shut along an arc. The 693-step answer passed two independent replays at minute 32.</span></a>
+            <a class="case p" href="../../run/?r=robowits-retrieve-cube-i00-privileged--4idoq4k"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robowits-retrieve-cube-i00-privileged--4idoq4k/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robowits-retrieve-cube-i00-privileged--4idoq4k/video.mp4"></video>
+              <span class="case-k">RoboWits: tip it out</span><b>RoboWits · Retrieve cube</b><span class="case-m">Claude Opus 5.5 · privileged · solved</span><span class="case-t">It gripped the container by its side, lifted it over the target and tilted it to about 135° so the cube slid out. The landing spot was sensitive to the path, so it tried six pour positions and kept the steadiest; fresh replays passed at minute 13.</span></a>
+            <a class="case p" href="../../run/?r=robocasa365-microwave-defrost-meat-i00-privileged--pwqnrer"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robocasa365-microwave-defrost-meat-i00-privileged--pwqnrer/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robocasa365-microwave-defrost-meat-i00-privileged--pwqnrer/video.mp4"></video>
+              <span class="case-k">RoboCasa365: step by step with IK</span><b>RoboCasa365 · Microwave, defrost meat</b><span class="case-m">Claude Opus 5.5 · privileged · solved</span><span class="case-t">Using Jacobian inverse kinematics and closed-loop control of the base, it took the box out of the freezer, put it in the microwave, closed the door and pressed start. A fresh replay passed at minute 46.</span></a>
+          </div>
+          <h4>Interpretation <small>(inferred)</small></h4>
+          <ul>
+            <li>Each of the easier benchmarks in privileged mode offers one of three things. Some give an exact state, so the agent can compute the motion in advance and then execute it (RoboDynamicExam, RoboCasa365, MuJoCo Playground). In some, unlimited resets let the agent check its answer against the score and retry before it submits (RoboWits, RoboPaint, BiGym 2.0). ManiGuard spells out its rules in the task, so the agent can check each step against them.</li>
+            <li>These benchmarks also mostly have short tasks with clear goals. Two of them, RoboDynamicExam and RoboPaint, drop in standard mode to <span data-s="em_s_pandadyn"></span> and <span data-s="em_s_robopaint"></span> (<a href="#f3">Finding 3</a>).</li>
+          </ul>
+          <h4>Scope</h4>
+          <ul>
+            <li>Mean success rate = the three agents’ solved tests ÷ (3 × the benchmark’s tests); only benchmarks with at least 5 tests. With 5 or 6 tests, a single test shifts a benchmark’s rate by 17–20 percentage points.</li>
+            <li>The core set removed easy tests and tests solved during screening, more from some benchmarks than from others, so per-benchmark rates partly reflect that selection.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="finding">
+      <h3 id="f5" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Control strategies shift with the evaluation mode.</button></h3>
+      <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in standard-realtime.</p>
+      <div class="finding-body" id="f5-body" hidden="until-found">
+        <ul class="claims">
+            <li>Agents control the robot in one of three ways: they write a program that moves it (code to control), send it commands themselves one segment at a time (direct control), or first train a model that then controls it. The figure also splits programs into three kinds and counts attempts that mixed approaches or never settled on one.</li>
+            <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
+        </ul>
+        <figure class="fig">
+          <div class="fig-body" id="fig-approach" data-fig="14"></div>
+        </figure>
+          <div class="cases rep">
+            <a class="case p" href="../../run/?r=maniguard-jar-transport-i25-privileged--rz5z7ys"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/video.mp4"></video>
+              <span class="case-k">Code to control: all three solved it</span><b>ManiGuard · Glass jar</b><span class="case-m">Claude Opus 5.5 · privileged · solved</span><span class="case-t">Its program read the lid’s hinge angle at every step and aimed a few degrees ahead as it pushed the lid shut with level fingers. It then gripped the jar by one edge and carried it to the goal. All three of the strongest agents solved this test.</span></a>
+          </div>
+        <details class="more">
+          <summary>Evidence, more cases and scope</summary>
+          <h4>Evidence</h4>
+          <p>Each sampled attempt is counted once, by the approach that produced its graded answer. The privileged programs were <span data-s="ap_p_kinds"></span>. When the setting changes, so does the approach: in standard mode, the same agent on the same glass jar switched to direct control and looked at the point cloud before each segment (the run is in <a href="#f1">Finding 1</a>). GPT-6 Astra did the same on RoboTwin:</p>
+          <div class="cases">
+            <a class="case p" href="../../run/?r=robotwin_2_0_put_bottles_dustbin-privileged--ku2qewp"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/robotwin-2/put_bottles_dustbin/poster.png" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/robotwin-2/put_bottles_dustbin/video.mp4"></video>
+              <span class="case-k">Code to control</span><b>RoboTwin 2.0 · Bottles into a dustbin</b><span class="case-m">GPT-6 Astra · privileged · solved</span><span class="case-t">After reading the task’s source, it scripted the grasps with the simulator’s motion primitives, handing two bottles from the right arm to the left in mid-air. It saved the answer at minute 5, and the official replay passed twice.</span></a>
+            <a class="case s" href="../../run/?r=robotwin_2_0_put_bottles_dustbin-standard--ydhsp73"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/video.mp4"></video>
+              <span class="case-k">Direct control</span><b>RoboTwin 2.0 · Bottles into a dustbin</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">It sent end-effector commands one at a time and looked at the camera images after each. It knocked over the cola bottle and picked it up again with the other arm; the last hand-over took several tries and succeeded at minute 29, about 30 seconds before the time limit.</span></a>
+          </div>
+          <p>In standard-realtime, the agent writes a program to play and lets it run:</p>
+          <div class="cases">
+            <a class="case t" href="../../run/?r=roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/video.mp4"></video>
+              <span class="case-k">The program plays</span><b>RoboOlympics-Match · Badminton match</b><span class="case-m">Claude Opus 5.5 · standard-realtime · solved</span><span class="case-t">A program running in the background located the shuttlecock from two cameras, fitted its flight with a drag model and swung the racket. At each pause the agent read the logs and patched the program, and it came back from 7–10 down to win 12–10 against a scripted opponent.</span></a>
+          </div>
+          <h4>Scope</h4>
+          <ul>
+            <li>The counts are from a random sample of about a third of the attempts (<span data-s="cb_sample"></span> analyzed, snapshot of <span data-s="cb_snapshot"></span>), labeled by an agent from the run logs and not yet checked by hand.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <!-- ===================================================================================== 5 -->
+    <h2 id="future" data-short="Future work"><span class="num">05</span>Future work</h2>
+    <p>The exam currently reports whether an attempt passed, not why it failed. We plan to label every failed attempt with a single cause: the agent misread the task, the grasp missed, the controller lost the robot, or the agent declared success before the goal was met. Each label will be checked by a person against the trace and the replay, so that statements such as the one in Finding 3 can rest on counted causes rather than on the suites in which failures occur.</p>
+    <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 and 2.</p>
+    <p>Most agents in this post pair a model with its maker's own harness: GPT-6 Astra runs in Codex, Claude Opus 5.5 in Claude Code and the Gemini models in the Antigravity CLI. The exam runs any model in any harness, so the same model can also be tested in several harnesses, for example an open-weight model in Claude Code and in the harness of its maker. Such comparisons would separate what the harness contributes, through its tools, its handling of context and its decision of when to stop, from what the model contributes, and we plan to add them to the results.</p>
+    <p>Only <span data-s="nt"></span> core tests run in the standard-realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
+    <p>Finally, the standard setting gives the agent only what a real robot provides: camera images, depth, joint readings and a control interface. The same tests can therefore run on physical hardware, and we plan to evaluate agents on real robots under the standard rules.</p>
+    <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/AhC6utNyfk" target="_blank" rel="noopener">Discord</a>.</p>
+
+    <h3 id="limits">Limitations</h3>
+    <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The approach labels in Finding 5 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
+
+    <h3 id="references">References</h3>
+    <ol class="refs">
+      <li id="ref-1"><span class="rf-a">C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press and K. Narasimhan.</span> <a class="rf-t" href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</a> <span class="rf-v">ICLR 2024.</span></li>
+      <li id="ref-2"><span class="rf-a">M. A. Merrill, A. G. Shaw, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2601.11868" target="_blank" rel="noopener">Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces</a> <span class="rf-v">ICLR 2026.</span></li>
+      <li id="ref-3"><span class="rf-a">A. Ouyang, S. Guo, S. Arora, A. L. Zhang, W. Hu, C. Ré and A. Mirhoseini.</span> <a class="rf-t" href="https://arxiv.org/abs/2502.10517" target="_blank" rel="noopener">KernelBench: Can LLMs Write Efficient GPU Kernels?</a> <span class="rf-v">ICML 2025.</span></li>
+      <li id="ref-4"><span class="rf-a">A. Brohan et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2307.15818" target="_blank" rel="noopener">RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control</a> <span class="rf-v">CoRL 2023.</span></li>
+      <li id="ref-5"><span class="rf-a">M. J. Kim et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2406.09246" target="_blank" rel="noopener">OpenVLA: An Open-Source Vision-Language-Action Model</a> <span class="rf-v">CoRL 2024.</span></li>
+      <li id="ref-6"><span class="rf-a">K. Black et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2410.24164" target="_blank" rel="noopener">π0: A Vision-Language-Action Flow Model for General Robot Control</a> <span class="rf-v">arXiv 2024.</span></li>
+      <li id="ref-7"><span class="rf-a">J. Liang, W. Huang, F. Xia, P. Xu, K. Hausman, B. Ichter, P. Florence and A. Zeng.</span> <a class="rf-t" href="https://arxiv.org/abs/2209.07753" target="_blank" rel="noopener">Code as Policies: Language Model Programs for Embodied Control</a> <span class="rf-v">ICRA 2023.</span></li>
+    </ol>
+
+    <h3 id="cite">Data and citation</h3>
+    <p>Tasks, results and agent runs are on this site (<a href="../../tasks/">tasks</a>, <a href="../../leaderboard/">leaderboard</a>, <a href="../../run/">runs</a>); videos and run records are in the <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</p>
+    <pre class="cite">@misc{embodiedfirstexam2026,
+  title  = {Embodied First Exam},
+  author = {Embodied First Exam Team},
+  year   = {2026},
+  url    = {https://www.embodied-first-exam.ai}
+}</pre>
+
+  </article>
+</main>
+<div id="footer"></div>
+</body>
+</html>
