@@ -35,6 +35,9 @@ MODES = ("privileged", "standard", "standard-realtime", "realtime")
 # directory prefixes per suite shown here, for deriving a base without the inventory
 PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco-playground": ["mujoco_playground_"],
           "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "embodied-safety-exam": ["ese-", "rsb-"]}
+# directory prefixes renamed in the repository after the Atlas package was built (new -> the Atlas's): RoboOlympics split
+# into -fun and -match (2026-10-18); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19)
+FORMER_PREFIX = [("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-")]
 CJK = re.compile(r"[\u2e80-\u2fff\u3000-\u303f\u3040-\u9fff\uf900-\ufaff\uff00-\uffef]+")
 # Chinese text inside English summaries, said in English (anything else in Chinese is dropped)
 CJK_EN = {"\u672c\u6240\u7acb\u5ddd": "Honjo Tatekawa"}   # a painting's title in a VLABench task
@@ -84,9 +87,9 @@ def site_bases(site: list[dict], inv: dict | None, atlas: dict) -> dict[str, str
         key = f"{t['suite']}/{t['id']}"
         if key in by_key:
             b = by_key[key]
-            # RoboOlympics split into -fun and -match in the repository (2026-10-18); the Atlas knows the bases before it
+            # a base renamed in the repository after the Atlas was built: the Atlas knows it by its earlier name
             if b not in atlas:
-                b = b.replace("roboolympics-fun-", "roboolympics-").replace("roboolympics-match-", "roboolympics-")
+                b = next((p_old + b[len(p_new):] for p_new, p_old in FORMER_PREFIX if b.startswith(p_new)), b)
             out[key] = b if b in atlas else None
             continue
         out[key] = derive_base(t, atlas)
@@ -167,7 +170,7 @@ def nearest(i: int, V, fam: list, exclude_fam: bool, k: int) -> list[int]:
         if not isinstance(V, np.ndarray):
             V = np.asarray(V, dtype=np.float32)
         s = V @ V[i]
-        order = np.argsort(-s).tolist()
+        order = np.argsort(-s, kind="stable").tolist()   # ties in index order, whatever the numpy build
     except ImportError:
         vi = V[i]
         s = [sum(a * b for a, b in zip(vi, row)) for row in V]
