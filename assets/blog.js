@@ -33,8 +33,8 @@ const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs
 const HARD_GROUPS = [
   ['precise manipulation and assembly', ['dextoolbench', 'ikea', 'robopaint']],
   ['balance and fast dynamics', ['humanoidbench', 'pandadyn', 'myosuite']],
-  ['long sequences', ['behavior-1k', 'robodojo']],
-  ['precise manipulation after reasoning', ['roboarc']],
+  ['long multi-step tasks', ['behavior-1k', 'robodojo']],
+  ['reasoning before precise manipulation', ['roboarc']],
 ];
 
 /* ---------------------------------------------------------------------------------------------- numbers */
@@ -74,7 +74,8 @@ function compute(ex, tasks, b, atlas) {
   const flash = runs.filter((r) => !TOP.includes(r));
   const ranked = (L) => [...runs].sort((x, y) => solved(L, y) - solved(L, x));
   const sameOrder = ['p', 's', 't'].every((k) => ranked(M[k]).slice(0, 3).join() === TOP.join());
-  const flashTop = Math.max(...flash.map((r) => Math.max(...['p', 's', 't'].map((k) => solved(M[k], r) / (M[k].length || 1)))));
+  // the best Flash-class result in any setting, with its count
+  const flashTop = flash.flatMap((r) => ['p', 's', 't'].map((k) => [solved(M[k], r), M[k].length])).reduce((a, x) => (x[0] / (x[1] || 1) > a[0] / (a[1] || 1) ? x : a), [0, 1]);
   const group = (L, keys) => { const g = {}; for (const x of L) for (const k of keys(x[0])) (g[k] ??= []).push(x); return g; };
   const ttOf = (t) => atlas?.tasks?.[`${t.suite}/${t.id}`]?.tt || [];
   // benchmarks as the analysis counts them: the IKEA assembly tasks (family ikea_*) apart from the rest of RoboARC
@@ -110,10 +111,10 @@ function compute(ex, tasks, b, atlas) {
   const inGroups = new Set(groups.flatMap(([, rs]) => rs.map((r) => r.id)));
   const rest = hard.s.filter((r) => !inGroups.has(r.id));
   const nIn = hard.s.length - rest.length;
-  per.hard_groups = `${nIn === hard.s.length ? 'They' : `${nw(nIn)[0].toUpperCase()}${nw(nIn).slice(1)} of them`} fall into ${nw(groups.length)} groups. ${groups.map(([g, rs]) => `${g[0].toUpperCase()}${g.slice(1)}: ${list(rs.map(hn))}.`).join(' ')}${rest.length ? ` The other ${nw(rest.length)} ${rest.length === 1 ? 'is' : 'are'} ${list(rest.map(hn))}.` : ''} Each share is the part of a benchmark’s tests that none of the three solves.`;
+  per.hard_groups = `${nIn === hard.s.length ? 'They' : `${nw(nIn)[0].toUpperCase()}${nw(nIn).slice(1)} of them`} fall into ${nw(groups.length)} groups (each percentage is the share of a benchmark’s tests that none of the three solves). ${groups.map(([g, rs]) => `${g[0].toUpperCase()}${g.slice(1)}: ${list(rs.map(hn))}.`).join(' ')}${rest.length ? ` The other ${nw(rest.length)} ${rest.length === 1 ? 'is' : 'are'} ${list(rest.map(hn))}.` : ''}`;
   const nextBelow = (rows, cut, f) => rows.find((r) => f(r) < cut);
   const hpNext = nextBelow(hardRows('p'), HARD, (r) => r.none / r.n);
-  per.hard_p_list = list(hard.p.map(hn)) + (hpNext ? `; the next, ${hn(hpNext)}, is just below half` : '');
+  per.hard_p_list = list(hard.p.map(hn)) + (hpNext ? `; the next, ${hn(hpNext)}, falls just short` : '');
   per.hard_s_frac = `${int(hard.s.length)} of ${int(benchRows('s').length)}`; per.hard_p_frac = `${int(hard.p.length)} of ${int(benchRows('p').length)}`;
   per.hard_s_word = nw(hard.s.length); per.hard_p_word = nw(hard.p.length);
   // Finding 5: the first benchmark spelled out in agent-attempts, the rest as rate (solved/attempts)
@@ -122,6 +123,7 @@ function compute(ex, tasks, b, atlas) {
   per.easy_p_frac = `${int(easy.p.length)} of ${int(benchRows('p').length)}`;
   per.easy_s_phrase = easy.s.length === 1 ? `only ${benchName(easy.s[0].id)}` : easy.s.length ? `${nw(easy.s.length)} benchmarks` : 'no benchmark';
   per.easy_s_list = easy.s.length ? list(easy.s.map(em)) : 'none';
+  per.easy_s_claim = easy.s.length === 1 ? `only one benchmark reaches 60% or more: ${em(easy.s[0])}` : easy.s.length ? `${nw(easy.s.length)} benchmarks reach 60% or more: ${list(easy.s.map(em))}` : 'no benchmark reaches 60%';
   // the tests the core set left out (set easy): the three strongest agents' mean rate there, on the tests all six sat
   const easySet = tasks.filter((t) => t.set !== 'core');
   for (const k of ['p', 's']) {
@@ -138,7 +140,7 @@ function compute(ex, tasks, b, atlas) {
   [['p', 0], ['s', 1], ['s', 2]].forEach(([k, i]) => {
     const L = only(M[k], TOP[i]);
     const by = (keys) => { const c = {}; for (const [t] of L) for (const x of keys(t)) c[x] = (c[x] || 0) + 1; return Object.entries(c).sort((a, z) => z[1] - a[1]); };
-    const tt = by(ttOf), lab = (x) => (atlas?.taxonomy?.tt?.[x] || x).toLowerCase();
+    const tt = by(ttOf), lab = (x) => (atlas?.taxonomy?.tt?.[x] || x).toLowerCase().replace(/ & /g, '/');
     per[`uniq_types_${i}`] = list(tt.slice(0, 2).map(([x]) => lab(x)));
     per[`uniq_list_${i}`] = list(tt.slice(0, 2).map(([x, n]) => `${lab(x)} (${n})`));
     per[`only_${i}`] = Q(L.length, M[k].length);
@@ -173,8 +175,8 @@ function compute(ex, tasks, b, atlas) {
     rsb_s_n: int(rsbS.length), a_s_norsb: Q(solved(M.s, TOP[0]) - solved(rsbS, TOP[0]), M.s.length - rsbS.length),
     a_p: Q(solved(M.p, TOP[0]), M.p.length), a_s: Q(solved(M.s, TOP[0]), M.s.length), a_t: Q(solved(M.t, TOP[0]), M.t.length),
     h_a_p: HQ(solved(M.p, TOP[0]), M.p.length), h_a_s: HQ(solved(M.s, TOP[0]), M.s.length), h_a_t: HQ(solved(M.t, TOP[0]), M.t.length),
-    order_note: sameOrder ? `In all three settings the order at the top is the same: ${TOP.map(name).join(', ')}. The three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% in any setting.`
-      : `The order at the top differs between the settings; the three Flash-class models are far behind, at most ${Math.round(100 * flashTop)}% in any setting.`,
+    order_note: sameOrder ? `The top three are the same in all three settings: ${list(TOP.map(name))}, in that order. The three Flash-class models trail far behind; their best result in any setting is ${Q(...flashTop)}.`
+      : `The order of the top three changes from setting to setting. The three Flash-class models trail far behind; their best result in any setting is ${Q(...flashTop)}.`,
     budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
     none6_p: `${int(M.p.length - anyOf(M.p))} of ${int(M.p.length)} privileged (${P(M.p.length - anyOf(M.p), M.p.length)})`,
     none6_s: `${int(M.s.length - anyOf(M.s))} of ${int(M.s.length)} standard (${P(M.s.length - anyOf(M.s), M.s.length)})`,
@@ -211,7 +213,7 @@ function compute(ex, tasks, b, atlas) {
     ps_lose_n: ps.filter((x) => x.a).length === runs.length ? 'every agent' : `each of the ${nw(ps.filter((x) => x.a).length)} agents that solves any`,
     ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
     core_top3: list(board.slice(0, 3).map((x) => `${x.name} at ${Q(x.c, CORE.length)}`)),
-    core_rest_max: P(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
+    core_rest_max: Q(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
   };
   return { S, M, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, safety: sf, name, short, ok, solved };
@@ -245,8 +247,8 @@ function figModes(el, R) {
     return `<div class="hb-row${TOP.includes(r) ? '' : ' fl'}" title="${esc(`${R.name(r)} · ${MODE_LABEL[k].toLowerCase()}: ${s} of ${n} solved`)}"><span class="who">${esc(R.name(r))}</span>`
       + `<span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${agc(r)})"></span></span><span class="val"><b>${pct(s, n)}%</b> ${frac(s, n)}</span></div>`;
   }).join('')}</div>`;
-  el.innerHTML = head('In every setting GPT-6 Astra solves the most and the three Flash-class models the fewest.', 'Success rate on all the core tests of each setting (a test without a result counts as failed)',
-    'each bar is the share of the tests one agent solved; the verifier decides pass or fail.')
+  el.innerHTML = head('In every setting GPT-6 Astra solves the most tests and the three Flash-class models the fewest.', 'Share of the core tests each agent solves, by setting (a test without a result counts as failed)',
+    'each bar is the share of a setting’s tests that one agent solved; the verifier decides pass or fail.')
     + agentLegend(R) + `<div class="hbs">${['p', 's', 't'].map(block).join('')}</div>`
     + numbers(['Agent', 'Privileged', 'Standard', 'Realtime'], R.order.map((r) => [esc(R.name(r)), ...['p', 's', 't'].map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
 }
@@ -273,8 +275,8 @@ function figOverlap(el, R) {
     return `<div class="wf"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(n)} tests</small></p>${TOP.map((r) => { const s = R.solved(R.M[k], r);
       return `<div class="wf-ag"><span>${esc(R.short(r))}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${AG[r]})"></span></span><b>${int(s)}</b></div>`; }).join('')}
       <div class="wf-grid" role="img" aria-label="${esc(`${MODE_LABEL[k]}: ${cats.map(([c, l]) => `${l} ${counts[k][c]}`).join(', ')}`)}">${cells(k)}</div></div>`; };
-  el.innerHTML = head('With privileged access most of what the three solve includes GPT-6 Astra; under standard rules the other two each add a share of their own.',
-    'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its colour says which of the three solved it, a split cell two of them.')
+  el.innerHTML = head('With privileged access, GPT-6 Astra solves almost every test that any of the three solves; under standard rules, the other two each solve some tests that it fails.',
+    'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its color shows which of the three solved it, and a cell split in two colors means two of them did.')
     + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
       `<tr><th scope="row"><i class="sw" style="background:${bg(col)}"></i>${esc(l)}</th>${['p', 's', 't'].map((k) => `<td>${int(counts[k][c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
     + `<div class="wfs">${['p', 's', 't'].map(panel).join('')}</div>`;
@@ -285,9 +287,9 @@ function figOverlap(el, R) {
 function figPaired(el, R) {
   const segs = [['both', 'Solved in both', 'var(--top)'], ['onlyP', 'Only with privileged access', 'var(--priv)'], ['onlyS', 'Only under standard rules', 'var(--std)'], ['neither', 'In neither', 'var(--wf-none)']];
   const rows = R.ps.map((r) => ({ id: r.id, name: r.name, n: r.n, both: r.both, onlyP: r.a - r.both, onlyS: r.c - r.both, neither: r.n - r.a - r.c + r.both }));
-  el.innerHTML = head('For every agent, “only with privileged access” is far larger than “only under standard rules”.',
-    'The same task in two settings: each agent’s outcome on the tasks with both a privileged and a standard test',
-    `each row is one agent on the ${R.S.ps_n} core tasks with both tests (a test without a result counts as failed); each segment is the share with that pair of outcomes.`)
+  el.innerHTML = head('Every agent solves far more tasks only with privileged access than only under standard rules.',
+    'The same task in two settings: each agent’s outcome on the tasks that have both a privileged and a standard test',
+    `each row is one agent on the ${R.S.ps_n} core tasks that have both tests (a test without a result counts as failed); each segment is the share of tasks with that pair of outcomes.`)
     + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
     + `<div class="sb">${rows.map((r) => `<div class="sb-row"><span class="who">${esc(r.name)}</span><span class="sb-trk">${segs.map(([k, l, c]) => (r[k]
       ? `<span style="flex:${r[k]} 1 0;background:${c}" title="${esc(`${r.name} · ${l}: ${r[k]} of ${r.n} tasks`)}">${(100 * r[k]) / r.n >= 9 ? `<em${k === 'neither' ? ' class="dk"' : ''}>${r[k]}</em>` : ''}</span>` : '')).join('')}</span><span class="n">${int(r.n)}</span></div>`).join('')}
@@ -299,7 +301,7 @@ function figPaired(el, R) {
 function figSteps(el, R) {
   el.innerHTML = `<div class="steps3">${['p', 's', 't'].map((k) => { const n = 3 * R.M[k].length, s = R.mean3(R.M[k]);
     return `<div class="${k === 't' ? 'r' : k}"><b>${pct(s, n)}%</b><span>${MODE_LABEL[k]} · ${int(s)}/${int(n)}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%"></span></span></div>`; }).join('')}</div>
-    <p class="fig-note">The three strongest agents together, in agent-attempts: their solved tests summed, out of three times the core tests of each setting.</p>`;
+    <p class="fig-note">The three strongest agents’ mean success rate: their solved tests added up ÷ (3 × the setting’s core tests), in agent-attempts.</p>`;
 }
 
 /** Findings 4 and 5 (the analysis's figures 1.4 and 1.5): a dot plot per setting, one row per benchmark (from MIN_BENCH
@@ -331,10 +333,10 @@ function figHard(el, R) {
   dotPlots(el, R, {
     rows: (k) => R.hardRows(k), past: (k, r) => r.none / r.n >= HARD, value: (r) => [r.none, r.n], valueName: 'None of the three solves',
     valueText: (a, n) => `${a}/${n}`, cutLabel: () => 'below half',
-    say: `With privileged access ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'benchmark has' : 'benchmarks have'} at least half their tests unsolved by all three; under standard rules, ${R.S.hard_s_word}.`,
-    cap: 'Each of the three strongest agents’ success rate, by benchmark (all the core tests of the setting)',
-    how: 'each dot is one agent’s share of a benchmark’s tests; the grey bar on the right is the share none of the three solves.',
-    note: `Hardest first. Benchmarks with at least ${MIN_BENCH} tests in the setting; each column lists those with at least half their tests unsolved by all three, then the next one below the dashed line. The tag after a name is the kind of task. The IKEA assembly tasks are counted apart from the rest of RoboARC.`,
+    say: `With privileged access, ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'benchmark has' : 'benchmarks have'} at least half their tests solved by none of the three; under standard rules, ${R.S.hard_s_word}.`,
+    cap: 'Success rate of each of the three strongest agents, by benchmark (all the core tests of the setting)',
+    how: 'each dot is one agent’s share of a benchmark’s tests; the gray bar on the right is the share that none of the three solves.',
+    note: `Hardest first. Only benchmarks with at least ${MIN_BENCH} tests in the setting. Each column lists the benchmarks with at least half their tests solved by none of the three, then the next one below the dashed line. The small label under each name is the kind of task. The IKEA assembly tasks are counted separately from the rest of RoboARC.`,
   });
 }
 
@@ -343,9 +345,9 @@ function figEasy(el, R) {
     rows: (k) => R.easyRows(k), past: (k, r) => r.sum / (3 * r.n) >= (k === 'p' ? EASY_P : EASY_S), value: (r) => [r.sum, 3 * r.n], valueName: 'Mean success rate',
     valueText: (a, n) => `${pct(a, n)}%`, cutLabel: (k) => `below ${k === 'p' ? 70 : 60}%`,
     say: `With privileged access the three strongest agents’ mean success rate is 70% or more in ${R.S.easy_p_frac.split(' of ')[0]} benchmarks; under standard rules ${R.S.easy_s_phrase} ${easyVerb(R.S.easy_s_phrase)} 60%.`,
-    cap: 'Each of the three strongest agents’ success rate, by benchmark (all the core tests of the setting)',
-    how: 'each dot is one agent’s share of a benchmark’s tests; the grey bar on the right is the three agents’ mean success rate.',
-    note: `Easiest first. Benchmarks with at least ${MIN_BENCH} tests in the setting; privileged lists those at 70% or more, standard those at 60% or more, then the next one below the dashed line. Mean success rate = the three agents’ solved tests ÷ (3 × the benchmark’s tests), so its unit is agent-attempts.`,
+    cap: 'Success rate of each of the three strongest agents, by benchmark (all the core tests of the setting)',
+    how: 'each dot is one agent’s share of a benchmark’s tests; the gray bar on the right is the three agents’ mean success rate.',
+    note: `Easiest first. Only benchmarks with at least ${MIN_BENCH} tests in the setting. The privileged column lists the benchmarks at 70% or more and the standard column those at 60% or more, each followed by the next one below the dashed line. Mean success rate = the three agents’ solved tests ÷ (3 × the benchmark’s tests), counted in agent-attempts.`,
   });
 }
 const easyVerb = (phrase) => (/^only |^no /.test(phrase) ? 'reaches' : 'reach');
@@ -353,13 +355,13 @@ const easyVerb = (phrase) => (/^only |^no /.test(phrase) ? 'reaches' : 'reach');
 /** Finding 6 (the analysis's figure 1.6): the approach each sampled attempt was judged on, per setting, with the three
  *  kinds of program inside code to control; a mark where one approach ends and the next begins. */
 const WAYS = [
-  ['open', 'code', 'Open-loop program', 'computes the whole motion ahead (waypoints, key frames, inverse-kinematics solutions, a recorded sequence) and runs it without reading feedback', '--w-open'],
-  ['closed', 'code', 'Closed-loop program', 'reads the state or the cameras every step or segment and adjusts', '--w-closed'],
-  ['search', 'code', 'Parameter search', 'finds a passing motion or its parameters through many episodes, resets or an optimizer (CEM, CMA, grid, random)', '--w-search'],
-  ['direct', 'direct', 'Direct control', 'the agent sends commands segment by segment, deciding the next after looking at images or readings', '--w-direct'],
-  ['train', 'train', 'Train a model to control', 'first trains a control policy (reinforcement learning or a neural network), which then controls', '--w-train'],
-  ['mixed', 'mixed', 'Mixed', 'changed approach midway, or two approaches in equal measure', '--w-mixed'],
-  ['none', 'none', 'No control plan', 'only explored, or never executed', '--w-none'],
+  ['open', 'code', 'Open-loop program', 'computes the whole motion in advance (waypoints, key frames, inverse-kinematics solutions, a recorded sequence) and runs it without feedback', '--w-open'],
+  ['closed', 'code', 'Closed-loop program', 'reads the state or the cameras at every step or segment and adjusts', '--w-closed'],
+  ['search', 'code', 'Parameter search', 'finds a passing motion, or its parameters, by trying many episodes and resets or by running an optimizer (CEM, CMA, grid or random search)', '--w-search'],
+  ['direct', 'direct', 'Direct control', 'the agent sends commands one segment at a time and decides the next one after looking at images or readings', '--w-direct'],
+  ['train', 'train', 'Train a model to control', 'first trains a control policy, such as a neural network or a reinforcement-learning policy, that then drives the robot', '--w-train'],
+  ['mixed', 'mixed', 'Mixed', 'switched approach midway, or used two approaches equally', '--w-mixed'],
+  ['none', 'none', 'No control plan', 'only explored, or never ran anything', '--w-none'],
 ];
 const GROUP_NAME = { code: 'Code to control', direct: 'Direct control' };
 function figApproach(el, R) {
@@ -376,11 +378,11 @@ function figApproach(el, R) {
       + `<span class="ap-bar">${segs.filter((s) => s.v).map((s) => `<span class="${s.edge ? 'edge' : ''}" style="flex:${s.v} 1 0;background:var(${s.w[4]})" title="${esc(`${MODE_LABEL[k]} · ${s.w[2]}: ${s.v} of ${n}`)}"></span>`).join('')}</span><small class="ap-sum">${sum}</small></span><span class="n">${int(n)}</span></div>`;
   };
   const ks = ['p', 's', 't'].filter((k) => mix[k]);
-  el.innerHTML = head('Privileged attempts mostly write a program, standard ones mostly send commands step by step, and realtime ones go back to a program.',
-    'Who decides each motion: the approach of the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts judged on that approach (each attempt counted once, by the approach it was graded on); labelled by an agent reading the logs, not yet checked by hand.')
+  el.innerHTML = head('Privileged attempts mostly write a program, standard ones mostly send commands step by step, and realtime ones use a program again.',
+    'How agents control the robot: the approach taken in the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts that used that approach (each attempt counted once, by the approach that produced its graded answer); labeled by an agent from the run logs, not yet checked by hand.')
     + `<div class="ap-defs"><div><p>Code to control</p><ul>${WAYS.filter((w) => w[1] === 'code').map(def).join('')}</ul></div><div><p>Other approaches</p><ul>${WAYS.filter((w) => w[1] !== 'code').map(def).join('')}</ul></div></div>`
     + `<div class="ap">${ks.map(row).join('')}<div class="ap-row ax"><span></span><span class="sb-ticks"><i style="left:0">0%</i><i style="left:50%">50%</i><i style="left:100%">100%</i></span><span class="n">attempts</span></div></div>`
-    + `<p class="fig-note">A dark mark separates the approaches; the three blues are the kinds of program. Sampled attempts, ${R.S.cb_sample} analysed in all (snapshot of ${R.S.cb_snapshot}).</p>`
+    + `<p class="fig-note">A dark mark separates the approaches; the three shades of blue are the three kinds of program. Sampled attempts: ${R.S.cb_sample} analyzed in all (snapshot of ${R.S.cb_snapshot}).</p>`
     + numbers(['Setting', ...WAYS.map((w) => w[2]), 'Sampled'], ks.map((k) => [MODE_LABEL[k], ...WAYS.map((w) => (w[1] === 'code' ? kinds[k]?.[w[0]] || 0 : mix[k]?.[w[0]] || 0)), mix[k].n]));
 }
 
@@ -390,8 +392,8 @@ function figSafety(el, R) {
   const segs = [['right', 'Harm from the robot’s motion, though the agent declined the hazard', '--sf-right'], ['harm', 'Other harm from the robot’s motion', '--sf-harm'],
     ['done', 'Carried out a hazardous request', '--sf-done'], ['gave', 'Gave up', '--sf-gave'], ['other', 'Other or no verdict', '--wf-none']];
   const row = { right: f.harm_right_call, harm: o.harm - f.harm_right_call, done: o.done, gave: o.gave_up, other: o.other };
-  el.innerHTML = head(`Harm from the robot’s own motion fails more attempts (${o.harm}) than carrying out a hazardous request (${o.done}).`,
-    `Failed attempts at Embodied Safety Exam’s core tests, by the benchmark’s verdict (${int(f.failures)} attempts)`, '')
+  el.innerHTML = head(`More attempts fail because the robot’s own motion causes harm (${o.harm}) than because the agent carries out a hazardous request (${o.done}).`,
+    `Failed attempts at the Embodied Safety Exam’s core tests, by the benchmark’s verdict (${int(f.failures)} attempts)`, '')
     + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}<span>${esc(l)} · <b>${row[k]}</b></span></span>`).join('')}</div>`
     + `<div class="sb"><div class="sb-row one"><span class="sb-trk">${segs.map(([k, l, c]) => (row[k] ? `<span style="flex:${row[k]} 1 0;background:var(${c})" title="${esc(`${l}: ${row[k]} of ${f.failures}`)}">${(100 * row[k]) / f.failures >= 9 ? `<em${k === 'other' || k === 'gave' ? ' class="dk"' : ''}>${row[k]}</em>` : ''}</span>` : '')).join('')}</span></div></div>`;
 }
