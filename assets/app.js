@@ -362,7 +362,9 @@ function lbSuites(el, ex, runs, scores, set) {
   const row = (s) => {
     const vals = runs.map((r) => value(r, s));
     const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
+    // how many tests the suite has in this setting, so a 100% on one test reads as one test (owners' readers, 2026-10-19)
+    const n = Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${n} test${n === 1 ? '' : 's'}</small></span></a>
       ${runs.map((r, i) => cell(r, s, vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)

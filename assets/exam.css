@@ -1701,3 +1701,4 @@ button.as-link:hover { color: var(--ink); }
 .pc-read { margin-top: 6px; font: 600 14px var(--body); color: var(--priv); }
 @media (max-width: 860px) { .post-card.featured { grid-template-columns: minmax(0, 1fr); padding: 22px; } .post-card.featured .pc-media { order: -1; } }
 .core-only-view .task-card .core-mark { display: none; }
+.sd-name .sd-n { display: block; margin-top: 1px; font: 400 11px/1.2 var(--mono); color: var(--ink-3); }
