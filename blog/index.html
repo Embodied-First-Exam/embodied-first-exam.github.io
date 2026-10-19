@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=2c2fb761">
+<link rel="stylesheet" href="../assets/blog.css?v=4f7eb15d">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
 <script type="module" src="../assets/blog.js?v=4c1416f4"></script>
@@ -162,7 +162,8 @@
     <p>Click a finding to open it. Each one shows the main numbers, a figure and one representative run, followed by a section you can expand with more evidence, more cases and caveats.</p>
 
     <div class="finding">
-      <h3 id="f1" data-short="Most tasks still fail"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>In standard mode, even the strongest agent fails most tests, and the realtime setting is even harder.</button></h3>
+      <h3 id="f1" data-short="Standard-mode performance remains low"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard-mode performance remains low.</button></h3>
+      <p class="finding-sum">Even the strongest agent fails most tasks in standard mode, and standard-realtime poses an even greater challenge.</p>
       <div class="finding-body" id="f1-body" hidden="until-found">
         <ul class="claims">
             <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
@@ -199,7 +200,8 @@
     </div>
 
     <div class="finding">
-      <h3 id="f2" data-short="Who solves what"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>In privileged mode, GPT-6 Astra solves nearly everything its rivals solve; in standard mode, Claude Opus 5.5 and Gemini 4 Argon solve many tests that Astra fails.</button></h3>
+      <h3 id="f2" data-short="Model strengths become more complementary in standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>Model strengths become more complementary in standard mode.</button></h3>
+      <p class="finding-sum">In privileged mode, GPT-6 Astra solves nearly all tasks solved by its rivals. In standard mode, Claude Opus 5.5 and Gemini 4 Argon each solve many tasks that Astra cannot.</p>
       <div class="finding-body" id="f2-body" hidden="until-found">
         <ul class="claims">
             <li>In privileged mode, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves.</li>
@@ -248,7 +250,8 @@
     </div>
 
     <div class="finding">
-      <h3 id="f3" data-short="Privileged vs standard"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Every agent loses most of its privileged-mode successes when the same tasks are run in standard mode.</button></h3>
+      <h3 id="f3" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
+      <p class="finding-sum">For every agent, most tasks solved in privileged mode become failures when rerun in standard mode.</p>
       <div class="finding-body" id="f3-body" hidden="until-found">
         <ul class="claims">
             <li>On the <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test, each agent fails in standard mode between <span data-s="ps_lose_lo"></span> (<span data-s="ps_lose_lo_who"></span>) and <span data-s="ps_lose_hi"></span> (<span data-s="ps_lose_hi_who"></span>) of the tasks it solves in privileged mode. GPT-6 Astra, for example, solves <span data-s="ps_astra_a"></span> of these tasks in privileged mode and only <span data-s="ps_astra_both"></span> of those in standard mode.</li>
@@ -294,7 +297,8 @@
     </div>
 
     <div class="finding">
-      <h3 id="f4" data-short="Where agents struggle"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>In both privileged and standard mode, the hardest tasks require tools or assembly, balance or fast reactions, or long household chores.</button></h3>
+      <h3 id="f4" data-short="The hardest tasks demand dexterity, dynamic control, or sustained execution"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>The hardest tasks demand dexterity, dynamic control, or sustained execution.</button></h3>
+      <p class="finding-sum">Across privileged and standard modes, the hardest tasks involve tool use and assembly, balance and rapid reactions, or long household chores.</p>
       <div class="finding-body" id="f4-body" hidden="until-found">
         <ul class="claims">
             <li>In standard mode, in <span data-s="hard_s_frac"></span> benchmarks (counting benchmarks with at least five tests), at least half of the tests are solved by none of the three strongest agents.</li>
@@ -345,7 +349,8 @@
     </div>
 
     <div class="finding">
-      <h3 id="f5" data-short="Where agents do well"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Agents do best when the motion can be planned in advance, when privileged mode lets them reset and retry freely, or when the task’s rules are written out clearly.</button></h3>
+      <h3 id="f5" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Planning, retries, and explicit rules favor success.</button></h3>
+      <p class="finding-sum">Agents perform best when motions can be planned in advance, privileged access allows unrestricted resets and retries, or task rules are explicitly specified.</p>
       <div class="finding-body" id="f5-body" hidden="until-found">
         <ul class="claims">
             <li>We call a benchmark easy when the three strongest agents’ mean success rate on it is high: 70% or more in privileged mode, 60% or more in standard mode. Each test counts once per agent (agent-attempts).</li>
@@ -391,7 +396,8 @@
     </div>
 
     <div class="finding">
-      <h3 id="f6" data-short="Program or steer"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f6-body"><span class="fn">Finding 6</span>In privileged mode, agents mostly write a program that controls the robot; in standard mode, they mostly steer the robot step by step; in standard-realtime, they mostly write a closed-loop controller.</button></h3>
+      <h3 id="f6" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f6-body"><span class="fn">Finding 6</span>Control strategies shift with the evaluation mode.</button></h3>
+      <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in standard-realtime.</p>
       <div class="finding-body" id="f6-body" hidden="until-found">
         <ul class="claims">
             <li>Agents control the robot in one of three ways: they write a program that moves it (code to control), send it commands themselves one segment at a time (direct control), or first train a model that then controls it. The figure also splits programs into three kinds and counts attempts that mixed approaches or never settled on one.</li>
