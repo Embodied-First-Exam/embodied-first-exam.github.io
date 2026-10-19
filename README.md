@@ -14,7 +14,6 @@ public HF dataset [MLL-Lab/embodied-exam-media](https://huggingface.co/datasets/
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
 assets/exam.css, assets/app.js                                        the look and the drawing of every page
 data/exam.json, data/tasks.json                                       suites, results, the label map; every question
-media/<suite>/                                                        pictures and demo videos
 scripts/                                                              export.py, media.py, upload_media.py, stamp.py, check.py
 CNAME                                                                 the custom domain, www.embodied-first-exam.ai
 ```

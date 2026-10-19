@@ -3,3 +3,6 @@ __pycache__/
 .DS_Store
 runlog/
 runlog
+
+# the pictures and videos are on HF (scripts/media.py), not here: GitHub Pages serves at most 1 GB per site
+/media/
