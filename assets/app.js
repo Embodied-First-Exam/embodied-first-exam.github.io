@@ -512,7 +512,7 @@ const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const [s, rows] of Object.entries(by)) runShards.set(s, Promise.resolve(rows));
   return splitSuites({ v: 1, total: (d.runs || []).length, suites: Object.fromEntries(Object.entries(by).map(([s, rows]) => [s, rows.length])), settings });
 }).catch((e) => { runSummaryP = null; throw e; }));   // a failed fetch is tried again next time, not remembered
-// RoboOlympics is two suites on this site since 2026-10-19 (Fun and Match); an index built before files both under
+// Embodied Olympics is two suites on this site since 2026-10-19 (Fun and Match); an index built before files both under
 // 'roboolympics'. Its rows go to the suite their task is in (data/tasks.json), with their counts; under the old id the
 // same rows stay reachable, for a run page whose bench is the old one.
 const SPLIT_SUITES = { roboolympics: ['roboolympics-fun', 'roboolympics-match'] };
@@ -1320,7 +1320,7 @@ const WAYS = {
   for epoch in range(5):` },
   d: { tab: 'mix', title: 'Mix them', vid: 'd_volleyball_spike', step: 56,
     line: 'Its own inverse kinematics by least squares for the striking palm, combined with a balance controller and a search over the jump and the strike.',
-    slug: 'roboolympics-fun-volleyball-spike-i00-privileged--aeefd7j', who: 'RoboOlympics-Fun · Volleyball spike · privileged · Codex · GPT-6 Astra',
+    slug: 'roboolympics-fun-volleyball-spike-i00-privileged--aeefd7j', who: 'Embodied-Olympics-Fun · Volleyball spike · privileged · Codex · GPT-6 Astra',
     code: `from scipy.optimize import least_squares
 ...
 n=np.array([.74,-.45,.5]);n/=np.linalg.norm(n)
@@ -1782,7 +1782,7 @@ function budgets(el, tasks) {
   const mins = (tasks || []).map((t) => t.budget_min).filter(Boolean);
   const h = (m) => (m % 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`);
   const lo = mins.length ? Math.min(...mins) : 30, hi = mins.length ? Math.max(...mins) : 240;
-  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in RoboOlympics-Fun and RoboEngineer offer one for training a policy.`;
+  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in Embodied-Olympics-Fun and RoboEngineer offer one for training a policy.`;
 }
 
 /** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags});
