@@ -166,6 +166,35 @@ def where_we_are(db, root, run='codex-gpt6_astra-high'):
             'simulators': len({m.get('simulator') for m in solved})}
 
 
+RUN_NAMES = {'codex-gpt6_astra-high': 'GPT-6 Astra · Codex', 'claude_code-opus_5_5-high': 'Claude Opus 5.5 · Claude Code',
+             'antigravity_cli-gemini_4_argon-high': 'Gemini 4 Argon · Antigravity CLI', 'antigravity_cli-gemini_3_8_flash-high': 'Gemini 3.8 Flash · Antigravity CLI',
+             'dsh-deepseek_v4_1_flash-high': 'DeepSeek V4.1 Flash · DeepSeek harness', 'claude_code-glm_5_3_flash-high': 'GLM-5.3 Flash · Claude Code',
+             'codex-gpt6_luna-xhigh': 'GPT-6 Luna · Codex (reference run)'}
+
+
+def overall(db, root):
+    """Core-set results per run and mode from the results index: the latest graded trial of each core task dir
+    (docs/core_set.toml); success = the verifier's pass. Runs with fewer than 100 graded core tasks are left out."""
+    import sqlite3
+    core = set(re.findall(r'"(?:[^"/]+/)?([^"/]+)"', '\n'.join(l for l in (root / 'docs' / 'core_set.toml').read_text(encoding='utf8').splitlines()
+                                                              if re.match(r'\s*(task|dir)\s*=', l))))
+    con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
+    rows = con.execute("select run, task, mode, state from cells where state in ('success','failed')").fetchall()
+    when = con.execute("select max(finished) from cells").fetchone()[0]
+    out = {}
+    for run, task, mode, state in rows:
+        if task not in core or run not in RUN_NAMES:
+            continue
+        r = out.setdefault(run, {'run': run, 'name': RUN_NAMES[run], 'privileged': [0, 0], 'standard': [0, 0], 'standard-realtime': [0, 0]})
+        r[mode][1] += 1
+        r[mode][0] += state == 'success'
+    res = [r | {'all': [sum(r[m][0] for m in ('privileged', 'standard', 'standard-realtime')), sum(r[m][1] for m in ('privileged', 'standard', 'standard-realtime'))]}
+           for r in out.values()]
+    res = sorted((r for r in res if r['all'][1] >= 100), key=lambda r: -r['all'][0] / r['all'][1])
+    import datetime
+    return {'snapshot': datetime.datetime.fromtimestamp(when, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC'), 'core': len(core), 'runs': res}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--analysis', required=True)
@@ -290,6 +319,7 @@ def main():
         out['repo'] = repo_counts(Path(a.repo))
     if a.db and a.repo:
         out['where'] = where_we_are(a.db, Path(a.repo))
+        out['overall'] = overall(a.db, Path(a.repo))
 
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf8')
     print(f'wrote {a.out} (snapshot {out["snapshot"]}, set {out["set"]})')

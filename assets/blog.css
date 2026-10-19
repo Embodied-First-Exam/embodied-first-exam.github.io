@@ -85,7 +85,8 @@ html[lang="zh"] .post p, html[lang="zh"] .post li { font-size: 17px; line-height
   letter-spacing: .04em; color: var(--ink-3); vertical-align: 2px; white-space: nowrap; }
 
 /* figures */
-.fig { margin-top: 34px !important; margin-bottom: 0; }
+.fig { margin: 34px 0 0 !important; }
+.post > .fig { margin-left: auto !important; margin-right: auto !important; }
 .fig .fig-body { padding: clamp(16px, 2.4vw, 26px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
 .fig figcaption { margin: 12px 2px 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
 .fig figcaption b { color: var(--ink); font-weight: 650; }
@@ -195,6 +196,24 @@ html[lang="zh"] .post p, html[lang="zh"] .post li { font-size: 17px; line-height
 .habit b { display: block; font: 700 22px/1.1 var(--display); color: var(--ink); }
 .habit b small { font: 500 13px var(--body); color: var(--ink-3); }
 .habit p { margin: 6px 0 0 !important; font-size: 14px !important; line-height: 1.5 !important; color: var(--ink-2) !important; }
+
+/* the results table */
+.ovt-wrap { overflow-x: auto; }
+.ovt { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ovt th { padding: 6px 8px; text-align: left; font: 600 11px/1.3 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--line-2); }
+.ovt td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+.ovt td.who { font-weight: 600; white-space: normal; min-width: 150px; }
+.ovt tr.ref td { color: var(--ink-3); }
+.ovt .ov { height: 6px; border-radius: 3px; background: var(--bg-2); overflow: hidden; margin-bottom: 4px; min-width: 70px; }
+.ovt .ov span { display: block; height: 100%; }
+.ovt b { font: 700 14px var(--mono); margin-right: 6px; }
+.ovt small { font: 400 11px var(--mono); color: var(--ink-3); }
+.src { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--bg-2); font: 500 10.5px/1.6 var(--mono); color: var(--ink-2); vertical-align: 2px; white-space: nowrap; }
+.todo { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; border: 1px dashed var(--priv); font: 600 10.5px/1.6 var(--mono); color: var(--priv-ink); vertical-align: 2px; white-space: nowrap; }
+.finding { margin-top: 48px !important; }
+.finding h3 { margin-top: 0 !important; }
+.finding .claim { margin-top: 10px !important; font-size: 18px !important; font-weight: 500; }
+.post h2 + .finding { margin-top: 28px !important; }
 
 /* the line chart */
 .chart-tabs { display: flex; gap: 6px; margin: 0 0 12px; }

@@ -1494,12 +1494,158 @@
  },
  "where": {
   "run": "codex-gpt6_astra-high",
-  "core_sat": 817,
+  "core_sat": 818,
   "core_solved": 422,
   "solved": 785,
-  "sat": 1238,
+  "sat": 1239,
   "robots": 39,
   "benchmarks": 32,
   "simulators": 20
+ },
+ "overall": {
+  "snapshot": "2026-10-19 01:39 UTC",
+  "core": 843,
+  "runs": [
+   {
+    "run": "codex-gpt6_astra-high",
+    "name": "GPT-6 Astra · Codex",
+    "privileged": [
+     248,
+     334
+    ],
+    "standard": [
+     156,
+     429
+    ],
+    "standard-realtime": [
+     18,
+     55
+    ],
+    "all": [
+     422,
+     818
+    ]
+   },
+   {
+    "run": "claude_code-opus_5_5-high",
+    "name": "Claude Opus 5.5 · Claude Code",
+    "privileged": [
+     182,
+     342
+    ],
+    "standard": [
+     116,
+     427
+    ],
+    "standard-realtime": [
+     7,
+     55
+    ],
+    "all": [
+     305,
+     824
+    ]
+   },
+   {
+    "run": "antigravity_cli-gemini_4_argon-high",
+    "name": "Gemini 4 Argon · Antigravity CLI",
+    "privileged": [
+     128,
+     343
+    ],
+    "standard": [
+     99,
+     427
+    ],
+    "standard-realtime": [
+     6,
+     55
+    ],
+    "all": [
+     233,
+     825
+    ]
+   },
+   {
+    "run": "antigravity_cli-gemini_3_8_flash-high",
+    "name": "Gemini 3.8 Flash · Antigravity CLI",
+    "privileged": [
+     66,
+     343
+    ],
+    "standard": [
+     32,
+     431
+    ],
+    "standard-realtime": [
+     1,
+     55
+    ],
+    "all": [
+     99,
+     829
+    ]
+   },
+   {
+    "run": "dsh-deepseek_v4_1_flash-high",
+    "name": "DeepSeek V4.1 Flash · DeepSeek harness",
+    "privileged": [
+     41,
+     336
+    ],
+    "standard": [
+     15,
+     423
+    ],
+    "standard-realtime": [
+     0,
+     55
+    ],
+    "all": [
+     56,
+     814
+    ]
+   },
+   {
+    "run": "claude_code-glm_5_3_flash-high",
+    "name": "GLM-5.3 Flash · Claude Code",
+    "privileged": [
+     14,
+     336
+    ],
+    "standard": [
+     16,
+     422
+    ],
+    "standard-realtime": [
+     0,
+     55
+    ],
+    "all": [
+     30,
+     813
+    ]
+   },
+   {
+    "run": "codex-gpt6_luna-xhigh",
+    "name": "GPT-6 Luna · Codex (reference run)",
+    "privileged": [
+     11,
+     345
+    ],
+    "standard": [
+     3,
+     432
+    ],
+    "standard-realtime": [
+     0,
+     55
+    ],
+    "all": [
+     14,
+     832
+    ]
+   }
+  ]
  }
 }

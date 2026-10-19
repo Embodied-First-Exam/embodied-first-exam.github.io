@@ -239,6 +239,34 @@ function figBreaks(el, d) {
     <p class="fig-note">${ZH ? '每个 run 只记主要的突破方式；细线是 95% 置信区间。' : 'Each run counts once, by its main breakthrough; thin lines are 95% intervals.'}</p>`;
 }
 
+
+/** Core-set results per agent and mode (data.overall, from the results index). */
+function figOverall(el, d) {
+  if (!el || !d.overall) return;
+  const o = d.overall, M = [['privileged', 'privileged', '--priv'], ['standard', 'standard', '--std'], ['standard-realtime', 'standard-realtime', '--rt'], ['all', 'all modes', '--ink']];
+  const cell = ([s, n], c) => `<td><div class="ov"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${c})"></span></div><b>${pct(s, n)}%</b><small>${s}/${n}</small></td>`;
+  el.innerHTML = `<p class="fig-title">Success on the core set, by agent and mode</p>
+    <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent · harness</th>${M.map(([, l]) => `<th>${l}</th>`).join('')}</tr></thead>
+    <tbody>${o.runs.map((r) => `<tr class="${r.run.includes('luna') ? 'ref' : ''}"><td class="who">${esc(r.name)}</td>${M.map(([m, , c]) => cell(r[m], c)).join('')}</tr>`).join('')}</tbody></table></div>
+    <p class="fig-note">Core set: the ${o.core} task dirs in docs/core_set.toml. Each cell counts the latest graded trial of each core task dir the agent sat; success means the verifier passed it. Results index snapshot ${esc(o.snapshot)}.</p>`;
+}
+
+/** For each agent, the tasks it ran in both modes: solved in both, only privileged, only standard, neither. */
+function figKept(el, d) {
+  if (!el) return;
+  const segs = [['both', 'Solved in both modes', '--c-honest'], ['priv_only', 'Only with privileged access', '--priv'], ['std_only', 'Only under standard rules', '--std'], ['neither', 'Neither', '--c-silent', 1]];
+  const rows = d.kept.filter((r) => d.agents[r.agent]).map((r) => ({ ...r, label: esc(AGENT(d, r.agent)) }));
+  el.innerHTML = `<p class="fig-title">Tasks each agent ran in both modes, by outcome</p>${legend(segs)}${stackRows(rows, segs)}`;
+}
+
+function figWaysRt(el, d) {
+  if (!el) return;
+  const segs = [['code', T.ways.code, '--w-code'], ['direct', T.ways.direct, '--w-direct'], ['train', T.ways.train, '--w-train'],
+    ['mixed', T.ways.mixed, '--w-mixed'], ['none', T.ways.none, '--w-none', 1]];
+  const rows = ['privileged', 'standard', 'realtime'].map((m) => ({ ...d.ways_rt_benches[m], label: `<span class="m-${m[0]}">${T[m === 'privileged' ? 'priv' : m === 'standard' ? 'std' : 'rt']}</span>` }));
+  el.innerHTML = `<p class="fig-title">Who decides each move on the benchmarks that have a realtime mode (BiGym 2.0, Panda Dynamic, RoboOlympics, HumanoidBench)</p>${legend(segs)}${stackRows(rows, segs)}`;
+}
+
 /* ------------------------------------------------------------------------------------------ the article */
 
 /** The contents: an ordinary list in the article, built from its section heads. */
@@ -265,6 +293,9 @@ function clips() {
 getJSON('data/blog.json').then((d) => {
   fillFacts(d);
   command($('#blog-cmd'));
+  figOverall($('#fig-overall'), d);
+  figKept($('#fig-kept'), d);
+  figWaysRt($('#fig-ways-rt'), d);
   figSame($('#fig-same'), d);
   figNobody($('#fig-nobody'), d);
   figWays($('#fig-ways'), d);
@@ -277,6 +308,8 @@ getJSON('data/blog.json').then((d) => {
   figSubtasks($('#fig-subtasks'), d);
   figEventual($('#fig-eventual'), d);
   figBreaks($('#fig-breaks'), d);
+  $$('[data-snapshot-a]').forEach((el) => { el.textContent = d.snapshot; });
+  $$('[data-snapshot-b]').forEach((el) => { el.textContent = d.bottleneck?.snapshot || ''; });
   $$('[data-snapshot]').forEach((el) => { el.textContent = [d.snapshot.slice(0, 10), d.bottleneck?.snapshot].filter(Boolean).join(ZH ? ' 与 ' : ' and '); });
   toc();
   clips();
