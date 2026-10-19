@@ -167,7 +167,7 @@ const LB_SETTINGS = [
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
-  core: (n) => `Each of the ${int(n)} core tasks once, in its default setting. The core set is the harder part of the exam: tasks judged easy or already solved by an early screening run are left out.`,
+  core: (n) => `We run each of the ${int(n)} core tasks once using the default settings. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
   standard: (n) => `Real-robot rules: the agent reaches the robot only through its API and sees camera images and joint readings, never object poses (${int(n)} core tests).`,
   'standard-realtime': (n) => `Standard rules on a running clock: the world keeps moving while the agent thinks (${int(n)} core tests, mostly dynamic tasks).`,
   privileged: (n) => `Full simulator access: the agent sees the whole state and can reset as often as it likes (${int(n)} core tests; some tasks have no privileged setting).`,
