@@ -1792,9 +1792,10 @@ async function blogPage() {
   let posts = [];
   try { posts = await getJSON('data/blogs.json'); } catch (e) { /* none yet */ }
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}">
-      <span class="pc-date">${esc([p.kind, p.date].filter(Boolean).join(' · '))}</span><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
-      ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}</a>`).join('')
+  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card${p.featured ? ' featured' : ''}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}">
+      <span class="pc-text">${p.badge ? `<span class="release-badge"><i aria-hidden="true">✦</i>${esc(p.badge)}</span>` : ''}<span class="pc-date">${esc([p.kind, p.date].filter(Boolean).join(' · '))}</span><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
+      ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}${p.featured ? '<span class="pc-read">Read the report →</span>' : ''}</span>
+      ${p.featured && p.video ? `<span class="pc-media"><video src="${esc(p.video)}" autoplay muted loop playsinline preload="metadata"></video></span>` : ''}</a>`).join('')
     : '<div class="empty-state">The first posts are on their way.</div>';
 }
 

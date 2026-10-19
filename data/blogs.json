@@ -8,6 +8,9 @@
   "tags": [
    "report",
    "results"
-  ]
+  ],
+  "badge": "Public release",
+  "featured": true,
+  "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/roboolympics/wall/catch_and_shoot_realgrasp.mp4?v=07ad7ee7"
  }
 ]

@@ -1678,3 +1678,25 @@ button.as-link:hover { color: var(--ink); }
 .core-mark::before { content: "★"; font-size: 9px; }
 .task-card .media .core-mark { position: absolute; z-index: 2; right: 8px; top: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
 .drawer-top .label .core-mark { margin-left: 6px; vertical-align: 1px; }
+
+/* the public release: a featured card with a badge (owners, 2026-10-19) */
+.release-badge { position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px 6px 12px; border-radius: 999px;
+  background: linear-gradient(100deg, var(--priv) 0%, #e8913a 45%, var(--std) 100%); color: #fff; font: 700 11.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--priv) 70%, transparent); overflow: hidden; }
+.release-badge i { font-style: normal; font-size: 12px; }
+.release-badge::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%); transform: translateX(-100%); animation: rb-shine 3.2s ease-in-out infinite; }
+@keyframes rb-shine { 0%, 55% { transform: translateX(-100%); } 85%, 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .release-badge::after { animation: none; } }
+.post-card.featured { grid-column: 1 / -1; position: relative; padding: 28px 30px; border: 1.5px solid transparent; gap: 10px;
+  background: linear-gradient(var(--surface, var(--bg)), var(--surface, var(--bg))) padding-box, linear-gradient(120deg, var(--priv), #e8913a, var(--std)) border-box; }
+.post-card.featured h3 { font-size: clamp(24px, 2.6vw, 34px); letter-spacing: -.02em; }
+.post-card.featured p { font-size: 16px; max-width: 760px; }
+.post-card.featured:hover { transform: translateY(-3px); box-shadow: 0 16px 40px -18px color-mix(in srgb, var(--priv) 55%, transparent); }
+.post-head .release-badge { margin: 0 0 14px; }
+.pc-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.post-card.featured { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 28px; padding: 30px; }
+.post-card.featured .release-badge { padding: 8px 16px 8px 14px; font-size: 13px; margin-bottom: 6px; }
+.post-card.featured .pc-media { display: block; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #0b0e12; box-shadow: 0 18px 40px -24px rgba(0,0,0,.6); }
+.post-card.featured .pc-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-read { margin-top: 6px; font: 600 14px var(--body); color: var(--priv); }
+@media (max-width: 860px) { .post-card.featured { grid-template-columns: minmax(0, 1fr); padding: 22px; } .post-card.featured .pc-media { order: -1; } }
