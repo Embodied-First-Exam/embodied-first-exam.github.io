@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=ab8a2df0">
+<link rel="stylesheet" href="../assets/blog.css?v=ba782e03">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
-<script type="module" src="../assets/blog.js?v=ecb510a9"></script>
+<script type="module" src="../assets/blog.js?v=49bd6c8a"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -99,32 +99,16 @@
     <h3 id="settings">Three settings</h3>
     <p>A task can be run in up to three settings, and each one is a separate test, scored on its own. The rest of this post uses these three names exactly as defined here.</p>
     <figure class="fig">
-      <div class="cards">
-        <div class="card p"><span class="k">privileged</span><h4>Inside the simulator</h4>
-          <dl><dt>Reaches</dt><dd>the simulator directly; agent and simulator share one container</dd>
-            <dt>Sees</dt><dd>the full simulator state, including every object pose, and the suite’s own tools</dd>
-            <dt>Sends</dt><dd>a <code>trajectory.npz</code> (for a few tasks, a program)</dd>
-            <dt>Resets</dt><dd>unlimited</dd>
-            <dt>Time</dt><dd>the agent plans offline, within the task’s time limit</dd>
-            <dt>Graded</dt><dd>by replaying the answer in a fresh simulator from the same start</dd>
-            <dt>Core tests</dt><dd><span data-s="core_p"></span></dd></dl></div>
-        <div class="card s"><span class="k">standard</span><h4>Real-robot rules</h4>
-          <dl><dt>Reaches</dt><dd>the robot only through its API; the simulator runs in a service the agent cannot open</dd>
-            <dt>Sees</dt><dd>RGB images, depth and joint readings; never object poses or the success check</dd>
-            <dt>Sends</dt><dd>action chunks, arrays of shape <code>(T, dim)</code> with T rows of joint or end-effector targets</dd>
-            <dt>Resets</dt><dd>none by default; a task may allow a fixed number (HumanoidBench 50, DexToolBench 20)</dd>
-            <dt>Time</dt><dd>the robot moves only when the agent sends a chunk; the time limit runs on the wall clock</dd>
-            <dt>Graded</dt><dd>on the live episode, by the service the agent cannot open</dd>
-            <dt>Core tests</dt><dd><span data-s="core_s"></span></dd></dl></div>
-        <div class="card r"><span class="k">standard-realtime</span><h4>Real-robot rules on a running clock</h4>
-          <dl><dt>Reaches</dt><dd>as in standard</dd>
-            <dt>Sees</dt><dd>as in standard</dd>
-            <dt>Sends</dt><dd>as in standard, usually from a program running in the agent’s container</dd>
-            <dt>Resets</dt><dd>10 by default</dd>
-            <dt>Time</dt><dd>once the episode starts, the robot runs at a fixed fraction of real speed whatever the agent does, and holds its last target while the agent thinks, so slow decisions cost</dd>
-            <dt>Graded</dt><dd>on the live episode, as in standard</dd>
-            <dt>Core tests</dt><dd><span data-s="core_t"></span></dd></dl></div>
-      </div>
+      <div class="tscroll"><table class="settings">
+        <thead><tr><th></th><th class="m-p">Privileged<small>inside the simulator</small></th><th class="m-s">Standard<small>real-robot rules</small></th><th class="m-r">Standard-realtime<small>on a running clock</small></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Reaches</th><td>the simulator directly, in the agent’s container</td><td>the robot only, through its API</td><td>the robot only, through its API</td></tr>
+          <tr><th scope="row">Sees</th><td>the full state, every object pose</td><td>RGB, depth and joints; no object poses</td><td>as in standard</td></tr>
+          <tr><th scope="row">Sends</th><td>a <code>trajectory.npz</code></td><td>action chunks <code>(T, dim)</code></td><td>action chunks, often from a running program</td></tr>
+          <tr><th scope="row">Resets</th><td>unlimited</td><td>none (a few tasks allow some)</td><td>10</td></tr>
+          <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
+          <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
+        </tbody></table></div>
       <figcaption><b>Figure 5.</b> The three settings. Most tasks have a privileged and a standard test. Standard-realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and standard-realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../how/">how a test is graded</a>.</figcaption>
     </figure>
 
@@ -132,28 +116,22 @@
     <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, using <span data-s="robots"></span> robots. A task is one fixed scene with one goal, and each of its settings is a test. Some suites are ports of widely used benchmarks (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); we built the others for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). We report results on the core set of <span data-s="core_tasks"></span> tasks (<span data-s="core_tests"></span> tests). You can <a href="../suites/">browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
 
     <h3 id="marking">Keeping the grading honest</h3>
-    <p>Reference solutions never enter the agent’s container, and we remove the original benchmarks’ solutions from the images. Doing nothing must score 0 on every task, and the reference solution must score 1 wherever one exists (a full reference solution for <span data-s="oracle_full"></span> tasks, a partial one for <span data-s="oracle_partial"></span>). Tasks without one, like most of BEHAVIOR-1K, rely on the original benchmark’s success check. Before we add a benchmark, we tell an agent to try to pass without doing the task; if it succeeds anywhere, we hold the benchmark back until its verifier is fixed. We learned two things along the way:</p>
-    <figure class="fig">
-      <div class="cards two">
-        <div class="story"><span class="k">Models remember deleted solutions</span><p>Claude Opus 5.5 rewrote a deleted RoboTwin reference solution from memory, with 26 of its 28 lines identical to the original. Opus and GPT-6 Astra both rebuilt a deleted HumanoidBench reward function with the original constants. Results on tasks built from public benchmarks should be read with that in mind.</p></div>
-        <div class="story"><span class="k">Tools outside the container</span><p>One harness offered tools that ran on the provider’s servers, outside the container and its network rules, and agents discovered and used them. These tools are now turned off, and the gateway in front of the model forwards only model calls.</p></div>
-      </div>
-      <figcaption><b>Figure 6.</b> Two lessons from testing whether agents can pass without doing the task.</figcaption>
-    </figure>
+    <p>Reference solutions never enter the agent’s container, and we remove the original benchmarks’ solutions from the images. Doing nothing must score 0 on every task, and the reference solution must score 1 wherever one exists (a full reference solution for <span data-s="oracle_full"></span> tasks, a partial one for <span data-s="oracle_partial"></span>). Tasks without one, like most of BEHAVIOR-1K, rely on the original benchmark’s success check. Before we add a benchmark, we tell an agent to try to pass without doing the task; if it succeeds anywhere, we hold the benchmark back until its verifier is fixed.</p>
+    <p>Two observations from this testing affect how the results should be read. First, models remember deleted solutions: Claude Opus 5.5 rewrote a deleted RoboTwin reference solution from memory, with 26 of its 28 lines identical to the original, and both Opus and GPT-6 Astra rebuilt a deleted HumanoidBench reward function with its original constants, so results on tasks built from public benchmarks may partly reflect memorization. Second, one harness offered tools that ran on the provider's servers, outside the container and its network rules, and agents found and used them; these tools are now turned off, and the gateway in front of the model forwards only model calls.</p>
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
     <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set leaves out tests that we judged easy and tests that an early screening run solved, so it is hard by design.</p>
     <figure class="fig fig-wide">
-      <div class="fig-body" id="fig-modes" data-fig="7"></div>
+      <div class="fig-body" id="fig-modes" data-fig="6"></div>
     </figure>
-    <p>Figure 7 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</p>
+    <p>Figure 6 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</p>
     <figure class="fig fig-wide">
-      <div class="fig-body" id="fig-types" data-fig="8"></div>
+      <div class="fig-body" id="fig-types" data-fig="7"></div>
     </figure>
-    <p>Broken down by task type (Figure 8), the three strongest agents do best on <span data-s="types_best"></span> and worst on <span data-s="types_worst"></span>. The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>. Figure 9 breaks the Core view down by suite. No single agent is best everywhere: of the <span data-s="suites_n"></span> suites with at least five core tasks, GPT-6 Astra leads or ties in <span data-s="suites_astra"></span>, Claude Opus 5.5 in <span data-s="suites_opus"></span> and Gemini 4 Argon in <span data-s="suites_argon"></span>.</p>
+    <p>Broken down by task type (Figure 7), the three strongest agents do best on <span data-s="types_best"></span> and worst on <span data-s="types_worst"></span>. The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>. Figure 8 breaks the Core view down by suite. No single agent is best everywhere: of the <span data-s="suites_n"></span> suites with at least five core tasks, GPT-6 Astra leads or ties in <span data-s="suites_astra"></span>, Claude Opus 5.5 in <span data-s="suites_opus"></span> and Gemini 4 Argon in <span data-s="suites_argon"></span>.</p>
     <figure class="fig fig-wide">
-      <div class="fig-body" id="fig-suites" data-fig="9"></div>
+      <div class="fig-body" id="fig-suites" data-fig="8"></div>
     </figure>
     <p class="fig-note">Data as of <span data-s="built"></span>. The approach labels in Finding 5 come from a random sample of <span data-s="cb_sample"></span> attempts (snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent that read the logs of each run and not yet checked by hand. Every clip in this post shows the run it names, and clicking it opens a step-by-step view of that run. The <a href="../leaderboard/">leaderboard</a> lists the same results for every suite.</p>
 
@@ -167,14 +145,14 @@
       <div class="finding-body" id="f1-body" hidden="until-found">
         <ul class="claims">
             <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
-            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 10).</li>
+            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 9).</li>
             <li>In privileged mode, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves.</li>
             <li>In standard mode, Claude Opus 5.5 and Gemini 4 Argon solve <span data-s="rival_s_extra"></span> tests that GPT-6 Astra fails. Between them, the three solve <span data-s="u_s_any"></span> of the standard tests; GPT-6 Astra solves <span data-s="u_s_astra"></span>.</li>
             <li>In standard-realtime, GPT-6 Astra again solves <span data-s="rival_t"></span> of the tests its rivals solve; they add <span data-s="rival_t_extra"></span> that it fails.</li>
         </ul>
-        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 10.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
+        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 9.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
         <figure class="fig">
-          <div class="fig-body" id="fig-overlap" data-fig="11"></div>
+          <div class="fig-body" id="fig-overlap" data-fig="10"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=robocasa365-display-meat-variety-i00-standard--oycva6z"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robocasa365-display-meat-variety-i00-standard--oycva6z/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robocasa365-display-meat-variety-i00-standard--oycva6z/replay.mp4"></video>
@@ -240,7 +218,7 @@
             <li>Standard-realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a standard-realtime test, each of the three strongest agents solves fewer in standard-realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-paired" data-fig="12"></div>
+          <div class="fig-body" id="fig-paired" data-fig="11"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=behavior-bringing-in-wood-i00-standard--myaibvy"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay.mp4"></video>
@@ -294,7 +272,7 @@
             <li>Standard-realtime has too few tests per benchmark for the figure. In the <span data-s="hard_t_n"></span> benchmarks with at least five, the share of tests that none of the three solves is <span data-s="hard_t_list"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-hard" data-fig="13"></div>
+          <div class="fig-body" id="fig-hard" data-fig="12"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=humanoidbench-manip-door-i00-standard--cfxzsqf"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/humanoidbench-manip-door-i00-standard--cfxzsqf/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/humanoidbench-manip-door-i00-standard--cfxzsqf/replay.mp4"></video>
@@ -347,7 +325,7 @@
             <li>In standard mode, <span data-s="easy_s_claim"></span>. In standard-realtime, no benchmark with at least five tests comes close; the best is <span data-s="easy_t_best"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-easy" data-fig="14"></div>
+          <div class="fig-body" id="fig-easy" data-fig="13"></div>
         </figure>
           <div class="cases rep">
             <a class="case p" href="../run/?r=mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/video.mp4"></video>
@@ -395,7 +373,7 @@
             <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-approach" data-fig="15"></div>
+          <div class="fig-body" id="fig-approach" data-fig="14"></div>
         </figure>
           <div class="cases rep">
             <a class="case p" href="../run/?r=maniguard-jar-transport-i25-privileged--rz5z7ys"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/video.mp4"></video>
@@ -408,7 +386,7 @@
           <div class="cases">
             <a class="case p" href="../run/?r=robotwin_2_0_put_bottles_dustbin-privileged--ku2qewp"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/robotwin-2/put_bottles_dustbin/poster.png" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/masters/robotwin-2/put_bottles_dustbin/video.mp4"></video>
               <span class="case-k">Code to control</span><b>RoboTwin 2.0 · Bottles into a dustbin</b><span class="case-m">GPT-6 Astra · privileged · solved</span><span class="case-t">After reading the task’s source, it scripted the grasps with the simulator’s motion primitives, handing two bottles from the right arm to the left in mid-air. It saved the answer at minute 5, and the official replay passed twice.</span></a>
-            <a class="case s" href="../run/?r=robotwin_2_0_put_bottles_dustbin-standard--ydhsp73"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/replay.mp4"></video>
+            <a class="case s" href="../run/?r=robotwin_2_0_put_bottles_dustbin-standard--ydhsp73"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/video.mp4"></video>
               <span class="case-k">Direct control</span><b>RoboTwin 2.0 · Bottles into a dustbin</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">It sent end-effector commands one at a time and looked at the camera images after each. It knocked over the cola bottle and picked it up again with the other arm; the last hand-over took several tries and succeeded at minute 29, about 30 seconds before the time limit.</span></a>
           </div>
           <p>In standard-realtime, the agent writes a program to play and lets it run:</p>

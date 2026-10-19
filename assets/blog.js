@@ -612,6 +612,47 @@ function refs() {
   });
 }
 
+/** Figures as wide as the text: the framework figure is drawn at 1240 px in its landscape layout and scaled to the column;
+ *  every figure gets an Enlarge button (charts also open on a click) that shows it full size in an overlay. */
+function zoomFigs() {
+  const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+  const flow = $('#flowfig');
+  let box = null;
+  if (flow) {
+    box = document.createElement('div'); box.className = 'flow-box';
+    flow.before(box); box.append(flow);
+    const fit = () => {
+      if (!box.contains(flow)) return;
+      if (innerWidth <= 860) { flow.style.transform = ''; box.style.height = ''; return; }
+      const k = Math.min(1, box.clientWidth / 1240);
+      flow.style.transform = `scale(${k})`; box.style.height = `${Math.ceil(flow.offsetHeight * k) + 2}px`;
+    };
+    new ResizeObserver(fit).observe(box); new ResizeObserver(fit).observe(flow); addEventListener('resize', fit); fit();
+  }
+  const open = (el, home) => {
+    const ov = document.createElement('div'); ov.className = 'zoom-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    const inner = document.createElement('div'); inner.className = 'zoom-in fig';
+    const x = Object.assign(document.createElement('button'), { className: 'zoom-x', type: 'button', textContent: '×' }); x.setAttribute('aria-label', 'Close');
+    const mark = document.createComment('zoom'); el.before(mark);
+    inner.append(el); ov.append(x, inner); document.body.append(ov); document.documentElement.style.overflow = 'hidden';
+    const close = () => { mark.replaceWith(el); ov.remove(); document.documentElement.style.overflow = ''; removeEventListener('keydown', key); home?.(); };
+    const key = (e) => { if (e.key === 'Escape') close(); };
+    x.addEventListener('click', close); ov.addEventListener('click', (e) => { if (e.target === ov) close(); }); addEventListener('keydown', key);
+    x.focus();
+  };
+  const add = (host, target, after) => {
+    host.classList.add('fig-zoom-host');
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'zoom-btn'; b.innerHTML = `${ICON}Enlarge`;
+    b.addEventListener('click', (e) => { e.stopPropagation(); open(target, after); });
+    host.append(b);
+  };
+  if (flow && box) add(box, flow, () => dispatchEvent(new Event('resize')));
+  $$('.post .fig-body[data-fig]').forEach((fb) => {
+    add(fb, fb);
+    fb.addEventListener('click', (e) => { if (e.target.closest('details, summary, a, button, .zoom-ov') || fb.closest('.zoom-ov')) return; open(fb); });
+  });
+}
+
 const settle = findings();
 refs();
 Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json'), getJSON('data/atlas.json')]).then(([ex, tasks, b, atlas]) => {
@@ -631,4 +672,4 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
 }).catch((e) => {
   console.error(e);
   $$('.fig-body').forEach((el) => { el.innerHTML = '<p class="fig-note">This figure could not be loaded.</p>'; });
-}).finally(() => { toc(); clips(); settle(); });
+}).finally(() => { toc(); clips(); settle(); zoomFigs(); });

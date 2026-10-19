@@ -27,7 +27,7 @@
 html[lang="zh"] body { font-family: var(--body), "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
 
 /* the header: the site's page head (app.js adds the moving wall beside it), on the article's column */
-.page-head.post-head { max-width: calc(880px + 2 * var(--gutter)); }
+.page-head.post-head { max-width: calc(1000px + 2 * var(--gutter)); }
 .page-head.post-head h1 { font-size: clamp(40px, 5.6vw, 72px); }
 /* the title is the home page's two-line question (exam.css .hero-q), set at the size of a post title */
 .page-head.post-head h1.post-q { width: min(960px, calc(50vw + 440px - var(--gutter))); max-width: none; font: 700 clamp(28px, 2.5vw, 36px)/1.16 var(--display); letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
@@ -42,7 +42,7 @@ html[lang="zh"] body { font-family: var(--body), "PingFang SC", "Hiragino Sans G
 
 /* the article */
 .post { position: relative; max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter) clamp(64px, 8vw, 110px); }
-.post { --col: 880px; }
+.post { --col: 1000px; }
 .post > * { max-width: var(--col); margin-left: auto; margin-right: auto; }
 .post h2 { margin-top: clamp(64px, 7vw, 96px); margin-bottom: 0; font: 700 clamp(28px, 3.1vw, 40px)/1.08 var(--display); letter-spacing: -.025em; scroll-margin-top: 90px; }
 .post h2 .num { display: block; margin-bottom: 10px; font: 500 12px/1 var(--mono); letter-spacing: .08em; color: var(--ink-3); text-transform: uppercase; }
@@ -264,7 +264,7 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .story blockquote { margin: 10px 0 0; padding-left: 14px; border-left: 3px solid var(--line-2); font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
 
 /* the contents: a block in the article, and a rail in the left margin where there is room for it */
-.toc-rail { position: fixed; top: 128px; left: calc((100vw - 880px) / 2 - 220px); width: 180px; z-index: 5; max-height: calc(100vh - 160px); overflow-y: auto; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+.toc-rail { position: fixed; top: 128px; left: max(20px, calc((100vw - 1000px) / 4 - 90px)); width: 180px; z-index: 5; max-height: calc(100vh - 160px); overflow-y: auto; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
 .toc-rail.show { opacity: 1; visibility: visible; }
 .toc-rail p { margin: 0 0 10px 12px; font: 600 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
 .toc-rail ol { list-style: none; margin: 0; padding: 0; }
@@ -285,7 +285,7 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .toc-rail > ol > li > a .k, .toc-rail .fold-head > a .k { font: 500 10.5px/1.9 var(--mono); color: var(--ink-3); }
 .toc-rail > ol > li > a.on .k, .toc-rail .fold-head > a.on .k { color: var(--priv-ink); }
 .toc-rail ol ol a.on .k { color: var(--priv-ink); }
-@media (max-width: 1340px) { .toc-rail { display: none; } }
+@media (max-width: 1419px) { .toc-rail { display: none; } }
 
 .cite { margin-top: 18px !important; padding: 16px 18px; border-radius: 12px; background: var(--code-bg); font: 400 12.5px/1.6 var(--mono); white-space: pre-wrap; overflow-x: auto; }
 
@@ -525,29 +525,6 @@ details.nums > summary:hover { color: var(--ink); }
 .post .fx-checks { margin: 2px 0 0; padding: 0; }
 .post .fx-checks li { font-size: 12px; line-height: 1.4; color: var(--ink-2); }
 .post .fx-checks li + li { margin-top: 0; }
-@media (min-width: 861px) and (max-width: 1199px) {
-  .post .fx-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: none; row-gap: 10px; column-gap: 12px; }
-  .post .fx-grid > * { grid-column: 1 / -1 !important; grid-row: auto !important; }
-  .post .fx-arrow, .post .fx-qcard { display: none; }
-  .post .fx-qh { padding: 0 2px; }
-  .post .fx-in.fx-goal { grid-column: 1 !important; }
-  .post .fx-in.fx-scene { grid-column: 2 !important; flex-direction: row; align-items: center; }
-  .post .fx-scene img { width: 52%; flex: none; }
-  .post .fx-in.fx-scene { flex-wrap: wrap; }
-  .post .fx-scene .fx-ih { width: 100%; }
-  .post .fx-layer { min-height: 58px; grid-template-columns: 150px minmax(0, 1fr); }
-  .post .fx-lb { flex-wrap: wrap; row-gap: 6px; padding: 8px 0; }
-  .post .fx-traj { order: 1; grid-column: 1 !important; margin-top: 30px; }
-  .post .fx-ver { order: 2; grid-column: 2 !important; margin-top: 30px; }
-  .post .fx-obs { max-height: 150px; }
-}
-/* wide screens: figures keep the text's left edge and grow into the empty right margin (the contents rail holds the left
-   one); the framework figure gets back the home page's landscape layout, so it fits one screen */
-@media (min-width: 1200px) {
-  .post > figure.fig-wide, .post > figure.fig-flow { max-width: none; width: min(1320px, calc(880px + (100vw - 880px) / 2 - 48px));
-    margin-left: calc((100% - 880px) / 2) !important; margin-right: 0 !important; }
-  .post > figure.fig-wide figcaption, .post > figure.fig-flow figcaption { max-width: 880px; }
-}
 
 /* the walk through the figure: numbered steps */
 .post ol.walk { list-style: none; padding: 0; counter-reset: w; }
@@ -569,7 +546,7 @@ details.nums > summary:hover { color: var(--ink); }
 .chart .rl { font: 500 11.5px var(--body); fill: var(--ink); }
 .chart .rp { stroke-width: 2.2; fill-opacity: .1; stroke-linejoin: round; }
 .chart .rp.fl { stroke-width: 1.4; stroke-dasharray: 4 3; }
-table.heat { width: 100%; border-collapse: separate; border-spacing: 3px; font: 400 12px var(--mono); }
+table.heat { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 3px; font: 400 12px var(--mono); }
 table.heat th { font: 600 11.5px var(--body); text-align: left; color: var(--ink-2, var(--ink)); padding: 4px 6px; white-space: nowrap; }
 table.heat thead th { text-align: center; font-size: 11px; }
 table.heat th small { font: 400 10.5px var(--mono); color: var(--ink-3); margin-left: 4px; }
@@ -598,3 +575,38 @@ ol.refs .rf-t { font-weight: 600; color: var(--ink); text-decoration: none; bord
 ol.refs .rf-t:hover { border-bottom-color: currentColor; }
 ol.refs .rf-v { color: var(--ink-3); font-style: italic; }
 ol.refs li:target { background: color-mix(in srgb, var(--accent, var(--std)) 10%, transparent); border-radius: 6px; }
+
+/* figures stay as wide as the text; the framework figure keeps its landscape layout, drawn at 1240 px and scaled to the
+   column; "Enlarge" opens any figure at full size */
+.fig-zoom-host { position: relative; }
+.flow-box { position: relative; overflow: hidden; }
+.flow-box > .flowfig { width: 1240px; transform-origin: 0 0; }
+@media (max-width: 860px) { .flow-box > .flowfig { width: auto; transform: none !important; } .flow-box { height: auto !important; } }
+.zoom-btn { position: absolute; top: 10px; right: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
+  border: 1px solid var(--line-2, var(--line)); border-radius: 999px; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(6px); font: 500 11px/1 var(--mono); color: var(--ink-2, var(--ink)); cursor: zoom-in; opacity: .85; transition: opacity .2s, border-color .2s; }
+.zoom-btn:hover { opacity: 1; border-color: var(--ink-3); }
+.zoom-btn svg { width: 12px; height: 12px; }
+.fig-body { cursor: zoom-in; }
+.fig-body details, .fig-body summary, .fig-body a { cursor: auto; }
+.zoom-ov { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 56px 24px 32px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(4px); overflow: auto; animation: zfade .18s ease; }
+.zoom-ov .zoom-in { width: min(1320px, 100%); margin: auto 0; padding: 24px; border-radius: 16px; background: var(--bg); border: 1px solid var(--line);
+  box-shadow: 0 20px 60px rgba(0,0,0,.18); cursor: auto; }
+.zoom-ov .zoom-in > .flowfig { width: 100% !important; transform: none !important; }
+.zoom-ov .zoom-x { position: fixed; top: 14px; right: 18px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg);
+  font: 400 20px/1 var(--body); color: var(--ink); cursor: pointer; }
+@keyframes zfade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Figure 5: the three settings side by side */
+table.settings { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.4; }
+table.settings th, table.settings td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+table.settings thead th { font: 600 12.5px/1.3 var(--mono); letter-spacing: .05em; text-transform: uppercase; border-bottom: 2px solid currentColor; }
+table.settings thead th small { display: block; margin-top: 3px; font: 400 12px/1.3 var(--body); letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+table.settings thead .m-p { color: var(--priv); } table.settings thead .m-s { color: var(--std); } table.settings thead .m-r { color: var(--rt); }
+table.settings tbody th { width: 92px; font: 500 11px/1.6 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+table.settings td { color: var(--ink-2, var(--ink)); width: 30%; }
+table.settings code { font-size: .88em; }
+@media (max-width: 640px) { table.settings { font-size: 12.5px; } table.settings th, table.settings td { padding: 7px 6px; } table.settings tbody th { width: 64px; font-size: 10px; } }
+.zoom-ov .zoom-btn { display: none; }
+table.heat thead th:first-child { width: 26%; text-align: left; }
