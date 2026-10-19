@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="../assets/exam.css?v=2e79e044">
 <link rel="stylesheet" href="../assets/blog.css?v=183a5c44">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=e4fdacb6"></script>
-<script type="module" src="../assets/blog.js?v=efa92476"></script>
+<script type="module" src="../assets/app.js?v=6c0d785c"></script>
+<script type="module" src="../assets/blog.js?v=0b8b4334"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -130,7 +130,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p><span data-s="n_runs_word"></span> agents have sat the core set, each a model in its own harness at high reasoning effort. Head to head, on the <span data-s="ns"></span> standard and <span data-s="np"></span> privileged tests that every one of them sat, <span data-s="best"></span> solves <span data-s="best_s"></span> standard tests (<span data-s="best_s_pct"></span>) and <span data-s="best_p"></span> privileged ones (<span data-s="best_p_pct"></span>). <span data-s="second"></span> and <span data-s="third"></span> follow; the three Flash-class models solve at most <span data-s="flash_max"></span> of the standard tests.</p>
+    <p><span data-s="n_runs_word"></span> agents have sat the core set, each a model in its own harness at high reasoning effort. On the <span data-s="ns"></span> standard and <span data-s="np"></span> privileged tests that every one of them sat, <span data-s="best"></span> solves <span data-s="best_s"></span> standard tests (<span data-s="best_s_pct"></span>) and <span data-s="best_p"></span> privileged ones (<span data-s="best_p_pct"></span>). <span data-s="second"></span> and <span data-s="third"></span> follow; the three Flash-class models solve at most <span data-s="flash_max"></span> of the standard tests.</p>
     <figure class="fig">
       <div class="fig-body" id="fig-overall"></div>
       <figcaption>The leaderboard’s numbers, from the same data. Standard includes the <span data-s="nt"></span> standard-realtime tests. Each cell is the latest finished attempt of the model on each test, one attempt per test; solved means the verifier marked it 1. Gemini 4 Argon lost <span data-s="argon_filtered"></span> runs to its provider’s content filter, which count as failures. <a href="../leaderboard/">The full leaderboard</a>, per suite and per trial.</figcaption>
@@ -140,7 +140,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
     <h2 id="findings" data-short="Key findings"><span class="num">04</span>Key findings</h2>
     <div class="aside">
       <p class="label">How we count</p>
-      <p>The unit is a test: one task in one setting. Unless a figure says otherwise, counts are over the head-to-head tests of the core set (<span data-s="ns"></span> standard, <span data-s="np"></span> privileged), with the latest finished attempt of each agent, as on the leaderboard; every share is given with its count. The core set leaves out tests judged easy and tests an early screening run solved, so it is hard by construction and its rates run lower than the whole exam’s. Site data of <span data-s="built"></span>.</p>
+      <p>The unit is a test: one task in one setting. Unless a figure says otherwise, counts are over the core-set tests every agent sat (<span data-s="ns"></span> standard, <span data-s="np"></span> privileged), with the latest finished attempt of each agent, as on the leaderboard; every share is given with its count. The core set leaves out tests judged easy and tests an early screening run solved, so it is hard by construction and its rates run lower than the whole exam’s. Site data of <span data-s="built"></span>.</p>
     </div>
 
     <div class="finding">
@@ -187,7 +187,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
 
     <div class="finding">
       <h3 id="f3" data-short="Difficulty varies widely"><span class="fn">Finding 3</span>Difficulty varies widely: some suites are mostly solved, while others are barely touched.</h3>
-      <p class="evidence">Per suite, the share of head-to-head tests that at least one agent solved ranges from all of them to none (figure). Under standard rules at least one agent solves most of Embodied Safety Exam and roughly half of each RoboOlympics suite, but only a few tests of BEHAVIOR-1K, HumanoidBench and DexToolBench. Most of the small ported suites are fully solved, but each has only a handful of core tests.</p>
+      <p class="evidence">Per suite, the share of core tests that at least one agent solved ranges from all of them to none (figure). Under standard rules at least one agent solves most of Embodied Safety Exam and roughly half of each RoboOlympics suite, but only a few tests of BEHAVIOR-1K, HumanoidBench and DexToolBench. Most of the small ported suites are fully solved, but each has only a handful of core tests.</p>
       <figure class="fig">
         <div class="fig-body" id="fig-suites"></div>
       </figure>
@@ -208,7 +208,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
 
     <div class="finding open">
       <h3 id="q1" data-short="Same failures?"><span class="fn">Open question</span>Do strong agents fail on the same tasks?</h3>
-      <p class="evidence">A first count, not yet a finding. Of the <span data-s="ns"></span> standard head-to-head tests, the three strongest agents all solved <span data-s="ov3"></span>, two of them <span data-s="ov2"></span>, one <span data-s="ov1"></span>, and none <span data-s="ov0"></span>. Of the <span data-s="astra_fails"></span> standard tests <span data-s="best"></span> failed, Claude Opus 5.5 or Gemini 4 Argon solved <span data-s="astra_fails_other"></span>.</p>
+      <p class="evidence">A first count, not yet a finding. Of the <span data-s="ns"></span> standard core tests every agent sat, the three strongest agents all solved <span data-s="ov3"></span>, two of them <span data-s="ov2"></span>, one <span data-s="ov1"></span>, and none <span data-s="ov0"></span>. Of the <span data-s="astra_fails"></span> standard tests <span data-s="best"></span> failed, Claude Opus 5.5 or Gemini 4 Argon solved <span data-s="astra_fails_other"></span>.</p>
       <figure class="fig">
         <div class="fig-body" id="fig-overlap"></div>
       </figure>
@@ -220,7 +220,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
     <p>Embodied Safety Exam gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
     <div class="finding">
       <h3 id="s1"><span class="fn ck">Case finding</span>A safe decision does not always lead to safe execution.</h3>
-      <p class="evidence">Head to head, the agents solve between <span data-s="rsb_lo"></span> and <span data-s="rsb_hi"></span> of its <span data-s="rsb_n"></span> standard tests. Of their <span data-s="sf_trials"></span> attempts at its core tests in our analysis (<span data-s="sf_rt"></span> of them realtime), <span data-s="sf_fail"></span> failed, and <span data-s="sf_harm"></span> of those failures (<span data-s="sf_harm_pct"></span>) came because the robot’s own motion caused harm: an arm pressed onto the table, a glass knocked over, a liquid spilled. That is more than the <span data-s="sf_done"></span> (<span data-s="sf_done_pct"></span>) where the agent carried out a request it should have refused. In <span data-s="sf_right"></span> of the motion-harm failures, the agent’s decision was right: it declined the hazardous part and told the operator, but the robot had already done the damage.</p>
+      <p class="evidence">On the tests every agent sat, the agents solve between <span data-s="rsb_lo"></span> and <span data-s="rsb_hi"></span> of its <span data-s="rsb_n"></span> standard tests. Of their <span data-s="sf_trials"></span> attempts at its core tests in our analysis (<span data-s="sf_rt"></span> of them realtime), <span data-s="sf_fail"></span> failed, and <span data-s="sf_harm"></span> of those failures (<span data-s="sf_harm_pct"></span>) came because the robot’s own motion caused harm: an arm pressed onto the table, a glass knocked over, a liquid spilled. That is more than the <span data-s="sf_done"></span> (<span data-s="sf_done_pct"></span>) where the agent carried out a request it should have refused. In <span data-s="sf_right"></span> of the motion-harm failures, the agent’s decision was right: it declined the hazardous part and told the operator, but the robot had already done the damage.</p>
       <figure class="fig">
         <div class="fig-body" id="fig-safety"></div>
         <figcaption>Counts from the benchmark’s verdict of each attempt (its outcome and judgment class), grouped by rule; bottleneck analysis, snapshot <span data-s="sf_snapshot"></span>, core set, the six agents above.</figcaption>

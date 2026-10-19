@@ -107,7 +107,7 @@ function stackRows(rows, segs) {
 function figOverall(el, R) {
   const { board, H } = R;
   const cell = (s, n, c) => `<td><div class="ov"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${c})"></span></div><b>${pct(s, n)}%</b><small>${s}/${n}</small></td>`;
-  el.innerHTML = `<p class="fig-title">Tests solved, head to head on the core set</p>
+  el.innerHTML = `<p class="fig-title">Tests solved on the core set (the tests every agent sat)</p>
     <div class="ovt-wrap"><table class="ovt"><thead><tr><th>Agent · harness</th><th>Standard <small>(${H.s.length} tests)</small></th><th>Privileged <small>(${H.p.length} tests)</small></th></tr></thead>
     <tbody>${board.map((r) => `<tr><td class="who">${esc(r.name)} <small>· ${esc(r.harness)}</small></td>${cell(r.s, H.s.length, '--std')}${cell(r.p, H.p.length, '--priv')}</tr>`).join('')}</tbody></table></div>`;
 }
@@ -123,7 +123,7 @@ function figReach(el, R) {
     return { label, n: L.length, best: b, other: o, none: L.length - b - o };
   };
   const segs = [['best', `Solved by ${name(best)}`, '--ink'], ['other', 'Solved only by another agent', '--flash'], ['none', 'Solved by no agent', '--c-other', 1]];
-  el.innerHTML = `<p class="fig-title">Head-to-head tests by who solved them</p>${legend(segs)}
+  el.innerHTML = `<p class="fig-title">Core tests by who solved them</p>${legend(segs)}
     ${stackRows([row(H.s, '<span class="m-s">Standard</span>'), row(H.p, '<span class="m-p">Privileged</span>')], segs)}`;
 }
 
@@ -156,10 +156,10 @@ function figSuites(el, R) {
   const small = R.suites.filter((s) => s.s[1] < MIN_SUITE).sort((x, y) => x.name.localeCompare(y.name));
   const bar = (k, [a, n]) => (n ? `<div class="nb-bar ${k}"><div class="t"><span style="width:${pct(a, n)}%"></span></div><small>${pct(a, n)}% · ${a}/${n}</small></div>`
     : `<div class="nb-bar ${k}"><div class="t"></div><small>no tests</small></div>`);
-  el.innerHTML = `<p class="fig-title">Share of each suite’s head-to-head tests solved by at least one agent</p>
+  el.innerHTML = `<p class="fig-title">Share of each suite’s core tests solved by at least one agent</p>
     <div class="legend"><span><i style="background:var(--std)"></i>Standard</span><span><i style="background:var(--priv)"></i>Privileged</span></div>
     ${big.map((s) => `<div class="nb-row"><div class="who">${esc(s.name)}</div><div class="nb-bars">${bar('s', s.s)}${bar('p', s.p)}</div></div>`).join('')}
-    <p class="fig-note">Suites with at least ${MIN_SUITE} standard tests in the head-to-head, ordered by the standard share. With fewer:
+    <p class="fig-note">Suites with at least ${MIN_SUITE} standard core tests, ordered by the standard share. With fewer:
       ${small.map((s) => `${esc(s.name)} ${s.s[0]}/${s.s[1]}`).join(', ')} (standard).</p>`;
 }
 
@@ -167,7 +167,7 @@ function figSuites(el, R) {
 function figOverlap(el, R) {
   const segs = [['k3', 'All three', '--c-honest'], ['k2', 'Two', '--f-possible'], ['k1', 'One', '--rt'], ['k0', 'None', '--c-other', 1]];
   const row = (L, label) => { const [k3, k2, k1, k0] = R.overlap(L); return { label, n: L.length, k3, k2, k1, k0 }; };
-  el.innerHTML = `<p class="fig-title">Head-to-head tests by how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>${legend(segs)}
+  el.innerHTML = `<p class="fig-title">Core tests by how many of ${TOP.map((r) => esc(R.name(r))).join(', ')} solved them</p>${legend(segs)}
     ${stackRows([row(R.H.s, '<span class="m-s">Standard</span>'), row(R.H.p, '<span class="m-p">Privileged</span>')], segs)}`;
 }
 
