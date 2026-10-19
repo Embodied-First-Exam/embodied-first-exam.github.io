@@ -56,11 +56,11 @@ for n, p in mods.items():
         done.pop(n, None)
 for n in sorted(mods):
     stamp(n)
-stamps = {"exam.css": digest(A / "exam.css"), "app.js": done["app.js"]}
+stamps = {"exam.css": digest(A / "exam.css"), "app.js": done["app.js"], "blog.css": digest(A / "blog.css"), "blog.js": done["blog.js"]}
 changed = 0
 for page in sorted([*ROOT.glob("**/index.html"), ROOT / "404.html"]):
     text = page.read_text(encoding="utf-8")
-    new = re.sub(r'(assets/(exam\.css|app\.js))(\?v=[0-9a-f]+)?"', lambda m: f'{m.group(1)}?v={stamps[m.group(2)]}"', text)
+    new = re.sub(r'(assets/(exam\.css|app\.js|blog\.css|blog\.js))(\?v=[0-9a-f]+)?"', lambda m: f'{m.group(1)}?v={stamps[m.group(2)]}"', text)
     if new != text:
         page.write_text(new, encoding="utf-8")
         changed += 1
