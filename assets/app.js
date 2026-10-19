@@ -1472,6 +1472,11 @@ function bigNumbers(el, ex) {
   const t = ex.totals || {};
   // tasks first, then tests: a task is one scene with all its modes, a test one of its modes (owners, 2026-10-19)
   iconNumbers(el, [['doc', t.instances, 'tasks', `${int(t.task_dirs)} tests`], ['layers', t.suites, 'benchmark suites'], ['arm', t.robots, 'robots']]);   // no simulator count: the task.toml labels are not engines (owners, 2026-10-19)
+  // one line under them: our own suites and tasks, and the core set (owners, 2026-10-19)
+  const ours = new Set((ex.suites || []).filter((s) => s.origin === 'ours').map((s) => s.id));
+  const ourTasks = (ex.suites || []).filter((s) => ours.has(s.id)).reduce((a, s) => a + (s.instances || 0), 0);
+  el.parentElement?.querySelector('.nums-line')?.remove();
+  el.insertAdjacentHTML('afterend', `<p class="nums-line reveal"><span><b>${int(ours.size)}</b> original suites</span><i aria-hidden="true">·</i><span><b>${int(ourTasks)}</b> original tasks</span><i aria-hidden="true">·</i><span><b>${int(t.core_tasks)}</b> core tasks</span></p>`);
 }
 
 /** Icons named in the markup: <span class="ic" data-icon="cube"></span>. */
