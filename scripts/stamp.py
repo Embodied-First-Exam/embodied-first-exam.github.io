@@ -9,6 +9,7 @@ keeps its cached copy otherwise.
 
 import hashlib
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -46,11 +47,24 @@ def stamp(name: str, seen=()) -> str:
 
 for n in sorted(mods):
     stamp(n)
-# the site's own pictures named in the modules (site('media/ways/...')) get a content hash too
-MEDIA_REF = re.compile(r"""(site\(['"`])(media/[\w./-]+\.(?:jpg|png|mp4))(\?v=[0-9a-f]*)?(['"`]\))""")
+# the site's own pictures named in the modules (site('media/ways/...'), on HF: scripts/media.py) get their content hash
+# too: the version on HF, or the staged one about to be uploaded (make media)
+sys.path.insert(0, str(ROOT / "scripts"))
+import media  # noqa: E402
+MEDIA_REF = re.compile(r"""(site\(['"`])media/([\w./-]+\.(?:jpg|png|mp4))(\?v=[0-9a-f]*)?(['"`]\))""")
+_hf: dict = {}
+
+
+def media_version(rel: str) -> str:
+    if not _hf:
+        _hf.update(media.listing())
+    staged = media.STAGE / rel
+    return (_hf.get(rel) or (0, ""))[1][:8] or (media.sha256(staged)[:8] if staged.is_file() else "")
+
+
 for n, p in mods.items():
     text = p.read_text(encoding="utf-8")
-    new = MEDIA_REF.sub(lambda m: f"{m.group(1)}{m.group(2)}?v={digest(ROOT / m.group(2))}{m.group(4)}" if (ROOT / m.group(2)).is_file() else m.group(0), text)
+    new = MEDIA_REF.sub(lambda m: f"{m.group(1)}media/{m.group(2)}?v={v}{m.group(4)}" if (v := media_version(m.group(2))) else m.group(0), text)
     if new != text:
         p.write_text(new, encoding="utf-8")
         done.pop(n, None)

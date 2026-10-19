@@ -6,14 +6,16 @@ questions, its leaderboard, the benchmark suites it is made of, how a question i
 Published at <https://www.embodied-first-exam.ai/> by GitHub Pages, straight from `main` (the `CNAME` file holds the
 custom domain; <https://embodied-first-exam.ai/> and <https://embodied-first-exam.github.io/> redirect there). There is
 no build step: the pages are static HTML, one stylesheet and one script, and everything they show comes from two data
-files.
+files. The pictures and videos are not in this repository (GitHub Pages serves at most 1 GB per site): they are in the
+public HF dataset [MLL-Lab/embodied-exam-media](https://huggingface.co/datasets/MLL-Lab/embodied-exam-media) under
+`site/<suite>/`, and the data names each by its address there with its content hash (`scripts/media.py`).
 
 ```
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
 assets/exam.css, assets/app.js                                        the look and the drawing of every page
 data/exam.json, data/tasks.json                                       suites, results, the label map; every question
 media/<suite>/                                                        pictures and demo videos
-scripts/                                                              export.py, stamp.py, check.py
+scripts/                                                              export.py, media.py, upload_media.py, stamp.py, check.py
 CNAME                                                                 the custom domain, www.embodied-first-exam.ai
 ```
 
@@ -21,8 +23,10 @@ CNAME                                                                 the custom
 
 ```bash
 make serve                 # preview at http://127.0.0.1:8870/ (PORT=... to change)
-make data SRC=<checkout>   # refresh data/ and media/ from the exam's source (its public mode)
-make release               # stamp the CSS and JS links, then check every link, picture and video
+make data SRC=<checkout>   # refresh data/ from the exam's source (its public mode); new or replaced media are made
+                           #   into web copies in a local stage (MEDIA_DIR, default ~/.cache/efe-export/media)
+make media                 # upload what make data listed as not on HF yet (needs an HF token with write access)
+make release               # stamp the CSS and JS links, then check every link, and every picture and video on HF
 git push                   # GitHub Pages publishes main within a minute or two
 ```
 

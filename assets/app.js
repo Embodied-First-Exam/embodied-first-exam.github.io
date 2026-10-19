@@ -1,9 +1,12 @@
 // The Embodied First Exam's pages: one module for all of them; body[data-page] says which page this is.
 // Data: data/exam.json (suites, runs, the taxonomy, the core tests every ranked model sat) and data/tasks.json (every task with its
-// results), refreshed by scripts/export.py. Pictures and videos are under media/. Paths are taken from the site root,
-// which is worked out from where this file is served (assets/app.js), so the site works at any address.
+// results), refreshed by scripts/export.py. Pictures and videos are on HF (the public dataset's site/ folder, see
+// scripts/media.py): the data names them by their full address, the site's own ones here as media/<path> (= site/<path>).
+// Pages are taken from the site root, which is worked out from where this file is served (assets/app.js), so the site
+// works at any address.
 
 const BASE = new URL('../', import.meta.url).pathname;
+const MEDIA = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/';
 const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
 // the Embodied Safety Exam's earlier suite id, in links from before 2026-10-19
@@ -21,7 +24,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 /** Escaped text with Markdown's inline code (`x`) as <code>. */
 const prose = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>');
-const site = (p) => (!p ? '' : /^https?:/.test(p) ? p : BASE + p);   // a picture or a video
+const site = (p) => (!p ? '' : /^https?:/.test(p) ? p : p.startsWith('media/') ? MEDIA + p.slice(6) : BASE + p);   // a picture or a video
 const exam = (p) => BASE + (p || '');                               // a page of this site
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 const rate = (s, n) => (n ? s / n : null);

@@ -2,30 +2,29 @@
 """Refresh the site's data and media from the exam's source.
 
 The pages are static; everything they show comes from data/exam.json and data/tasks.json and the pictures and videos
-under media/. Those are produced by the exam's generator (scripts/exam_data.py in the source checkout, the branch that
+they name, which live on HF (scripts/media.py: the public dataset's site/ folder). Those are produced by the exam's generator (scripts/exam_data.py in the source checkout, the branch that
 holds the exam's task set and results), run in its public mode. This script runs it and makes the output fit this site:
 
   - it keeps only what this site shows: no addresses of other sites (task review pages, run pages, logs), no links into
     private repositories;
-  - it moves every picture and video it refers to under media/<suite>/ and copies those files here (and removes the
-    ones nothing refers to any more);
+  - it gives every picture and video an address on HF, site/<suite>/<file> (media/<suite>/<file> before 2026-10-19),
+    with its content hash (?v=...); files the source has that HF does not have yet (new or replaced media) are made
+    into web copies in the local stage (scripts/media.py STAGE, outside this repository) and listed for `make media`,
+    which uploads them;
   - it rewords the few sentences that mention those other sites.
 
     python3 scripts/export.py --src ../tmp/2026-10-06_exam_site
 
-The source may also be a clone of the private repository Embodied-First-Exam/exam-site-source, which holds the media
-manifests but not the media files (1.5 GB). Then a file the source lacks but this site already has (same path under
-media/) is kept as it is; a file the source has is brought in unless this site has it byte for byte, whatever the
-dates; and nothing is removed from media/ unless --prune (or EXPORT_PRUNE=1) is given: a source without the files
-cannot tell an unused file from one it merely lacks. (A source that has every file it refers to works as before.) New
-or replaced media go into the clone's docs/assets/<suite>/demos/ first (see the source repository's SITE_SOURCE.md).
+The source is normally a clone of the private repository Embodied-First-Exam/exam-site-source, which holds the media
+manifests but not the media files. A file the source lacks is taken as it is on HF; a file the source has (a new or
+replaced web copy in its docs/assets/<suite>/demos/, see its SITE_SOURCE.md) is brought into the stage unless HF has
+it already. Nothing is ever removed from HF here (`make media PRUNE=1` does that, after showing the list).
 """
 
 from __future__ import annotations
 
 import argparse
 import filecmp
-import hashlib
 import json
 import os
 import shutil
@@ -37,8 +36,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-MEDIA = ROOT / "media"
-SITE_MEDIA = MEDIA / "ways"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import media  # noqa: E402  (scripts/media.py: the HF address, the stage, the dataset's listing)
 
 # data keys that hold addresses on other sites, or the private repository's task directory names; dropped wherever
 # they occur
@@ -90,12 +89,9 @@ def media_path(src: str) -> str:
     return out[:-4] + ".jpg" if out.lower().endswith(".png") else out
 
 
-# this machine's record of the copies it made (source file, size, date -> the copy's md5), outside both repositories
-BROUGHT = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "efe-export" / "brought.json"
-
-
-def md5(path: Path) -> str:
-    return hashlib.md5(path.read_bytes()).hexdigest()
+# this machine's record of the web copies it made (site path -> source file, size, date and the copy's sha256), next to
+# the stage: the encoder is not deterministic, so a source file is not re-encoded once its copy is staged or on HF
+BROUGHT = media.STAGE.parent / "brought-site.json"
 
 
 def source_file(src_root: Path, path: str) -> Path:
@@ -165,8 +161,6 @@ class Rewriter:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--src", type=Path, required=True, help="the exam's source checkout (with scripts/exam_data.py and .venv/)")
-    ap.add_argument("--prune", action="store_true", default=os.environ.get("EXPORT_PRUNE") == "1",
-                    help="remove media/ files nothing refers to even when the source lacks media files (a clone)")
     args = ap.parse_args()
     src = args.src.resolve()
     py = src / ".venv" / "bin" / "python"
@@ -193,61 +187,57 @@ def main() -> int:
         if n.get("icon") in NOTE_TEXT:
             n["text"] = NOTE_TEXT[n["icon"]]
 
-    # media: bring in what is referred to (compressed where it pays), drop what is not
-    # a source without (all) the media files, e.g. a clone of exam-site-source: what it lacks but this site has is kept
-    present, kept, missing = [], 0, []
+    # media: every file the data names is site/<suite>/<file> on HF. The source's own files (new or replaced web copies)
+    # are brought into the stage unless HF has them already; the rest are taken as HF has them.
+    hf = media.listing()
+    present, missing, version = [], [], {}
     for site, srcpath in sorted(rw.media.items()):
-        f = source_file(src, srcpath)
-        dest = ROOT / site
+        rel = site[len("media/"):]
+        f, dest = source_file(src, srcpath), media.STAGE / rel
         if f.is_file():
-            present.append((f, dest))
-        elif dest.is_file():
-            kept += 1
+            present.append((rel, f, dest))
+        elif rel in hf:
+            version[rel] = hf[rel][1]
+        elif dest.is_file():                  # staged earlier, not uploaded yet
+            version[rel] = media.sha256(dest)
         else:
             missing.append(str(f))
-    brought = json.loads(BROUGHT.read_text()) if BROUGHT.is_file() else {}
-    def here_already(f: Path, dest: Path) -> bool:
-        """Whether dest holds what bring(f) makes: the same bytes, or the re-encoded copy this machine made of f."""
-        if not dest.is_file():
-            return False
-        if filecmp.cmp(f, dest, shallow=False):
-            return True
-        was = brought.get(str(dest)) or {}
-        return was.get("src") == [str(f), f.stat().st_size, f.stat().st_mtime_ns] and was.get("md5") == md5(dest)
-    if kept:
-        # a partial source holds only the files put there on purpose (new web copies), and a fresh clone of this site
-        # gives every file here a new date: bring each one that is not here already, whatever the dates
-        jobs = [(f, dest) for f, dest in present if not here_already(f, dest)]
-    else:
-        jobs = [(f, dest) for f, dest in present if not dest.is_file() or dest.stat().st_mtime < f.stat().st_mtime]
     if missing:
-        raise SystemExit(f"missing in the source and on this site ({len(missing)}):\n  " + "\n  ".join(missing[:20])
+        raise SystemExit(f"missing in the source, on HF and in the stage ({len(missing)}):\n  " + "\n  ".join(missing[:20])
                          + ("\n  ..." if len(missing) > 20 else ""))
+    brought = json.loads(BROUGHT.read_text()) if BROUGHT.is_file() else {}
+    ident = lambda f: [str(f), f.stat().st_size, f.stat().st_mtime_ns]
+    def made_already(rel: str, f: Path, dest: Path) -> str:
+        """The sha256 of the copy of f that is staged or on HF already, or '' when it has to be made."""
+        on_hf = hf.get(rel, (0, ""))[1]
+        if dest.is_file() and filecmp.cmp(f, dest, shallow=False):
+            return media.sha256(dest)
+        was = brought.get(rel) or {}
+        if was.get("src") == ident(f):
+            if dest.is_file() and media.sha256(dest) == was.get("sha256"):
+                return was["sha256"]
+            if on_hf and on_hf == was.get("sha256"):
+                return on_hf
+        if on_hf and media.sha256(f) == on_hf:          # HF has this very file
+            return on_hf
+        return ""
+    jobs = []
+    for rel, f, dest in present:
+        done = made_already(rel, f, dest)
+        if done:
+            version[rel] = done
+        else:
+            jobs.append((rel, f, dest))
     with ThreadPoolExecutor(max_workers=6) as pool:
-        list(pool.map(lambda job: bring(*job), jobs))
-    copied = len(jobs)
-    if jobs:      # the encoder is not deterministic: remember what was made from which source, for the next run
-        for f, dest in jobs:
-            brought[str(dest)] = {"src": [str(f), f.stat().st_size, f.stat().st_mtime_ns], "md5": md5(dest)}
-        try:
-            BROUGHT.parent.mkdir(parents=True, exist_ok=True)
-            BROUGHT.write_text(json.dumps(brought, indent=0))
-        except OSError:
-            pass
-    wanted = {ROOT / p for p in rw.media}
-    # media/ways/ is the site's own (the home diagram's demos of how agents answer), not the source's: kept
-    stale = [f for f in MEDIA.rglob("*") if f.is_file() and f not in wanted and SITE_MEDIA not in f.parents]
-    if stale and kept and not args.prune:
-        print(f"{len(stale)} media/ files nothing refers to any more, KEPT (the source lacks media files; check the list "
-              f"and rerun with EXPORT_PRUNE=1 or --prune to remove them):", file=sys.stderr)
-        for f in stale:
-            print(f"  {f.relative_to(ROOT)}", file=sys.stderr)
-        stale = []
-    for f in stale:
-        f.unlink()
-    for d in sorted((d for d in MEDIA.rglob("*") if d.is_dir()), reverse=True):
-        if not any(d.iterdir()):
-            d.rmdir()
+        list(pool.map(lambda job: bring(job[1], job[2]), jobs))
+    for rel, f, dest in jobs:
+        version[rel] = media.sha256(dest)
+        brought[rel] = {"src": ident(f), "sha256": version[rel]}
+    if jobs:
+        BROUGHT.parent.mkdir(parents=True, exist_ok=True)
+        BROUGHT.write_text(json.dumps(brought, indent=0))
+    upload = sorted(rel for rel, v in version.items() if hf.get(rel, (0, ""))[1] != v)
+    unused = sorted(rel for rel in hf if rel not in version and not rel.startswith(media.SITE_OWN))
 
     # difficulty labels stay off the public site until they are settled (user, 2026-10-16)
     for t in tasks:
@@ -259,29 +249,33 @@ def main() -> int:
     # no suites "on the way in" on the public site (user, 2026-10-18)
     exam.pop("incoming", None)
     exam.get("totals", {}).pop("incoming", None)
-    # every picture and video is linked with a content hash (?v=...): a replaced render gets a new address, so no browser
-    # keeps showing the one it cached under the old file name (owners, 2026-10-18)
-    hashes: dict[str, str] = {}
-    def version(path: str) -> str:
-        if path not in hashes:
-            f = ROOT / path
-            hashes[path] = hashlib.md5(f.read_bytes()).hexdigest()[:8] if f.is_file() else ""
-        return hashes[path]
-    def stamp_media(node):
+    # every picture and video is linked at its HF address with its content hash (?v=...): a replaced render gets a new
+    # address, so no browser keeps showing the one it cached (owners, 2026-10-18)
+    def to_hf(node):
         if isinstance(node, dict):
-            return {k: stamp_media(v) for k, v in node.items()}
+            return {k: to_hf(v) for k, v in node.items()}
         if isinstance(node, list):
-            return [stamp_media(v) for v in node]
-        if isinstance(node, str) and node.startswith("media/") and "?" not in node and version(node):
-            return f"{node}?v={version(node)}"
+            return [to_hf(v) for v in node]
+        if isinstance(node, str) and node.startswith("media/") and node[len("media/"):] in version:
+            rel = node[len("media/"):]
+            return media.url(rel, version[rel])
         return node
-    exam, tasks = stamp_media(exam), stamp_media(tasks)
+    exam, tasks = to_hf(exam), to_hf(tasks)
     DATA.mkdir(exist_ok=True)
     (DATA / "exam.json").write_text(json.dumps(exam, ensure_ascii=False, separators=(",", ":")))
     (DATA / "tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, separators=(",", ":")))
-    size = sum(f.stat().st_size for f in MEDIA.rglob("*") if f.is_file())
-    print(f"data/exam.json, data/tasks.json written ({len(tasks)} tasks); media: {len(rw.media)} files, {copied} copied, "
-          f"{kept} kept from the site (not in the source), {len(stale)} removed, {size / 1e6:.0f} MB")
+    size = sum(hf[r][0] if r not in upload else (media.STAGE / r).stat().st_size for r in version)
+    print(f"data/exam.json, data/tasks.json written ({len(tasks)} tasks); media: {len(version)} files, {size / 1e6:.0f} MB, "
+          f"{len(jobs)} web copies made into {media.STAGE}, {len(upload)} to upload")
+    if upload:
+        print(f"  NOT ON HF YET ({len(upload)}): run `make media` before `make release`:", file=sys.stderr)
+        for rel in upload[:30]:
+            print(f"    {rel}", file=sys.stderr)
+        if len(upload) > 30:
+            print("    ...", file=sys.stderr)
+    if unused:
+        print(f"  {len(unused)} files on HF (site/) nothing refers to any more, kept; `make media PRUNE=1` lists and "
+              f"removes them", file=sys.stderr)
     return 0
 
 
