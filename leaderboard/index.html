@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=c0f43dea">
+<link rel="stylesheet" href="../assets/exam.css?v=23f63293">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=e2409cd3"></script>
+<script type="module" src="../assets/app.js?v=6c41124b"></script>
 </head>
 <body data-page="leaderboard">
 <div id="nav"></div>
@@ -35,12 +35,8 @@
         <button class="on" data-mode="standard">Sort by standard</button>
         <button data-mode="privileged">by privileged</button>
       </div>
-      <div class="chips" id="lb-harness" role="group" aria-label="Harness"></div>
+      <select class="lb-select" id="lb-harness" aria-label="Harness"></select>
       <span class="grow"></span>
-      <div class="seg" id="lb-kind" role="group" aria-label="Kind of entrant">
-        <button class="on" data-kind="agent">Code agents</button>
-        <button data-kind="vla">VLA policies <i id="n-vla"></i></button>
-      </div>
     </div>
     <div class="lbh lbh-page"><div id="lb-key"></div><div class="lbh-chart" id="lb-board"></div></div>
     <p class="note" id="lb-note"></p>

@@ -230,19 +230,19 @@ function lbBoard(ex, tasks, onDraw) {
   function sync() {
     $$('#lb-view button').forEach((b) => b.classList.toggle('on', b.dataset.view === state.view));
     $$('#lb-mode button').forEach((b) => b.classList.toggle('on', b.dataset.mode === state.sort));
-    $$('#lb-kind button').forEach((b) => b.classList.toggle('on', b.dataset.kind === state.kind));
-    $$('#lb-harness .chip').forEach((b) => b.classList.toggle('on', b.dataset.h === state.harness));
+
+    $('#lb-harness').value = state.harness;
     const u = new URL(location.href);
     u.searchParams.set('view', state.view); u.searchParams.set('mode', state.sort);
     history.replaceState(null, '', u);
     draw();
   }
-  $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<button class="chip${h === 'all' ? ' on' : ''}" data-h="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</button>`).join('');
-  $('#lb-harness').addEventListener('click', (e) => { const b = e.target.closest('[data-h]'); if (b) { state.harness = b.dataset.h; sync(); } });
+  // the harness: one choice from a list (owners, 2026-10-19)
+  $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<option value="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</option>`).join('');
+  $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
   $('#lb-view').addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) { state.view = b.dataset.view; sync(); } });
   $('#lb-mode').addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) { state.sort = b.dataset.mode; sync(); } });
-  $('#lb-kind').addEventListener('click', (e) => { const b = e.target.closest('[data-kind]'); if (b) { state.kind = b.dataset.kind; sync(); } });
-  $('#n-vla').textContent = ex.runs.filter((r) => r.kind === 'vla').length;
+  // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
 }
 
@@ -381,11 +381,15 @@ function dots(ex, t, runs) {
 const STATE_WORD = { S: 'solved', F: 'not solved', E: 'error', Q: 'queued', N: 'not run', R: 'running', X: 'not counted', '-': 'no data' };
 const stateWord = (c) => STATE_WORD[c] || 'not run';
 
+// a card's "▶ run" mark comes from the task's own results (data/tasks.json), so no runs index is fetched to draw cards;
+// the runs themselves are looked up only when the task's drawer opens (watchable)
+const hasRuns = (t) => Object.keys(t.results || {}).length > 0;
+
 function taskCard(ex, t, runs) {
   const s = ex._suites[t.suite];
   const crop = cropFor(t.suite, t.id);
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
-    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${WATCH.has(`${t.suite}/${t.id}`) ? '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>' : ''}</div>
+    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${hasRuns(t) ? '<span class="watch-mark" title="Agents sat this task: open it to watch a run step by step">▶ run</span>' : ''}</div>
     <div class="body"><h4>${esc(t.title)}</h4>${t.code ? `<span class="t-code">${esc(t.code)}</span>` : ''}
       ${runs.length && resultOf(t) !== 'unrun' ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
@@ -399,17 +403,70 @@ const runBase = () => (runBaseP ??= fetch(exam('runlog/index.json'), { method: '
 let RUN_BASE = RUNS_REMOTE;
 const runURL = (p) => RUN_BASE + p;
 const runJSON = async (p) => { RUN_BASE = await runBase(); const r = await fetch(runURL(p)); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
-let runIndexP, WATCH = new Set();
-const markWatchable = (root = document) => $$('.task-card', root).forEach((c) => {
-  if (WATCH.has(c.dataset.task) && !$('.watch-mark', c)) $('.media', c)?.insertAdjacentHTML('beforeend', '<span class="watch-mark" title="A run you can watch step by step">▶ run</span>');
+
+// The runs' index comes in two layouts. v2 (index.json has "v": 2): index.json is a summary (counts by suite and by
+// setting) and index/<suite>.json holds one suite's rows, so a page fetches only the suites it shows. v1 (older
+// uploads): index.json holds every row. A v1 index is split into suites here, so everything below reads both alike.
+/** The site's suite id of a run row: its site link ("<suite>/<task id>"), else its bench under the site's name. */
+const runSuite = (r) => (r.site ? r.site.split('/')[0] : BENCH_SUITE[r.bench] || r.bench);
+let runSummaryP;
+const runShards = new Map();   // suite id -> promise of its rows
+/** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
+// runs the owners took off the site (GPT-6 Luna's, 2026-10-19): not listed, not counted as a setting, not watched
+const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
+const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
+const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
+  for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
+  if (d.runs) d.runs = shown(d.runs);
+  if (d.v >= 2) return splitSuites(d);
+  const by = {}, settings = {};
+  for (const r of d.runs || []) { (by[runSuite(r)] ??= []).push(r); settings[r.run] = (settings[r.run] || 0) + 1; }
+  for (const [s, rows] of Object.entries(by)) runShards.set(s, Promise.resolve(rows));
+  return splitSuites({ v: 1, total: (d.runs || []).length, suites: Object.fromEntries(Object.entries(by).map(([s, rows]) => [s, rows.length])), settings });
+}).catch((e) => { runSummaryP = null; throw e; }));   // a failed fetch is tried again next time, not remembered
+// RoboOlympics is two suites on this site since 2026-10-19 (Fun and Match); an index built before files both under
+// 'roboolympics'. Its rows go to the suite their task is in (data/tasks.json), with their counts; under the old id the
+// same rows stay reachable, for a run page whose bench is the old one.
+const SPLIT_SUITES = { roboolympics: ['roboolympics-fun', 'roboolympics-match'] };
+async function splitSuites(sum) {
+  for (const [old, parts] of Object.entries(SPLIT_SUITES)) {
+    if (!sum.suites?.[old] || parts.some((p) => sum.suites[p])) continue;
+    try {
+      const [rows, tasks] = await Promise.all([runShards.get(old) || runJSON(`index/${encodeURIComponent(old)}.json`).then((x) => shown(x.runs)), loadTasks()]);
+      const home = new Map(tasks.filter((t) => parts.includes(t.suite)).map((t) => [t.id, t.suite]));
+      const moved = rows.map((r) => { const id = (r.site || '').split('/')[1], s = home.get(id); return s ? { ...r, site: `${s}/${id}` } : r; });
+      runShards.set(old, Promise.resolve(moved));
+      delete sum.suites[old];
+      for (const p of parts) {
+        const mine = moved.filter((r) => r.site?.startsWith(`${p}/`));
+        runShards.set(p, Promise.resolve(mine));
+        if (mine.length) sum.suites[p] = mine.length;
+        if (sum.solved) sum.solved[p] = mine.filter((r) => r.success === 1 || r.state === 'success').length;
+      }
+    } catch (e) { console.warn('runs', old, e); }
+  }
+  return sum;
+}
+/** One suite's rows, fetched once; [] for a suite without runs. A failed fetch rejects and is not cached. */
+const runShard = (suite) => runSummary().then((sum) => {
+  if (runShards.has(suite)) return runShards.get(suite);
+  if (!sum.suites?.[suite]) return [];
+  const p = runJSON(`index/${encodeURIComponent(suite)}.json`).then((d) => shown(d.runs));
+  runShards.set(suite, p);
+  p.catch(() => runShards.delete(suite));
+  return p;
 });
-/** Runs that can be watched step by step, by the site's "<suite>/<task id>": runlog/index.json, fetched once. */
-const watchable = () => (runIndexP ??= runJSON('index.json').then((d) => {
-  const m = new Map();
-  for (const r of d.runs || []) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
-  WATCH = new Set(m.keys());
-  return m;
-}).catch(() => new Map()));
+const watchP = new Map();
+/** A suite's runs that can be watched step by step, by the site's "<suite>/<task id>"; fetched when first asked for
+ *  (a drawer of that suite opens, a run page needs its siblings). An empty map, marked failed, if they cannot be loaded. */
+const watchable = (suite) => {
+  if (!watchP.has(suite)) watchP.set(suite, runShard(suite).then((rows) => {
+    const m = new Map();
+    for (const r of rows) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
+    return m;
+  }).catch((e) => { console.warn('runs', suite, e); watchP.delete(suite); return Object.assign(new Map(), { failed: true }); }));
+  return watchP.get(suite);
+};
 
 function openTask(ex, t, runs) {
   const s = ex._suites[t.suite] || {};
@@ -444,18 +501,22 @@ function openTask(ex, t, runs) {
     <h2>${esc(t.title)}</h2>${t.code ? `<p class="t-code">${esc(t.code)}</p>` : ''}<p class="sentence">${prose(t.sentence || '')}</p>
     ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${tags}</div>` : ''}
     ${media}
+    <div id="drawer-watch" data-task="${esc(t.suite)}/${esc(t.id)}">${hasRuns(t) ? '<p class="watch-run wait"><span class="spin"></span>Looking for runs to watch…</p>' : ''}</div>
     <div id="drawer-atlas"></div>
     ${res ? `<h3>Results</h3><div class="lbh-task"><div class="lbh-res lbh-rh"><span></span><span>Model</span><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></div>${res}</div>` : ''}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
     <div class="link-list" id="drawer-links"><a class="btn small" href="${exam('suite/')}?id=${s.id}">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
-  watchable().then((m) => {
-    const mine = m.get(`${t.suite}/${t.id}`) || [];
-    if (!mine.length || !$('#drawer-links')) return;
-    $('#drawer-links').insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
-    const media = $('#drawer .media');
-    if (media) media.insertAdjacentHTML('afterend', `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`);
+  // the runs to watch: this suite's runs index, fetched when the drawer opens; a placeholder holds the place meanwhile
+  const key = `${t.suite}/${t.id}`;
+  watchable(t.suite).then((m) => {
+    const slot = $('#drawer-watch');
+    if (!slot || slot.dataset.task !== key) return;   // another task's drawer opened meanwhile
+    const mine = m.get(key) || [];
+    slot.innerHTML = !mine.length ? (m.failed && hasRuns(t) ? '<p class="watch-run wait">The runs could not be loaded just now. Reopen the task to try again.</p>' : '')
+      : `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`;
+    if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
   import('./search.js?v=0f3e018c').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
@@ -492,7 +553,6 @@ function resultOf(t) {
 function taskBrowser(el, ex, tasks, opts = {}) {
   const runs = ex.runs.filter((r) => (ex.leaderboard?.shared?.runs || []).includes(r.id));
   drawerShell();
-  watchable().then(() => markWatchable(el));
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
   const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60,
     tags: (opts.suite ? '' : Q.get('tags') || '').split(',').filter((x) => ex._tags[x]) };
@@ -561,7 +621,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
 
 /** The suites the exam's team built and releases with the exam (owners, 2026-10-18): first everywhere, in this order,
  *  each with the EFE Original tag beside its name. */
-const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics', 'robosafe', 'dexhand'];
+const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics-fun', 'roboolympics-match', 'robosafe', 'dexhand', 'roboengineer'];
 const isOurs = (s) => OUR_RELEASE.includes(s?.id);
 // beside the name, small (nameTag), and on the picture's top right corner, as a frosted chip (owners, 2026-10-18)
 const nameTag = (s) => (isOurs(s) ? `<span class="name-tag" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
@@ -569,8 +629,9 @@ const releaseTag = (s, big = false) => (isOurs(s)
   ? `<span class="rel-tag${big ? ' big' : ''}" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
 
 function prepare(ex) {
-  const rank = (s) => (isOurs(s) ? OUR_RELEASE.indexOf(s.id) : OUR_RELEASE.length);
-  ex.suites = ex.suites.map((s, i) => [s, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([s]) => s);
+  // the team's own suites first, then the others, each group in alphabetical order (owners, 2026-10-19); an example last
+  const group = (s) => (s.example ? 2 : isOurs(s) ? 0 : 1);
+  ex.suites = [...ex.suites].sort((a, b) => group(a) - group(b) || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
   ex._suites = suiteMap(ex);
   ex._tags = Object.fromEntries((ex.taxonomy || []).flatMap((g) => g.tags.map((t) => [t.id, t])));
   return ex;
@@ -1167,7 +1228,7 @@ def watch(t=.6):
   for epoch in range(5):` },
   d: { tab: 'mix', title: 'Mix them', vid: 'd_dunk', step: 15,
     line: 'Its own inverse kinematics by least squares for the arm, combined with a search over the jump and the throw.',
-    slug: 'roboolympics-dunk-i00-privileged--wmry4fr', who: 'RoboOlympics · Dunk · privileged · Codex · GPT-6 Astra',
+    slug: 'roboolympics-dunk-i00-privileged--wmry4fr', who: 'RoboOlympics-Fun · Dunk · privileged · Codex · GPT-6 Astra',
     code: `from scipy.optimize import least_squares
 ...
 def fun(x):
@@ -1619,7 +1680,7 @@ async function tasksPage(ex) {
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
   drawerShell();
   m.tasksSearch(el, ex, tasks, { card: (t) => taskCard(ex, t, runs), close: closeTask,
-    mark: (root) => watchable().then(() => markWatchable(root)), result: resultOf, bodies: BODY_ORDER });
+    result: resultOf, bodies: BODY_ORDER });
   el.addEventListener('click', (e) => { const b = e.target.closest('[data-task]'); if (b && index.has(b.dataset.task)) openTask(ex, index.get(b.dataset.task), runs); });
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
@@ -1686,29 +1747,56 @@ const settingOf = (r) => {
 const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5',
   'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
 
-/** The list of runs that can be watched step by step (runlog/index.json). */
+/** A setting's name from its run id alone (the summary has no rows to fall back on); the id itself if it is not one. */
+const settingName = (id) => (Object.keys(HARNESS_NAME).some((h) => id.startsWith(h + '-')) ? settingOf({ run: id }) : id);
+
+/** The list of runs that can be watched step by step. The summary (index.json) comes first and fills the menus with
+ *  the suites and their counts; then only the chosen suite's rows load (index/<suite>.json), the first suite in the
+ *  site's own order unless ?suite= says otherwise. "All suites" loads every suite, a few at a time, and the list grows
+ *  as they come in. The filters and pages work on the rows loaded. */
 async function runIndex(ex, head) {
-  let idx;
   head.innerHTML = '<p class="kicker">Runs</p><h1>Watch an agent work</h1>';
-  $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the runs…</div>';
-  try { idx = await runJSON('index.json'); } catch (e) { idx = { runs: [] }; }
-  const runs = idx.runs || [];
-  head.innerHTML = `<p class="kicker">Runs</p><h1>Watch an agent work</h1>
-`;
   $('#run-strip').remove();
   $('#run-side').remove();
+  $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the runs…</div>';
+  let sum;
+  try { sum = await runSummary(); } catch (e) {
+    $('#run-log').innerHTML = `<div class="empty-state">The list of runs could not be loaded (${esc(e.message)}). <a class="link" href="${esc(location.href)}">Try again</a></div>`;
+    return;
+  }
   const titleOf = (r) => r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
     .replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const modeOf = (t) => (/-standard-realtime$/.test(t) ? 'standard-realtime' : /-standard$/.test(t) ? 'standard' : 'privileged');
   $('#run-log').classList.add('run-index');
-  const suiteOf = (r) => ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
+  const suiteOf = (r) => ex._suites[runSuite(r)] || {};
   const okOf = (r) => r.success === 1 || r.state === 'success';
-  const suites = [...new Map(runs.map((r) => [suiteOf(r).id || r.bench, suiteOf(r).name || r.bench])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  // the suites with runs in the site's order (the team's suites first), then any the site does not list, by id
+  const counts = sum.suites || {};
+  const order = [...ex.suites.map((s) => s.id).filter((id) => counts[id]), ...Object.keys(counts).filter((id) => counts[id] && !ex._suites[id]).sort()];
+  const nameOf = (id) => ex._suites[id]?.name || id;
   let view = 'list';
   try { view = localStorage.getItem('exam-runs-view') || 'list'; } catch (e) { /* private mode */ }
   const per = () => (view === 'list' ? 50 : 24);
-  const st = { suite: Q.get('suite') || '', setting: Q.get('setting') || '', out: '', mode: '', q: '', page: Math.max(1, +Q.get('page') || 1) };
-  const settings = [...new Map(runs.map((r) => [r.run, settingOf(r)])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  const want = Q.get('suite');
+  const st = { suite: want === 'all' || order.includes(want) ? want : order[0] || 'all', setting: Q.get('setting') || '', out: '', mode: '', q: '', page: Math.max(1, +Q.get('page') || 1) };
+  const settings = Object.keys(sum.settings || {}).filter((id) => id && id !== 'undefined').map((id) => [id, settingName(id)]).sort((a, b) => a[1].localeCompare(b[1]));
+  // what has loaded: rows by suite, the error of each suite that failed, the suites on their way
+  const got = new Map(), bad = new Map(), coming = new Set();
+  const scope = () => (st.suite === 'all' ? order : [st.suite]);
+  const load = (id) => {
+    if (got.has(id) || coming.has(id)) return Promise.resolve();
+    coming.add(id); bad.delete(id);
+    return runShard(id).then((rows) => { got.set(id, rows); }, (e) => { bad.set(id, e.message); }).finally(() => { coming.delete(id); draw(); });
+  };
+  // all suites: four at a time, in the site's order
+  const loadScope = () => {
+    const queue = scope().filter((id) => !got.has(id));
+    const next = () => (queue.length ? load(queue.shift()).then(next) : null);
+    return Promise.all(Array.from({ length: Math.min(4, queue.length) }, next));
+  };
+  // the rows to show: the suites in order up to the first one still loading, so rows already shown never move as
+  // later suites arrive (a suite that failed is skipped, and said so)
+  const loaded = () => { const out = []; for (const id of scope()) { if (got.has(id)) out.push(...got.get(id)); else if (!bad.has(id)) break; } return out; };
   const row = (r) => {
     const s = suiteOf(r), ok = okOf(r);
     return `<a class="rr" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
@@ -1731,7 +1819,8 @@ async function runIndex(ex, head) {
   $('#run-log').innerHTML = `<div class="ri-tools">
       <input type="search" id="ri-q" placeholder="Search tasks" aria-label="Search tasks">
       <select id="ri-setting" aria-label="Setting"><option value="">All settings</option>${settings.map(([id, n]) => `<option value="${esc(id)}"${id === st.setting ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
-      <select id="ri-suite" aria-label="Suite"><option value="">All suites</option>${suites.map(([id, n]) => `<option value="${esc(id)}"${id === st.suite ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
+      <select id="ri-suite" aria-label="Suite">${order.map((id) => `<option value="${esc(id)}"${id === st.suite ? ' selected' : ''}>${esc(nameOf(id))} (${int(counts[id])})</option>`).join('')}
+        <option value="all"${st.suite === 'all' ? ' selected' : ''}>All suites (${int(sum.total ?? order.reduce((n, id) => n + counts[id], 0))})</option></select>
       <select id="ri-mode" aria-label="Mode"><option value="">Both modes</option><option value="privileged">Privileged</option><option value="standard">Standard</option><option value="standard-realtime">Standard, real time</option></select>
       <div class="ri-out">${[['', 'All'], ['ok', 'Solved'], ['no', 'Not solved']].map(([v, n]) => `<button type="button" class="chip${v === '' ? ' on' : ''}" data-out="${v}">${n}</button>`).join('')}</div>
       <span class="ri-count" id="ri-count"></span>
@@ -1739,41 +1828,51 @@ async function runIndex(ex, head) {
     <div class="ri-grid" id="ri-grid"></div><nav class="ri-pager" id="ri-pager" aria-label="Pages"></nav>`;
   const draw = () => {
     const q = st.q.toLowerCase();
-    const list = runs.filter((r) => (!st.setting || r.run === st.setting) && (!st.suite || (suiteOf(r).id || r.bench) === st.suite) && (!st.mode || modeOf(r.task) === st.mode)
+    const waiting = scope().filter((id) => !got.has(id) && !bad.has(id)), failed = scope().filter((id) => bad.has(id));
+    const list = loaded().filter((r) => (!st.setting || r.run === st.setting) && (!st.mode || modeOf(r.task) === st.mode)
       && (!st.out || (st.out === 'ok') === okOf(r)) && (!q || `${titleOf(r)} ${r.task} ${suiteOf(r).name || ''}`.toLowerCase().includes(q)));
+    const pages = Math.max(1, Math.ceil(list.length / per()));
+    if (!waiting.length) st.page = Math.min(st.page, pages);   // while suites still arrive, a page asked for may not exist yet
     const g = $('#ri-grid');
     g.className = view === 'list' ? 'ri-list' : 'ri-grid';
-    g.innerHTML = (view === 'list' && list.length ? '<div class="rr rr-head"><span></span><span>Task</span><span>Setting</span><span>Result</span><span class="rr-n">Time</span><span class="rr-n">Steps</span><span>What it did</span><span class="rr-n">Cost</span></div>' : '')
-      + (list.slice((st.page - 1) * per(), st.page * per()).map(view === 'list' ? row : card).join('') || '<p class="muted">No run matches.</p>');
-    const pages = Math.max(1, Math.ceil(list.length / per()));
-    st.page = Math.min(st.page, pages);
-    const from = list.length ? (st.page - 1) * per() + 1 : 0, to = Math.min(st.page * per(), list.length);
-    $('#ri-count').textContent = `${int(from)}–${int(to)} of ${int(list.length)} runs`;
+    const shown = list.slice((st.page - 1) * per(), st.page * per());
+    const more = waiting.length && st.page >= pages
+      ? `<div class="ri-wait"><span class="spin"></span>${st.suite === 'all' ? `Loading ${waiting.length === order.length ? 'the runs' : `${int(waiting.length)} more suite${waiting.length > 1 ? 's' : ''}`}…` : `Loading the runs of ${esc(nameOf(st.suite))}…`}</div>` : '';
+    const fail = failed.length ? `<div class="ri-wait bad">The runs of ${failed.map((id) => esc(nameOf(id))).join(', ')} could not be loaded (${esc(bad.get(failed[0]))}).<button type="button" class="btn small" data-retry>Try again</button></div>` : '';
+    g.innerHTML = (view === 'list' && shown.length ? '<div class="rr rr-head"><span></span><span>Task</span><span>Setting</span><span>Result</span><span class="rr-n">Time</span><span class="rr-n">Steps</span><span>What it did</span><span class="rr-n">Cost</span></div>' : '')
+      + shown.map(view === 'list' ? row : card).join('') + more + fail
+      + (!shown.length && !more && !fail ? '<p class="muted">No run matches.</p>' : '');
+    const from = shown.length ? (st.page - 1) * per() + 1 : 0, to = from ? from + shown.length - 1 : 0;
+    $('#ri-count').textContent = (waiting.length || failed.length) && !list.length ? '' : `${int(from)}–${int(to)} of ${int(list.length)} runs${waiting.length ? ' so far' : ''}`;
     // page numbers: the first, the last, and two either side of the current one; gaps as an ellipsis
     const nums = [...new Set([1, pages, ...Array.from({ length: 5 }, (_, k) => st.page - 2 + k)])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
     const btn = (n, label, extra = '') => `<button type="button" class="pg${n === st.page && !extra ? ' on' : ''}" data-page="${n}"${extra}>${label}</button>`;
     $('#ri-pager').innerHTML = pages < 2 ? '' : `${btn(st.page - 1, '← Previous', st.page === 1 ? ' disabled' : ' data-nav="1"')}
       <span class="pg-nums">${nums.map((n, k) => `${k && n - nums[k - 1] > 1 ? '<span class="pg-gap">…</span>' : ''}${btn(n, int(n))}`).join('')}</span>
-      ${btn(st.page + 1, 'Next →', st.page === pages ? ' disabled' : ' data-nav="1"')}
+      ${btn(st.page + 1, 'Next →', st.page >= pages ? ' disabled' : ' data-nav="1"')}
       <label class="pg-jump">Page <input type="number" min="1" max="${pages}" value="${st.page}" aria-label="Go to page"> of ${int(pages)}</label>`;
     const u = new URL(location.href);
+    u.searchParams.set('suite', st.suite);
+    st.setting ? u.searchParams.set('setting', st.setting) : u.searchParams.delete('setting');
     st.page > 1 ? u.searchParams.set('page', st.page) : u.searchParams.delete('page');
     history.replaceState(null, '', u);
   };
   $('#ri-q').addEventListener('input', (e) => { st.q = e.target.value; st.page = 1; draw(); });
-  $('#ri-suite').addEventListener('change', (e) => { st.suite = e.target.value; st.page = 1; draw(); });
+  $('#ri-suite').addEventListener('change', (e) => { st.suite = e.target.value; st.page = 1; draw(); loadScope(); });
   $('#ri-setting').addEventListener('change', (e) => { st.setting = e.target.value; st.page = 1; draw(); });
   $('#ri-mode').addEventListener('change', (e) => { st.mode = e.target.value; st.page = 1; draw(); });
   $$('.ri-out .chip').forEach((c) => c.addEventListener('click', () => { $$('.ri-out .chip').forEach((d) => d.classList.toggle('on', d === c)); st.out = c.dataset.out; st.page = 1; draw(); }));
   const go = (n) => { st.page = n; draw(); $('#run-log').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   $('#ri-pager').addEventListener('click', (e) => { const b = e.target.closest('button[data-page]'); if (b && !b.disabled) go(+b.dataset.page); });
   $('#ri-pager').addEventListener('change', (e) => { if (e.target.matches('.pg-jump input')) go(Math.max(1, Math.round(+e.target.value) || 1)); });
+  $('#ri-grid').addEventListener('click', (e) => { if (e.target.closest('[data-retry]')) { [...bad.keys()].forEach((id) => bad.delete(id)); draw(); loadScope(); } });
   $$('.ri-view .chip').forEach((c) => c.addEventListener('click', () => {
     view = c.dataset.view; $$('.ri-view .chip').forEach((d) => d.classList.toggle('on', d === c));
     try { localStorage.setItem('exam-runs-view', view); } catch (e) { /* private mode */ }
     st.page = 1; draw();
   }));
   draw();
+  loadScope();
 }
 
 async function runPage(ex) {
@@ -1809,13 +1908,15 @@ async function runPage(ex) {
     </dl>
     ${r.task_text ? `<details class="run-task"><summary>The question, as the agent read it</summary><pre>${esc(r.task_text)}</pre></details>` : ''}`;
 
-  runJSON('index.json').then((idx) => {
-    const me = (idx.runs || []).find((x) => x.slug === slug);
-    if (!me?.site) return;
-    const others = (idx.runs || []).filter((x) => x.site === me.site && x.slug !== slug);
+  // the task this run sat and the other runs of it: from the run's suite's rows only (watchable), not the whole index
+  watchable(BENCH_SUITE[r.bench] || r.bench).then((m) => {
+    const mine = [...m.values()].find((rows) => rows.some((x) => x.slug === slug)) || [];
+    const me = mine.find((x) => x.slug === slug);
+    if (!me?.site || !$('#run-links')) return;
+    const others = mine.filter((x) => x.slug !== slug);
     $('#run-links').insertAdjacentHTML('afterbegin', `<a class="btn small primary" href="${exam('tasks/')}?task=${encodeURIComponent(me.site)}">Open the task <span class="arr">→</span></a>`
       + others.map((o) => `<a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(o.slug)}">${esc(settingOf(o))} · ${/-standard/.test(o.task) ? 'standard' : 'privileged'}</a>`).join(''));
-  }).catch(() => {});
+  });
 
   // ---- the strip: one lane per kind of action over the run's clock, the context growing behind, a playhead
   const W = 1000, laneH = 15, top = 8, lanes = KIND_ORDER.length, H = top + lanes * laneH + 30;

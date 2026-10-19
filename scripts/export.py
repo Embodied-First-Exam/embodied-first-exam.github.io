@@ -12,11 +12,19 @@ holds the exam's task set and results), run in its public mode. This script runs
   - it rewords the few sentences that mention those other sites.
 
     python3 scripts/export.py --src ../tmp/2026-10-06_exam_site
+
+The source may also be a clone of the private repository Embodied-First-Exam/exam-site-source, which holds the media
+manifests but not the media files (1.5 GB). Then a file the source lacks but this site already has (same path under
+media/) is kept as it is; a file the source has is brought in unless this site has it byte for byte, whatever the
+dates; and nothing is removed from media/ unless --prune (or EXPORT_PRUNE=1) is given: a source without the files
+cannot tell an unused file from one it merely lacks. (A source that has every file it refers to works as before.) New
+or replaced media go into the clone's docs/assets/<suite>/demos/ first (see the source repository's SITE_SOURCE.md).
 """
 
 from __future__ import annotations
 
 import argparse
+import filecmp
 import hashlib
 import json
 import os
@@ -80,6 +88,14 @@ def media_path(src: str) -> str:
     else:
         raise SystemExit(f"unexpected media path: {src}")
     return out[:-4] + ".jpg" if out.lower().endswith(".png") else out
+
+
+# this machine's record of the copies it made (source file, size, date -> the copy's md5), outside both repositories
+BROUGHT = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "efe-export" / "brought.json"
+
+
+def md5(path: Path) -> str:
+    return hashlib.md5(path.read_bytes()).hexdigest()
 
 
 def source_file(src_root: Path, path: str) -> Path:
@@ -149,6 +165,8 @@ class Rewriter:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--src", type=Path, required=True, help="the exam's source checkout (with scripts/exam_data.py and .venv/)")
+    ap.add_argument("--prune", action="store_true", default=os.environ.get("EXPORT_PRUNE") == "1",
+                    help="remove media/ files nothing refers to even when the source lacks media files (a clone)")
     args = ap.parse_args()
     src = args.src.resolve()
     py = src / ".venv" / "bin" / "python"
@@ -176,20 +194,55 @@ def main() -> int:
             n["text"] = NOTE_TEXT[n["icon"]]
 
     # media: bring in what is referred to (compressed where it pays), drop what is not
-    jobs = []
+    # a source without (all) the media files, e.g. a clone of exam-site-source: what it lacks but this site has is kept
+    present, kept, missing = [], 0, []
     for site, srcpath in sorted(rw.media.items()):
         f = source_file(src, srcpath)
-        if not f.is_file():
-            raise SystemExit(f"missing in the source: {f}")
         dest = ROOT / site
-        if not dest.is_file() or dest.stat().st_mtime < f.stat().st_mtime:
-            jobs.append((f, dest))
+        if f.is_file():
+            present.append((f, dest))
+        elif dest.is_file():
+            kept += 1
+        else:
+            missing.append(str(f))
+    brought = json.loads(BROUGHT.read_text()) if BROUGHT.is_file() else {}
+    def here_already(f: Path, dest: Path) -> bool:
+        """Whether dest holds what bring(f) makes: the same bytes, or the re-encoded copy this machine made of f."""
+        if not dest.is_file():
+            return False
+        if filecmp.cmp(f, dest, shallow=False):
+            return True
+        was = brought.get(str(dest)) or {}
+        return was.get("src") == [str(f), f.stat().st_size, f.stat().st_mtime_ns] and was.get("md5") == md5(dest)
+    if kept:
+        # a partial source holds only the files put there on purpose (new web copies), and a fresh clone of this site
+        # gives every file here a new date: bring each one that is not here already, whatever the dates
+        jobs = [(f, dest) for f, dest in present if not here_already(f, dest)]
+    else:
+        jobs = [(f, dest) for f, dest in present if not dest.is_file() or dest.stat().st_mtime < f.stat().st_mtime]
+    if missing:
+        raise SystemExit(f"missing in the source and on this site ({len(missing)}):\n  " + "\n  ".join(missing[:20])
+                         + ("\n  ..." if len(missing) > 20 else ""))
     with ThreadPoolExecutor(max_workers=6) as pool:
         list(pool.map(lambda job: bring(*job), jobs))
     copied = len(jobs)
+    if jobs:      # the encoder is not deterministic: remember what was made from which source, for the next run
+        for f, dest in jobs:
+            brought[str(dest)] = {"src": [str(f), f.stat().st_size, f.stat().st_mtime_ns], "md5": md5(dest)}
+        try:
+            BROUGHT.parent.mkdir(parents=True, exist_ok=True)
+            BROUGHT.write_text(json.dumps(brought, indent=0))
+        except OSError:
+            pass
     wanted = {ROOT / p for p in rw.media}
     # media/ways/ is the site's own (the home diagram's demos of how agents answer), not the source's: kept
     stale = [f for f in MEDIA.rglob("*") if f.is_file() and f not in wanted and SITE_MEDIA not in f.parents]
+    if stale and kept and not args.prune:
+        print(f"{len(stale)} media/ files nothing refers to any more, KEPT (the source lacks media files; check the list "
+              f"and rerun with EXPORT_PRUNE=1 or --prune to remove them):", file=sys.stderr)
+        for f in stale:
+            print(f"  {f.relative_to(ROOT)}", file=sys.stderr)
+        stale = []
     for f in stale:
         f.unlink()
     for d in sorted((d for d in MEDIA.rglob("*") if d.is_dir()), reverse=True):
@@ -228,7 +281,7 @@ def main() -> int:
     (DATA / "tasks.json").write_text(json.dumps(tasks, ensure_ascii=False, separators=(",", ":")))
     size = sum(f.stat().st_size for f in MEDIA.rglob("*") if f.is_file())
     print(f"data/exam.json, data/tasks.json written ({len(tasks)} tasks); media: {len(rw.media)} files, {copied} copied, "
-          f"{len(stale)} removed, {size / 1e6:.0f} MB")
+          f"{kept} kept from the site (not in the source), {len(stale)} removed, {size / 1e6:.0f} MB")
     return 0
 
 
