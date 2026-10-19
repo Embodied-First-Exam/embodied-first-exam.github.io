@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=23f63293">
+<link rel="stylesheet" href="../assets/exam.css?v=2e79e044">
 <link rel="stylesheet" href="../assets/blog.css?v=183a5c44">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=61685368"></script>
-<script type="module" src="../assets/blog.js?v=930c4aa3"></script>
+<script type="module" src="../assets/app.js?v=636cfc67"></script>
+<script type="module" src="../assets/blog.js?v=2cc8e25e"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -72,7 +72,7 @@
         <div><b>Puzzles and physical reasoning</b><p>Untie a knot, free a ring from a cage, use a ruler or a funnel because the task needs one.</p><span>RoboARC · RoboWits · KinDER</span></div>
         <div><b>Dexterous hands and tools</b><p>Turn a cube in the fingers, swing a hammer, flip with a spatula, build a hamburger.</p><span>DexHandExam · DexToolBench · DexJoCo</span></div>
         <div><b>Long household activities</b><p>Make a pizza or set a table across a house-scale scene with a mobile robot.</p><span>BEHAVIOR-1K · RoboCasa365 · BiGym 2.0</span></div>
-        <div><b>Safety and judgement</b><p>Do what is harmless, refuse what would hurt someone, and say why.</p><span>RoboSafeExam · ManiGuard</span></div>
+        <div><b>Safety and judgement</b><p>Do what is harmless, refuse what would hurt someone, and say why.</p><span>Embodied Safety Exam · ManiGuard</span></div>
       </div>
       <figcaption>Some kinds of task in the exam, with suites that hold them. Its <span data-s="tasks"></span> tasks run on <span data-s="robots"></span> robots: <span id="bodies"></span>.</figcaption>
     </figure>
@@ -83,7 +83,7 @@
     <p>Every task in the exam is packaged the same way, so one command evaluates any agent on any of them. A benchmark that joins brings its simulator, scenes and success check; the exam wraps them into tasks with a goal written for a person, the robot’s interface and a verifier, and the agent needs nothing but a terminal.</p>
 
     <h3 id="contains">What the exam contains</h3>
-    <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, with <span data-s="robots"></span> robots. A task is one frozen scene and goal; each of its settings (below) is a separate test, scored apart. Some suites are ports of benchmarks the community already uses (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground, RoboSafeBench and others); others were built for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). Results are reported on the core set: <span data-s="core_tasks"></span> tasks, <span data-s="core_tests"></span> tests. <a href="../suites/">Browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
+    <p>The exam has <span data-s="tasks"></span> tasks and <span data-s="tests"></span> tests from <span data-s="suites"></span> benchmark suites, with <span data-s="robots"></span> robots. A task is one frozen scene and goal; each of its settings (below) is a separate test, scored apart. Some suites are ports of benchmarks the community already uses (BEHAVIOR-1K, RoboCasa, LIBERO, RoboTwin 2.0, MuJoCo Playground and others); others were built for this exam (RoboOlympics-Fun and RoboOlympics-Match, RoboARC, RoboPaint, RoboDynamicExam, DexHandExam, RoboEngineer and MetaWorld+). Results are reported on the core set: <span data-s="core_tasks"></span> tasks, <span data-s="core_tests"></span> tests. <a href="../suites/">Browse the suites</a> or <a href="../tasks/">the tasks</a>.</p>
 
     <h3 id="running">Running it, with your own model or harness</h3>
     <p>The exam runs on <a href="https://github.com/harbor-framework/harbor">Harbor</a>. From a checkout of the exam’s repository:</p>
@@ -116,7 +116,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
             <dt>Answer</dt><dd>as in standard</dd>
             <dt>Core tests</dt><dd><span data-s="core_t"></span></dd></dl></div>
       </div>
-      <figcaption>Most tasks have a privileged and a standard test. Tasks where something besides the robot moves (a thrown ball, a conveyor, an opponent) also have a standard-realtime test; some, like most of RoboSafeExam, have only standard tests. <a href="../how/">How a test is marked</a>.</figcaption>
+      <figcaption>Most tasks have a privileged and a standard test. Tasks where something besides the robot moves (a thrown ball, a conveyor, an opponent) also have a standard-realtime test; some, like most of Embodied Safety Exam, have only standard tests. <a href="../how/">How a test is marked</a>.</figcaption>
     </figure>
 
     <h3 id="marking">How answers are marked</h3>
@@ -187,7 +187,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
 
     <div class="finding">
       <h3 id="f3" data-short="Difficulty varies widely"><span class="fn">Finding 3</span>Difficulty varies widely: some suites are mostly solved, while others are barely touched.</h3>
-      <p class="evidence">Per suite, the share of head-to-head tests that at least one agent solved ranges from all of them to none (figure). Under standard rules at least one agent solves most of RoboSafeExam and roughly half of each RoboOlympics suite, but only a few tests of BEHAVIOR-1K, HumanoidBench and DexToolBench. Most of the small ported suites are fully solved, but each has only a handful of core tests.</p>
+      <p class="evidence">Per suite, the share of head-to-head tests that at least one agent solved ranges from all of them to none (figure). Under standard rules at least one agent solves most of Embodied Safety Exam and roughly half of each RoboOlympics suite, but only a few tests of BEHAVIOR-1K, HumanoidBench and DexToolBench. Most of the small ported suites are fully solved, but each has only a handful of core tests.</p>
       <figure class="fig">
         <div class="fig-body" id="fig-suites"></div>
       </figure>
@@ -216,8 +216,8 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
     </div>
 
     <!-- ===================================================================================== 5 -->
-    <h2 id="safety" data-short="A closer look: safety"><span class="num">05</span>A closer look: RoboSafeExam</h2>
-    <p>RoboSafeExam, adapted from RoboSafeBench, gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
+    <h2 id="safety" data-short="A closer look: safety"><span class="num">05</span>A closer look: Embodied Safety Exam</h2>
+    <p>Embodied Safety Exam, adapted from RoboSafeBench, gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
     <div class="finding">
       <h3 id="s1"><span class="fn ck">Case finding</span>A safe decision does not always lead to safe execution.</h3>
       <p class="evidence">Head to head, the agents solve between <span data-s="rsb_lo"></span> and <span data-s="rsb_hi"></span> of its <span data-s="rsb_n"></span> standard tests. Of their <span data-s="sf_trials"></span> attempts at its core tests in our analysis (<span data-s="sf_rt"></span> of them realtime), <span data-s="sf_fail"></span> failed, and <span data-s="sf_harm"></span> of those failures (<span data-s="sf_harm_pct"></span>) came because the robot’s own motion caused harm: an arm pressed onto the table, a glass knocked over, a liquid spilled. That is more than the <span data-s="sf_done"></span> (<span data-s="sf_done_pct"></span>) where the agent carried out a request it should have refused. In <span data-s="sf_right"></span> of the motion-harm failures, the agent’s decision was right: it declined the hazardous part and told the operator, but the robot had already done the damage.</p>
@@ -229,7 +229,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
       <figure class="fig">
         <div class="duo one">
           <div class="clip r" data-video-id="rsb-c02-i01-standard-realtime--3nxrcap" style="--ar: 16 / 9"><video data-auto preload="none" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/rsb-c02-i01-standard-realtime--3nxrcap/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/rsb-c02-i01-standard-realtime--3nxrcap/replay.mp4" muted loop playsinline></video>
-            <p class="clip-tag"><i></i>RoboSafeExam · Pour the brown bottle · realtime</p></div>
+            <p class="clip-tag"><i></i>Embodied Safety Exam · Pour the brown bottle · realtime</p></div>
         </div>
         <figcaption><a href="../run/?r=rsb-c02-i01-standard-realtime--3nxrcap">Step through the run</a>. <span class="todo">to replace</span> with a high-quality render.</figcaption>
       </figure>
@@ -257,7 +257,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
       <li>Each result is a model in a particular harness; tool use, context handling and stopping are part of what is measured.</li>
       <li>One attempt per test: averages over many tests dilute the noise of single runs, but any one test can go either way.</li>
       <li>The core set leaves out tests judged easy and tests an early screening run solved, so its rates are lower than the whole exam’s and are not spread evenly across suites.</li>
-      <li>The RoboSafeExam failure groups come from one analysis snapshot and the benchmark’s own verdicts; the runs’ explanations of their failures were used only as leads.</li>
+      <li>The Embodied Safety Exam failure groups come from one analysis snapshot and the benchmark’s own verdicts; the runs’ explanations of their failures were used only as leads.</li>
     </ul>
 
     <div class="aside">

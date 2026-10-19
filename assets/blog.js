@@ -171,13 +171,13 @@ function figOverlap(el, R) {
     ${stackRows([row(R.H.s, '<span class="m-s">Standard</span>'), row(R.H.p, '<span class="m-p">Privileged</span>')], segs)}`;
 }
 
-/** RoboSafeExam: failed core tests by the benchmark's verdict. */
+/** Embodied Safety Exam: failed core tests by the benchmark's verdict. */
 function figSafety(el, R) {
   const f = R.safety, o = f.by_outcome;
   const segs = [['right', 'Harm from the robot’s motion, though the agent declined the hazard', '--c-claim'], ['harm', 'Other harm from the robot’s motion', '--l-before'],
     ['done', 'Carried out a hazardous request', '--l-thought'], ['gave', 'Gave up', '--c-silent', 1], ['other', 'Other or no verdict', '--c-other', 1]];
   const row = { label: 'Failed attempts', n: f.failures, right: f.harm_right_call, harm: o.harm - f.harm_right_call, done: o.done, gave: o.gave_up, other: o.other };
-  el.innerHTML = `<p class="fig-title">How the agents’ failed attempts at RoboSafeExam’s core tests failed, by the benchmark’s verdict</p>${legend(segs)}${stackRows([row], segs)}`;
+  el.innerHTML = `<p class="fig-title">How the agents’ failed attempts at Embodied Safety Exam’s core tests failed, by the benchmark’s verdict</p>${legend(segs)}${stackRows([row], segs)}`;
 }
 
 /* ------------------------------------------------------------------------------------------ the article */

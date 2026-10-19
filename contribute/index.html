@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Contribute · Embodied First Exam</title>
-<meta name="description" content="How to bring a suite, tasks, a review, an exploit report or an evaluation run to the Embodied First Exam.">
+<meta name="description" content="How to bring a suite, or real-robot evaluation and analysis, to the Embodied First Exam.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=23f63293">
+<link rel="stylesheet" href="../assets/exam.css?v=2e79e044">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=61685368"></script>
+<script type="module" src="../assets/app.js?v=636cfc67"></script>
 </head>
 <body data-page="contribute">
 <div id="nav"></div>
@@ -27,17 +27,25 @@
     <dl class="bignums reveal" id="c-figures"></dl>
   </section>
 
-  <section class="section" id="roles">
+  <section class="section band" id="propose">
     <div class="head reveal">
-      <h2>Five ways in</h2>
+      <h2>How to contribute</h2>
     </div>
-    <div class="ways reveal">
-      <a class="way" href="#propose"><span class="ic" data-icon="layers" aria-hidden="true"></span><b>Propose a suite</b><p>Bring a benchmark under the protocol, in both modes.</p><span class="go">Send us an e-mail ↓</span></a>
-      <a class="way" data-doc="CONTRIBUTING.md" href="#process"><span class="ic" data-icon="doc" aria-hidden="true"></span><b>Add tasks</b><p>A new family or more scenes for a suite already in.</p><span class="go">Kinds of pull requests ↗</span></a>
-      <a class="way" data-doc="docs/REVIEWING.md" href="#process"><span class="ic" data-icon="review" aria-hidden="true"></span><b>Review a family</b><p>Check a family that has no full reference solution.</p><span class="go">The review checklist ↗</span></a>
-      <a class="way" data-doc="CONTRIBUTING.md" href="#rules"><span class="ic" data-icon="cheat" aria-hidden="true"></span><b>Break a task</b><p>Pass a verifier without doing the task, then help fix it.</p><span class="go">Task fixes ↗</span></a>
-      <a class="way" data-doc="docs/SHARING_RUNS.md" href="#faq"><span class="ic" data-icon="terminal" aria-hidden="true"></span><b>Run batches</b><p>Run assigned batches on your GPUs and send the logs back.</p><span class="go">Sending back runs ↗</span></a>
+    <div class="routes reveal">
+      <div class="propose-mail route frame">
+        <span class="ic" data-icon="layers" aria-hidden="true"></span>
+        <h3>Propose a suite</h3>
+        <p>Send a short description of the benchmark: the upstream version, the scope, a reference solution if there is one, how success is verified, and why it is hard for today’s coding agents.</p>
+        <a class="btn primary" href="mailto:embodied-first-exam@gmail.com?subject=Suite%20proposal">Propose by e-mail <span class="arr">→</span></a>
+      </div>
+      <div class="propose-mail route frame" id="real-robot">
+        <span class="ic" data-icon="arm" aria-hidden="true"></span>
+        <h3>Provide real-robot evaluation and analysis</h3>
+        <p>Run the exam’s tasks, or their real-robot counterparts, on physical robots, and share the evaluation and your analysis of where simulation and reality agree and where they part.</p>
+        <a class="btn primary" href="mailto:embodied-first-exam@gmail.com?subject=Real-robot%20evaluation">Get in touch by e-mail <span class="arr">→</span></a>
+      </div>
     </div>
+    <p class="note reveal">Both go to <a href="mailto:embodied-first-exam@gmail.com">embodied-first-exam@gmail.com</a>.</p>
   </section>
 
   <section class="section" id="criteria">
@@ -66,16 +74,6 @@
       <li><b>Merge</b><span>Base images published, the suite added to the site.</span><span class="chips"><i>eai-&lt;name&gt;</i></span></li>
       <li><b>On the board</b><span>Its questions join the exam’s evaluations.</span><span class="chips"><i>both modes</i><i>every log</i></span></li>
     </ol>
-  </section>
-
-  <section class="section band" id="propose">
-    <div class="head reveal">
-      <h2>Propose a suite</h2>
-    </div>
-    <div class="propose-mail frame reveal">
-      <p>Send a short description of the benchmark: the upstream version, the scope, a reference solution if there is one, how success is verified, and why it is hard for today’s coding agents.</p>
-      <a class="btn primary" href="mailto:embodied-first-benchmark@gmail.com">embodied-first-benchmark@gmail.com</a>
-    </div>
   </section>
 
   <section class="section" id="thin-sec">
@@ -114,7 +112,7 @@
     </div>
     <div class="faq reveal">
       <details><summary>How do I send a proposal?</summary>
-        <p>E-mail it to <a class="link" href="mailto:embodied-first-benchmark@gmail.com">embodied-first-benchmark@gmail.com</a>. The exam’s repository is not public yet; access for the pull request is arranged once a proposal is approved.</p></details>
+        <p>E-mail it to <a class="link" href="mailto:embodied-first-exam@gmail.com">embodied-first-exam@gmail.com</a>. The exam’s code is not public yet; access for the pull request is arranged once a proposal is approved.</p></details>
       <details><summary>My benchmark has no scripted expert. Can it still come in?</summary>
         <p>Yes. A family without a full reference solution needs a positive example (a successful model trial, an upstream policy rollout or a hand-built trajectory) and a human review. Its results are reported apart from the tasks with a verified solution until it has one.</p></details>
       <details><summary>Does my suite need both modes?</summary>
@@ -124,7 +122,7 @@
       <details><summary>What if the simulator or its assets cannot be redistributed?</summary>
         <p>The image is marked build-only and comes with build instructions (licences, data). It is never published, though the maintainers may keep a private package for the team.</p></details>
       <details><summary>Can I get my own agent on the leaderboard?</summary>
-        <p>Official results come from Harbor’s native agents (Codex, Claude Code and others) under the protocol’s budgets, run with our runner. Helpers with GPU hosts run assigned batches and send the job directories back; ask the maintainers for an assignment.</p></details>
+        <p>Official results come from Harbor’s native agents (Codex, Claude Code and others) under the protocol’s budgets, run with our runner.</p></details>
       <details><summary>How is a suite credited?</summary>
         <p>Every adapted suite credits its upstream benchmark on its suite page and in its documentation.</p></details>
     </div>

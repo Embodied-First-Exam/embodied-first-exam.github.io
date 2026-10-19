@@ -1477,3 +1477,104 @@ h1 .name-tag i { font-size: 12px; }
 .g-item b:has(.name-tag) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; } .g-item b .name-tag { margin: 0; }
 .bignums dd small { display: block; margin-top: 4px; font: 500 13px/1.3 var(--mono); color: var(--ink-3); }
 .lb-select { height: 36px; padding: 0 32px 0 14px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); font-size: 13.5px; cursor: pointer; }
+
+/* ---------- owner's feedback, 2026-10-19 ---------- */
+/* the suites in two groups, each under its heading: EFE Suites, Existing Suites (home, Suites page, leaderboard) */
+.suite-group > h3.sg-head { margin: 0 0 18px; font: 650 clamp(22px, 2.2vw, 28px)/1.15 var(--display); letter-spacing: -.02em; }
+.galleries .suite-group + .suite-group { margin-top: clamp(48px, 5vw, 72px); }
+.suites-wrap .suite-group + .suite-group, #suites .suite-group + .suite-group { margin-top: 48px; }
+.sx-grp { grid-column: 1 / -1; padding: 18px 6px 6px; font: 650 17px/1.2 var(--display); letter-spacing: -.01em; color: var(--ink); }
+.sx-head + .sx-grp { padding-top: 4px; }
+/* home: a suite's demo plays on hover over its picture */
+.g-item .img video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .3s ease, transform .6s ease; pointer-events: none; }
+.g-item.playing .img video { opacity: 1; }
+.g-item:hover .img video { transform: scale(1.04); }
+@media (prefers-reduced-motion: reduce) { .g-item .img video { display: none; } }
+/* home: a suite in a dialog, a sheet from the bottom on a phone */
+/* The card does not scroll; its text does. (The card used to scroll, with the 16:9 video inside the scroller: a scrollbar
+   narrowed the video, the shorter video made the scrollbar unneeded, its going widened the video again, and so on, several
+   times a second, whenever the content was within ~8px of the card's maximum height: the dialog shook. Owner, 2026-10-19.)
+   Now the video sits outside the scroller, so a scrollbar can only make the text taller, never shorter: no loop. */
+.sm-card { width: min(860px, 100%); padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+.sm-card .ol-x { z-index: 4; background: rgba(255, 255, 255, .82); color: #1d2430; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.sm-media { position: relative; flex: none; aspect-ratio: 16 / 9; max-height: 52vh; overflow: hidden; background: #0b0d10; border-radius: 24px 24px 0 0; }
+.sm-media video, .sm-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.sm-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 30px 28px; }
+/* the page keeps its scrollbar's room while a dialog locks it, so nothing behind the fog shifts */
+html.ol-lock { scrollbar-gutter: stable; }
+.sm-kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--ink-3); }
+.sm-card h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; padding-right: 0; }
+.sm-card h3 .name-tag { font-size: 12px; padding: 2px 9px 2px 7px; }
+.sm-lead { margin: 12px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink); }
+.sm-desc { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.sm-desc code { padding: 1px 5px; border-radius: 4px; background: var(--code-bg); font: 500 .88em/1.4 var(--mono); }
+.sm-nums { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: start; gap: 8px 36px; margin: 22px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); }
+.sm-nums div { min-width: 0; }
+.sm-nums dt { font-size: 13px; color: var(--ink-3); }
+.sm-nums dd { margin: 2px 0 0; font: 700 22px/1.2 var(--display); letter-spacing: -.01em; color: var(--ink); overflow-wrap: anywhere; }
+.sm-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
+@media (max-width: 640px) {
+  .sm-modal { padding: 0; place-items: end stretch; }
+  .sm-card { width: 100%; max-height: 92vh; border-radius: 20px 20px 0 0; transform: translateY(40px); }
+  .sm-modal.on .sm-card { transform: none; }
+  .sm-media { border-radius: 20px 20px 0 0; }
+  .sm-body { padding: 18px 16px 24px; }
+  .sm-card .ol-x { top: 10px; right: 10px; }
+  .sm-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+  .sm-nums dd { font-size: 19px; }
+  .sm-cta .btn.primary { flex: 1 1 100%; }
+}
+/* leaderboard: no small print; the harness and effort sit on the name's line, in the normal size */
+.lbh-nl { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.lbh-nl b { flex: none; }
+.lbh-set { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 14px/1.25 var(--body); color: var(--ink-3); }
+/* the bar: Discord after GitHub */
+.dc-btn svg { width: 20px; height: 20px; }
+/* contribute: the ways to contribute, side by side */
+.routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.routes .route { max-width: none; gap: 14px; background: var(--surface); }
+.route h3 { margin: 0; font: 650 22px/1.2 var(--display); letter-spacing: -.01em; }
+.route .btn { margin-top: auto; }
+@media (max-width: 760px) { .routes { grid-template-columns: minmax(0, 1fr); } .routes .route { padding: 22px 20px; } }
+.sm-nums .tx dd { font: 600 15px/1.4 var(--body); letter-spacing: 0; padding-top: 4px; }
+.sm-nums .tx { max-width: 280px; }
+@media (max-width: 640px) { .sm-desc { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; } }
+@media (min-width: 761px) {
+  .lbh-row { grid-template-columns: 22px 26px 300px minmax(0, 1fr) 84px; }
+  .lbh-axis { grid-template-columns: calc(22px + 26px + 20px + 300px + 6px) minmax(0, 1fr) 94px; }
+}
+@media (max-width: 760px) { .lbh-nl { flex-wrap: wrap; column-gap: 6px; } .lbh-set { flex-basis: 100%; font-size: 13.5px; } }
+.lbh-pair { font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
+.lbh-pair .x b { color: var(--ink-2); font-weight: 650; }
+.lbh-dh .lbh-nl b { font: 600 16px/1.25 var(--body); }
+.lbh-dh > div.lbh-nl:first-of-type { display: flex; }
+/* a phone: room for GitHub, Discord, the menu and the theme beside the wordmark */
+@media (max-width: 520px) {
+  .nav { gap: 6px; padding-left: 12px; }
+  .nav .wordmark { gap: 7px; font-size: 15px; }
+  .nav .wordmark .mark { width: 24px; height: 24px; }
+  .nav .icon-btn { width: 32px; height: 32px; }
+  .nav .gh-btn:not(.dc-btn) { margin-left: auto; }
+  .nav .menu-btn { margin-left: 0; }
+  .nav .menu-btn + .icon-btn { margin-left: 0; }
+}
+@media (max-width: 374px) { .nav .wordmark { font-size: 0; } }
+
+/* ---------- Safari 14 and older (macOS Mojave and before): no aspect-ratio, no inset ----------
+   Without aspect-ratio these picture boxes have no height and every preview vanishes, leaving the cards' text only.
+   The old padding trick gives them their shape there; browsers with aspect-ratio (Safari 15+, every current one) skip this. */
+@supports not (aspect-ratio: 1 / 1) {
+  .wt::before, .g-item .img::before, .task-card .media::before, .da-thumb::before, .suite-card .media::before,
+  .cover::before, .rv-pic::before, .ri-pic::before, .sph-stage::before { content: ""; display: block; padding-top: 75%; }
+  .suite-card .media::before { padding-top: 56.25%; }
+  .cover::before, .rv-pic::before, .ri-pic::before { padding-top: 62.5%; }
+  .sph-stage::before { padding-top: 100%; }
+  .g-item.more .img::before, .g-item.more .img em { grid-area: 1 / 1; }
+  .wt img, .wt video, .wt .swap, .wt .swap img, .g-item .img img, .g-item .img video, .task-card .media img, .da-thumb img,
+  .suite-card .media img, .cover img, .cover video, .rv-pic img, .ri-pic img, .sph-canvas { top: 0; left: 0; }
+  .placeholder-art { top: 0; right: 0; bottom: 0; left: 0; }
+}
+/* the Suites page: a card's demo plays on hover, as on the home page */
+.suite-card .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+.suite-card.playing .media video { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .suite-card .media video { display: none; } }

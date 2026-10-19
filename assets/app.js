@@ -46,6 +46,10 @@ const MOON = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentC
 // GitHub is not linked yet: its button stays in place, inert, until the real address exists
 const GITHUB_URL = '';
 const GITHUB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
+// the exam's Discord, an icon after GitHub in the bar (owners, 2026-10-19). PLACEHOLDER: the invite link is not known yet;
+// put it here (the one place it lives); a real https:// address also makes the icon open in a new tab
+const DISCORD_URL = '#discord';
+const DISCORD = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
 const MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>';
 
@@ -58,6 +62,7 @@ function chrome() {
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
       <div class="nav-links">${links.map(([n, p, label]) => (p ? `<a href="${exam(p)}"${active(n) ? ' class="active"' : ''}>${label}</a>` : `<a class="soon" aria-disabled="true" title="Coming soon">${label}</a>`)).join('')}</div>
       <a class="icon-btn gh-btn${GITHUB_URL ? '' : ' soon'}"${GITHUB_URL ? ` href="${GITHUB_URL}"` : ' aria-disabled="true"'} aria-label="The exam on GitHub" title="${GITHUB_URL ? 'GitHub' : 'GitHub: coming soon'}">${GITHUB}</a>
+      <a class="icon-btn gh-btn dc-btn" data-discord href="${DISCORD_URL}"${/^https?:/.test(DISCORD_URL) ? ' target="_blank" rel="noopener"' : ''} aria-label="Discord" title="Discord">${DISCORD}</a>
       <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false">${MENU}</button>
       <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between day and night">${MOON}${SUN}</button>
     </nav>`;
@@ -172,10 +177,8 @@ function suiteBars(ex, r, sc) {
       <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%"></span>` : ''}${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
       <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${p != null ? `${Math.round(p)}%` : '–'}</em></span></a>`;
   }).join('');
-  const cost = r.est_n ? `about $${(r.est_usd / r.est_n).toFixed(r.est_usd / r.est_n < 1 ? 2 : 1)} of model use per question at list price` : '';
-  const time = r.agent_n ? `${Math.round(r.agent_s / r.agent_n / 60)} min per attempt` : '';
-  return `<div class="lbh-minis">${minis || '<p class="muted">No suite marked yet.</p>'}</div>
-    <p class="lbh-foot">${[esc(r.label), cost, time].filter(Boolean).join(' · ')}</p>`;
+  // (no small foot line: the cost and the time per attempt moved up beside the two scores; owner, 2026-10-19)
+  return `<div class="lbh-minis">${minis || '<p class="muted">No suite marked yet.</p>'}</div>`;
 }
 
 /** The leaderboard page: the ranked board with its controls, smaller runs folded away, a model's suites on a click. */
@@ -186,14 +189,10 @@ function lbBoard(ex, tasks, onDraw) {
   const harnesses = [...new Set(ex.runs.filter((r) => (r.kind || 'agent') === 'agent').map((r) => r.harness))];
   const state = { view: Q.get('view') === 'all' ? 'all' : 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
-  const metaOf = (r, sc, part) => {
-    const total = MODES.reduce((a, m) => a + (sc[m]?.[1] || 0), 0);
-    const reset = part && r.standard_reset?.done ? ` · <span class="rs" title="Standard attempts with ${r.standard_reset.budget} resets allowed are not counted">+${r.standard_reset.done} with resets, not counted</span>` : '';
-    return `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} tests${reset}`;
-  };
+  // no small line of suites and tests under a row (owner, 2026-10-19: the leaderboard carries no small print)
   const rowHTML = (r, sc, rank, part, best) => {
     const open = state.open === r.id;
-    return lbhRow(r, sc, rank, best, { part, meta: metaOf(r, sc, part), open }) + (open ? lbhDetail(ex, r, sc, false) : '');
+    return lbhRow(r, sc, rank, best, { part, open }) + (open ? lbhDetail(ex, r, sc, false) : '');
   };
   function draw() {
     const pool = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
@@ -213,16 +212,11 @@ function lbBoard(ex, tasks, onDraw) {
       html = LBH_AXIS + main.map((r, i) => { const k = key(scores[r.id], state.sort); if (k !== prev) { rank = i + 1; prev = k; } return rowHTML(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
-        html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}</button>
-          <span>Fewer than ${minSuites} suites each: scored on what they sat, not ranked.</span></div>`;
+        html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
         if (open) html += partial.map((r) => rowHTML(r, pscores[r.id], 0, true, best)).join('');
       }
     }
     board.innerHTML = html;
-    const n = main.length ? MODES.map((m) => scores[main[0].id][m][1]) : [0, 0];
-    $('#lb-note').innerHTML = state.view === 'shared'
-      ? `Head to head: the same ${int(n[0])} privileged and ${int(n[1])} standard tests of the core set for every ranked model.`
-      : 'Everything each model sat: the counts differ from row to row, so compare with care.';
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
     if (onDraw) onDraw({ state, main, scores });
@@ -276,19 +270,20 @@ function lbSuites(el, ex, runs, scores) {
     const tag = href ? `a href="${href}"` : 'span';
     return `<${tag} class="sx-cell${best ? ' best' : ''}" style="--t:${tint}%" title="${esc(tip)}">${text}</${href ? 'a' : 'span'}>`;
   };
-  const head = `<div class="sx-row sx-head"><span></span>${runs.map((r) => `<span class="sx-col"><b>${esc(r.model)}</b><small>${esc(r.effort)}</small></span>`).join('')}</div>`;
-  const rows = suites.map((s) => {
+  // no small effort line under a model's name (owner, 2026-10-19): the harness joins the name only where a model appears twice
+  const twice = (r) => runs.filter((x) => x.model === r.model).length > 1;
+  const head = `<div class="sx-row sx-head"><span></span>${runs.map((r) => `<span class="sx-col" title="${esc([r.harness, r.effort].filter(Boolean).join(' · '))}"><b>${esc(r.model)}${twice(r) && r.harness ? ` · ${esc(r.harness)}` : ''}</b></span>`).join('')}</div>`;
+  const row = (s) => {
     const vals = runs.map((r) => value(r, s));
     const top = SX_MODE === 'drop' ? null : Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
       ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
-  }).join('');
+  };
+  // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
+  const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp">${title}</div>${list.map(row).join('')}`).join('');
   const modes = [['standard', '<i class="sw s"></i>Standard'], ['privileged', '<i class="sw p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
-  const note = { standard: 'Share of each suite’s standard tests solved. The best in each row is underlined.',
-    privileged: 'Share of each suite’s privileged tests solved. The best in each row is underlined.',
-    drop: 'Points lost from privileged to standard: where the simulator matters most.' }[SX_MODE];
-  el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div>
-    <span class="sx-note">${note}</span></div>
+  // (no small note beside the switch: the leaderboard carries no small print; owner, 2026-10-19)
+  el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div></div>
     <div class="sd-scroll"><div class="sx-grid sx-${SX_MODE}" style="--n:${runs.length}">${head}${rows}</div></div>`;
   el.querySelectorAll('.sx-bar button').forEach((b) => b.addEventListener('click', () => { SX_MODE = b.dataset.m; lbSuites(el, ex, runs, scores); }));
 }
@@ -320,7 +315,7 @@ function suiteCard(ex, s) {
   const robot = s.robots?.[0]?.name || '';
   const more = (s.robots?.length || 0) > 1 ? ` and ${s.robots.length - 1} more` : '';
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
-    <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${releaseTag(s)}</div>
+    <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${hoverVideo(s, cropFor(s.id, cover?.task))}${releaseTag(s)}</div>
     <div class="body"><h4>${esc(s.name)}${nameTag(s)}</h4><p>${esc(s.blurb || '')}</p>
       <div class="meta">${tasksTests(s.instances, s.task_dirs)} · ${esc(robot)}${more}</div></div></a>`;
 }
@@ -343,11 +338,22 @@ const coverOf = (s) => s.teaser || s.preview?.find((p) => p.cover)
 
 function suitesGrid(el, ex, filter = {}) {
   const list = ex.suites.filter((s) => (!filter.body || s.body === filter.body) && (!filter.origin || (filter.origin === 'ours' ? isOurs(s) : s.origin === filter.origin)));
-  // one plain grid, no headings by robot body (user, 2026-10-18); the example task comes last
+  // no headings by robot body (user, 2026-10-18), but the team's own suites and the others apart (owner, 2026-10-19);
+  // the example task comes last
   const shown = [...list.filter((s) => !s.example), ...(filter.body ? [] : list.filter((s) => s.example))];
-  el.innerHTML = `<div class="suite-group reveal"><div class="suite-grid">${shown.map((s) => suiteCard(ex, s)).join('')}</div></div>`;
+  el.innerHTML = suiteGroups(shown).map(([title, items]) => `<div class="suite-group reveal">${groupHead(title, items.length)}
+    <div class="suite-grid">${items.map((s) => suiteCard(ex, s)).join('')}</div></div>`).join('') || '<div class="empty-state">No suite here.</div>';
+  // the demo plays on hover, as on the home page; a click goes straight to the suite's page, no dialog (owner, 2026-10-19)
+  hoverPlay($$('.suite-card', el));
   reveal(el);
 }
+
+/** The suites in two groups, each with its heading (owner, 2026-10-19): the exam team's own (isOurs), then the rest;
+ *  the order inside a group is the one prepare() gave. An empty group is left out. */
+function suiteGroups(list) {
+  return [['EFE Suites', list.filter((s) => isOurs(s))], ['Existing Suites', list.filter((s) => !isOurs(s))]].filter(([, l]) => l.length);
+}
+const groupHead = (title, n) => `<h3 class="sg-head">${title}<small>${n} suite${n === 1 ? '' : 's'}</small></h3>`;
 
 /* -------------------------------------------------------------------------------------- coverage (taxonomy) */
 
@@ -394,12 +400,10 @@ function taskCard(ex, t, runs) {
       ${runs.length && resultOf(t) !== 'unrun' ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
 
-// Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-media (runs/), or a local runlog/ folder
-// when one is there (previews). Decided once, by asking for the local index.
+// Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-media (runs/), previews included
+// (no probe for a local copy, which logged a 404 on every page that reads runs).
 const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/';
-let runBaseP;
-const runBase = () => (runBaseP ??= fetch(exam('runlog/index.json'), { method: 'HEAD', cache: 'no-cache' })
-  .then((r) => (r.ok ? exam('runlog/') : RUNS_REMOTE)).catch(() => RUNS_REMOTE));
+const runBase = async () => RUNS_REMOTE;
 let RUN_BASE = RUNS_REMOTE;
 const runURL = (p) => RUN_BASE + p;
 const runJSON = async (p) => { RUN_BASE = await runBase(); const r = await fetch(runURL(p)); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
@@ -1197,26 +1201,29 @@ r.submit("joint_position", A, dt=0.1)</code></pre></figure>
  *  lines of the code the agent wrote, quoted as it wrote them. */
 const WAY_ORDER = ['a', 'b', 'c'];   // the owner's order (2026-10-18): direct control, code to control, train a model to control
 const WAYS = {
-  a: { tab: 'Direct Control', title: 'Direct control', vid: 'a_barkour', step: 10,
-    line: 'A trot written by hand: a phase clock, a duty cycle and foot targets, turned into joint targets for every step.',
-    slug: 'mujoco_playground_barkour_joystick-privileged--dycu4ar', who: 'MuJoCo Playground · Barkour joystick · privileged · Codex · GPT-6 Astra',
+  a: { tab: 'Direct Control', title: 'Direct control', vid: 'a_barkour_v2', step: 5,
+    line: 'A trot written by hand: a gait clock and swing-foot targets, then a small optimisation for the ground forces, turned into joint targets for every step.',
+    slug: 'mujoco_playground_barkour_joystick-privileged--ieyzivc', who: 'MuJoCo Playground · Barkour joystick · privileged · Codex · GPT-6 Astra',
     code: `for t in range(1000):
   ...
-  phase=((t*dt-p.get('start',.10))/T+offsets)%1
-  stance=(phase<duty) if t*dt>=p.get('start',.10) else np.ones(4,dtype=bool)
-  feet=d.site_xpos[footids].copy()
-  for i in range(4):
-   mujoco.mj_jacSite(m,d,jacs[i],jr,int(footids[i]))` },
-  b: { tab: 'Code to Control', title: 'Code to control', vid: 'b_stack_blocks', step: 9,
-    line: 'Gripper poses for each arm, sent as end-effector targets; depth and video after every move to check the blocks.',
-    slug: 'robotwin_2_0_stack_blocks_three-standard--5vbeb5g', who: 'RoboTwin 2.0 · Stack three blocks · standard · Codex · GPT-6 Astra',
-    code: `    rot=Rotation.from_quat(np.array(q)[[1,2,3,0]]).as_matrix()
-    a[j:j+3]=np.array(xyz)-.12*rot[:,0]; a[j+3:j+7]=q; a[j+7]=grip
-    obs=r.submit('ee_pose',[a],include_depth=True,video='mp4',note=note)
+  # Alternating diagonal swings, separated by four-foot support.
+  clock=t*.01-.10;half=p['period']/2
+  k=int(np.floor(max(clock,0)/half));u=(clock-k*half)/p['swing']
+  if clock>=0 and u<1:sw[[0,3] if k%2==0 else [1,2]]=True
+  ...
+  tau=dyn[6:]@x+bias[6:]` },
+  b: { tab: 'Code to Control', title: 'Code to control', vid: 'b_peg_insertion', step: 18,
+    line: 'Its own model of both arms’ kinematics, fitted from what the cameras saw, turns gripper goals into joint targets; after every move it measures the grip again and corrects.',
+    slug: 'mujoco_playground_aloha_single_peg_insertion-standard--cu9yhuj', who: 'MuJoCo Playground · ALOHA single peg insertion · standard · Codex · GPT-6 Astra',
+    code: `def plan_grips(goals, compensation=True):
+    actual=qp(); target=qt();q=target.copy()
+    for side,(p,R) in goals.items():
+        k=side*7
+        want=camera_for_grip(p,R)
+        q[k:k+6]=fk[side].ik(want,actual[k:k+6])
     ...
-def watch(t=.6):
-    obs=r.get_obs(seconds=t,include_depth=True)` },
-  c: { tab: 'Train Model to Control', title: 'Train a model to control', vid: 'c_hurdle', step: 15,
+        move(q,duration if it==0 else 1.,note)` },
+  c: { tab: 'Train Model to Control', title: 'Train a model to control', vid: 'c_hurdle', step: 10,
     line: 'A neural controller trained from scratch on parallel rollouts with taller and taller hurdles, then refined by rollout search.',
     slug: 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za', who: 'HumanoidBench · Hurdle · privileged · Codex · GPT-6 Astra',
     code: `class Agent(nn.Module):
@@ -1226,15 +1233,16 @@ def watch(t=.6):
    delta=rw[t]+.99*vv*(1-nd)-va[t];last=delta+.99*.95*(1-nd)*last;adv[t]=last
   …
   for epoch in range(5):` },
-  d: { tab: 'mix', title: 'Mix them', vid: 'd_dunk', step: 15,
-    line: 'Its own inverse kinematics by least squares for the arm, combined with a search over the jump and the throw.',
-    slug: 'roboolympics-dunk-i00-privileged--wmry4fr', who: 'RoboOlympics-Fun · Dunk · privileged · Codex · GPT-6 Astra',
+  d: { tab: 'mix', title: 'Mix them', vid: 'd_volleyball_spike', step: 56,
+    line: 'Its own inverse kinematics by least squares for the striking palm, combined with a balance controller and a search over the jump and the strike.',
+    slug: 'roboolympics-fun-volleyball-spike-i00-privileged--aeefd7j', who: 'RoboOlympics-Fun · Volleyball spike · privileged · Codex · GPT-6 Astra',
     code: `from scipy.optimize import least_squares
 ...
-def fun(x):
- d.qpos[ix]=x;mujoco.mj_kinematics(m,d)
- b=r.mount['right']; ball=d.xpos[b]+d.xmat[b].reshape(3,3)@np.array([0,0,.2245])
- return np.r_[(ball-np.array([.18,0,2.48]))*10, .02*(x-np.array([-3,0,0,1.57,0,0,0]))]` },
+n=np.array([.74,-.45,.5]);n/=np.linalg.norm(n)
+for sign in [1,-1]:
+ def fun(x):
+  q[24:27]=x;d.qpos[r.qadr]=q;mujoco.mj_forward(w.m,d)
+  return np.r_[d.site_xmat[r.palm['right']].reshape(3,3)[:,0]-sign*n,.01*x]` },
 };
 /** A little Python colouring for the quoted code: keywords, strings, numbers, comments, calls. */
 function pyHL(src) {
@@ -1512,22 +1520,28 @@ function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false, stil
   return `<${still ? 'div' : 'button type="button"'} class="lbh-row${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
       aria-label="${esc(r.model)}: standard ${frac(sc.standard)}, privileged ${frac(sc.privileged)}">
     <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
-    <span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small>${meta ? `<small class="lbh-meta">${meta}</small>` : ''}</span>
+    <span class="lbh-name"><span class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></span>${meta ? `<small class="lbh-meta">${meta}</small>` : ''}</span>
     <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%" title="Privileged: ${frac(sc.privileged)}"></span>` : ''}${v != null ? `<span class="lbh-s" style="--w:${v.toFixed(1)}%;--k:${k}%" title="Standard: ${frac(sc.standard)}"></span>` : ''}</span>
     <span class="lbh-val" style="--k:${k}%"><b>${v != null ? `${Math.round(v)}<small>%</small>` : '–'}</b>${p != null ? `<em>${Math.round(p)}%</em>` : '<em>–</em>'}</span>
   </${still ? 'div' : 'button'}>`;
 }
-const LBH_KEY = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b>the robot’s own sensors, one go; deeper is higher</span>
-  <span><i class="sw p"></i><b>Privileged</b>open book: the simulator’s inside and retries</span></div>`;
+// the key names the two bars, without the small explanations beside them (owner, 2026-10-19)
+const LBH_KEY = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b></span>
+  <span><i class="sw p"></i><b>Privileged</b></span></div>`;
 const LBH_AXIS = `<div class="lbh-axis" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>`;
 /** A model opened under its row: both modes, then its suites one by one. */
 function lbhDetail(ex, r, sc, href = true) {
   const pc = (x) => (x?.[1] ? Math.round(pctOf(x)) : '–');
-  return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></div>
-      <div class="lbh-pair"><span class="s"><b>${pc(sc.standard)}%</b>standard · ${sc.standard?.[0] ?? 0} of ${sc.standard?.[1] ?? 0}</span>
-        <span class="p"><b>${pc(sc.privileged)}%</b>privileged · ${sc.privileged?.[0] ?? 0} of ${sc.privileged?.[1] ?? 0}</span></div>
+  // no small print (owner, 2026-10-19): each number with a one- or two-word label in the normal size, the counts on hover
+  const of = (x) => `${x?.[0] ?? 0} of ${x?.[1] ?? 0} tests`;
+  const usd = r.est_n ? r.est_usd / r.est_n : null;
+  return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
+      <div class="lbh-pair"><span class="s" title="${of(sc.standard)}"><b>${pc(sc.standard)}%</b>Standard</span>
+        <span class="p" title="${of(sc.privileged)}"><b>${pc(sc.privileged)}%</b>Privileged</span>
+        ${usd != null ? `<span class="x" title="Model use per question at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per question</span>` : ''}
+        ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
       ${href ? `<a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
-    <p class="lbh-dk"><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span>each suite</p>${suiteBars(ex, r, { suites: sc.suites || {} })}</div>`;
+    <p class="lbh-dk"><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></p>${suiteBars(ex, r, { suites: sc.suites || {} })}</div>`;
 }
 
 /** The leaderboard on the home page. The message is the standard mode, the exam itself: how much of it each agent solves
@@ -1566,13 +1580,115 @@ function homeBoard(el, ex) {
 /** The suites on the home page: a picture and a name each. */
 function gallery(el, ex) {
   if (!el) return;
-  const items = ranked(ex).map((s) => {
-    const cover = coverOf(s);
-    const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${cropFor(s.id, cover.task) ? ` class="${cropFor(s.id, cover.task)}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
-    return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
+  const item = (s) => {
+    const cover = coverOf(s), demo = demoOf(s), crop = cropFor(s.id, cover?.task);
+    const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${crop ? ` class="${crop}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
+    return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}" data-suite="${esc(s.id)}" aria-haspopup="dialog"><div class="img">${img}${hoverVideo(s, crop)}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
       <span>${int(s.instances)} tasks · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
+  };
+  // the team's own suites and the others under their headings (owner, 2026-10-19)
+  el.innerHTML = suiteGroups(ranked(ex)).map(([title, list]) => `<div class="suite-group">${groupHead(title, list.length)}<div class="gallery">${list.map(item).join('')}</div></div>`).join('');
+  hoverPlay($$('.g-item', el));
+  // a plain left click opens the suite's card in a dialog; ctrl-, cmd-, shift- and middle clicks still follow the link
+  el.addEventListener('click', (e) => {
+    const a = e.target.closest('.g-item[data-suite]');
+    if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+    const s = ex._suites[a.dataset.suite];
+    if (!s) return;
+    e.preventDefault();
+    suiteDialog(ex, s, a);
   });
-  el.innerHTML = items.join('');
+}
+
+/** A suite's demo: its teaser, else its cover if that has a video, else its first task video. */
+const demoOf = (s) => [s.teaser, coverOf(s), ...(s.preview || [])].find((m) => m?.video);
+
+/** A suite card's demo, played on hover (home and Suites page, owner 2026-10-19): nothing of it loads before the first
+ *  hover (data-src, preload none). */
+const hoverVideo = (s, crop = '') => { const d = demoOf(s); return d?.video ? `<video muted loop playsinline preload="none" data-src="${esc(site(d.video))}" aria-hidden="true"${crop ? ` class="${crop}"` : ''}></video>` : ''; };
+/** Hover plays a card's demo, on a pointer that hovers and without reduced motion; touch has no hover play; never while
+ *  a dialog is open. */
+function hoverPlay(cards) {
+  const canHover = matchMedia('(hover: hover) and (pointer: fine)'), still = matchMedia('(prefers-reduced-motion: reduce)');
+  cards.forEach((a) => {
+    const v = $('video[data-src]', a);
+    if (!v) return;
+    a.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'touch' || !canHover.matches || still.matches || document.documentElement.classList.contains('ol-lock')) return;
+      if (!v.src) v.src = v.dataset.src;
+      a.classList.add('playing');
+      v.play().catch(() => {});
+    });
+    a.addEventListener('pointerleave', () => { a.classList.remove('playing'); v.pause(); });
+  });
+}
+const stopHoverPlay = () => $$('.playing').forEach((a) => { a.classList.remove('playing'); $('video[data-src]', a)?.pause(); });
+
+/** A suite in a dialog on the home page (owner, 2026-10-19): name and tag, the brief, its demo video, the numbers, the
+ *  suite page and its own links. Closes on ×, Esc or a click on the fog; the focus stays inside while it is open; on a
+ *  phone it is a sheet from the bottom. */
+let suiteDlg;
+function suiteDialog(ex, s, opener) {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  stopHoverPlay();   // the card's demo stops behind the fog
+  if (!suiteDlg) {
+    suiteDlg = document.createElement('div');
+    suiteDlg.className = 'ol-modal sm-modal';
+    suiteDlg.hidden = true;
+    suiteDlg.innerHTML = '<div class="ol-fog"></div><div class="ol-card sm-card" role="dialog" aria-modal="true" aria-labelledby="sm-title"></div>';
+    document.body.append(suiteDlg);
+  }
+  const card = $('.sm-card', suiteDlg);
+  const demo = demoOf(s), cover = coverOf(s), crop = cropFor(s.id, (demo || cover)?.task);
+  const L = s.links || {};
+  const ext = [['Paper', L.paper], ['Website', L.website || L.project_page || L.project || L.site], ['Code', L.repository]]
+    .filter(([, v]) => v).map(([label, v]) => `<a class="btn small" href="${esc(v)}" target="_blank" rel="noopener">${label} ↗</a>`).join('');
+  const media = demo ? `<video src="${esc(site(demo.video))}"${demo.poster ? ` poster="${esc(site(demo.poster))}"` : ''} muted loop playsinline controls${still ? ' preload="metadata"' : ' autoplay'}${crop ? ` class="${crop}"` : ''}></video>`
+    : cover ? poster(cover, crop) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
+  const robots = (s.robots || []).map((r) => r.name).filter(Boolean);
+  // the numbers big; the robots and the simulator (its name, without the notes in brackets) as text beside them
+  const nums = [[int(s.instances), `task${s.instances === 1 ? '' : 's'}`], [int(s.task_dirs), `test${s.task_dirs === 1 ? '' : 's'}`],
+    [esc(robots.join(', ')), `robot${robots.length === 1 ? '' : 's'}`, 'tx'], [esc((s.simulator || '').replace(/\s*\(.*$/, '')), 'simulator', 'tx']].filter(([v]) => v);
+  card.innerHTML = `<button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="sm-media">${media}</div>
+    <div class="sm-body">
+      <p class="sm-kicker">${codeMark(s)}<span>${esc(ex.bodies?.[s.body] || '')}</span></p>
+      <h3 id="sm-title">${esc(s.name)}${nameTag(s)}</h3>
+      ${s.blurb ? `<p class="sm-lead">${esc(s.blurb)}</p>` : ''}
+      ${s.description ? `<p class="sm-desc">${prose(s.description)}</p>` : ''}
+      <dl class="sm-nums">${nums.map(([v, k, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <div class="sm-cta"><a class="btn primary" href="${exam('suite/')}?id=${esc(s.id)}">Open suite page <span class="arr">→</span></a>${ext}</div>
+    </div>`;
+  const video = $('video', card);
+  const focusables = () => $$('a[href], button, video[controls]', card);
+  const onKey = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key !== 'Tab') return;
+    const f = focusables(), first = f[0], last = f[f.length - 1];
+    if (!card.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  const onClick = (e) => { if (!e.target.closest('.sm-card') || e.target.closest('.ol-x')) close(); };
+  function close() {
+    suiteDlg.classList.remove('on');
+    document.documentElement.classList.remove('ol-lock');
+    removeEventListener('keydown', onKey);
+    suiteDlg.removeEventListener('click', onClick);
+    video?.pause();
+    setTimeout(() => { if (!suiteDlg.classList.contains('on')) { suiteDlg.hidden = true; card.innerHTML = ''; } }, still ? 0 : 320);
+    opener?.focus({ preventScroll: true });
+  }
+  suiteDlg.hidden = false;
+  card.scrollTop = 0;
+  const b = opener?.getBoundingClientRect(), c = card.getBoundingClientRect();
+  if (b && !matchMedia('(max-width: 640px)').matches) card.style.transformOrigin = `${b.left + b.width / 2 - c.left}px ${b.top + b.height / 2 - c.top}px`;
+  else card.style.transformOrigin = '';
+  document.documentElement.classList.add('ol-lock');
+  requestAnimationFrame(() => suiteDlg.classList.add('on'));
+  addEventListener('keydown', onKey);
+  suiteDlg.addEventListener('click', onClick);
+  setTimeout(() => $('.ol-x', card).focus({ preventScroll: true }), 60);
 }
 
 async function home(ex) {
@@ -1690,12 +1806,7 @@ async function contributePage(ex) {
   const c = ex.contribute || {};
   const t = ex.totals || {};
   iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'tasks', `${int(t.task_dirs)} tests`]]);
-  $$('[data-doc]').forEach((a) => {
-    if (c.docs) { a.href = c.docs + a.dataset.doc; return; }
-    // no public documents yet: cards keep their place on this page, inline mentions become plain text
-    if (a.classList.contains('way')) $('.go', a)?.remove();
-    else a.replaceWith(document.createTextNode(a.textContent.replace(/\s*↗$/, '')));
-  });
+  // (the five ways in and their links to the repository's documents are gone: owner, 2026-10-19)
   const info = coverageInfo(ex);
   thinSpots($('#thin'), ex, info);
   // recognition (a draft for the maintainers while it says so)
@@ -1889,9 +2000,12 @@ async function runPage(ex) {
     .replace(/[-_]+/g, ' ')).replace(/\b\w/g, (c) => c.toUpperCase());
   document.title = `${title} · run · Embodied First Exam`;
   const steps = r.steps || [];
-  const total = Math.max(r.wall_s || 0, (steps.at(-1)?.t || 0) + 5);
+  const total = Math.max(r.wall_s || 0, (steps[steps.length - 1]?.t || 0) + 5);
   const count = (k) => steps.reduce((a, st) => a + st.calls.filter((c) => c.kind === k).length, 0);
-  const submits = steps.reduce((a, st) => a + (st.sim?.submit || 0), 0), resets = steps.reduce((a, st) => a + (st.sim?.reset || 0), 0);
+  // a run's own totals (sim_total) count every robot command even where a step cannot be matched to it
+  const submits = Math.max(r.sim_total?.submit || 0, steps.reduce((a, st) => a + (st.sim?.submit || 0), 0)), resets = Math.max(r.sim_total?.reset || 0, steps.reduce((a, st) => a + (st.sim?.reset || 0), 0));
+  // some harnesses do not record when each step happened: their step times are estimated, shown with ≈
+  const est = r.step_times === 'estimated', at = (t) => `${est ? '≈' : ''}${clock(t)}`, estTip = est ? ' title="Estimated: this harness does not record when each step happened"' : '';
   const solved = r.success === 1 || r.state === 'success';
   const model = settingOf(r);
   head.innerHTML = `<p class="kicker">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(mode)} · one run</p>
@@ -1922,7 +2036,7 @@ async function runPage(ex) {
   const W = 1000, laneH = 15, top = 8, lanes = KIND_ORDER.length, H = top + lanes * laneH + 30;
   const x = (t) => ((t / total) * W).toFixed(1);
   const maxIn = Math.max(1, ...steps.map((st) => st.tok?.in || 0));
-  const area = steps.length > 1 ? `M0,${H - 4} ${steps.map((st) => `L${x(st.t)},${(H - 4 - ((st.tok?.in || 0) / maxIn) * 24).toFixed(1)}`).join(' ')} L${x(steps.at(-1).t)},${H - 4} Z` : '';
+  const area = steps.length > 1 ? `M0,${H - 4} ${steps.map((st) => `L${x(st.t)},${(H - 4 - ((st.tok?.in || 0) / maxIn) * 24).toFixed(1)}`).join(' ')} L${x(steps[steps.length - 1].t)},${H - 4} Z` : '';
   const marks = steps.flatMap((st, i) => {
     const kinds = [...new Set(st.calls.map((c) => c.kind))];
     return kinds.filter((k) => KIND_ORDER.includes(k)).map((k) => `<rect class="lane-mark k-${k}" data-i="${i}" x="${x(st.t)}" y="${top + KIND_ORDER.indexOf(k) * laneH + 2}" width="${Math.max(2.4, ((steps[i + 1]?.t ?? st.t + 4) - st.t) / total * W - 1).toFixed(1)}" height="${laneH - 4}" rx="2"/>`);
@@ -1960,7 +2074,7 @@ async function runPage(ex) {
       ${o.pics?.length ? `<div class="ro-pics">${o.pics.map((p) => `<img loading="lazy" src="${esc(runURL(p))}" alt="what the agent saw">`).join('')}</div>` : ''}</div>` : '';
     const sim = st.sim?.submit || st.sim?.reset ? `<span class="rt-sim">${st.sim.submit ? `${st.sim.submit} command${st.sim.submit > 1 ? 's' : ''} to the robot` : ''}${st.sim.reset ? ` · reset` : ''}</span>` : '';
     return `<article class="rstep" data-i="${i}" data-kinds="${['all', ...(st.say ? ['say'] : []), ...kinds].join(' ')}">
-      <div class="rt"><span class="rt-time">${clock(st.t)}</span><span class="rt-n">step ${i + 1}</span>${sim}<span class="rt-tok" title="prompt tokens · new output tokens · cost">${kTok(st.tok?.in)} ctx · +${int(st.tok?.out)} · $${(st.tok?.usd || 0).toFixed(2)}</span></div>
+      <div class="rt"><span class="rt-time"${estTip}>${at(st.t)}</span><span class="rt-n">step ${i + 1}</span>${sim}<span class="rt-tok" title="prompt tokens · new output tokens · cost">${kTok(st.tok?.in)} ctx · +${int(st.tok?.out)} · $${(st.tok?.usd || 0).toFixed(2)}</span></div>
       ${st.say ? `<div class="rsay">${prose(st.say)}</div>` : ''}${calls}${out}</article>`;
   };
   $('#run-log').innerHTML = `<div class="rl-bar">${filters.map((f) => `<button type="button" class="chip${f === 'all' ? ' on' : ''}" data-f="${f}">${f !== 'all' && f !== 'say' ? runIcon(f) : ''}${fname[f]}</button>`).join('')}</div>
@@ -1969,20 +2083,20 @@ async function runPage(ex) {
 
   // ---- behaviour: the current step drives the strip's playhead and the agent's view
   const arts = $$('.rstep');
-  const picAt = (i) => { for (let k = i; k >= 0; k--) if (steps[k].out?.pics?.length) return [k, steps[k].out.pics.at(-1)]; return [-1, null]; };
+  const picAt = (i) => { for (let k = i; k >= 0; k--) if (steps[k].out?.pics?.length) return [k, steps[k].out.pics[steps[k].out.pics.length - 1]]; return [-1, null]; };
   let cur = -1;
   const setStep = (i, scroll) => {
     if (i === cur || i < 0 || i >= steps.length) return;
     cur = i;
     arts.forEach((a, k) => a.classList.toggle('on', k === i));
     $('#rs-head').setAttribute('x1', x(steps[i].t)); $('#rs-head').setAttribute('x2', x(steps[i].t));
-    $('#rs-now').textContent = clock(steps[i].t);
+    $('#rs-now').textContent = at(steps[i].t);
     $$('.lane-mark').forEach((m) => m.classList.toggle('on', +m.dataset.i === i));
     const [k, p] = picAt(i);
     const img = $('#rv-img');
     if (p && img.dataset.src !== p) { img.classList.remove('in'); img.parentElement.classList.add('loading'); img.onload = () => { img.classList.add('in'); img.parentElement.classList.remove('loading'); }; img.src = runURL(p); img.dataset.src = p; }
     $('#rv-none').hidden = !!p; img.hidden = !p;
-    $('#rv-cap').textContent = p ? `Step ${k + 1} · ${clock(steps[k].t)}${k < i ? ` (the latest picture by step ${i + 1})` : ''}` : '';
+    $('#rv-cap').textContent = p ? `Step ${k + 1} · ${at(steps[k].t)}${k < i ? ` (the latest picture by step ${i + 1})` : ''}` : '';
     if (scroll) arts[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
   const io = new IntersectionObserver((es) => {
