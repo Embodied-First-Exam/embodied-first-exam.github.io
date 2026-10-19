@@ -188,7 +188,7 @@ const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0]
 const LB_DESC = {
   core: (n) => `We run each of the ${int(n)} core tasks once using the default settings. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
   standard: (n) => `We evaluate the ${int(n)} core tasks that have standard settings. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
-  'standard-realtime': (n) => `We evaluate the ${int(n)} core tasks that have standard-realtime settings. We use the standard settings, with the world continuing to run while the agent thinks.`,
+  'standard-realtime': (n) => `We evaluate the ${int(n)} core tasks that have standard-realtime settings. Standard-realtime covers only a subset of tasks with dynamic environments, such as moving objects, opponents or balance, where reaction time matters. We use the standard settings, with the world continuing to run while the agent thinks.`,
   privileged: (n) => `We evaluate the ${int(n)} core tasks that have privileged settings. The agent and simulator run in the same container, giving the agent access to the full simulator state and allowing it to reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
@@ -341,6 +341,10 @@ function lbSuites(el, ex, runs, scores, set) {
   if (!el) return;
   const h = $('#lb-suites-set');
   if (h) h.textContent = set.label;
+  // a note on why some suites have few tests in a setting (readers' question, 2026-10-19)
+  const sn = $('#lb-suites-note');
+  if (sn) sn.textContent = set.id === 'standard-realtime' ? 'Standard-realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
+    : 'The number of tests each suite has in this setting is under its name.';
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
   const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
   const suites = ranked(ex).filter((s) => runs.some((r) => scores[r.id]?.suites?.[s.id]));
