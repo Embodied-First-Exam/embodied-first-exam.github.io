@@ -611,14 +611,17 @@ function openTask(ex, t, runs) {
   else if (m.poster) media = `<div class="media"><img src="${esc(site(m.poster))}" alt=""><span class="note">${m.still ? 'the scene the task starts from' : 'preview'}</span></div>`;
   const allRuns = ex.runs.filter((r) => t.results?.[r.id]);
   // one row per model, as the ranked rows: its maker's mark, then each mode's verdict, standard in ink, privileged grey hatched
+  // a column per mode the task has: standard, standard-realtime, privileged (owners, 2026-10-19)
+  const RK = { standard: 's', 'standard-realtime': 't', privileged: 'p' };
+  const cols = ['standard', 'standard-realtime', 'privileged'].filter((m) => (t.modes || []).includes(m) || allRuns.some((r) => t.results[r.id]?.[RK[m]]));
   const res = allRuns.map((r) => {
     const cell = (mode) => {
-      const c = t.results[r.id]?.[MK[mode]];
+      const c = t.results[r.id]?.[RK[mode]];
       if (!c) return '<span class="lbh-c"><span class="lbh-v na">–</span></span>';
-      const cls = c.r ? 'rs' : c.s === 'S' ? `S ${MK[mode]}` : c.s;
+      const cls = c.r ? 'rs' : c.s === 'S' ? `S ${RK[mode]}` : c.s;
       return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
     };
-    return `<div class="lbh-res">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cell('standard')}${cell('privileged')}</div>`;
+    return `<div class="lbh-res">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
   }).join('');
   const facts = [
     ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}?id=${s.id}">${esc(s.name)}</a>`],
@@ -637,7 +640,7 @@ function openTask(ex, t, runs) {
     ${media}
     <div id="drawer-watch" data-task="${esc(t.suite)}/${esc(t.id)}">${hasRuns(t) ? '<p class="watch-run wait"><span class="spin"></span>Looking for runs to watch…</p>' : ''}</div>
     <div id="drawer-atlas"></div>
-    ${res ? `<h3>Results</h3><div class="lbh-task"><div class="lbh-res lbh-rh"><span></span><span>Model</span><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></div>${res}</div>` : ''}
+    ${res ? `<h3>Results</h3><div class="lbh-task" style="--ncol:${cols.length}"><div class="lbh-res lbh-rh"><span></span><span>Model</span>${cols.map((m) => `<span><i class="sw ${RK[m]}"></i>${{ standard: 'Standard', 'standard-realtime': 'Standard-realtime', privileged: 'Privileged' }[m]}</span>`).join('')}</div>${res}</div>` : ''}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
