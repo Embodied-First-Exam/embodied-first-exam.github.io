@@ -151,9 +151,9 @@ function compute(ex, tasks, b, atlas) {
   });
   const flashFill = (L) => L.filter(([t, m]) => !TOP.some((r) => ok(t, r, m)) && flash.some((r) => ok(t, r, m))).length;
   const allM = [...M.p, ...M.s, ...M.t];
-  // what the tests on a running clock are: by benchmark, the two Embodied Olympics suites together
+  // what the tests on a running clock are: by benchmark, the two EmbodiedOlympics suites together
   const rtBy = {};
-  for (const [t] of M.t) { const k = t.suite.startsWith('roboolympics') ? 'Embodied Olympics' : suiteName[t.suite] || t.suite; rtBy[k] = (rtBy[k] || 0) + 1; }
+  for (const [t] of M.t) { const k = t.suite.startsWith('roboolympics') ? 'EmbodiedOlympics' : suiteName[t.suite] || t.suite; rtBy[k] = (rtBy[k] || 0) + 1; }
   // a case's test: how many of the other agents solved it
   const task = (suite, id) => tasks.find((t) => t.suite === suite && t.id === id);
   const othersSolved = (suite, id, m, r) => { const t = task(suite, id); return t ? runs.filter((o) => o !== r && ok(t, o, m)).length : null; };
