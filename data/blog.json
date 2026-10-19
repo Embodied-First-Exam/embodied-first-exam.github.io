@@ -57,8 +57,8 @@
   },
   "bench_tags": {
    "myosuite": "musculoskeletal hand",
-   "behavior-1k": "long household tasks",
    "humanoidbench": "humanoid whole-body control",
+   "behavior-1k": "long household tasks",
    "dextoolbench": "dexterous hand + tools",
    "ikea": "two-arm precision assembly",
    "robodojo": "two-arm long sequences",
@@ -69,27 +69,12 @@
    "robocasa365": "multi-step kitchen",
    "roboengineer": "controller tuning",
    "maniguard": "tabletop + safety rules",
-   "mujoco-playground": "quadruped / humanoid control",
    "robowits": "two arms + physical reasoning",
-   "embodied-safety-exam": "safety judgement"
+   "mujoco-playground": "quadruped / humanoid control"
   },
   "snapshot": "2026-10-18 18:30",
   "sample": 1489,
   "interim": true,
-  "no_return": {
-   "p": [
-    1,
-    416
-   ],
-   "s": [
-    230,
-    592
-   ],
-   "t": [
-    46,
-    79
-   ]
-  },
   "approach": {
    "p": [
     549,

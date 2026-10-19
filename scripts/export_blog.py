@@ -3,11 +3,11 @@
 
 The blog's results (the scores per setting, the suites, the overlap between agents) are computed in the page from
 data/exam.json and data/tasks.json, the files the leaderboard reads, so the two cannot disagree. What is left comes from the
-cross-benchmark analysis page (its built index.html, which carries its data as `const DATA = {...}`): two numbers from its
-random sample of trials that the site cannot hold, failed trials with a point of no return and the approach each trial was
-graded on, per setting (with the three kinds of program inside code to control), and the short tag the analysis's benchmark
-figures give each benchmark (translated here). Each count is read from the page's own count (numerator, denominator), not
-recomputed.
+cross-benchmark analysis page (its built index.html, which carries its data as `const DATA = {...}`): from its random sample
+of trials, which the site cannot hold, the approach each trial was graded on, per setting (with the three kinds of program
+inside code to control), and the short tag the analysis's benchmark figures give each benchmark (translated here). Each count
+is read from the page's own count (numerator, denominator), not recomputed. A count the page no longer reports is left out
+(not kept from an older page), so the blog shows no stale number.
 
     python3 scripts/export_blog.py [--crossbench <analysis page>] [--out data/blog.json]
 
@@ -22,7 +22,8 @@ from pathlib import Path
 
 MODE = {'privileged': 'p', 'standard': 's', 'realtime': 't'}
 # the analysis's benchmark ids -> the site's suite ids (the IKEA assembly tasks are their own row in both)
-BENCH = {'behavior': 'behavior-1k', 'mujoco_playground': 'mujoco-playground', 'robotwin_2_0': 'robotwin-2', 'rsb': 'embodied-safety-exam'}
+BENCH = {'behavior': 'behavior-1k', 'mujoco_playground': 'mujoco-playground', 'robotwin_2_0': 'robotwin-2', 'rsb': 'embodied-safety-exam',
+         'ese': 'embodied-safety-exam'}
 # the short tags of the analysis's benchmark figures, in English
 TAGS = {'长程家务': 'long household tasks', '人形双臂家务': 'humanoid, two-arm chores', '灵巧手+用工具': 'dexterous hand + tools',
         '人形全身控制': 'humanoid whole-body control', '双臂精密装配': 'two-arm precision assembly', '桌面操作+安全约束': 'tabletop + safety rules',
@@ -35,9 +36,9 @@ WAYS = {'Code to Control（开环）': 'open', 'Code to Control（闭环）': 'c
 
 
 def crossbench(page):
-    """The sample numbers of the cross-benchmark analysis: per setting, [numerator, denominator] for failed trials with a point
-    of no return, and for the main approach (code with privileged access, direct commands under standard rules, a closed-loop
-    program on a running clock)."""
+    """The sample numbers of the cross-benchmark analysis: per setting, [numerator, denominator] for the main approach (code
+    with privileged access, direct commands under standard rules, a closed-loop program on a running clock), the approach
+    table and figure of its finding 1.6, and the benchmark figures' short tags."""
     text = Path(page).read_text(encoding='utf8')
     d, _ = json.JSONDecoder().raw_decode(text[text.index('const DATA = ') + len('const DATA = '):])
     tips = [html.unescape(t) for f in d['findings'].values() for t in re.findall(r'data-tip="([^"]*)"', f['html'])]
@@ -46,7 +47,7 @@ def crossbench(page):
         """[numerator, denominator] per setting, from the tips whose text holds all of that setting's needles."""
         out = {}
         for t in tips:
-            m = re.search(r'分母：(\d+) .*?[（；](privileged|standard|realtime)）.*?分子：.*?的 (\d+) 个', t)
+            m = re.search(r'分母：(\d+) .*?[（；](privileged|standard|realtime)[）。；].*?分子：.*?的 (\d+) 个', t)
             if m and all(n in t for n in needles[MODE[m.group(2)]]):
                 out[MODE[m.group(2)]] = [int(m.group(3)), int(m.group(1))]
         return out
@@ -75,7 +76,6 @@ def crossbench(page):
     return {
         'approach_mix': mix, 'approach_kinds': kinds, 'bench_tags': tags,
         'snapshot': site['snapshot'], 'sample': site.get('n_sample'), 'interim': bool(site.get('interim')),
-        'no_return': count({k: ('有不可挽回点',) for k in 'pst'}),
         'approach': count({'p': ('做法标注', 'Code to Control（开环）'), 's': ('做法标注', '「Direct Control」的'),
                            't': ('做法标注', '「Code to Control（闭环）」的')}),
     }
