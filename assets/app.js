@@ -1586,7 +1586,7 @@ function gallery(el, ex) {
     const cover = coverOf(s), demo = demoOf(s), crop = cropFor(s.id, cover?.task);
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${crop ? ` class="${crop}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}" data-suite="${esc(s.id)}" aria-haspopup="dialog"><div class="img">${img}${hoverVideo(s, crop)}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
-      <span>${int(s.instances)} tasks · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
+      <span>${int(s.instances)} tasks · ${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</span></a>`;
   };
   // the team's own suites and the others under their headings (owner, 2026-10-19)
   el.innerHTML = suiteGroups(ranked(ex)).map(([title, list]) => `<div class="suite-group">${groupHead(title, list.length)}<div class="gallery">${list.map(item).join('')}</div></div>`).join('');
@@ -1654,7 +1654,7 @@ function suiteDialog(ex, s, opener) {
   card.innerHTML = `<button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="sm-media">${media}</div>
     <div class="sm-body">
-      <p class="sm-kicker">${codeMark(s)}<span>${esc(ex.bodies?.[s.body] || '')}</span></p>
+      <p class="sm-kicker">${codeMark(s)}<span>${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</span></p>
       <h3 id="sm-title">${esc(s.name)}${nameTag(s)}</h3>
       ${s.blurb ? `<p class="sm-lead">${esc(s.blurb)}</p>` : ''}
       ${s.description ? `<p class="sm-desc">${prose(s.description)}</p>` : ''}
@@ -1759,7 +1759,7 @@ async function suitePage(ex) {
   $('#suite-head').innerHTML = `
     <div class="suite-hero">
       <div>
-        <p class="kicker">${codeMark(s)} &nbsp;${s.example ? 'example task' : 'a suite of the exam'} · ${esc(ex.bodies?.[s.body] || '')}</p>
+        <p class="kicker">${codeMark(s)} &nbsp;${s.example ? 'example task' : 'a suite of the exam'} · ${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</p>
         <h1 style="margin:10px 0 0;font:800 clamp(40px,5.6vw,76px)/.95 var(--display);letter-spacing:-.035em">${esc(s.name)}${nameTag(s)}</h1>
         <p class="lead" style="margin:16px 0 0;font-size:18px;color:var(--ink-2)">${esc(s.blurb || '')}</p>
         <p class="desc">${prose(s.description || '')}</p>
