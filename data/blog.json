@@ -71,7 +71,7 @@
    "maniguard": "tabletop + safety rules",
    "robowits": "two arms + physical reasoning",
    "mujoco-playground": "quadruped / humanoid control",
-   "roboolympics-fun": "humanoid sports"
+   "embodied-olympics-fun": "humanoid sports"
   },
   "snapshot": "2026-10-18 18:30",
   "sample": 1489,

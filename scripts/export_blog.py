@@ -23,7 +23,7 @@ from pathlib import Path
 MODE = {'privileged': 'p', 'standard': 's', 'realtime': 't'}
 # the analysis's benchmark ids -> the site's suite ids (the IKEA assembly tasks are their own row in both)
 BENCH = {'behavior': 'behavior-1k', 'mujoco_playground': 'mujoco-playground', 'robotwin_2_0': 'robotwin-2', 'rsb': 'embodied-safety-exam',
-         'ese': 'embodied-safety-exam'}
+         'ese': 'embodied-safety-exam', 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match'}
 # the short tags of the analysis's benchmark figures, in English
 TAGS = {'长程家务': 'long household tasks', '人形双臂家务': 'humanoid, two-arm chores', '灵巧手+用工具': 'dexterous hand + tools',
         '人形全身控制': 'humanoid whole-body control', '双臂精密装配': 'two-arm precision assembly', '桌面操作+安全约束': 'tabletop + safety rules',

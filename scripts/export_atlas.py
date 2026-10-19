@@ -40,6 +40,9 @@ PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco
 # 2026-10-19); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19)
 FORMER_PREFIX = [("embodied-olympics-fun-", "roboolympics-"), ("embodied-olympics-match-", "roboolympics-"),
                  ("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-")]
+# suites renamed after their questions were first placed on the sphere (Embodied Olympics, 2026-10-19): a question
+# without an Atlas record keeps the small offset of its earlier key, so a rename does not move its dot
+FORMER_SUITE = {"embodied-olympics-fun": "roboolympics-fun", "embodied-olympics-match": "roboolympics-match"}
 CJK = re.compile(r"[\u2e80-\u2fff\u3000-\u303f\u3040-\u9fff\uf900-\ufaff\uff00-\uffef]+")
 # Chinese text inside English summaries, said in English (anything else in Chinese is dropped)
 CJK_EN = {"\u672c\u6240\u7acb\u5ddd": "Honjo Tatekawa"}   # a painting's title in a VLABench task
@@ -260,7 +263,8 @@ def main() -> int:
             m = [sum(recs[j]["xyz"][d] for j in peers) for d in range(3)]
             n = math.sqrt(sum(x * x for x in m)) or 1
             # a small offset fixed by the question's key, so questions placed at one centre do not sit on one dot
-            h = hashlib.sha256(keys[i].encode()).digest()
+            seed = FORMER_SUITE.get(site[i]["suite"], site[i]["suite"]) + "/" + site[i]["id"]
+            h = hashlib.sha256(seed.encode()).digest()
             m = [x / n + (h[d] / 255 - 0.5) * 0.12 for d, x in enumerate(m)]
             n = math.sqrt(sum(x * x for x in m)) or 1
             rec["xyz"] = r3([x / n for x in m])

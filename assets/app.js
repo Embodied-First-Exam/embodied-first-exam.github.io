@@ -9,8 +9,27 @@ const BASE = new URL('../', import.meta.url).pathname;
 const MEDIA = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/';
 const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
-// the Embodied Safety Exam's earlier suite id, in links from before 2026-10-19
-for (const k of ['suite', 'id', 'task']) { const v = Q.get(k); if (v && /^robosafe(\/|$)/.test(v)) Q.set(k, v.replace(/^robosafe/, 'embodied-safety-exam')); }
+// suites' earlier ids, in links from before 2026-10-19: the Embodied Safety Exam was robosafe; Embodied Olympics - Fun and
+// - Match were roboolympics-fun and roboolympics-match (and one suite, roboolympics, before 2026-10-18: its tasks are found
+// in either, see taskKey). The address is rewritten too, so the Tasks page's filters (search.js) read the new id.
+const SUITE_ALIAS = { robosafe: 'embodied-safety-exam', 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match',
+  roboolympics: 'embodied-olympics-fun' };
+const SUITE_SPLIT = { roboolympics: ['embodied-olympics-fun', 'embodied-olympics-match'] };
+const suiteNow = (id) => SUITE_ALIAS[id] || id;
+{
+  let moved = false;
+  for (const k of ['suite', 'id', 'task']) {
+    const v = Q.get(k), m = v && /^([^/]+)(\/.*)?$/.exec(v);
+    if (m && SUITE_ALIAS[m[1]] && !(k === 'task' && SUITE_SPLIT[m[1]])) { Q.set(k, SUITE_ALIAS[m[1]] + (m[2] || '')); moved = true; }
+  }
+  if (moved) history.replaceState(history.state, '', `${location.pathname}?${Q}${location.hash}`);
+}
+/** A task's key ("<suite>/<id>") in `index`, also from a link to a suite that was split since (roboolympics/<id>). */
+const taskKey = (want, index) => {
+  if (!want || index.has(want)) return want;
+  const [s, id] = want.split('/');
+  return (SUITE_SPLIT[s] || []).map((x) => `${x}/${id}`).find((k) => index.has(k)) || want;
+};
 const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
@@ -496,6 +515,23 @@ const runJSON = async (p) => { RUN_BASE = await runBase(); const r = await fetch
 // uploads): index.json holds every row. A v1 index is split into suites here, so everything below reads both alike.
 /** The site's suite id of a run row: its site link ("<suite>/<task id>"), else its bench under the site's name. */
 const runSuite = (r) => (r.site ? r.site.split('/')[0] : BENCH_SUITE[r.bench] || r.bench);
+// The runs' files on HF keep the names they were built with (owners, 2026-10-19: no run is moved or rebuilt for a rename),
+// so an index built before a suite was renamed lists its shard, and its rows' site, under the earlier id
+// (roboolympics-fun, roboolympics-match). They are read here under the suite's id now; the slugs stay as they are, and
+// runPage finds a run by either name. An index built after the rename has the new ids and none of this applies.
+const RUN_SUITE_RENAMED = { 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
+const shardFile = new Map();   // the site's suite id -> the shard's name in the index, where they differ
+const siteNow = (r) => { const [s, id] = (r.site || '').split('/'); return RUN_SUITE_RENAMED[s] ? { ...r, site: `${RUN_SUITE_RENAMED[s]}/${id}` } : r; };
+function renameSuites(sum) {
+  for (const [old, now] of Object.entries(RUN_SUITE_RENAMED)) {
+    if (!sum.suites?.[old] || sum.suites[now]) continue;
+    sum.suites[now] = sum.suites[old];
+    delete sum.suites[old];
+    if (sum.solved && old in sum.solved) { sum.solved[now] = sum.solved[old]; delete sum.solved[old]; }
+    shardFile.set(now, old);
+  }
+  return sum;
+}
 let runSummaryP;
 const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
@@ -504,8 +540,8 @@ const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
-  if (d.runs) d.runs = shown(d.runs);
-  if (d.v >= 2) return splitSuites(d);
+  if (d.runs) d.runs = shown(d.runs).map(siteNow);
+  if (d.v >= 2) return splitSuites(renameSuites(d));
   const by = {}, settings = {};
   for (const r of d.runs || []) { (by[runSuite(r)] ??= []).push(r); settings[r.run] = (settings[r.run] || 0) + 1; }
   for (const [s, rows] of Object.entries(by)) runShards.set(s, Promise.resolve(rows));
@@ -514,7 +550,7 @@ const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
 // Embodied Olympics is two suites on this site since 2026-10-19 (Fun and Match); an index built before files both under
 // 'roboolympics'. Its rows go to the suite their task is in (data/tasks.json), with their counts; under the old id the
 // same rows stay reachable, for a run page whose bench is the old one.
-const SPLIT_SUITES = { roboolympics: ['roboolympics-fun', 'roboolympics-match'] };
+const SPLIT_SUITES = { roboolympics: ['embodied-olympics-fun', 'embodied-olympics-match'] };
 async function splitSuites(sum) {
   for (const [old, parts] of Object.entries(SPLIT_SUITES)) {
     if (!sum.suites?.[old] || parts.some((p) => sum.suites[p])) continue;
@@ -538,7 +574,7 @@ async function splitSuites(sum) {
 const runShard = (suite) => runSummary().then((sum) => {
   if (runShards.has(suite)) return runShards.get(suite);
   if (!sum.suites?.[suite]) return [];
-  const p = runJSON(`index/${encodeURIComponent(suite)}.json`).then((d) => shown(d.runs));
+  const p = runJSON(`index/${encodeURIComponent(shardFile.get(suite) || suite)}.json`).then((d) => shown(d.runs).map(siteNow));
   runShards.set(suite, p);
   p.catch(() => runShards.delete(suite));
   return p;
@@ -701,7 +737,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
   import('./search.js?v=e34f9293').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
-  const want = Q.get('task');
+  const want = taskKey(Q.get('task'), index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
 
@@ -709,7 +745,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
 
 /** The suites the exam's team built and releases with the exam (owners, 2026-10-18): first everywhere, in this order,
  *  each with the EFE Original tag beside its name. */
-const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'roboolympics-fun', 'roboolympics-match', 'embodied-safety-exam', 'dexhand', 'roboengineer'];
+const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'embodied-olympics-fun', 'embodied-olympics-match', 'embodied-safety-exam', 'dexhand', 'roboengineer'];
 const isOurs = (s) => OUR_RELEASE.includes(s?.id);
 // beside the name, small (nameTag), and on the picture's top right corner, as a frosted chip (owners, 2026-10-18)
 const nameTag = (s) => (isOurs(s) ? `<span class="name-tag" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
@@ -1929,7 +1965,7 @@ async function tasksPage(ex) {
     result: resultOf, bodies: BODY_ORDER, legend: dotsKey(),
     models: runs.map((r) => ({ id: r.id, name: named(r), title: [r.model, r.harness, r.effort].filter(Boolean).join(' · '), mark: makerMark(r.model) })) });
   el.addEventListener('click', (e) => { const b = e.target.closest('[data-task]'); if (b && index.has(b.dataset.task)) openTask(ex, index.get(b.dataset.task), runs); });
-  const want = Q.get('task');
+  const want = taskKey(Q.get('task'), index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
 
@@ -1970,7 +2006,8 @@ const runIcon = (k) => `<svg class="rk-ic" viewBox="0 0 24 24" fill="none" strok
 const clock = (s) => { s = Math.max(0, Math.round(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; };
 const kTok = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
 // the evaluation's bench names that differ from the site's suite ids
-const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'embodied-safety-exam', rsb: 'embodied-safety-exam', ese: 'embodied-safety-exam', ikea: 'roboarc' };
+const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'embodied-safety-exam', rsb: 'embodied-safety-exam', ese: 'embodied-safety-exam', ikea: 'roboarc',
+  'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
 const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5',
@@ -2117,14 +2154,17 @@ async function runIndex(ex, head) {
   loadScope();
 }
 
+// a run's slug under its suite's other name (runs built before a rename keep theirs; a rebuilt index may use the new one)
+const SLUG_RENAMED = [['roboolympics-fun-', 'embodied-olympics-fun-'], ['roboolympics-match-', 'embodied-olympics-match-']];
+const otherSlug = (slug) => { for (const [a, b] of SLUG_RENAMED) { if (slug.startsWith(a)) return b + slug.slice(a.length); if (slug.startsWith(b)) return a + slug.slice(b.length); } return null; };
 async function runPage(ex) {
-  const slug = Q.get('r');
+  let slug = Q.get('r');
   const head = $('#run-head');
   if (!slug) return runIndex(ex, head);
   let r;
   head.innerHTML = '<p class="kicker">Run</p><h1>&nbsp;</h1>';
   $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the run: every step, command and picture…</div>';
-  try { r = await runJSON(`${slug}.json`); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
+  try { r = await runJSON(`${slug}.json`).catch((e) => { const alt = otherSlug(slug); if (!alt) throw e; return runJSON(`${alt}.json`).then((x) => { slug = alt; return x; }, () => { throw e; }); }); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
   const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
   const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
   const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
