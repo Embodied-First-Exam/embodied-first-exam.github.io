@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Leaderboard · Embodied First Exam</title>
-<meta name="description" content="How often code agents solve the Embodied First Exam's tests, privileged and standard, on the same tests.">
+<meta name="description" content="How often code agents solve the Embodied First Exam's core tests, one setting at a time: core, standard, standard-realtime and privileged.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=e76315c3">
+<link rel="stylesheet" href="../assets/exam.css?v=1722aa8d">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=4bb0bafa"></script>
+<script type="module" src="../assets/app.js?v=764070d6"></script>
 </head>
 <body data-page="leaderboard">
 <div id="nav"></div>
@@ -27,19 +27,19 @@
     <p class="lb-pre"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.2"/></svg>
       <span id="lb-pre-text"></span> <a href="#counting">How it is counted ↓</a></p>
     <div class="lb-bar">
-      <div class="seg" id="lb-mode" role="group" aria-label="Sort by">
-        <button class="on" data-mode="standard">Sort by standard</button>
-        <button data-mode="privileged">by privileged</button>
+      <div class="seg lb-set" id="lb-mode" role="group" aria-label="Setting">
+        <button type="button" data-set="core" class="on" aria-pressed="true">Core</button><button type="button" data-set="standard" aria-pressed="false">Standard</button><button type="button" data-set="standard-realtime" aria-pressed="false">Standard-realtime</button><button type="button" data-set="privileged" aria-pressed="false">Privileged</button>
       </div>
       <select class="lb-select" id="lb-harness" aria-label="Harness"></select>
       <span class="grow"></span>
     </div>
-    <div class="lbh lbh-page"><div id="lb-key"></div><div class="lbh-chart" id="lb-board"></div></div>
+    <p class="lb-basis" id="lb-basis"></p>
+    <div class="lbh lbh-page"><div class="lbh-chart" id="lb-board"></div></div>
   </section>
 
   <section class="section">
     <div class="head reveal">
-      <h2>Suite by suite</h2>
+      <h2>Suite by suite · <span id="lb-suites-set">Core</span></h2>
     </div>
     <div class="sdots reveal" id="lb-suites"></div>
   </section>

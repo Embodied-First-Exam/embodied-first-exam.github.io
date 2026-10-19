@@ -206,158 +206,204 @@ function poster(media, cls = '') {
 
 /* --------------------------------------------------------------------------------------------- leaderboard */
 
-/** Scores of a group of runs. view "shared": only the trials every run in `group` graded; "all": each run's own. */
-function scoreGroup(group, tasks, view) {
-  const out = Object.fromEntries(group.map((r) => [r.id, { privileged: [0, 0], standard: [0, 0], suites: {} }]));
+/** The leaderboard's settings, shown one at a time behind a switch (owners, 2026-10-19). Core is the core set as the
+ *  default command runs it, each core task once in its default mode, and it is the default view; then standard,
+ *  standard-realtime and privileged, each the core set's tests in that one mode (real time is no longer standard).
+ *  `key` is the result key of a task's cell (data/tasks.json); Core takes each task's own default key. */
+const LB_SETTINGS = [
+  { id: 'core', label: 'Core', key: null },
+  { id: 'standard', label: 'Standard', key: 's' },
+  { id: 'standard-realtime', label: 'Standard-realtime', key: 't' },
+  { id: 'privileged', label: 'Privileged', key: 'p' },
+];
+const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
+
+/** Scores of a group of runs in one setting: only the core tests of that setting; view "shared": only those every run in
+ *  `group` has sat; "all": each run's own. {tests: the setting's core tests, trials: the tests counted (shared view),
+ *  scores: {run: {v: [solved, sat], suites: {suite: [solved, sat]}}}} */
+function scoreGroup(group, tasks, view, set) {
+  const scores = Object.fromEntries(group.map((r) => [r.id, { v: [0, 0], suites: {} }]));
+  let tests = 0, trials = 0;
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
-    // the core set only, a cell per task dir; a standard-realtime dir (t) counts on the standard side (owners, 2026-10-18)
-    const core = t.core ? new Set(t.core) : null;
-    for (const m of MODES) {
-      for (const k of (m === 'standard' ? ['s', 't'] : [MK[m]])) {
-        if (core && !core.has(k)) continue;
-        const cells = group.map((r) => scored(t.results?.[r.id]?.[k]));
-        if (view === 'shared' && cells.some((c) => !GRADED.has(c))) continue;
-        group.forEach((r, i) => {
-          const c = cells[i];
-          if (!GRADED.has(c)) return;
-          const o = out[r.id];
-          o[m][0] += c === 'S';
-          o[m][1] += 1;
-          const ss = (o.suites[t.suite] ??= {});
-          const cell = (ss[m] ??= [0, 0]);
-          cell[0] += c === 'S';
-          cell[1] += 1;
-        });
-      }
-    }
+    const k = set.key ?? t.default;
+    if (!k || !t.core || !t.core.includes(k)) continue;   // the core set only (owners, 2026-10-18)
+    tests += 1;
+    const cells = group.map((r) => scored(t.results?.[r.id]?.[k]));
+    if (view === 'shared' && (!group.length || cells.some((c) => !GRADED.has(c)))) continue;
+    trials += 1;
+    group.forEach((r, i) => {
+      const c = cells[i];
+      if (!GRADED.has(c)) return;
+      const o = scores[r.id];
+      o.v[0] += c === 'S';
+      o.v[1] += 1;
+      const ss = (o.suites[t.suite] ??= [0, 0]);
+      ss[0] += c === 'S';
+      ss[1] += 1;
+    });
   }
-  return out;
+  return { tests, trials, scores };
 }
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
+const solvedOf = (v) => (v?.[1] ? `${int(v[0])}/${int(v[1])}` : '–');
 
-/** A model, suite by suite, as the ranked rows: the standard score as a thin ink bar over the privileged score's grey
- *  hatched ghost, both numbers at the end. */
-function suiteBars(ex, r, sc) {
-  const frac = (x) => (x?.[1] ? `${x[0]} of ${x[1]}` : 'not sat');
-  const minis = ranked(ex).filter((s) => sc.suites[s.id]).map((s) => {
-    const v = sc.suites[s.id];
-    const q = pctOf(v.standard), p = pctOf(v.privileged);
+/** What a setting's ranking stands on, in plain words: its tests every ranked agent has sat, and whether that is still a
+ *  subset of the setting's core tests. `who` names the agents when the board is narrowed (a harness). */
+function lbBasis(set, trials, tests, who = '') {
+  const what = set.id === 'core' ? `core tests (each core task once, in its default mode)` : `${set.label.toLowerCase()} tests of the core set`;
+  const sub = trials < tests ? `, a subset of its ${int(tests)} until every run finishes` : '';
+  return `Ranked on the ${int(trials)} ${what} that every ranked ${who ? `${esc(who)} ` : ''}agent has sat${sub}.`;
+}
+
+/** The switch between the settings: one button each, the chosen one pressed; arrow keys move along it. */
+function settingSwitch(el, current, pick) {
+  el.setAttribute('role', 'group');
+  el.setAttribute('aria-label', 'Setting');
+  el.innerHTML = LB_SETTINGS.map((s) => `<button type="button" data-set="${s.id}" aria-pressed="${s.id === current}" class="${s.id === current ? 'on' : ''}">${s.label}</button>`).join('');
+  const buttons = $$('button', el);
+  const press = (id) => buttons.forEach((b) => { const on = b.dataset.set === id; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  el.addEventListener('click', (e) => { const b = e.target.closest('[data-set]'); if (b) { press(b.dataset.set); pick(b.dataset.set); } });
+  el.addEventListener('keydown', (e) => {
+    const i = buttons.indexOf(document.activeElement);
+    if (i < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+    const j = e.key === 'Home' ? 0 : e.key === 'End' ? buttons.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
+    buttons[j].focus();
+    buttons[j].click();
+  });
+  return press;
+}
+
+/** A model, suite by suite, in one setting: a bar and the share solved, the counts beside it. */
+function suiteBars(ex, suites, set) {
+  const minis = ranked(ex).filter((s) => suites[s.id]?.[1]).map((s) => {
+    const v = suites[s.id], q = pctOf(v);
     const k = Math.round(38 + 62 * (q ?? 0) / 100);
-    return `<a class="lbh-mini" href="${exam('suite/')}?id=${s.id}" style="--i:0" title="${esc(s.name)}: standard ${frac(v.standard)}, privileged ${frac(v.privileged)}">
+    return `<a class="lbh-mini" href="${exam('suite/')}?id=${s.id}" style="--i:0" title="${esc(s.name)}, ${esc(set.label)}: ${v[0]} of ${v[1]} solved">
       <span class="nm">${codeMark(s)}<span>${esc(s.name)}</span></span>
-      <span class="lbh-track">${p != null ? `<span class="lbh-p" style="--w:${p.toFixed(1)}%"></span>` : ''}${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
-      <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${p != null ? `${Math.round(p)}%` : '–'}</em></span></a>`;
+      <span class="lbh-track"><span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span></span>
+      <span class="lbh-val" style="--k:${k}%"><b>${Math.round(q)}<small>%</small></b><em>${solvedOf(v)}</em></span></a>`;
   }).join('');
-  // (no small foot line: the cost and the time per attempt moved up beside the two scores; owner, 2026-10-19)
   return `<div class="lbh-minis">${minis || '<p class="muted">No suite marked yet.</p>'}</div>`;
 }
 
-/** The leaderboard page: the ranked board with its controls, smaller runs folded away, a model's suites on a click. */
+/** One ranked row in one setting: place (gold, silver, bronze), maker's mark, model and harness, the share solved as an
+ *  ink bar (deeper for higher, relative to `best`), then the share and solved / sat. `part`: a smaller run, not ranked. */
+function lbRow(r, v, rank, best, set, { part = false, open = false } = {}) {
+  const q = pctOf(v);
+  const k = Math.round(38 + 62 * (q ?? 0) / Math.max(best || 0, 1));
+  return `<button type="button" class="lbh-row lb1${part ? ' part' : ''}${open ? ' on' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}" aria-expanded="${open}"
+      aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%` : 'not sat'}">
+    <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
+    <span class="lbh-name"><span class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></span></span>
+    <span class="lbh-track">${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
+    <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${solvedOf(v)}</em></span>
+  </button>`;
+}
+
+/** A model opened under its row, in one setting: its share and count, cost and time, then its suites one by one. */
+function lbDetail(ex, r, sc, set, href = true) {
+  const usd = r.est_n ? r.est_usd / r.est_n : null;
+  const q = pctOf(sc.v);
+  return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
+      <div class="lbh-pair"><span class="s"><b>${q != null ? Math.round(q) : '–'}%</b>${esc(set.label)}</span>
+        <span class="s"><b>${solvedOf(sc.v)}</b>Solved</span>
+        ${usd != null ? `<span class="x" title="Model use per test at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per test</span>` : ''}
+        ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
+      ${href ? `<a class="btn small" href="${exam('leaderboard/')}?${set.id === 'core' ? '' : `mode=${set.id}&`}open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
+    ${suiteBars(ex, sc.suites || {}, set)}</div>`;
+}
+const LB_AXIS = `<div class="lbh-axis lb1" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>`;
+
+/** The leaderboard page: the setting switch (remembered in ?mode=), the ranked board, a model's suites on a click. */
 function lbBoard(ex, tasks, onDraw) {
   const lb = ex.leaderboard || {};
   const minSuites = lb.min_suites || 10;
   const board = $('#lb-board');
   const harnesses = [...new Set(ex.runs.filter((r) => (r.kind || 'agent') === 'agent').map((r) => r.harness))];
-  // only the core tests every ranked model sat (owners, 2026-10-19: one view, no 'everything each sat')
-  const state = { view: 'shared', sort: Q.get('mode') === 'privileged' ? 'privileged' : 'standard',
-    harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
-  // no small line of suites and tests under a row (owner, 2026-10-19: the leaderboard carries no small print)
-  const rowHTML = (r, sc, rank, part, best) => {
-    const open = state.open === r.id;
-    return lbhRow(r, sc, rank, best, { part, open }) + (open ? lbhDetail(ex, r, sc, false) : '');
-  };
+  // only the core tests of the chosen setting every ranked agent has sat (owners, 2026-10-19)
+  const state = { set: lbSetting(Q.get('mode')).id, harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
   function draw() {
+    const set = lbSetting(state.set);
     const pool = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
     const main = pool.filter((r) => (r.suites?.length || 0) >= minSuites);
     const partial = pool.filter((r) => (r.suites?.length || 0) < minSuites).sort((a, b) => (b.suites?.length || 0) - (a.suites?.length || 0));
-    const scores = scoreGroup(main, tasks, state.view);
-    const pscores = Object.fromEntries(partial.map((r) => [r.id, scoreGroup([r], tasks, 'all')[r.id]]));
-    const other = state.sort === 'privileged' ? 'standard' : 'privileged';
-    const key = (sc, m) => pctOf(sc[m]) ?? -1;
-    main.sort((a, b) => key(scores[b.id], state.sort) - key(scores[a.id], state.sort) || key(scores[b.id], other) - key(scores[a.id], other));
+    const g = scoreGroup(main, tasks, 'shared', set);
+    const scores = g.scores;
+    const pscores = Object.fromEntries(partial.map((r) => [r.id, scoreGroup([r], tasks, 'all', set).scores[r.id]]));
+    const key = (sc) => pctOf(sc.v) ?? -1;
+    main.sort((a, b) => key(scores[b.id]) - key(scores[a.id]) || a.model.localeCompare(b.model));
+    $('#lb-basis').innerHTML = main.length ? lbBasis(set, g.trials, g.tests, state.harness === 'all' ? '' : state.harness) : '';
+    const row = (r, sc, rank, part, best) => lbRow(r, sc.v, rank, best, set, { part, open: state.open === r.id }) + (state.open === r.id ? lbDetail(ex, r, sc, set, false) : '');
     let html = '';
     if (!main.length && !partial.length) {
       html = `<div class="empty-state">${state.kind === 'vla' ? 'No VLA policy has sat the exam yet.' : 'No run with this harness yet.'}</div>`;
     } else {
       let rank = 0, prev = null;
-      const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].standard) ?? 0));
-      html = LBH_AXIS + main.map((r, i) => { const k = key(scores[r.id], state.sort); if (k !== prev) { rank = i + 1; prev = k; } return rowHTML(r, scores[r.id], rank, false, best); }).join('');
+      const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
+      html = LB_AXIS + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
-        if (open) html += partial.map((r) => rowHTML(r, pscores[r.id], 0, true, best)).join('');
+        if (open) html += partial.map((r) => row(r, pscores[r.id], 0, true, best)).join('');
       }
     }
     board.innerHTML = html;
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
-    if (onDraw) onDraw({ state, main, scores });
+    if (onDraw) onDraw({ state, main, scores, set });
   }
   function sync() {
-    $$('#lb-mode button').forEach((b) => b.classList.toggle('on', b.dataset.mode === state.sort));
-
     $('#lb-harness').value = state.harness;
+    // the setting in the address, so a link can point at a view; Core, the default, needs none
     const u = new URL(location.href);
-    u.searchParams.set('mode', state.sort);
+    if (state.set === 'core') u.searchParams.delete('mode'); else u.searchParams.set('mode', state.set);
     history.replaceState(null, '', u);
     draw();
   }
   // the harness: one choice from a list (owners, 2026-10-19)
   $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<option value="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</option>`).join('');
   $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
-  $('#lb-mode').addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) { state.sort = b.dataset.mode; sync(); } });
+  settingSwitch($('#lb-mode'), state.set, (id) => { state.set = id; sync(); });
   // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
 }
 
-/** Suite by suite: a table of numbers, one row per suite and one column per model, each cell tinted by its value.
- *  A switch picks the number: standard, privileged, or what is lost without the simulator. The best cell of a row is
- *  underlined. (It replaced bubbles sized by score, which were hard to read.) */
-let SX_MODE = 'standard';
-function lbSuites(el, ex, runs, scores) {
+/** Suite by suite: a table of numbers, one row per suite and one column per model, each cell tinted by its value, in the
+ *  setting the board shows (on the same tests). The best cell of a row is underlined. */
+function lbSuites(el, ex, runs, scores, set) {
   if (!el) return;
+  const h = $('#lb-suites-set');
+  if (h) h.textContent = set.label;
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
-  const pct = (r, s, m) => pctOf(scores[r.id]?.suites?.[s.id]?.[m]);
+  const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
   const suites = ranked(ex).filter((s) => runs.some((r) => scores[r.id]?.suites?.[s.id]));
-  const value = (r, s) => {
-    if (SX_MODE !== 'drop') return pct(r, s, SX_MODE);
-    const p = pct(r, s, 'privileged'), q = pct(r, s, 'standard');
-    if (p == null || q == null) return null;
-    return p === 0 && q === 0 ? NaN : Math.round(p) - Math.round(q);     // solved neither way: no loss to speak of
-  };
   const cell = (r, s, best) => {
     const v = value(r, s);
     if (v == null) return '<span class="sx-cell na" title="Not sat">–</span>';
-    if (Number.isNaN(v)) return '<span class="sx-cell zero" title="Solved in neither mode">0 · 0</span>';
     const sv = scores[r.id].suites[s.id];
-    const of = (m) => (sv[m] ? `${sv[m][0]} of ${sv[m][1]}` : 'not sat');
-    const tip = `${s.name} · ${r.model}: privileged ${of('privileged')}, standard ${of('standard')}`;
-    // tints stay light enough for dark text everywhere: up to 60% of the mode colour, 44% of grey for a drop
-    const tint = SX_MODE === 'drop' ? Math.round(4 + Math.min(100, Math.abs(v) * 1.4) * 0.4) : Math.round(4 + v * 0.56);
-    const text = SX_MODE === 'drop' ? `${v > 0 ? '−' : v < 0 ? '+' : ''}${Math.abs(v)}` : `${Math.round(v)}<small>%</small>`;
+    const tip = `${s.name} · ${r.model}, ${set.label}: ${sv[0]} of ${sv[1]} solved`;
+    // tints stay light enough for dark text everywhere: up to 60% of the colour
+    const tint = Math.round(4 + v * 0.56);
     // where the build carries the suite's runs page (the internal site), a number opens that model's attempts there
     const href = s.pages?.runs ? `${site(s.pages.runs)}?run=${encodeURIComponent(r.id)}` : '';
     const tag = href ? `a href="${href}"` : 'span';
-    return `<${tag} class="sx-cell${best ? ' best' : ''}" style="--t:${tint}%" title="${esc(tip)}">${text}</${href ? 'a' : 'span'}>`;
+    return `<${tag} class="sx-cell${best ? ' best' : ''}" style="--t:${tint}%" title="${esc(tip)}">${Math.round(v)}<small>%</small></${href ? 'a' : 'span'}>`;
   };
   // no small effort line under a model's name (owner, 2026-10-19): the harness joins the name only where a model appears twice
   const twice = (r) => runs.filter((x) => x.model === r.model).length > 1;
   const head = `<div class="sx-row sx-head"><span></span>${runs.map((r) => `<span class="sx-col" title="${esc([r.harness, r.effort].filter(Boolean).join(' · '))}"><b>${esc(r.model)}${twice(r) && r.harness ? ` · ${esc(r.harness)}` : ''}</b></span>`).join('')}</div>`;
   const row = (s) => {
     const vals = runs.map((r) => value(r, s));
-    const top = SX_MODE === 'drop' ? null : Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
+    const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}</span></a>
-      ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
+      ${runs.map((r, i) => cell(r, s, vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
   const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp">${title}</div>${list.map(row).join('')}`).join('');
-  const modes = [['standard', '<i class="sw s"></i>Standard'], ['privileged', '<i class="sw p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
-  // (no small note beside the switch: the leaderboard carries no small print; owner, 2026-10-19)
-  el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div></div>
-    <div class="sd-scroll"><div class="sx-grid sx-${SX_MODE}" style="--n:${runs.length}">${head}${rows}</div></div>`;
-  el.querySelectorAll('.sx-bar button').forEach((b) => b.addEventListener('click', () => { SX_MODE = b.dataset.m; lbSuites(el, ex, runs, scores); }));
+  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
 /** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
@@ -368,7 +414,7 @@ function lbRules(el, ex) {
   const visual = {
     states: `<div class="rv-states"><span class="lbl">Counted</span><span class="chip-st ok">✓ solved</span><span class="chip-st">✗ failed</span><span class="chip-st">! error</span>
       <span class="lbl">Left out</span><span class="chip-st out">stopped</span><span class="chip-st out">withdrawn</span><span class="chip-st out">still running</span></div>`,
-    modes: `<div class="rv-modes"><span><i class="sw p"></i>Privileged</span><span class="ne">≠</span><span><i class="sw s"></i>Standard</span></div>`,
+    modes: `<div class="rv-modes">${LB_SETTINGS.map((x) => `<span>${x.label}</span>`).join('<span class="ne">≠</span>')}</div>`,
     budget: `<div class="rv-states"><span class="chip-st">1 hour</span><span class="chip-st">100M tokens in</span><span class="chip-st">10M out</span><span class="chip-st out">no web search</span></div>`,
     venn: `<svg class="rv-venn" viewBox="0 0 120 92" aria-hidden="true"><defs><clipPath id="vv-a"><circle cx="46" cy="38" r="28"/></clipPath><clipPath id="vv-b"><circle cx="74" cy="38" r="28"/></clipPath></defs>
       <g clip-path="url(#vv-a)"><g clip-path="url(#vv-b)"><circle cx="60" cy="60" r="28" class="in"/></g></g>
@@ -1589,7 +1635,7 @@ function makerMark(model) {
   return `<span class="mk" title="${m[1]}"><svg viewBox="0 0 24 24" role="img" aria-label="${m[1]}">${m[2]}</svg></span>`;
 }
 
-/** One ranked row, shared by the home page and the leaderboard page: place (gold, silver, bronze), maker's mark, model
+/** One row of a suite page's results (both modes, everything each model sat there): place (gold, silver, bronze), maker's mark, model
  *  and setting, the standard score as an ink bar (deeper for higher, relative to `best`), the privileged score as a grey
  *  hatched ghost behind it, and both numbers at the end. `part`: a smaller run, listed but not ranked. */
 function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false, still = false } = {}) {
@@ -1608,52 +1654,47 @@ function lbhRow(r, sc, rank, best, { part = false, meta = '', open = false, stil
 const LBH_KEY = `<div class="lbh-key"><span><i class="sw s"></i><b>Standard</b></span>
   <span><i class="sw p"></i><b>Privileged</b></span></div>`;
 const LBH_AXIS = `<div class="lbh-axis" aria-hidden="true"><span></span><span class="lbh-ticks">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span></div>`;
-/** A model opened under its row: both modes, then its suites one by one. */
-function lbhDetail(ex, r, sc, href = true) {
-  const pc = (x) => (x?.[1] ? Math.round(pctOf(x)) : '–');
-  // no small print (owner, 2026-10-19): each number with a one- or two-word label in the normal size, the counts on hover
-  const of = (x) => `${x?.[0] ?? 0} of ${x?.[1] ?? 0} tests`;
-  const usd = r.est_n ? r.est_usd / r.est_n : null;
-  return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
-      <div class="lbh-pair"><span class="s" title="${of(sc.standard)}"><b>${pc(sc.standard)}%</b>Standard</span>
-        <span class="p" title="${of(sc.privileged)}"><b>${pc(sc.privileged)}%</b>Privileged</span>
-        ${usd != null ? `<span class="x" title="Model use per test at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per test</span>` : ''}
-        ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
-      ${href ? `<a class="btn small" href="${exam('leaderboard/')}?open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
-    <p class="lbh-dk"><span><i class="sw s"></i>Standard</span><span><i class="sw p"></i>Privileged</span></p>${suiteBars(ex, r, { suites: sc.suites || {} })}</div>`;
-}
-
-/** The leaderboard on the home page. The message is the standard mode, the exam itself: how much of it each agent solves
- *  with only the robot's own sensors, and how far apart the agents are. One bar per ranked model, longest first, with
- *  its maker's mark and its place, one row each so the board can grow; the privileged score (open book) stands behind it as a hatched ghost, so the gap is
- *  there to see but never the headline. A click on a bar opens that model's two modes suite by suite. */
+/** The leaderboard on the home page, the same rule as the leaderboard page (owners, 2026-10-19): one setting at a time,
+ *  Core first, a compact switch for the others; one bar per ranked model, longest first, with its maker's mark and its
+ *  place. A click on a bar opens that model's suites in the setting shown. The numbers are the generator's
+ *  (leaderboard.shared.views: the core tests of each setting every ranked agent has sat). */
 function homeBoard(el, ex) {
   const sh = ex.leaderboard?.shared;
   const runs = runMap(ex);
-  if (!el || !sh?.runs?.length) { if (el) el.innerHTML = '<div class="empty-state">No ranked runs yet.</div>'; return; }
-  const P = (id, m) => pctOf(sh.scores[id][m]);
-  const order = [...sh.runs].sort((a, b) => (P(b, 'standard') ?? -1) - (P(a, 'standard') ?? -1) || (P(b, 'privileged') ?? -1) - (P(a, 'privileged') ?? -1));
-  const best = P(order[0], 'standard') ?? 0;
-  const rows = order.map((id, i) => lbhRow(runs[id] || { model: id }, sh.scores[id], i + 1, best)).join('');
-  el.innerHTML = `${LBH_KEY}
-    <div class="lbh-chart">${LBH_AXIS}
-      <div class="lbh-rows">${rows}</div></div>
-    <p class="lbh-hint">Click a model to see where its open-book gap comes from, suite by suite.</p>
+  const note = $('#bars-note');
+  if (!el || !sh?.runs?.length || !sh.views) { if (el) el.innerHTML = '<div class="empty-state">No ranked runs yet.</div>'; return; }
+  el.innerHTML = `<div class="lbh-top"><div class="seg lb-set" id="lbh-set"></div></div>
+    <div class="lbh-chart">${LB_AXIS}<div class="lbh-rows"></div></div>
+    <p class="lbh-hint">Click a model to see its suites one by one.</p>
     <div class="lbh-detail" hidden></div>`;
-  const det = $('.lbh-detail', el);
-  el.addEventListener('click', (e) => {
+  const list = $('.lbh-rows', el), det = $('.lbh-detail', el);
+  let set = LB_SETTINGS[0];
+  const draw = () => {
+    const vw = sh.views[set.id] || { scores: {}, suites: {} };
+    const P = (id) => pctOf(vw.scores?.[id]) ?? -1;
+    const order = [...sh.runs].sort((a, b) => P(b) - P(a) || (runs[a]?.model || a).localeCompare(runs[b]?.model || b));
+    const best = Math.max(0, P(order[0]));
+    let rank = 0, prev = null;
+    list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set); }).join('');
+    det.hidden = true;
+    el.classList.remove('picked');
+    if (note) note.innerHTML = `${lbBasis(set, vw.trials || 0, vw.tests || 0)} <a href="${exam('leaderboard/')}${set.id === 'core' ? '' : `?mode=${set.id}`}">Full leaderboard, per suite →</a>`;
+  };
+  settingSwitch($('#lbh-set', el), set.id, (id) => { set = lbSetting(id); draw(); });
+  list.addEventListener('click', (e) => {
     const b = e.target.closest('.lbh-row'); if (!b) return;
     const was = b.getAttribute('aria-expanded') === 'true';
     $$('.lbh-row', el).forEach((c) => { c.setAttribute('aria-expanded', 'false'); c.classList.remove('on'); });
     el.classList.toggle('picked', !was);
     if (was) { det.hidden = true; return; }
     b.setAttribute('aria-expanded', 'true'); b.classList.add('on');
-    const id = b.dataset.id, r = runs[id] || { model: id };
-    det.innerHTML = lbhDetail(ex, r, { ...sh.scores[id], suites: sh.suites[id] || {} }).replace(/^<div class="lbh-detail in">|<\/div>$/g, '');
+    const id = b.dataset.id, r = runs[id] || { model: id }, vw = sh.views[set.id] || {};
+    det.innerHTML = lbDetail(ex, r, { v: vw.scores?.[id], suites: vw.suites?.[id] || {} }, set).replace(/^<div class="lbh-detail in">|<\/div>$/g, '');
     b.after(det);
     det.hidden = false;
     det.classList.remove('in'); void det.offsetWidth; det.classList.add('in');
   });
+  draw();
 }
 
 /** The suites on the home page: a picture and a name each. */
@@ -1780,8 +1821,6 @@ async function home(ex) {
   homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
-  const sh = ex.leaderboard?.shared;
-  if (sh) $('#bars-note').innerHTML = `On the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests (real-time included) of the core set that every ranked model has sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=53875b2c').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
@@ -1791,10 +1830,9 @@ async function home(ex) {
 async function leaderboardPage(ex) {
   const lb = ex.leaderboard || {};
   $('#lb-pre-text').textContent = lb.note || '';
-  $('#lb-key').innerHTML = LBH_KEY;
   lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
-  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores));
+  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
 }
 
 async function suitesPage(ex) {

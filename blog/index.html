@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=e76315c3">
+<link rel="stylesheet" href="../assets/exam.css?v=1722aa8d">
 <link rel="stylesheet" href="../assets/blog.css?v=eabfbc85">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=4bb0bafa"></script>
+<script type="module" src="../assets/app.js?v=764070d6"></script>
 <script type="module" src="../assets/blog.js?v=a3a833df"></script>
 </head>
 <body data-page="blog">
@@ -146,7 +146,7 @@ CLAUDE_FORCE_OAUTH=1 harbor run -d embodied-first-exam -a claude-code -m anthrop
     <p><span data-s="n_runs_word"></span> agents sat the core set, each a model in its own harness at high reasoning effort: GPT-6 Astra (Codex), Claude Opus 5.5 (Claude Code) and Gemini 4 Argon (Antigravity CLI), and three Flash-class models: Gemini 3.8 Flash (Antigravity CLI), GLM 5.3 Flash (Claude Code) and DeepSeek V4.1 Flash (DeepSeek’s own harness). Six findings follow, each with its conclusion, the numbers and figure behind it and a representative run; the rest of the evidence opens under each.</p>
     <div class="aside">
       <p class="label">How we count</p>
-      <p>The unit is a test: one task in one setting. Results are the latest finished attempt of each agent on the core-set tests every agent sat, as on the leaderboard, but with the three settings kept apart: <span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime tests. The leaderboard’s standard column (<span data-s="ns"></span> tests) is our standard plus realtime tests; there <span data-s="best"></span> has <span data-s="best_s"></span> (<span data-s="best_s_pct"></span>). Every share is given with its count. The core set leaves out tests judged easy and tests an early screening run solved, so it is hard by construction. Site data of <span data-s="built"></span>.</p>
+      <p>The unit is a test: one task in one setting. Results are the latest finished attempt of each agent on the core-set tests every agent sat, as on the leaderboard, but with the three settings kept apart: <span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime tests. The leaderboard keeps the settings apart too, one at a time, and opens on Core: each core task once, in its default mode. Every share is given with its count. The core set leaves out tests judged easy and tests an early screening run solved, so it is hard by construction. Site data of <span data-s="built"></span>.</p>
       <p>The six findings and their figures are those of our cross-benchmark analysis of the evaluation, recomputed here from the site’s data. A few numbers, how agents worked and where an attempt became lost, exist only in the analysis’s random sample of about a third of the attempts (<span data-s="cb_sample"></span> analysed, snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent reading each run’s logs and not yet checked by hand; they are marked as such. Each case is a real run: its clip is that run’s replay, and it opens step by step.</p>
     </div>
 
