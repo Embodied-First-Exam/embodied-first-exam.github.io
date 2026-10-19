@@ -479,7 +479,7 @@ function taskCard(ex, t, runs) {
   const s = ex._suites[t.suite];
   const crop = cropFor(t.suite, t.id);
   return `<button class="task-card" data-task="${esc(t.suite)}/${esc(t.id)}">
-    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${hasRuns(t) ? '<span class="watch-mark" title="Agents sat this task: open it to watch a run step by step">▶ run</span>' : ''}</div>
+    <div class="media">${t.media?.poster ? poster(t.media, crop) : `<div class="placeholder-art">${esc(s?.code || '')}</div>`}${s ? codeMark(s) : ''}${t.media?.still ? '<span class="still">scene</span>' : ''}${t.set === 'core' ? '<span class="core-mark" title="In the core set: the leaderboard counts this task">Core</span>' : ''}${hasRuns(t) ? '<span class="watch-mark" title="Agents sat this task: open it to watch a run step by step">▶ run</span>' : ''}</div>
     <div class="body"><h4>${esc(t.title)}</h4>${t.code ? `<span class="t-code">${esc(t.code)}</span>` : ''}
       ${runs.length && resultOf(t) !== 'unrun' ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
@@ -585,7 +585,7 @@ function openTask(ex, t, runs) {
   ].filter(([, v]) => v);
   const tags = (t.tags || []).map((id) => ex._tags[id]).filter(Boolean).map((tg) => `<span class="pill">${esc(tg.name)}</span>`).join(' ');
   $('#drawer .drawer-inner').innerHTML = `
-    <div class="drawer-top"><span class="label">${esc(s.name || '')} · task</span><button class="icon-btn" data-close aria-label="Close">✕</button></div>
+    <div class="drawer-top"><span class="label">${esc(s.name || '')} · task${t.set === 'core' ? ' <span class="core-mark" title="In the core set: the leaderboard counts this task">Core</span>' : ''}</span><button class="icon-btn" data-close aria-label="Close">✕</button></div>
     <h2>${esc(t.title)}</h2>${t.code ? `<p class="t-code">${esc(t.code)}</p>` : ''}<p class="sentence">${prose(t.sentence || '')}</p>
     ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${tags}</div>` : ''}
     ${media}
