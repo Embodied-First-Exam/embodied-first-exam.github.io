@@ -653,7 +653,7 @@ function openTask(ex, t, runs) {
     if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=e34f9293').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=fad66359').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -747,7 +747,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=e34f9293').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=fad66359').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = taskKey(Q.get('task'), index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -1870,7 +1870,7 @@ async function home(ex) {
   gallery($('#gallery'), ex);
   getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=e34f9293').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
   import('./sphere.js?v=8f724915').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
@@ -1963,7 +1963,7 @@ async function suitePage(ex) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=e34f9293').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=fad66359').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
