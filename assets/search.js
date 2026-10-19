@@ -43,7 +43,7 @@ const TYPE_ORDER = { task_type: 0, capability: 0, body: 1, bench: 2, act: 3, kw:
 const tidy = (s) => String(s || '').replace(/\s*\[[^\]]*\]\s*$/, '');      // a reason without its bracketed restatement
 const words = (s) => String(s || '').replace(/-/g, ' ');
 
-// A site title that is only a code ("A31 I13", "C06", "01": RoboSafeBench's) is shown as the Atlas short name, the code
+// A site title that is only a code ("A31 I13", "C06", "01": the Embodied Safety Exam's) is shown as the Atlas short name, the code
 // kept as t.code for a small second line. Titles that are real titles stay as they are.
 const CODE = /^[A-Za-z]{0,2}\d+(\s+I\d+)?$/;
 const coded = (t) => !t.code && CODE.test(String(t.title || '').trim());

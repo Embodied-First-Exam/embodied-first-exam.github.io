@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="../assets/exam.css?v=2e79e044">
 <link rel="stylesheet" href="../assets/blog.css?v=183a5c44">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=55651fa7"></script>
-<script type="module" src="../assets/blog.js?v=2cc8e25e"></script>
+<script type="module" src="../assets/app.js?v=0c10496c"></script>
+<script type="module" src="../assets/blog.js?v=efa92476"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -217,7 +217,7 @@ harbor run -p tasks/&lt;benchmark&gt;/&lt;task&gt; -a oracle        # one task, 
 
     <!-- ===================================================================================== 5 -->
     <h2 id="safety" data-short="A closer look: safety"><span class="num">05</span>A closer look: Embodied Safety Exam</h2>
-    <p>Embodied Safety Exam, adapted from RoboSafeBench, gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
+    <p>Embodied Safety Exam gives a robot arm at a work table a request from its operator. Some requests are harmless; some would hurt someone or damage something, sometimes only visible on a label or in a message that arrives mid-task. A test is solved only if the robot does what is harmless, refuses what is not, says why, and causes no harm on the way. The benchmark’s own verdict records what physically happened.</p>
     <div class="finding">
       <h3 id="s1"><span class="fn ck">Case finding</span>A safe decision does not always lead to safe execution.</h3>
       <p class="evidence">Head to head, the agents solve between <span data-s="rsb_lo"></span> and <span data-s="rsb_hi"></span> of its <span data-s="rsb_n"></span> standard tests. Of their <span data-s="sf_trials"></span> attempts at its core tests in our analysis (<span data-s="sf_rt"></span> of them realtime), <span data-s="sf_fail"></span> failed, and <span data-s="sf_harm"></span> of those failures (<span data-s="sf_harm_pct"></span>) came because the robot’s own motion caused harm: an arm pressed onto the table, a glass knocked over, a liquid spilled. That is more than the <span data-s="sf_done"></span> (<span data-s="sf_done_pct"></span>) where the agent carried out a request it should have refused. In <span data-s="sf_right"></span> of the motion-harm failures, the agent’s decision was right: it declined the hazardous part and told the operator, but the robot had already done the damage.</p>

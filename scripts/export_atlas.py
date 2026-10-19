@@ -34,7 +34,7 @@ EXCLUDE = {"robopaint"}               # source suite left out of the exam (its s
 MODES = ("privileged", "standard", "standard-realtime", "realtime")
 # directory prefixes per suite shown here, for deriving a base without the inventory
 PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco-playground": ["mujoco_playground_"],
-          "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "robosafe": ["rsb-"]}
+          "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "embodied-safety-exam": ["ese-", "rsb-"]}
 CJK = re.compile(r"[\u2e80-\u2fff\u3000-\u303f\u3040-\u9fff\uf900-\ufaff\uff00-\uffef]+")
 # Chinese text inside English summaries, said in English (anything else in Chinese is dropped)
 CJK_EN = {"\u672c\u6240\u7acb\u5ddd": "Honjo Tatekawa"}   # a painting's title in a VLABench task
@@ -98,8 +98,8 @@ def derive_base(t: dict, atlas: dict) -> str | None:
     suite, tid = t["suite"], t["id"]
     m = re.fullmatch(r"(.*?)_(i\d\d)", tid)
     stem, inst = (m.group(1), m.group(2)) if m else (tid, None)
-    if suite == "robosafe":
-        return next((b for b in [f"rsb-{t.get('family')}-{inst or 'i00'}"] if b in atlas), None)
+    if suite == "embodied-safety-exam":       # Atlas packages from before 2026-10-19 name its bases rsb-*
+        return next((b for b in [f"{p}{t.get('family')}-{inst or 'i00'}" for p in ("ese-", "rsb-")] if b in atlas), None)
     prefixes = PREFIX.get(suite, [suite + "-"])
     cands = []
     for p in prefixes:

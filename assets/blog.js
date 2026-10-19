@@ -53,7 +53,7 @@ function compute(ex, tasks, b) {
   // the three strongest: how many of them solved each test
   const overlap = (L) => [3, 2, 1, 0].map((k) => L.filter(([t, m]) => TOP.filter((r) => ok(t, r, m)).length === k).length);
   const astraFails = H.s.filter(([t, m]) => !ok(t, TOP[0], m));
-  const rsb = board.map((r) => solved(H.s.filter(([t]) => t.suite === 'robosafe'), r.id));
+  const rsb = board.map((r) => solved(H.s.filter(([t]) => t.suite === 'embodied-safety-exam'), r.id));
   const sf = b.safety;
   const coreModes = (m) => core.filter((t) => (t.core || '').includes(m)).length;
   const bodies = {};
@@ -78,7 +78,7 @@ function compute(ex, tasks, b) {
     fam_backflip: `${fam('backflip')}`, fam_dunk: `${fam('dunk')}`, fam_pole: fam('pole_vault') ? `${fam('pole_vault')}` : 'none',
     ov3: int(overlap(H.s)[0]), ov2: int(overlap(H.s)[1]), ov1: int(overlap(H.s)[2]), ov0: int(overlap(H.s)[3]),
     astra_fails: int(astraFails.length), astra_fails_other: int(astraFails.filter(([t, m]) => TOP.slice(1).some((r) => ok(t, r, m))).length),
-    rsb_n: int(H.s.filter(([t]) => t.suite === 'robosafe').length), rsb_lo: int(Math.min(...rsb)), rsb_hi: int(Math.max(...rsb)),
+    rsb_n: int(H.s.filter(([t]) => t.suite === 'embodied-safety-exam').length), rsb_lo: int(Math.min(...rsb)), rsb_hi: int(Math.max(...rsb)),
     sf_trials: int(sf.trials), sf_fail: int(sf.failures), sf_harm: int(sf.by_outcome.harm), sf_harm_pct: P(sf.by_outcome.harm, sf.failures),
     sf_done: int(sf.by_outcome.done), sf_done_pct: P(sf.by_outcome.done, sf.failures), sf_right: int(sf.harm_right_call),
     sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
