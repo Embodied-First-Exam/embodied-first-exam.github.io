@@ -380,7 +380,7 @@ function suiteCard(ex, s) {
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
     <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${hoverVideo(s, cropFor(s.id, cover?.task))}${releaseTag(s)}</div>
     <div class="body"><h4>${esc(s.name)}${nameTag(s)}</h4><p>${esc(s.blurb || '')}</p>
-      <div class="meta">${tasksTests(s.instances, s.task_dirs)} · ${esc(robot)}${more}</div></div></a>`;
+      <div class="meta">${tasksTests(s.instances, s.task_dirs)} · ${s.robots_label ? esc(s.robots_label) : `${esc(robot)}${more}`}</div></div></a>`;
 }
 
 // suites whose scenes look alike, kept apart on the home page's wall as if they were one
@@ -1099,10 +1099,10 @@ function flowDiagram(el, ex) {
       ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
       <div class="fx-iface" style="grid-row:4">
         <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per mode</small></span>
-        <div class="fx-mode s" data-rt="standard" role="button" tabindex="0" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success check.">
+        <div class="fx-mode s" data-rt="standard" role="button" tabindex="0" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success checker.">
           <div class="fx-mh"><span class="fx-lock">${ic('lock')}</span><b>Standard</b><em data-rt="realtime" title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
           <dl><div><dt>reach</dt><dd><span class="fx-pipe" title="The agent’s code reaches the simulator only through the eai-standard API: /spec, /observe, /submit, /kinematics"><i class="b">${ic('code')}</i><i class="ln"></i><i class="api">${ic('lock')}API</i><i class="ln"></i><i class="b">${ic('cube')}</i></span><small>robot API only</small></dd></div>
-            <div><dt>sees</dt><dd><span class="fx-chips"><i>${ic('camera')}RGB</i><i>${ic('layers')}depth</i><i>${ic('arm')}joints</i></span><small title="Never given: object poses, segmentation, contact forces, the success check">no object poses</small></dd></div>
+            <div><dt>sees</dt><dd><span class="fx-chips"><i>${ic('camera')}RGB</i><i>${ic('layers')}depth</i><i>${ic('arm')}joints</i></span><small title="Never given: object poses, segmentation, contact forces, the success checker">no object poses</small></dd></div>
             <div><dt>sends</dt><dd><span class="fx-chunk" title="joint_position or ee_pose rows, dt apart: a (T, dim) array per /submit" aria-hidden="true">${'<i></i>'.repeat(15)}</span><small>action chunks <code>(T, dim)</code></small></dd></div></dl>
           <span class="fx-how">How it runs underneath →</span>
         </div>
@@ -1655,7 +1655,7 @@ function gallery(el, ex) {
     const cover = coverOf(s), demo = demoOf(s), crop = cropFor(s.id, cover?.task);
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${crop ? ` class="${crop}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}" data-suite="${esc(s.id)}" aria-haspopup="dialog"><div class="img">${img}${hoverVideo(s, crop)}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
-      <span>${int(s.instances)} tasks · ${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</span></a>`;
+      <span>${int(s.instances)} tasks · ${esc(bodyLabel(ex, s))}</span></a>`;
   };
   // the team's own suites and the others under their headings (owner, 2026-10-19)
   el.innerHTML = suiteGroups(ranked(ex)).map(([title, list]) => `<div class="suite-group">${groupHead(title, list.length)}<div class="gallery">${list.map(item).join('')}</div></div>`).join('');
@@ -1723,7 +1723,7 @@ function suiteDialog(ex, s, opener) {
   card.innerHTML = `<button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="sm-media">${media}</div>
     <div class="sm-body">
-      <p class="sm-kicker">${codeMark(s)}<span>${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</span></p>
+      <p class="sm-kicker">${codeMark(s)}<span>${esc(bodyLabel(ex, s))}</span></p>
       <h3 id="sm-title">${esc(s.name)}${nameTag(s)}</h3>
       ${s.blurb ? `<p class="sm-lead">${esc(s.blurb)}</p>` : ''}
       ${s.description ? `<p class="sm-desc">${prose(s.description)}</p>` : ''}
@@ -1797,6 +1797,16 @@ async function blogPage() {
       <span class="pc-date">${esc([p.kind, p.date].filter(Boolean).join(' · '))}</span><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
       ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}</a>`).join('')
     : '<div class="empty-state">The first posts are on their way.</div>';
+}
+
+/** A suite's robots in a few words: its own label if it has one, else every kind of body it uses, most tasks first
+ *  (owners, 2026-10-19: the Embodied Safety Exam has one-arm, two-arm and mobile robots, not only "One arm"). */
+function bodyLabel(ex, s) {
+  if (s.embodiment_label) return s.embodiment_label;
+  const kinds = Object.entries(s.bodies || {}).sort((a, b) => b[1] - a[1]).map(([k]) => ex.bodies?.[k] || k);
+  if (kinds.length < 2) return ex.bodies?.[s.body] || kinds[0] || '';
+  const low = kinds.map((k, i) => (i ? k.charAt(0).toLowerCase() + k.slice(1) : k));
+  return `${low.slice(0, -1).join(', ')} and ${low[low.length - 1]}`;
 }
 
 async function home(ex) {
@@ -1888,7 +1898,7 @@ async function suitePage(ex) {
   $('#suite-head').innerHTML = `
     <div class="suite-hero">
       <div>
-        <p class="kicker">${codeMark(s)} &nbsp;${s.example ? 'example task' : 'a suite of the exam'} · ${esc(s.embodiment_label || ex.bodies?.[s.body] || '')}</p>
+        <p class="kicker">${codeMark(s)} &nbsp;${s.example ? 'example task' : 'a suite of the exam'} · ${esc(bodyLabel(ex, s))}</p>
         <h1 style="margin:10px 0 0;font:800 clamp(40px,5.6vw,76px)/.95 var(--display);letter-spacing:-.035em">${esc(s.name)}${nameTag(s)}</h1>
         <p class="lead" style="margin:16px 0 0;font-size:18px;color:var(--ink-2)">${esc(s.blurb || '')}</p>
         <p class="desc">${prose(s.description || '')}</p>
