@@ -4,7 +4,8 @@
    the task pages. The figures follow the designs of our cross-benchmark analysis (same definitions, groupings, orderings
    and encodings), drawn from the site's data. data/blog.json (scripts/export_blog.py) adds the few numbers that exist only
    in the analysis's sample. Numbers in the text are <span data-s="key">, filled from the same computation; a key that
-   starts with h_ carries a little markup (a count set smaller after its share). app.js draws the navigation and footer. */
+   starts with h_ carries a little markup (a count set smaller after its share). app.js draws the navigation, the footer and the
+   Introduction's framework figure (the home page's). */
 
 const BASE = new URL('../', import.meta.url).pathname;
 const $ = (s, el = document) => el.querySelector(s);
@@ -15,8 +16,8 @@ const int = (n) => Number(n || 0).toLocaleString('en-US');
 const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
 
 const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
-const MODE_LABEL = { p: 'Privileged', s: 'Standard', t: 'Realtime' };
-const MODE_CLS = { p: 'm-p', s: 'm-s', t: 'm-r' };
+const MODE_LABEL = { c: 'Core', p: 'Privileged', s: 'Standard', t: 'Standard-realtime' };
+const MODE_CLS = { c: '', p: 'm-p', s: 'm-s', t: 'm-r' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const AG = { [TOP[0]]: '--ag-astra', [TOP[1]]: '--ag-opus', [TOP[2]]: '--ag-argon' };                       // their colours
 const agc = (r) => AG[r] || '--flash';
@@ -53,7 +54,7 @@ function compute(ex, tasks, b, atlas) {
   // counts as failed (owners, 2026-10-19)
   const sat = (m) => core.filter((t) => (t.core || '').includes(m)).map((t) => [t, m]);
   const M = { p: sat('p'), s: sat('s'), t: sat('t') };
-  const LB = [...M.s, ...M.t];   // standard and realtime together (the Embodied Safety Exam's tests)
+  const LB = [...M.s, ...M.t];   // standard and standard-realtime together
   // the leaderboard's default view, Core: each core task once, in its default mode
   const CORE = core.filter((t) => t.default && (t.core || '').includes(t.default)).map((t) => [t, t.default]);
   const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
@@ -74,6 +75,7 @@ function compute(ex, tasks, b, atlas) {
   const flash = runs.filter((r) => !TOP.includes(r));
   const ranked = (L) => [...runs].sort((x, y) => solved(L, y) - solved(L, x));
   const sameOrder = ['p', 's', 't'].every((k) => ranked(M[k]).slice(0, 3).join() === TOP.join());
+  const sameOrderCore = sameOrder && ranked(CORE).slice(0, 3).join() === TOP.join();
   // the best Flash-class result in any setting, with its count
   const flashTop = flash.flatMap((r) => ['p', 's', 't'].map((k) => [solved(M[k], r), M[k].length])).reduce((a, x) => (x[0] / (x[1] || 1) > a[0] / (a[1] || 1) ? x : a), [0, 1]);
   const group = (L, keys) => { const g = {}; for (const x of L) for (const k of keys(x[0])) (g[k] ??= []).push(x); return g; };
@@ -86,7 +88,6 @@ function compute(ex, tasks, b, atlas) {
   const budgets = core.map((t) => t.budget_min).filter(Boolean);
   const dur = (min) => (min % 60 ? `${min} minutes` : `${['', 'one', 'two', 'three', 'four', 'five', 'six'][min / 60] || min / 60} hour${min > 60 ? 's' : ''}`);
   const cb = b.crossbench || {};
-  const sf = b.safety;
   const coreModes = (m) => core.filter((t) => (t.core || '').includes(m)).length;
   const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`;
   const Q = (a, n) => `${a && !pct(a, n) ? '<1' : pct(a, n)}% (${int(a)}/${int(n)})`;
@@ -102,6 +103,9 @@ function compute(ex, tasks, b, atlas) {
   const hard = { p: hardRows('p').filter((r) => r.none / r.n >= HARD), s: hardRows('s').filter((r) => r.none / r.n >= HARD) };
   const easy = { p: easyRows('p').filter((r) => r.sum / (3 * r.n) >= EASY_P), s: easyRows('s').filter((r) => r.sum / (3 * r.n) >= EASY_S) };
   const hn = (r) => `${benchName(r.id)} ${Q(r.none, r.n)}`;
+  // standard-realtime by benchmark (too few tests for the figures): the benchmarks with MIN_BENCH tests, hardest first
+  const tRows = Object.entries(group(M.t, benchOf)).filter(([, L]) => L.length >= MIN_BENCH)
+    .map(([id, L]) => ({ id, L, n: L.length, none: none3(L), sum: mean3(L) })).sort((x, y) => y.none / y.n - x.none / x.n || y.n - x.n);
   const em = (r) => `${benchName(r.id)} ${Q(r.sum, 3 * r.n)}`;
   const per = {};
   for (const k of ['p', 's']) for (const r of benchRows(k)) { per[`hn_${k}_${r.id}`] = Q(r.none, r.n); per[`em_${k}_${r.id}`] = Q(r.sum, 3 * r.n); }
@@ -112,9 +116,7 @@ function compute(ex, tasks, b, atlas) {
   const rest = hard.s.filter((r) => !inGroups.has(r.id));
   const nIn = hard.s.length - rest.length;
   per.hard_groups = `${nIn === hard.s.length ? 'They' : `${nw(nIn)[0].toUpperCase()}${nw(nIn).slice(1)} of them`} fall into ${nw(groups.length)} groups (each percentage is the share of a benchmark’s tests that none of the three solves). ${groups.map(([g, rs]) => `${g[0].toUpperCase()}${g.slice(1)}: ${list(rs.map(hn))}.`).join(' ')}${rest.length ? ` The other ${nw(rest.length)} ${rest.length === 1 ? 'is' : 'are'} ${list(rest.map(hn))}.` : ''}`;
-  const nextBelow = (rows, cut, f) => rows.find((r) => f(r) < cut);
-  const hpNext = nextBelow(hardRows('p'), HARD, (r) => r.none / r.n);
-  per.hard_p_list = list(hard.p.map(hn)) + (hpNext ? `; the next, ${hn(hpNext)}, falls just short` : '');
+  per.hard_p_list = list(hard.p.map(hn));
   per.hard_s_frac = `${int(hard.s.length)} of ${int(benchRows('s').length)}`; per.hard_p_frac = `${int(hard.p.length)} of ${int(benchRows('p').length)}`;
   per.hard_s_word = nw(hard.s.length); per.hard_p_word = nw(hard.p.length);
   // Finding 5: the first benchmark spelled out in agent-attempts, the rest as rate (solved/attempts)
@@ -136,6 +138,7 @@ function compute(ex, tasks, b, atlas) {
   per.gap_bench = lower.length === both.length ? `every one of the ${int(both.length)}` : `${int(lower.length)} of the ${int(both.length)}`;
   // what each of the three solves alone: by task type (privileged for GPT-6 Astra, standard for the other two, as the
   // analysis reads it), and for GPT-6 Astra the benchmarks
+  const rivals = (t, m) => ok(t, TOP[1], m) || ok(t, TOP[2], m);
   const only = (L, r) => L.filter(([t, m]) => ok(t, r, m) && !TOP.some((o) => o !== r && ok(t, o, m)));
   [['p', 0], ['s', 1], ['s', 2]].forEach(([k, i]) => {
     const L = only(M[k], TOP[i]);
@@ -147,9 +150,6 @@ function compute(ex, tasks, b, atlas) {
     if (i === 0) per.uniq_suites_0 = list(by((t) => [benchOf(t)[0]]).slice(0, 2).map(([x, n]) => `${benchName(x)} (${n})`));
   });
   const flashFill = (L) => L.filter(([t, m]) => !TOP.some((r) => ok(t, r, m)) && flash.some((r) => ok(t, r, m))).length;
-  const esS = LB.filter(([t]) => t.suite === 'embodied-safety-exam');
-  const ese = runs.map((r) => solved(esS, r));
-  const rsbS = M.s.filter(([t]) => t.suite === 'embodied-safety-exam');
   const allM = [...M.p, ...M.s, ...M.t];
   // what the tests on a running clock are: by benchmark, the two RoboOlympics suites together
   const rtBy = {};
@@ -157,14 +157,13 @@ function compute(ex, tasks, b, atlas) {
   // a case's test: how many of the other agents solved it
   const task = (suite, id) => tasks.find((t) => t.suite === suite && t.id === id);
   const othersSolved = (suite, id, m, r) => { const t = task(suite, id); return t ? runs.filter((o) => o !== r && ok(t, o, m)).length : null; };
-  const filt = (x, all) => (x && all ? `${int(all[1] - x[1])} of ${int(all[1])}` : null);
   const st3 = (r) => `${sr(r).a}→${sr(r).c}`;
   const mix = cb.approach_mix || {}, kinds = cb.approach_kinds || {};
   const train = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.train || 0), 0), sampled = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.n || 0), 0);
   const tot = ex.totals;
   const oracle = (k) => tasks.filter((t) => t.oracle === k).length;
   const S = {
-    tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots),
+    tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots), simulators: int(tot.simulators),
     core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs), default_run: int(tot.default_run),
     core_p: int(coreModes('p')), core_s: int(coreModes('s')), core_t: int(coreModes('t')),
     oracle_full: int(oracle('full')), oracle_partial: int(oracle('partial')), oracle_none: int(oracle('none')),
@@ -172,7 +171,6 @@ function compute(ex, tasks, b, atlas) {
     np: int(M.p.length), ns_only: int(M.s.length), nt: int(M.t.length), ns: int(LB.length),
     best: board[0].name, best_s: `${int(board[0].s)}/${int(LB.length)}`, best_s_pct: P(board[0].s, LB.length),
     ...per,
-    rsb_s_n: int(rsbS.length), a_s_norsb: Q(solved(M.s, TOP[0]) - solved(rsbS, TOP[0]), M.s.length - rsbS.length),
     a_p: Q(solved(M.p, TOP[0]), M.p.length), a_s: Q(solved(M.s, TOP[0]), M.s.length), a_t: Q(solved(M.t, TOP[0]), M.t.length),
     h_a_p: HQ(solved(M.p, TOP[0]), M.p.length), h_a_s: HQ(solved(M.s, TOP[0]), M.s.length), h_a_t: HQ(solved(M.t, TOP[0]), M.t.length),
     order_note: sameOrder ? `The top three are the same in all three settings: ${list(TOP.map(name))}, in that order. The three Flash-class models trail far behind; their best result in any setting is ${Q(...flashTop)}.`
@@ -180,7 +178,7 @@ function compute(ex, tasks, b, atlas) {
     budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
     none6_p: `${int(M.p.length - anyOf(M.p))} of ${int(M.p.length)} privileged (${P(M.p.length - anyOf(M.p), M.p.length)})`,
     none6_s: `${int(M.s.length - anyOf(M.s))} of ${int(M.s.length)} standard (${P(M.s.length - anyOf(M.s), M.s.length)})`,
-    none6_t: `${int(M.t.length - anyOf(M.t))} of the ${int(M.t.length)} realtime tests (${P(M.t.length - anyOf(M.t), M.t.length)})`,
+    none6_t: `${int(M.t.length - anyOf(M.t))} of the ${int(M.t.length)} standard-realtime tests (${P(M.t.length - anyOf(M.t), M.t.length)})`,
     nr_p: cb.no_return?.p ? F(...cb.no_return.p) : null, nr_s: sample(cb.no_return?.s), nr_t: sample(cb.no_return?.t),
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s),
     ap_t_code: mix.t ? Q(mix.t.code, mix.t.n) : null, ap_t_closed: kinds.t ? `${int(kinds.t.closed)} of the ${int(mix.t?.code)}` : null,
@@ -192,31 +190,52 @@ function compute(ex, tasks, b, atlas) {
     u_s_extra: int(anyOf(M.s, TOP) - solved(M.s, TOP[0])),
     astra_cover_p: Q(solved(M.p, TOP[0]), anyOf(M.p, TOP)), h_astra_cover_p: HQ(solved(M.p, TOP[0]), anyOf(M.p, TOP)),
     flash_rate: Q(flash.reduce((a, r) => a + solved(allM, r), 0), flash.length * allM.length), astra_rate: Q(solved(allM, TOP[0]), allM.length),
-    argon_uf_p: sample(cb.argon_unfiltered?.p), argon_uf_s: sample(cb.argon_unfiltered?.s),
-    argon_f_p: filt(cb.argon_unfiltered?.p, cb.opus_same_snapshot?.p), argon_f_s: filt(cb.argon_unfiltered?.s, cb.opus_same_snapshot?.s),
     ff_p: F(flashFill(M.p), none3(M.p)), ff_s: F(flashFill(M.s), none3(M.s)),
     ps_astra_keep: `${int(pr(TOP[0]).both)} of the ${int(pr(TOP[0]).a)}`,
     ps_n: int(Math.max(...ps.map((r) => r.n))), ps_n_lo: int(Math.min(...ps.map((r) => r.n))), ps_n_hi: int(Math.max(...ps.map((r) => r.n))),
     st_n: int(Math.max(...st.map((r) => r.n))), st_astra: st3(TOP[0]), st_opus: st3(TOP[1]), st_argon: st3(TOP[2]),
     rt_mix: Object.entries(rtBy).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(', '),
-    ese_n: int(esS.length), ese_ns: int(esS.filter(([, m]) => m === 's').length), ese_nt: int(esS.filter(([, m]) => m === 't').length),
-    ese_lo: int(Math.min(...ese)), ese_hi: int(Math.max(...ese)),
-    sf_trials: int(sf.trials), sf_fail: int(sf.failures), sf_harm: int(sf.by_outcome.harm), sf_harm_pct: P(sf.by_outcome.harm, sf.failures),
-    sf_done: int(sf.by_outcome.done), sf_done_pct: P(sf.by_outcome.done, sf.failures), sf_right: int(sf.harm_right_call),
-    sf_rt: int(sf.modes['standard-realtime'] || 0), sf_snapshot: b.snapshot,
     dusty_s_others: (() => { const n = othersSolved('maniguard', 'dusty_transfer_i03', 's', TOP[0]); return n == null ? null : `${nw(n)} other agent${n === 1 ? '' : 's'}`; })(),
     built: (ex.build?.at || '').slice(0, 10),
     // plain words for the headings: the best agent's standard failure share, what every agent loses without privileged
-    // access, and the leaderboard's Core view for the overview
+    // access, and the leaderboard's Core view for the overall results
     a_s_fail_word: about(1 - solved(M.s, TOP[0]) / (M.s.length || 1)),
     ps_lose_all: moreThan(Math.min(...ps.filter((x) => x.a).map((x) => (x.a - x.both) / x.a))),
     ps_lose_n: ps.filter((x) => x.a).length === runs.length ? 'every agent' : `each of the ${nw(ps.filter((x) => x.a).length)} agents that solves any`,
     ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
     core_top3: list(board.slice(0, 3).map((x) => `${x.name} at ${Q(x.c, CORE.length)}`)),
     core_rest_max: Q(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
+    // the Introduction: each core task's default setting
+    def_s: int(CORE.filter(([, m]) => m === 's').length), def_t: int(CORE.filter(([, m]) => m === 't').length),
+    // Finding 1: the other two strongest agents, standard and standard-realtime; the three together
+    o_s: Q(solved(M.s, TOP[1]), M.s.length), o_t: Q(solved(M.t, TOP[1]), M.t.length),
+    g_s: Q(solved(M.s, TOP[2]), M.s.length), g_t: Q(solved(M.t, TOP[2]), M.t.length),
+    m3_s: Q(mean3(M.s), 3 * M.s.length), m3_t: Q(mean3(M.t), 3 * M.t.length),
+    a_t_cmp: (() => { const d = pct(solved(M.t, TOP[0]), M.t.length) - pct(solved(M.s, TOP[0]), M.s.length);
+      return Math.abs(d) <= 2 ? 'about the same share as in standard mode' : d < 0 ? 'a smaller share than in standard mode' : 'a larger share than in standard mode'; })(),
+    // Finding 2: what GPT-6 Astra solves of the tests its two rivals solve, per setting
+    rival_p: Q(M.p.filter(([t, m]) => ok(t, TOP[0], m) && rivals(t, m)).length, M.p.filter(([t, m]) => rivals(t, m)).length),
+    rival_p_n: int(M.p.filter(([t, m]) => rivals(t, m)).length),
+    rival_s_extra: int(M.s.filter(([t, m]) => !ok(t, TOP[0], m) && rivals(t, m)).length),
+    rival_t_extra: int(M.t.filter(([t, m]) => !ok(t, TOP[0], m) && rivals(t, m)).length),
+    rival_t: Q(M.t.filter(([t, m]) => ok(t, TOP[0], m) && rivals(t, m)).length, M.t.filter(([t, m]) => rivals(t, m)).length),
+    // Finding 3: the share of its privileged successes each agent fails in standard mode, lowest and highest
+    ...(() => { const L = ps.filter((x) => x.a).map((x) => ({ n: x.name, v: pct(x.a - x.both, x.a) }));
+      const lo = Math.min(...L.map((x) => x.v)), hi = Math.max(...L.map((x) => x.v));
+      return { ps_lose_lo: `${lo}%`, ps_lose_hi: `${hi}%`, ps_lose_lo_who: list(L.filter((x) => x.v === lo).map((x) => x.n)), ps_lose_hi_who: list(L.filter((x) => x.v === hi).map((x) => x.n)) }; })(),
+    // Finding 4: in privileged mode, the hardest benchmarks past the cut and the two after it; standard-realtime by benchmark
+    hard_p_more: list(hardRows('p').filter((r) => r.none / r.n < HARD).slice(0, 2).map(hn)),
+    hard_p_more_in: hardRows('p').filter((r) => r.none / r.n < HARD).slice(0, 2).every((r) => HARD_GROUPS.some(([, ids]) => ids.includes(r.id))) ? 'also come from these groups' : 'come from other groups',
+    hard_t_list: list(tRows.map(hn)), hard_t_n: nw(tRows.length),
+    // Finding 5: the best standard-realtime benchmark by the three's mean success rate
+    easy_t_best: tRows.length ? em([...tRows].sort((x, y) => y.sum / y.n - x.sum / x.n)[0]) : 'none',
+    // Finding 6: closed-loop programs among all sampled standard-realtime attempts; the kinds of privileged program
+    ap_t_closed_all: kinds.t && mix.t ? Q(kinds.t.closed, mix.t.n) : null,
+    ap_p_kinds: kinds.p ? `${int(kinds.p.closed)} closed-loop, ${int(kinds.p.open)} open-loop and ${int(kinds.p.search)} parameter searches` : null,
+    views_note: sameOrderCore ? 'the top three keep the same order in each of them' : 'the order of the top three changes between them',
   };
-  return { S, M, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
-    none3, mean3, safety: sf, name, short, ok, solved };
+  return { S, M: { ...M, c: CORE }, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
+    none3, mean3, name, short, ok, solved, flash };
 }
 
 function fill(S) {
@@ -239,18 +258,25 @@ const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</su
 const frac = (a, n) => `${int(a)}/${int(n)}`;
 const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The three Flash-class models</span></div>`;
 
-/** Finding 1 (the analysis's figure 1.1): each agent's share of all the core tests of a setting, one block per setting,
- *  the three strongest in their colours, the Flash-class models in grey. */
+/** Overall results (the analysis's figure 1.1, with the leaderboard's Core view added first): each agent's share of the
+ *  Core view's tests and of all the core tests of each setting, one block per view, the three strongest in their colours,
+ *  the Flash-class models in grey. */
 function figModes(el, R) {
   const block = (k) => `<div class="hb"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(R.M[k].length)} tests</small></p>${R.order.map((r) => {
     const s = R.solved(R.M[k], r), n = R.M[k].length;
     return `<div class="hb-row${TOP.includes(r) ? '' : ' fl'}" title="${esc(`${R.name(r)} · ${MODE_LABEL[k].toLowerCase()}: ${s} of ${n} solved`)}"><span class="who">${esc(R.name(r))}</span>`
       + `<span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${agc(r)})"></span></span><span class="val"><b>${pct(s, n)}%</b> ${frac(s, n)}</span></div>`;
   }).join('')}</div>`;
-  el.innerHTML = head('In every setting GPT-6 Astra solves the most tests and the three Flash-class models the fewest.', 'Share of the core tests each agent solves, by setting',
-    'each bar is the share of a setting’s tests that one agent solved; the verifier decides pass or fail.')
-    + agentLegend(R) + `<div class="hbs">${['p', 's', 't'].map(block).join('')}</div>`
-    + numbers(['Agent', 'Privileged', 'Standard', 'Realtime'], R.order.map((r) => [esc(R.name(r)), ...['p', 's', 't'].map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
+  const V = ['c', 'p', 's', 't'], lead = R.order[0];
+  // the sentence on top only says what holds in all four views
+  const leads = V.every((k) => R.order.every((r) => R.solved(R.M[k], r) <= R.solved(R.M[k], lead)));
+  const flashLast = V.every((k) => Math.max(...R.flash.map((r) => R.solved(R.M[k], r))) < Math.min(...TOP.map((r) => R.solved(R.M[k], r))));
+  const say = leads && flashLast ? `In the Core view and in every setting, ${R.name(lead)} solves the most tests and the three Flash-class models the fewest.`
+    : leads ? `In the Core view and in every setting, ${R.name(lead)} solves the most tests.` : `${R.name(lead)} solves the most tests in the Core view.`;
+  el.innerHTML = head(say, 'Share of the core tests each agent solves: the Core view, then each setting',
+    'each bar is the share of a view’s tests that one agent solved; Core counts each core task once, in its default setting, and the other three count every core test of one setting. The verifier decides pass or fail.')
+    + agentLegend(R) + `<div class="hbs">${V.map(block).join('')}</div>`
+    + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
 }
 
 /** Finding 2 (the analysis's figure 1.2): a waffle per setting, each cell about 1% of the tests, coloured by which of the
@@ -275,9 +301,9 @@ function figOverlap(el, R) {
     return `<div class="wf"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(n)} tests</small></p>${TOP.map((r) => { const s = R.solved(R.M[k], r);
       return `<div class="wf-ag"><span>${esc(R.short(r))}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${AG[r]})"></span></span><b>${int(s)}</b></div>`; }).join('')}
       <div class="wf-grid" role="img" aria-label="${esc(`${MODE_LABEL[k]}: ${cats.map(([c, l]) => `${l} ${counts[k][c]}`).join(', ')}`)}">${cells(k)}</div></div>`; };
-  el.innerHTML = head('With privileged access, GPT-6 Astra solves almost every test that any of the three solves; under standard rules, the other two each solve some tests that it fails.',
+  el.innerHTML = head('In privileged mode, GPT-6 Astra solves almost every test that any of the three solves; in standard mode, the other two each solve some tests that it fails.',
     'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its color shows which of the three solved it, and a cell split in two colors means two of them did.')
-    + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
+    + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Standard-realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
       `<tr><th scope="row"><i class="sw" style="background:${bg(col)}"></i>${esc(l)}</th>${['p', 's', 't'].map((k) => `<td>${int(counts[k][c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
     + `<div class="wfs">${['p', 's', 't'].map(panel).join('')}</div>`;
 }
@@ -285,9 +311,9 @@ function figOverlap(el, R) {
 /** Finding 3 (the analysis's figure 1.3): per agent, the tasks with both a privileged and a standard test, by the outcome
  *  of the two: solved in both, only with privileged access, only under standard rules, in neither. */
 function figPaired(el, R) {
-  const segs = [['both', 'Solved in both', 'var(--top)'], ['onlyP', 'Only with privileged access', 'var(--priv)'], ['onlyS', 'Only under standard rules', 'var(--std)'], ['neither', 'In neither', 'var(--wf-none)']];
+  const segs = [['both', 'Solved in both', 'var(--top)'], ['onlyP', 'Only in privileged mode', 'var(--priv)'], ['onlyS', 'Only in standard mode', 'var(--std)'], ['neither', 'In neither', 'var(--wf-none)']];
   const rows = R.ps.map((r) => ({ id: r.id, name: r.name, n: r.n, both: r.both, onlyP: r.a - r.both, onlyS: r.c - r.both, neither: r.n - r.a - r.c + r.both }));
-  el.innerHTML = head('Every agent solves far more tasks only with privileged access than only under standard rules.',
+  el.innerHTML = head('Every agent solves far more tasks only in privileged mode than only in standard mode.',
     'The same task in two settings: each agent’s outcome on the tasks that have both a privileged and a standard test',
     `each row is one agent on the ${R.S.ps_n} core tasks that have both tests; each segment is the share of tasks with that pair of outcomes.`)
     + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
@@ -297,7 +323,7 @@ function figPaired(el, R) {
     + numbers(['Agent', 'Both', 'Only privileged', 'Only standard', 'Neither', 'Tasks'], rows.map((r) => [esc(r.name), r.both, r.onlyP, r.onlyS, r.neither, r.n]));
 }
 
-/** Finding 3's strip (the analysis's head bars of 1.3): the three strongest agents' solved tests, summed, per setting. */
+/** Finding 1's strip (the analysis's head bars of 1.3): the three strongest agents' solved tests, summed, per setting. */
 function figSteps(el, R) {
   el.innerHTML = `<div class="steps3">${['p', 's', 't'].map((k) => { const n = 3 * R.M[k].length, s = R.mean3(R.M[k]);
     return `<div class="${k === 't' ? 'r' : k}"><b>${pct(s, n)}%</b><span>${MODE_LABEL[k]} · ${int(s)}/${int(n)}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%"></span></span></div>`; }).join('')}</div>
@@ -333,7 +359,7 @@ function figHard(el, R) {
   dotPlots(el, R, {
     rows: (k) => R.hardRows(k), past: (k, r) => r.none / r.n >= HARD, value: (r) => [r.none, r.n], valueName: 'None of the three solves',
     valueText: (a, n) => `${a}/${n}`, cutLabel: () => 'below half',
-    say: `With privileged access, ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'benchmark has' : 'benchmarks have'} at least half their tests solved by none of the three; under standard rules, ${R.S.hard_s_word}.`,
+    say: `In privileged mode, ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'benchmark has' : 'benchmarks have'} at least half their tests solved by none of the three; in standard mode, ${R.S.hard_s_word}.`,
     cap: 'Success rate of each of the three strongest agents, by benchmark (all the core tests of the setting)',
     how: 'each dot is one agent’s share of a benchmark’s tests; the gray bar on the right is the share that none of the three solves.',
     note: `Hardest first. Only benchmarks with at least ${MIN_BENCH} tests in the setting. Each column lists the benchmarks with at least half their tests solved by none of the three, then the next one below the dashed line. The small label under each name is the kind of task. The IKEA assembly tasks are counted separately from the rest of RoboARC.`,
@@ -344,7 +370,7 @@ function figEasy(el, R) {
   dotPlots(el, R, {
     rows: (k) => R.easyRows(k), past: (k, r) => r.sum / (3 * r.n) >= (k === 'p' ? EASY_P : EASY_S), value: (r) => [r.sum, 3 * r.n], valueName: 'Mean success rate',
     valueText: (a, n) => `${pct(a, n)}%`, cutLabel: (k) => `below ${k === 'p' ? 70 : 60}%`,
-    say: `With privileged access the three strongest agents’ mean success rate is 70% or more in ${R.S.easy_p_frac.split(' of ')[0]} benchmarks; under standard rules ${R.S.easy_s_phrase} ${easyVerb(R.S.easy_s_phrase)} 60%.`,
+    say: `In privileged mode the three strongest agents’ mean success rate is 70% or more in ${R.S.easy_p_frac.split(' of ')[0]} benchmarks; in standard mode ${R.S.easy_s_phrase} ${easyVerb(R.S.easy_s_phrase)} 60%.`,
     cap: 'Success rate of each of the three strongest agents, by benchmark (all the core tests of the setting)',
     how: 'each dot is one agent’s share of a benchmark’s tests; the gray bar on the right is the three agents’ mean success rate.',
     note: `Easiest first. Only benchmarks with at least ${MIN_BENCH} tests in the setting. The privileged column lists the benchmarks at 70% or more and the standard column those at 60% or more, each followed by the next one below the dashed line. Mean success rate = the three agents’ solved tests ÷ (3 × the benchmark’s tests), counted in agent-attempts.`,
@@ -378,24 +404,12 @@ function figApproach(el, R) {
       + `<span class="ap-bar">${segs.filter((s) => s.v).map((s) => `<span class="${s.edge ? 'edge' : ''}" style="flex:${s.v} 1 0;background:var(${s.w[4]})" title="${esc(`${MODE_LABEL[k]} · ${s.w[2]}: ${s.v} of ${n}`)}"></span>`).join('')}</span><small class="ap-sum">${sum}</small></span><span class="n">${int(n)}</span></div>`;
   };
   const ks = ['p', 's', 't'].filter((k) => mix[k]);
-  el.innerHTML = head('Privileged attempts mostly write a program, standard ones mostly send commands step by step, and realtime ones use a program again.',
+  el.innerHTML = head('In privileged mode agents mostly write a program, in standard mode they mostly send commands step by step, and in standard-realtime they mostly write a closed-loop program.',
     'How agents control the robot: the approach taken in the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts that used that approach (each attempt counted once, by the approach that produced its graded answer); labeled by an agent from the run logs, not yet checked by hand.')
     + `<div class="ap-defs"><div><p>Code to control</p><ul>${WAYS.filter((w) => w[1] === 'code').map(def).join('')}</ul></div><div><p>Other approaches</p><ul>${WAYS.filter((w) => w[1] !== 'code').map(def).join('')}</ul></div></div>`
     + `<div class="ap">${ks.map(row).join('')}<div class="ap-row ax"><span></span><span class="sb-ticks"><i style="left:0">0%</i><i style="left:50%">50%</i><i style="left:100%">100%</i></span><span class="n">attempts</span></div></div>`
     + `<p class="fig-note">A dark mark separates the approaches; the three shades of blue are the three kinds of program. Sampled attempts: ${R.S.cb_sample} analyzed in all (snapshot of ${R.S.cb_snapshot}).</p>`
     + numbers(['Setting', ...WAYS.map((w) => w[2]), 'Sampled'], ks.map((k) => [MODE_LABEL[k], ...WAYS.map((w) => (w[1] === 'code' ? kinds[k]?.[w[0]] || 0 : mix[k]?.[w[0]] || 0)), mix[k].n]));
-}
-
-/** Embodied Safety Exam: failed attempts at its core tests by the benchmark's verdict. */
-function figSafety(el, R) {
-  const f = R.safety, o = f.by_outcome;
-  const segs = [['right', 'Harm from the robot’s motion, though the agent declined the hazard', '--sf-right'], ['harm', 'Other harm from the robot’s motion', '--sf-harm'],
-    ['done', 'Carried out a hazardous request', '--sf-done'], ['gave', 'Gave up', '--sf-gave'], ['other', 'Other or no verdict', '--wf-none']];
-  const row = { right: f.harm_right_call, harm: o.harm - f.harm_right_call, done: o.done, gave: o.gave_up, other: o.other };
-  el.innerHTML = head(`More attempts fail because the robot’s own motion causes harm (${o.harm}) than because the agent carries out a hazardous request (${o.done}).`,
-    `Failed attempts at the Embodied Safety Exam’s core tests, by the benchmark’s verdict (${int(f.failures)} attempts)`, '')
-    + `<div class="legend">${segs.map(([k, l, c]) => `<span>${sw(c)}<span>${esc(l)} · <b>${row[k]}</b></span></span>`).join('')}</div>`
-    + `<div class="sb"><div class="sb-row one"><span class="sb-trk">${segs.map(([k, l, c]) => (row[k] ? `<span style="flex:${row[k]} 1 0;background:var(${c})" title="${esc(`${l}: ${row[k]} of ${f.failures}`)}">${(100 * row[k]) / f.failures >= 9 ? `<em${k === 'other' || k === 'gave' ? ' class="dk"' : ''}>${row[k]}</em>` : ''}</span>` : '')).join('')}</span></div></div>`;
 }
 
 /* ------------------------------------------------------------------------------------------ the article */
@@ -405,7 +419,7 @@ function figSafety(el, R) {
 function toc() {
   const heads = $$('.post h2[id]');
   if (!heads.length) return;
-  const label = (h) => esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''));
+  const label = (h) => `<span class="k">${esc(h.querySelector('.num')?.textContent || '')}</span>${esc(h.dataset.short || h.textContent.replace(/^\s*\d+\s*/, ''))}`;
   const subs = (h) => {
     const out = [];
     for (let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) {
@@ -414,7 +428,7 @@ function toc() {
     }
     return out;
   };
-  const fnum = (h3) => { const t = h3.querySelector('.fn:not(.ck)')?.textContent; return t && (t.replace(/\D+/g, '') || '?'); };
+  const fnum = (h3) => { const t = h3.querySelector('.fn')?.textContent; return t && (t.replace(/\D+/g, '') || '?'); };
   const sub3 = (h3) => esc([...(h3.querySelector('button') || h3).childNodes].filter((n) => !n.classList?.contains('fn')).map((n) => n.textContent).join('').trim());
   // the rail: section names, plus each finding by its short name, folded until the reader reaches the findings or
   // opens them; the current one marked
@@ -468,6 +482,15 @@ function findings() {
     b.addEventListener('click', () => set(b, b.getAttribute('aria-expanded') !== 'true'));
     document.getElementById(b.getAttribute('aria-controls'))?.addEventListener('beforematch', () => set(b, true));
   });
+  // the sections' old addresses: the old overview is now the overall results, and the old case study is gone
+  const ALIAS = { framework: 'introduction', overview: 'results', safety: 'findings', s1: 'findings' };
+  const moved = () => {
+    let id = '';
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { /* a malformed hash */ }
+    if (!ALIAS[id]) return null;
+    history.replaceState(null, '', `#${ALIAS[id]}`);
+    return document.getElementById(ALIAS[id]);
+  };
   const reveal = (id) => {
     let el = null;
     try { if (id) el = document.getElementById(decodeURIComponent(id)); } catch { /* a malformed hash */ }
@@ -477,8 +500,9 @@ function findings() {
   };
   // a click on an in-page link opens the finding first, so the browser then scrolls to it with its body laid out
   document.addEventListener('click', (e) => { const a = e.target.closest?.('a[href^="#"]'); if (a) reveal(a.getAttribute('href').slice(1)); });
-  addEventListener('hashchange', () => reveal(location.hash.slice(1))?.scrollIntoView());
-  const target = reveal(location.hash.slice(1));
+  addEventListener('hashchange', () => { const m = moved(); (reveal(location.hash.slice(1)) || m)?.scrollIntoView(); });
+  const old = moved();
+  const target = reveal(location.hash.slice(1)) || old;
   target?.scrollIntoView({ behavior: 'instant' });
   let shut = [];
   addEventListener('beforeprint', () => { shut = $$('.post details:not([open])'); shut.forEach((d) => { d.open = true; }); });
@@ -511,8 +535,10 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
     kinds.textContent = Object.entries(c).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${(ex.bodies?.[k] || k).toLowerCase()} (${int(n)} tasks)`).join(', ');
     const nk = $('#body-kinds'); if (nk) nk.textContent = nw(Object.keys(c).length);
   }
-  const figs = { modes: figModes, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach, safety: figSafety };
+  const figs = { modes: figModes, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
+  // each figure's number before its caption
+  $$('.fig-body[data-fig]').forEach((el) => $('.fig-cap', el)?.insertAdjacentHTML('afterbegin', `<b>Figure ${el.dataset.fig}.</b> `));
 }).catch((e) => {
   console.error(e);
   $$('.fig-body').forEach((el) => { el.innerHTML = '<p class="fig-note">This figure could not be loaded.</p>'; });

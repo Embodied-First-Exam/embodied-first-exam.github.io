@@ -2247,7 +2247,7 @@ loadExam().then(async (raw) => {
   footer(ex);
   headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
-    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blog: async () => {}, notfound: async () => {} };
+    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blog: async (ex) => flowDiagram($('#flowfig'), ex), notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
   fillIcons();
   reveal();

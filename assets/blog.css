@@ -12,8 +12,6 @@
   --ag-astra: #3a5fc8; --ag-opus: #b83f8c; --ag-argon: #4f8a2a; --wf-none: #dfe5ec;
   /* Finding 6: the three kinds of program in one blue ramp, the other approaches apart */
   --w-open: #9cc0ea; --w-closed: #3f7fc8; --w-search: #1d4378; --w-direct: #c97b2e; --w-train: #8e5bc0; --w-mixed: #c9b458; --w-none: #c3cad3;
-  /* Embodied Safety Exam's verdicts: harm in reds, the rest apart */
-  --sf-right: #9e2a2b; --sf-harm: #dd7373; --sf-done: #6b4fb0; --sf-gave: #9aa3ad;
 }
 [data-theme="dark"] {
   --rt: #e3b341; --rt-ink: #f0c867;
@@ -24,7 +22,6 @@
   --top: #eceae6; --flash: #6c747e;
   --ag-astra: #6f8ee8; --ag-opus: #d9659f; --ag-argon: #6f9f3c; --wf-none: #2c3138;
   --w-open: #a9c8ee; --w-closed: #5a95dc; --w-search: #2f5d9e; --w-direct: #d98f45; --w-train: #a77fd6; --w-mixed: #b8a54d; --w-none: #4a5059;
-  --sf-right: #d04a4a; --sf-harm: #e99595; --sf-done: #9b80e0; --sf-gave: #6c747e;
 }
 
 html[lang="zh"] body { font-family: var(--body), "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
@@ -284,6 +281,9 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .toc-rail .fold-body > ol { overflow: hidden; }
 .toc-rail ol ol a { display: grid; grid-template-columns: 20px 1fr; padding: 3px 0 3px 12px; font-size: 12px; }
 .toc-rail ol ol a .k { font: 500 10.5px/1.6 var(--mono); color: var(--ink-3); }
+.toc-rail > ol > li > a, .toc-rail .fold-head > a { display: grid; grid-template-columns: 24px 1fr; }
+.toc-rail > ol > li > a .k, .toc-rail .fold-head > a .k { font: 500 10.5px/1.9 var(--mono); color: var(--ink-3); }
+.toc-rail > ol > li > a.on .k, .toc-rail .fold-head > a.on .k { color: var(--priv-ink); }
 .toc-rail ol ol a.on .k { color: var(--priv-ink); }
 @media (max-width: 1340px) { .toc-rail { display: none; } }
 
@@ -314,7 +314,6 @@ svg.chart .lab { font-size: 12px; font-weight: 600; }
 .finding .scope { margin-top: 22px !important; padding: 12px 16px; border-radius: 12px; background: var(--bg-2); font-size: 15px !important; line-height: 1.6 !important; color: var(--ink-2) !important; }
 .finding .scope b { color: var(--ink); }
 .finding.open h3 .fn { color: var(--rt-ink); }
-.finding h3 .fn.ck { color: var(--std-ink); }
 .db-row .who small { display: block; font: 400 11.5px var(--mono); color: var(--ink-3); }
 .ovt th small, .ovt td.who small { font: 400 11px var(--mono); color: var(--ink-3); text-transform: none; letter-spacing: 0; }
 .mixt td { width: 38%; }
@@ -519,3 +518,34 @@ details.nums > summary:hover { color: var(--ink); }
   .hb-row .val b { display: block; margin: 0; }
   .dp-row { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 58px; gap: 6px; }
 }
+
+/* the Introduction: the home page's framework figure (exam.css draws it) laid out for the reading column in three
+   bands, the question, the five layers, then the trajectory and the verifier; below 860px exam.css stacks it */
+.fig-flow .flowfig { margin: 6px 0 0; }
+.post .fx-checks { margin: 2px 0 0; padding: 0; }
+.post .fx-checks li { font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+.post .fx-checks li + li { margin-top: 0; }
+@media (min-width: 861px) {
+  .post .fx-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: none; row-gap: 10px; column-gap: 12px; }
+  .post .fx-grid > * { grid-column: 1 / -1 !important; grid-row: auto !important; }
+  .post .fx-arrow, .post .fx-qcard { display: none; }
+  .post .fx-qh { padding: 0 2px; }
+  .post .fx-in.fx-goal { grid-column: 1 !important; }
+  .post .fx-in.fx-scene { grid-column: 2 !important; flex-direction: row; align-items: center; }
+  .post .fx-scene img { width: 52%; flex: none; }
+  .post .fx-in.fx-scene { flex-wrap: wrap; }
+  .post .fx-scene .fx-ih { width: 100%; }
+  .post .fx-layer { min-height: 58px; grid-template-columns: 150px minmax(0, 1fr); }
+  .post .fx-lb { flex-wrap: wrap; row-gap: 6px; padding: 8px 0; }
+  .post .fx-traj { order: 1; grid-column: 1 !important; margin-top: 30px; }
+  .post .fx-ver { order: 2; grid-column: 2 !important; margin-top: 30px; }
+  .post .fx-obs { max-height: 150px; }
+}
+
+/* the walk through the figure: numbered steps */
+.post ol.walk { list-style: none; padding: 0; counter-reset: w; }
+.post ol.walk > li { position: relative; padding-left: 36px; }
+.post ol.walk > li + li { margin-top: 12px; }
+.post ol.walk > li::before { counter-increment: w; content: counter(w); position: absolute; left: 0; top: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 700 11.5px/24px var(--mono); text-align: center; }
+.post ol.walk ul { margin-top: 8px; padding-left: 1.1em; }
+.post ol.walk code { font-size: .86em; }
