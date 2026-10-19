@@ -525,7 +525,7 @@ details.nums > summary:hover { color: var(--ink); }
 .post .fx-checks { margin: 2px 0 0; padding: 0; }
 .post .fx-checks li { font-size: 12px; line-height: 1.4; color: var(--ink-2); }
 .post .fx-checks li + li { margin-top: 0; }
-@media (min-width: 861px) {
+@media (min-width: 861px) and (max-width: 1199px) {
   .post .fx-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: none; row-gap: 10px; column-gap: 12px; }
   .post .fx-grid > * { grid-column: 1 / -1 !important; grid-row: auto !important; }
   .post .fx-arrow, .post .fx-qcard { display: none; }
@@ -540,6 +540,13 @@ details.nums > summary:hover { color: var(--ink); }
   .post .fx-traj { order: 1; grid-column: 1 !important; margin-top: 30px; }
   .post .fx-ver { order: 2; grid-column: 2 !important; margin-top: 30px; }
   .post .fx-obs { max-height: 150px; }
+}
+/* wide screens: figures keep the text's left edge and grow into the empty right margin (the contents rail holds the left
+   one); the framework figure gets back the home page's landscape layout, so it fits one screen */
+@media (min-width: 1200px) {
+  .post > figure.fig-wide, .post > figure.fig-flow { max-width: none; width: min(1320px, calc(880px + (100vw - 880px) / 2 - 48px));
+    margin-left: calc((100% - 880px) / 2) !important; margin-right: 0 !important; }
+  .post > figure.fig-wide figcaption, .post > figure.fig-flow figcaption { max-width: 880px; }
 }
 
 /* the walk through the figure: numbered steps */
