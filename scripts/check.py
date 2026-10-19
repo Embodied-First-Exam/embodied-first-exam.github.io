@@ -17,7 +17,7 @@ FORBIDDEN = ["embodied-agent-interface", "runs/overview", "/runs/", "benchmarks/
              "robot_coding_bench", "internal preview", "log.json", "RoboPaint-strict", "robopaint-strict"]
 SKIP = ("http://", "https://", "mailto:", "#", "data:", "javascript:")
 # public addresses that contain a forbidden fragment by coincidence: removed from the text before the scan
-ALLOWED = ["huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/"]
+ALLOWED = ["huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/", "blog.json"]  # blog.json: the blog's own data file, not a log
 
 
 def exists(base: Path, ref: str) -> bool:
@@ -47,7 +47,8 @@ def main() -> int:
         json.loads(data)
     # the Task Atlas files (scripts/export_atlas.py), when present
     atlas = [p for p in (ROOT / "assets/search_core.js", ROOT / "data/atlas.json", ROOT / "data/search.json") if p.is_file()]
-    for f in [*pages, ROOT / "assets/app.js", ROOT / "assets/exam.css", ROOT / "data/exam.json", ROOT / "data/tasks.json", *atlas]:
+    blog = [p for p in (ROOT / "assets/blog.js", ROOT / "assets/blog.css", ROOT / "data/blog.json") if p.is_file()]
+    for f in [*pages, ROOT / "assets/app.js", ROOT / "assets/exam.css", ROOT / "data/exam.json", ROOT / "data/tasks.json", *atlas, *blog]:
         text = f.read_text(encoding="utf-8")
         for ok in ALLOWED:
             text = text.replace(ok, "")
