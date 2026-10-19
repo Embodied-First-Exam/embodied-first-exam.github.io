@@ -631,3 +631,7 @@ table.heat thead th:first-child { width: 26%; text-align: left; }
 /* the report's intro video, under the byline */
 .post-head .intro-video { margin: 26px 0 0; width: min(1000px, 100%); }
 .post-head .intro-video video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; background: #0b0e12; box-shadow: 0 24px 60px -30px rgba(0,0,0,.55); }
+.post .contrib { margin-top: 6px; margin-bottom: 0; font: 500 15.5px/1.75 var(--body); color: var(--ink); }
+.post .contrib .au { white-space: nowrap; }
+.post .contrib sup, .post .contrib + .au-note sup { font: 600 .72em/0 var(--mono); color: var(--priv); margin-left: 1px; }
+.post .contrib + .au-note { margin-top: 8px; font: 400 13px/1.5 var(--body); color: var(--ink-3); }

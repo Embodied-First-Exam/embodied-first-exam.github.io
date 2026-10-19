@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../../assets/exam.css?v=3ea4a206">
-<link rel="stylesheet" href="../../assets/blog.css?v=1783235f">
+<link rel="stylesheet" href="../../assets/blog.css?v=7161f07f">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../../assets/app.js?v=916c7605"></script>
 <script type="module" src="../../assets/blog.js?v=b087f5d3"></script>
@@ -413,6 +413,34 @@
     <h3 id="limits">Limitations</h3>
     <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The approach labels in Finding 5 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
 
+    <h3 id="contributors">Current contributors</h3>
+    <p class="authors contrib">
+      <span class="au">Kangrui Wang<sup>*§</sup></span>,
+      <span class="au">Changhe Chen<sup>*§</sup></span>,
+      <span class="au">Qineng Wang<sup>*§</sup></span>,
+      <span class="au">Pingyue Zhang<sup>*§</sup></span>,
+      <span class="au">Chi Gui<sup>*§</sup></span>,
+      <span class="au">Feishi Wang<sup>§</sup></span>,
+      <span class="au">Canyu Chen<sup>§</sup></span>,
+      <span class="au">Wenli Xiao<sup>§</sup></span>,
+      <span class="au">Xiaoyu Huang<sup>§</sup></span>,
+      <span class="au">Tonghe Zhang<sup>§</sup></span>,
+      <span class="au">Linjie Li<sup>§</sup></span>,
+      <span class="au">Yiyou Sun</span>,
+      <span class="au">Mingkai Deng</span>,
+      <span class="au">Jinyu Hou</span>,
+      <span class="au">Eric P. Xing</span>,
+      <span class="au">Huaxiu Yao</span>,
+      <span class="au">Zhiwen Fan</span>,
+      <span class="au">Yuejiang Liu</span>,
+      <span class="au">Jiajun Wu</span>,
+      <span class="au">Yuke Zhu</span>,
+      <span class="au">Guanya Shi<sup>†</sup></span>,
+      <span class="au">Ruohan Zhang<sup>†</sup></span>,
+      <span class="au">Manling Li<sup>†</sup></span>
+    </p>
+    <p class="au-note"><sup>*</sup> Equal contribution · <sup>§</sup> Core contributor · <sup>†</sup> Equal advising</p>
+
     <h3 id="references">References</h3>
     <ol class="refs">
       <li id="ref-1"><span class="rf-a">C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press and K. Narasimhan.</span> <a class="rf-t" href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</a> <span class="rf-v">ICLR 2024.</span></li>
@@ -428,7 +456,7 @@
     <p>Tasks, results and agent runs are on this site (<a href="../../tasks/">tasks</a>, <a href="../../leaderboard/">leaderboard</a>, <a href="../../run/">runs</a>); videos and run records are in the <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</p>
     <pre class="cite">@misc{embodiedfirstexam2026,
   title  = {Embodied First Exam},
-  author = {Kangrui Wang*§ and Changhe Chen*§ and Qineng Wang*§ and Pingyue Zhang*§ and Chi Gui*§ and Feishi Wang§ and Canyu Chen§ and Wenli Xiao§ and Xiaoyu Huang§ and Tonghe Zhang§ and Linjie Li§ and Yiyou Sun and Mingkai Deng and Jinyu Hou and Eric P. Xing and Huaxiu Yao and Zhiwen Fan and Yuejiang Liu and Jiajun Wu and Yuke Zhu and Guanya Shi† and Ruohan Zhang† and Manling Li†},
+  author = {{Embodied First Exam Team}},
   year   = {2026},
   url    = {https://www.embodied-first-exam.ai}
 }</pre>
