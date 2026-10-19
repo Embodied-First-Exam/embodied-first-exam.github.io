@@ -24,7 +24,7 @@ function styles() {
   document.documentElement.classList.add('search-css-wait');
   styled.addEventListener('load', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
   styled.addEventListener('error', () => document.documentElement.classList.remove('search-css-wait'), { once: true });
-  styled.href = new URL('./search.css?v=8e929bd9', import.meta.url).href;
+  styled.href = new URL('./search.css?v=5c633d2c', import.meta.url).href;
   document.head.append(styled);
 }
 
@@ -171,7 +171,10 @@ export function tasksSearch(grid, ex, tasks, kit) {
   for (const g of G) state[g.id] = Q.get(g.id) || '';
   if (G.some((g) => g.more && state[g.id])) state.more = true;
   const inSet = (t) => state.set === 'all' || (t.set || 'core') === state.set;
+  // tasks: one scene with all its modes (owners, 2026-10-19), in the core set when any mode is
   const setCount = (k) => (k === 'all' ? tasks.length : tasks.filter((t) => (t.set || 'core') === k).length);
+  // and its tests (a task's modes; in the core set, its core modes)
+  const setTests = (k) => tasks.reduce((n, t) => n + (k === 'all' ? (t.modes?.length || 0) : t.core && t.core !== '-' ? t.core.length : 0), 0);
   const needsIndex = () => state.q.trim() || state.tt || state.cap;
 
   // ---- the box and the filter row
@@ -182,7 +185,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
   const input = box.querySelector('input'), read = box.querySelector('.ts-read'), clear = box.querySelector('.ts-clear');
   f.classList.add('ts-filters');
   f.innerHTML = `<div class="seg ts-set" role="group" aria-label="Which tasks">${SETS.map(([k, name]) => `<button type="button" data-set="${k}" class="${state.set === k ? 'on' : ''}"
-      title="${k === 'core' ? 'The core set: what the headline counts' : 'Every task'}">${name} <i>${int(setCount(k))}</i></button>`).join('')}</div>`
+      title="${k === 'core' ? 'The core set: the tasks the headline counts' : 'Every task'}">${name} <i>${int(setCount(k))}</i><small class="ts-tests">${int(setTests(k))} tests</small></button>`).join('')}</div>`
     + `<button type="button" class="chip ts-ftoggle" aria-expanded="false">Filters</button>`
     + G.map((g) => `<select data-f="${g.id}" aria-label="${esc(g.any)}"${g.more ? ' class="ts-more"' : ''}></select>`).join('')
     + `<button type="button" class="chip ts-moreb" aria-expanded="${state.more}">More filters</button>`

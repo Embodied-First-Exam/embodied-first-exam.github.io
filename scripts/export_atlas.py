@@ -18,6 +18,7 @@ import argparse
 import base64
 import collections as C
 import datetime as dt
+import hashlib
 import json
 import math
 import re
@@ -82,7 +83,11 @@ def site_bases(site: list[dict], inv: dict | None, atlas: dict) -> dict[str, str
     for t in site:
         key = f"{t['suite']}/{t['id']}"
         if key in by_key:
-            out[key] = by_key[key] if by_key[key] in atlas else None
+            b = by_key[key]
+            # RoboOlympics split into -fun and -match in the repository (2026-10-18); the Atlas knows the bases before it
+            if b not in atlas:
+                b = b.replace("roboolympics-fun-", "roboolympics-").replace("roboolympics-match-", "roboolympics-")
+            out[key] = b if b in atlas else None
             continue
         out[key] = derive_base(t, atlas)
     return out
@@ -244,9 +249,14 @@ def main() -> int:
         if not rec.get("est"):
             continue
         peers = [j for j in range(len(recs)) if not recs[j].get("est") and fam_key[j] == fam_key[i]] or \
-                [j for j in range(len(recs)) if not recs[j].get("est") and site[j]["suite"] == site[i]["suite"]]
+                [j for j in range(len(recs)) if not recs[j].get("est") and site[j]["suite"] == site[i]["suite"]] or \
+                [j for j in range(len(recs)) if not recs[j].get("est") and site[j].get("body") and site[j].get("body") == site[i].get("body")]
         if peers:
             m = [sum(recs[j]["xyz"][d] for j in peers) for d in range(3)]
+            n = math.sqrt(sum(x * x for x in m)) or 1
+            # a small offset fixed by the question's key, so questions placed at one centre do not sit on one dot
+            h = hashlib.sha256(keys[i].encode()).digest()
+            m = [x / n + (h[d] / 255 - 0.5) * 0.12 for d, x in enumerate(m)]
             n = math.sqrt(sum(x * x for x in m)) or 1
             rec["xyz"] = r3([x / n for x in m])
             rec["reg"] = max(range(len(index["regions"])),
@@ -342,7 +352,8 @@ def main() -> int:
     # (docs/easy_set.toml of the exam's repository: reported apart) or the core set (owners, 2026-10-18)
     if not problems:
         for t, rec in zip(site, recs):
-            t["set"] = "easy" if rec["easy"] else "core"
+            if "core" not in t:                 # the exam data marks the core set itself (docs/core_set.toml) since 2026-10-18
+                t["set"] = "easy" if rec["easy"] else "core"
         (DATA / "tasks.json").write_text(json.dumps(site, ensure_ascii=False, separators=(",", ":")))
         print(f"data/tasks.json: set written ({sum(t['set'] == 'core' for t in site)} core, {sum(t['set'] == 'easy' for t in site)} easy)")
 

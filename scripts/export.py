@@ -41,9 +41,7 @@ SUITE_IDS = {"robopaint-strict": "robopaint"}
 # the contribution page's links into the source repository, which is private: left out until public ones exist
 PRIVATE_CONTRIBUTE = ("repository", "proposal_issue", "protocol_issue", "docs")
 # sentences reworded for this site (they mention the other site)
-NOTE_TEXT = {
-    "target": "Counts the exam's questions at {commit}.",
-}
+NOTE_TEXT: dict[str, str] = {}      # (the core set card's text names no other site since 2026-10-18)
 # the source repository is private: in text shown on this site it is "the exam", and its name is not a link anywhere
 REWORD = [
     ("RoboPaint-strict", "RoboPaint"),

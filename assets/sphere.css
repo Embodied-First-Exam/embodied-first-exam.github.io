@@ -97,3 +97,5 @@
 }
 .sph-set { grid-area: set; justify-self: start; margin: 0 0 22px; }
 .sph-set button i { margin-left: 4px; font-style: normal; font-family: var(--mono); font-size: .85em; opacity: .7; }
+
+.sph-set .sph-tests { margin-left: 6px; font: 500 11px/1 var(--mono); opacity: .65; }

@@ -133,21 +133,25 @@ function scoreGroup(group, tasks, view) {
   const out = Object.fromEntries(group.map((r) => [r.id, { privileged: [0, 0], standard: [0, 0], suites: {} }]));
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
+    // the core set only, a cell per task dir; a standard-realtime dir (t) counts on the standard side (owners, 2026-10-18)
+    const core = t.core ? new Set(t.core) : null;
     for (const m of MODES) {
-      const k = MK[m];
-      const cells = group.map((r) => scored(t.results?.[r.id]?.[k]));
-      if (view === 'shared' && cells.some((c) => !GRADED.has(c))) continue;
-      group.forEach((r, i) => {
-        const c = cells[i];
-        if (!GRADED.has(c)) return;
-        const o = out[r.id];
-        o[m][0] += c === 'S';
-        o[m][1] += 1;
-        const ss = (o.suites[t.suite] ??= {});
-        const cell = (ss[m] ??= [0, 0]);
-        cell[0] += c === 'S';
-        cell[1] += 1;
-      });
+      for (const k of (m === 'standard' ? ['s', 't'] : [MK[m]])) {
+        if (core && !core.has(k)) continue;
+        const cells = group.map((r) => scored(t.results?.[r.id]?.[k]));
+        if (view === 'shared' && cells.some((c) => !GRADED.has(c))) continue;
+        group.forEach((r, i) => {
+          const c = cells[i];
+          if (!GRADED.has(c)) return;
+          const o = out[r.id];
+          o[m][0] += c === 'S';
+          o[m][1] += 1;
+          const ss = (o.suites[t.suite] ??= {});
+          const cell = (ss[m] ??= [0, 0]);
+          cell[0] += c === 'S';
+          cell[1] += 1;
+        });
+      }
     }
   }
   return out;
@@ -185,7 +189,7 @@ function lbBoard(ex, tasks, onDraw) {
   const metaOf = (r, sc, part) => {
     const total = MODES.reduce((a, m) => a + (sc[m]?.[1] || 0), 0);
     const reset = part && r.standard_reset?.done ? ` · <span class="rs" title="Standard attempts with ${r.standard_reset.budget} resets allowed are not counted">+${r.standard_reset.done} with resets, not counted</span>` : '';
-    return `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} questions${reset}`;
+    return `${r.suites?.length || 0} suite${(r.suites?.length || 0) === 1 ? '' : 's'} · ${int(total)} tests${reset}`;
   };
   const rowHTML = (r, sc, rank, part, best) => {
     const open = state.open === r.id;
@@ -217,7 +221,7 @@ function lbBoard(ex, tasks, onDraw) {
     board.innerHTML = html;
     const n = main.length ? MODES.map((m) => scores[main[0].id][m][1]) : [0, 0];
     $('#lb-note').innerHTML = state.view === 'shared'
-      ? `Head to head: the same ${int(n[0])} privileged and ${int(n[1])} standard questions for every ranked model.`
+      ? `Head to head: the same ${int(n[0])} privileged and ${int(n[1])} standard tests of the core set for every ranked model.`
       : 'Everything each model sat: the counts differ from row to row, so compare with care.';
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
@@ -280,8 +284,8 @@ function lbSuites(el, ex, runs, scores) {
       ${runs.map((r, i) => cell(r, s, top != null && vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   }).join('');
   const modes = [['standard', '<i class="sw s"></i>Standard'], ['privileged', '<i class="sw p"></i>Privileged'], ['drop', '<i class="arr"></i>What it loses']];
-  const note = { standard: 'Share of each suite’s questions solved in standard mode. The best in each row is underlined.',
-    privileged: 'Share of each suite’s questions solved in privileged mode. The best in each row is underlined.',
+  const note = { standard: 'Share of each suite’s standard tests solved. The best in each row is underlined.',
+    privileged: 'Share of each suite’s privileged tests solved. The best in each row is underlined.',
     drop: 'Points lost from privileged to standard: where the simulator matters most.' }[SX_MODE];
   el.innerHTML = `<div class="sx-bar"><div class="seg sx-${SX_MODE}" role="group" aria-label="Which number">${modes.map(([m, l]) => `<button type="button" data-m="${m}" class="${m === SX_MODE ? 'on' : ''}">${l}</button>`).join('')}</div>
     <span class="sx-note">${note}</span></div>
@@ -318,7 +322,7 @@ function suiteCard(ex, s) {
   return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
     <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${releaseTag(s)}</div>
     <div class="body"><h4>${esc(s.name)}${nameTag(s)}</h4><p>${esc(s.blurb || '')}</p>
-      <div class="meta">${int(s.instances)} scenes · ${esc(robot)}${more}</div></div></a>`;
+      <div class="meta">${tasksTests(s.instances, s.task_dirs)} · ${esc(robot)}${more}</div></div></a>`;
 }
 
 // suites whose scenes look alike, kept apart on the home page's wall as if they were one
@@ -454,7 +458,7 @@ function openTask(ex, t, runs) {
     if (media) media.insertAdjacentHTML('afterend', `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`);
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=50ce7d17').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=0f3e018c').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -533,7 +537,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
       + (hits.length > state.limit ? `<div class="load-more"><button class="btn" data-more>Show ${Math.min(60, hits.length - state.limit)} more of ${int(hits.length - state.limit)}</button></div>` : '')
       : '<div class="empty-state">No task matches these filters.</div>';
     const c = f && $('.count', f);
-    if (c) c.textContent = `${int(hits.length)} of ${int(tasks.length)} scenes`;
+    if (c) c.textContent = `${int(hits.length)} of ${int(tasks.length)} tasks`;
     const chip = f && $('.tagset', f);
     if (chip) chip.innerHTML = state.tags.length ? `${state.tags.map((g) => esc(ex._tags[g].name)).join(' <span>×</span> ')} <button type="button" aria-label="Clear the labels">✕</button>` : '';
     if (chip) chip.hidden = !state.tags.length;
@@ -548,7 +552,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=50ce7d17').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=0f3e018c').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = Q.get('task');
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -960,7 +964,7 @@ function flowDiagram(el, ex) {
           <span class="fx-how">How it runs underneath →</span>
         </div>
       </div>
-      ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.simulators || 20)} · ${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
+      ${layer(5, `<span class="fx-lname">Simulators<small>${int(t.robots || 40)} robots</small></span>`, 'cube', `${sims.map((x) => `<span class="fx-sim">${x}</span>`).join('')}`, 'Each suite’s own simulator, behind the same interface')}
       <i class="fx-arrow out" style="grid-row:4"><em>recorded</em></i>
       <div class="fx-ver" title="Its own sandbox, no network">
         <span class="fx-vh">${ic('shield')}Verifier</span>
@@ -1255,13 +1259,16 @@ function trustRow(el) {
 /** Numbers with their icons: [[icon, value, label], ...]. */
 function iconNumbers(el, items) {
   if (!el) return;
-  el.innerHTML = items.map(([icon, v, l]) => `<div><svg viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[icon]}</svg><dt>${int(v)}</dt><dd>${esc(l)}</dd></div>`).join('');
+  el.innerHTML = items.map(([icon, v, l, sub]) => `<div><svg viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[icon]}</svg><dt>${int(v)}</dt><dd>${esc(l)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`).join('');
 }
+// a task is one scene with all its modes; a test is one of its modes, a task dir of the repository (owners, 2026-10-19)
+const tasksTests = (tasks, tests) => `${int(tasks)} task${tasks === 1 ? '' : 's'} · ${int(tests)} test${tests === 1 ? '' : 's'}`;
 
 /** The exam in four numbers. */
 function bigNumbers(el, ex) {
   const t = ex.totals || {};
-  iconNumbers(el, [['doc', t.instances, 'questions'], ['layers', t.suites, 'benchmark suites'], ['arm', t.robots, 'robots'], ['cube', t.simulators, 'simulators']]);
+  // tasks first, then tests: a task is one scene with all its modes, a test one of its modes (owners, 2026-10-19)
+  iconNumbers(el, [['doc', t.instances, 'tasks', `${int(t.task_dirs)} tests`], ['layers', t.suites, 'benchmark suites'], ['arm', t.robots, 'robots']]);   // no simulator count: the task.toml labels are not engines (owners, 2026-10-19)
 }
 
 /** Icons named in the markup: <span class="ic" data-icon="cube"></span>. */
@@ -1276,12 +1283,12 @@ function fillIcons(root = document) {
 /** The one line under the title: the command that sits the whole exam, typed out once, with a copy button. */
 function heroRun(el, ex) {
   if (!el) return;
-  const cmd = 'harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra';
+  const cmd = 'harbor run -a codex -m openai/gpt-6-luna';   // the repository's README (2026-10-18): the core set by default
   const paint = (s) => esc(s).replace(/(^|\s)(-\w)(?=\s|$)/g, '$1<span class="f">$2</span>');
   el.innerHTML = `<div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd"></code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button></div>
-    <p class="hr-note">One line runs all ${int(ex.totals?.instances)} questions, in every mode. <button type="button" class="ol-open" aria-haspopup="dialog">
+    <p class="hr-note">One line runs the core set: ${tasksTests(ex.totals?.core_tasks, ex.totals?.core_dirs)}. <button type="button" class="ol-open" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Change one argument</button></p>`;
   const code = $('.hr-cmd', el);
   code.setAttribute('aria-label', cmd);
@@ -1306,27 +1313,23 @@ function heroRun(el, ex) {
  *  mode are written as one pattern per suite. */
 function oneLine(opener, ex) {
   if (!opener) return;
-  const suites = (ex.suites || []).filter((s) => !s.example);
-  const SCOPES = {
-    humanoid: { prefixes: ['humanoidbench', 'robocasa-gr1'], ids: ['humanoidbench', 'robocasa-gr1'] },
-    rc365: { prefixes: ['robocasa365'], ids: ['robocasa365'] },
-  };
-  const AGENTS = { codex: '-a codex -m openai/gpt-6-astra', claude: '-a claude-code -m anthropic/claude-opus-5-5' };
-  const st = { mode: '', scope: '', agent: 'codex', k: '' };
-  const parts = () => {
-    const sc = SCOPES[st.scope];
-    const tail = st.mode ? `-${st.mode}` : '';
-    const pats = sc ? sc.prefixes.map((p) => `${p}-*${tail}`) : st.mode ? [`*${tail}`] : [];
-    return [['base', 'harbor run -d embodied-first-exam'], ['pick', pats.map((p) => `-i '${p}'`).join(' ')],
-      ['agent', AGENTS[st.agent]], ['k', st.k ? '-k 3' : '']].filter(([, t]) => t);
-  };
+  // the flags of the repository's README (2026-10-18): the core set by default, --all for every task, a mode flag,
+  // -p tasks/<benchmark> for one benchmark, -a oracle for the reference solutions; counts from the exam's own numbers
+  const F = ex.folders || {};
+  const AGENTS = { codex: '-a codex -m openai/gpt-6-luna', claude: '-a claude-code -m anthropic/claude-opus-5-5', oracle: '-a oracle' };
+  const st = { set: '', mode: '', bench: '', agent: 'codex' };
+  const parts = () => [['base', 'harbor run'], ['set', st.set ? '--all' : ''], ['mode', st.mode ? `--${st.mode}` : ''],
+    ['bench', st.bench ? `-p tasks/${st.bench}` : ''], ['agent', AGENTS[st.agent]]].filter(([, t]) => t);
   const command = () => parts().map(([, t]) => t).join(' ');
   const tally = () => {
-    const ids = SCOPES[st.scope]?.ids;
-    const pool = suites.filter((s) => !ids || ids.includes(s.id));
+    const pool = st.bench ? [st.bench] : Object.keys(F);
     const modes = st.mode ? [st.mode] : ['privileged', 'standard', 'standard-realtime'];
-    const n = pool.reduce((a, s) => a + modes.reduce((b, m) => b + (s.modes?.[m] || 0), 0), 0);
-    return { n, k: pool.filter((s) => modes.some((m) => s.modes?.[m])).length, modes };
+    // tasks (a scene with all its modes); with a mode chosen, the tasks that have that mode
+    const i = st.set ? 1 : 0;
+    const at = (f) => (st.mode ? F[f]?.modes?.[st.mode] : F[f]?.tasks) || [0, 0];
+    const n = pool.reduce((a, f) => a + at(f)[i], 0);
+    const tests = pool.reduce((a, f) => a + modes.reduce((b, m) => b + (F[f]?.modes?.[m] || [0, 0])[i], 0), 0);
+    return { n, tests, k: pool.filter((f) => at(f)[i]).length, modes };
   };
   const opt = (g, v, label, note) => `<button type="button" class="ol-opt" data-g="${g}" data-v="${v}" aria-pressed="false"><b>${label}</b><small>${note}</small></button>`;
   const dlg = document.createElement('div');
@@ -1341,30 +1344,29 @@ function oneLine(opener, ex) {
           <button type="button" class="ol-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg><span>Copy</span></button></div>
         <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
       <div class="ol-groups">
-        <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'standard-realtime', 'Real-time', 'RoboOlympics')}</div>
-        <div class="ol-g"><span class="ol-k">Questions</span>${opt('scope', 'humanoid', 'Humanoids', 'HumanoidBench, RoboCasa-GR1')}${opt('scope', 'rc365', 'RoboCasa365', 'mobile kitchens')}</div>
-        <div class="ol-g"><span class="ol-k">Agent</span>${opt('agent', 'claude', 'Claude Code', 'Opus 5.5')}${opt('k', '1', 'Three attempts', 'pass@3')}</div>
+        <div class="ol-g"><span class="ol-k">Tasks</span>${opt('set', 'all', 'Every task', '--all, not only the core set')}${opt('bench', 'roboarc', 'RoboARC', '-p tasks/roboarc')}${opt('bench', 'robocasa365', 'RoboCasa365', '-p tasks/robocasa365')}</div>
+        <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'standard-realtime', 'Real-time', 'a clock that does not stop')}</div>
+        <div class="ol-g"><span class="ol-k">Agent</span>${opt('agent', 'claude', 'Claude Code', 'Opus 5.5')}${opt('agent', 'oracle', 'Reference solution', '-a oracle')}</div>
       </div></div>`;
   document.body.append(dlg);
   const card = $('.ol-card', dlg), cmdEl = $('.cmd', dlg), outEl = $('.out', dlg), copy = $('.ol-copy', dlg);
   const out = () => {
     const t = tally();
-    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> questions · ${t.k} suite${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
-      + `<span class="ok">▸</span> each answer marked by a fresh simulator${st.k ? ', <b>3 attempts</b> each' : ''}`;
+    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${st.set ? '' : ' of the core set'} · ${t.k} benchmark${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
+      + `<span class="ok">▸</span> ${st.agent === 'oracle' ? 'the reference solutions, marked like any answer' : 'each answer marked by a fresh simulator'}`;
   };
   let prev = {};
   const show = (changed) => {
     cmdEl.innerHTML = parts().map(([key, t]) => `<span class="${key === 'base' ? 'b' : 'arg'}${key === changed || (changed && prev[key] !== t && key !== 'base') ? ' new' : ''}">${esc(t)}</span>`).join(' ');
     prev = Object.fromEntries(parts());
     out();
-    $$('.ol-opt', dlg).forEach((b) => b.setAttribute('aria-pressed', String(st[b.dataset.g] === b.dataset.v || (b.dataset.g === 'k' && !!st.k))));
+    $$('.ol-opt', dlg).forEach((b) => b.setAttribute('aria-pressed', String(st[b.dataset.g] === b.dataset.v)));
   };
   $$('.ol-opt', dlg).forEach((b) => b.addEventListener('click', () => {
     const g = b.dataset.g;
-    if (g === 'agent') st.agent = st.agent === 'claude' ? 'codex' : 'claude';
-    else if (g === 'k') st.k = st.k ? '' : '1';
+    if (g === 'agent') st.agent = st.agent === b.dataset.v ? 'codex' : b.dataset.v;
     else st[g] = st[g] === b.dataset.v ? '' : b.dataset.v;
-    show(g === 'scope' || g === 'mode' ? 'pick' : g);
+    show(g);
   }));
   copy.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(command()); } catch { return; }
@@ -1507,7 +1509,7 @@ function gallery(el, ex) {
     const cover = coverOf(s);
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${cropFor(s.id, cover.task) ? ` class="${cropFor(s.id, cover.task)}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
     return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}"><div class="img">${img}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
-      <span>${int(s.instances)} scenes · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
+      <span>${int(s.instances)} tasks · ${esc(ex.bodies?.[s.body] || '')}</span></a>`;
   });
   el.innerHTML = items.join('');
 }
@@ -1523,11 +1525,11 @@ async function home(ex) {
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   const sh = ex.leaderboard?.shared;
-  if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard questions that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
+  if (sh) $('#bars-note').innerHTML = `Head to head on the ${int(sh.trials.privileged)} privileged and ${int(sh.trials.standard)} standard tests of the core set that every ranked model sat. <a href="${exam('leaderboard/')}">Full leaderboard, per suite and per trial →</a>`;
   gallery($('#gallery'), ex);
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=50ce7d17').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
-  import('./sphere.js?v=bbdaf9c2').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=0f3e018c').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./sphere.js?v=481d5d3f').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
 async function leaderboardPage(ex) {
@@ -1571,7 +1573,7 @@ async function suitePage(ex) {
   const facts = [
     ['Origin', isOurs(s) ? 'built by the exam’s team, released with the exam' : s.origin === 'ours' ? 'built by the lab' : `adapted from the upstream benchmark${s.edition ? ` (${esc(s.edition)})` : ''}`],
     ['Simulator', esc(s.simulator || '')], ['Robot', robots],
-    ['Scenes', `${int(s.instances)} scenes`],   // no count per mode (owners, 2026-10-18)
+    ['Tasks', tasksTests(s.instances, s.task_dirs)],   // tasks, then tests; no count per mode (owners, 2026-10-18/19)
     ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
     ['Agent time', (s.budgets_min || []).map((b) => `${b} min`).join(', ')],
   ].filter(([, v]) => v);
@@ -1598,18 +1600,18 @@ async function suitePage(ex) {
     const reset = r.standard_reset?.done ? ` · <span class="rs">+${r.standard_reset.done} with resets, not counted</span>` : '';
     const part = !sv[1];
     return lbhRow(run, { standard: sv[1] ? sv : null, privileged: pv[1] ? pv : null }, part ? 0 : ++place, best,
-      { part, still: true, meta: `${int(pv[1] + sv[1])} questions${reset}` });
+      { part, still: true, meta: `${int(pv[1] + sv[1])} tests${reset}` });
   }).join('')}</div></div><p class="lbh-hint">Everything each model sat in this suite. For a like-for-like comparison, see the <a class="link" href="${exam('leaderboard/')}">leaderboard</a>.</p>`
     : '<div class="empty-state">No model has sat this suite yet.</div>';
   const tasks = (await loadTasks()).filter((t) => t.suite === s.id);
-  $('#suite-tasks-count').textContent = `${int(tasks.length)} scene${tasks.length === 1 ? '' : 's'}`;
+  $('#suite-tasks-count').textContent = tasksTests(tasks.length, tasks.reduce((n, t) => n + (t.modes?.length || 0), 0));
   taskBrowser($('#tasks'), ex, tasks, { suite: s.id });
 }
 
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=50ce7d17').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=0f3e018c').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
@@ -1626,7 +1628,7 @@ async function tasksPage(ex) {
 async function contributePage(ex) {
   const c = ex.contribute || {};
   const t = ex.totals || {};
-  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'questions']]);
+  iconNumbers($('#c-figures'), [['layers', t.suites, 'suites in the exam'], ['arm', t.robots, 'robots'], ['doc', t.instances, 'tasks', `${int(t.task_dirs)} tests`]]);
   $$('[data-doc]').forEach((a) => {
     if (c.docs) { a.href = c.docs + a.dataset.doc; return; }
     // no public documents yet: cards keep their place on this page, inline mentions become plain text

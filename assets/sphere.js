@@ -5,7 +5,7 @@
  * homeSphere(el, ex): el is the empty #sphere box, ex is data/exam.json. data/atlas.json and data/tasks.json are fetched
  * only when the box comes near the viewport. */
 
-const STYLE = new URL('./sphere.css?v=ae7b4a80', import.meta.url);
+const STYLE = new URL('./sphere.css?v=24d0854b', import.meta.url);
 const DATA = (p) => new URL(`../${p}`, import.meta.url).href;
 const PAGE = (p) => new URL(`../${p}`, import.meta.url).href;
 const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal', 'aerial'];
@@ -160,11 +160,15 @@ function bestSide(D) {
 }
 
 function build(el, ex, atlas, tasks, set = 'all') {
-  // the core set (main's easy_set.toml left out: the easy set is reported apart) or every task
-  const isCore = (a) => !a.easy;
-  const nAll = Object.values(atlas.tasks || {}).filter((a) => Array.isArray(a.xyz)).length;
-  const nCore = Object.values(atlas.tasks || {}).filter((a) => Array.isArray(a.xyz) && isCore(a)).length;
-  const A = set === 'core' ? { ...atlas, tasks: Object.fromEntries(Object.entries(atlas.tasks || {}).filter(([, a]) => isCore(a))) } : atlas;
+  // the core set (the repository's docs/core_set.toml, marked on each question by the exam data) or every task; the
+  // counts are questions as the repository's README counts them, one per task dir (a scene in one mode), the dots scenes
+  const setOf = new Map((tasks || []).map((t) => [`${t.suite}/${t.id}`, t]));
+  const coreModes = (t) => (t && t.core && t.core !== '-' ? t.core.length : 0);
+  const isCore = (k, a) => { const t = setOf.get(k); return t ? coreModes(t) > 0 : !a.easy; };
+  // tasks: one scene with all its modes (owners, 2026-10-19), in the core set when any mode is
+  const nAll = (tasks || []).length;
+  const nCore = (tasks || []).filter((t) => coreModes(t) > 0).length;
+  const A = set === 'core' ? { ...atlas, tasks: Object.fromEntries(Object.entries(atlas.tasks || {}).filter(([k, a]) => isCore(k, a))) } : atlas;
   const D = prepare(ex, A, tasks);
   const { N, P, rec, modes, regions } = D;
   if (!N) return;
@@ -174,8 +178,8 @@ function build(el, ex, atlas, tasks, set = 'all') {
   /* ---------- markup ---------- */
   const setEl = el$('div', 'seg sph-set');
   setEl.setAttribute('role', 'group'); setEl.setAttribute('aria-label', 'Which tasks');
-  setEl.innerHTML = `<button type="button" data-set="all" class="${set === 'all' ? 'on' : ''}">All set <i>${int(nAll)}</i></button>`
-    + `<button type="button" data-set="core" class="${set === 'core' ? 'on' : ''}" title="The core set: the tasks the headline counts; the easy set is reported apart">Core set <i>${int(nCore)}</i></button>`;
+  setEl.innerHTML = `<button type="button" data-set="all" class="${set === 'all' ? 'on' : ''}">All set <i>${int(nAll)}</i><small class="sph-tests">${int((tasks || []).reduce((n, t) => n + (t.modes?.length || 0), 0))} tests</small></button>`
+    + `<button type="button" data-set="core" class="${set === 'core' ? 'on' : ''}" title="The core set: the tasks the headline counts">Core set <i>${int(nCore)}</i><small class="sph-tests">${int((tasks || []).reduce((n, t) => n + coreModes(t), 0))} tests</small></button>`;
   setEl.addEventListener('click', (e) => {
     const b = e.target.closest('[data-set]');
     if (!b || b.dataset.set === set) return;
@@ -183,7 +187,7 @@ function build(el, ex, atlas, tasks, set = 'all') {
     build(el, ex, atlas, tasks, b.dataset.set);
   });
   const total = el$('p', 'sph-total');
-  total.append(el$('b', null, int(N)), el$('span', null, set === 'core' ? 'core tasks, each a dot; the easy set is counted apart. Near dots are similar tasks.' : 'tasks, each a dot. Near dots are similar tasks.'));
+  total.append(el$('b', null, int(N)), el$('span', null, `${set === 'core' ? 'core tasks' : 'tasks'}, each a dot. Near dots are similar tasks.`));
   const modesEl = el$('div', 'sph-modes');
   modesEl.setAttribute('role', 'group'); modesEl.setAttribute('aria-label', 'Colour the dots by');
   modesEl.appendChild(el$('p', 'label', 'Colour by'));

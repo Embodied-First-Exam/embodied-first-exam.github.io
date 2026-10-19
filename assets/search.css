@@ -120,3 +120,5 @@ button.ts-c:hover { border-color: var(--ink); }
 .ts-filters select.ts-more { display: none; }
 .ts-filters.more select.ts-more { display: block; }
 .ts-moreb { flex: none; }
+
+.ts-set .ts-tests { margin-left: 6px; font: 500 11px/1 var(--mono); opacity: .65; }
