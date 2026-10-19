@@ -593,7 +593,28 @@ function clips() {
   });
 }
 
+/** In-text citations: a small card with the full reference on hover or focus. */
+function refs() {
+  let card = null;
+  const show = (a) => {
+    const items = (a.dataset.refs || '').split(',').map((n) => document.getElementById(`ref-${n}`)).filter(Boolean);
+    if (!items.length) return;
+    card ??= Object.assign(document.createElement('div'), { className: 'ref-card' });
+    card.innerHTML = items.map((li) => `<p>${li.innerHTML}</p>`).join('');
+    document.body.append(card);
+    const r = a.getBoundingClientRect(), w = card.offsetWidth;
+    card.style.left = `${Math.max(16, Math.min(scrollX + r.left - w / 2, scrollX + innerWidth - w - 16))}px`;
+    card.style.top = `${scrollY + r.bottom + 8}px`;
+  };
+  const hide = () => card?.remove();
+  $$('sup.ref a').forEach((a) => {
+    a.addEventListener('mouseenter', () => show(a)); a.addEventListener('focus', () => show(a));
+    a.addEventListener('mouseleave', hide); a.addEventListener('blur', hide);
+  });
+}
+
 const settle = findings();
+refs();
 Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json'), getJSON('data/atlas.json')]).then(([ex, tasks, b, atlas]) => {
   const R = compute(ex, tasks, b, atlas);
   fill(R.S);

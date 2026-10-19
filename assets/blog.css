@@ -573,3 +573,21 @@ table.heat td.hi { color: #fff; }
 
 /* each finding: its one-sentence summary, shown even when the finding is folded */
 .finding-sum { margin: -4px 0 14px !important; color: var(--ink-2, var(--ink)); font-size: 16px; line-height: 1.55; }
+
+/* in-text citations: small superscript numbers with a hover card; the reference list */
+sup.ref { font: 600 .68em/0 var(--mono); vertical-align: super; margin-left: 1px; white-space: nowrap; }
+sup.ref a { color: var(--accent, var(--std)); text-decoration: none; padding: 0 1px; border-radius: 3px; }
+sup.ref a:hover, sup.ref a:focus-visible { background: color-mix(in srgb, var(--accent, var(--std)) 14%, transparent); }
+.ref-card { position: absolute; z-index: 50; max-width: min(380px, calc(100vw - 32px)); padding: 10px 12px; border-radius: 10px;
+  background: var(--bg, #fff); border: 1px solid var(--line, #d9dee5); box-shadow: 0 8px 28px rgba(0,0,0,.14);
+  font: 400 13px/1.5 var(--body); color: var(--ink); pointer-events: none; }
+.ref-card p { margin: 0 !important; } .ref-card p + p { margin-top: 6px !important; }
+.ref-card .rf-t { font-weight: 600; color: var(--ink); }
+ol.refs { padding-left: 1.6em; font-size: 14.5px; line-height: 1.55; }
+ol.refs li { margin: 0 0 8px; padding-left: 4px; scroll-margin-top: 90px; }
+ol.refs li::marker { font: 600 12px var(--mono); color: var(--ink-3); }
+ol.refs .rf-a { color: var(--ink-2, var(--ink)); }
+ol.refs .rf-t { font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line, #d9dee5); }
+ol.refs .rf-t:hover { border-bottom-color: currentColor; }
+ol.refs .rf-v { color: var(--ink-3); font-style: italic; }
+ol.refs li:target { background: color-mix(in srgb, var(--accent, var(--std)) 10%, transparent); border-radius: 6px; }

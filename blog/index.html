@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=4f7eb15d">
+<link rel="stylesheet" href="../assets/blog.css?v=e6d6e27f">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=79f6671b"></script>
-<script type="module" src="../assets/blog.js?v=4c1416f4"></script>
+<script type="module" src="../assets/blog.js?v=af7a8bc9"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -55,8 +55,8 @@
 
     <!-- ===================================================================================== 1 -->
     <h2 id="motivation" data-short="Motivation"><span class="num">01</span>Motivation</h2>
-    <p>Code agents now handle a wide range of software work. They resolve issues in real repositories [<a class="cite" href="#ref-1">1</a>], complete hard tasks in the terminal [<a class="cite" href="#ref-2">2</a>] and write efficient GPU kernels [<a class="cite" href="#ref-3">3</a>]. All of these exams, however, take place in the digital world. Robots remain largely outside the reach of code agents: a robot behavior today comes either from a policy trained on many demonstrations, such as a vision-language-action model [<a class="cite" href="#ref-4">4</a>, <a class="cite" href="#ref-5">5</a>, <a class="cite" href="#ref-6">6</a>], or from a controller that an engineer writes, tunes and debugs for one robot and one task.</p>
-    <p>The second route is, to a large extent, software engineering. The engineer reads the interface of the robot, writes a controller, runs it, observes what happens and revises the code. Prior work has shown that language models can write short robot programs from instructions [<a class="cite" href="#ref-7">7</a>]; a code agent can go further and carry out the whole loop. If it succeeds, any robot that exposes a programming interface could acquire a new behavior from a plain-language instruction, with no new demonstrations and no engineer in the loop (Figure 2).</p>
+    <p>Code agents now handle a wide range of software work. They resolve issues in real repositories<sup class="ref"><a href="#ref-1" data-refs="1">1</a></sup>, complete hard tasks in the terminal<sup class="ref"><a href="#ref-2" data-refs="2">2</a></sup> and write efficient GPU kernels<sup class="ref"><a href="#ref-3" data-refs="3">3</a></sup>. All of these exams, however, take place in the digital world. Robots remain largely outside the reach of code agents: a robot behavior today comes either from a policy trained on many demonstrations, such as a vision-language-action model<sup class="ref"><a href="#ref-4" data-refs="4,5,6">4–6</a></sup>, or from a controller that an engineer writes, tunes and debugs for one robot and one task.</p>
+    <p>The second route is, to a large extent, software engineering. The engineer reads the interface of the robot, writes a controller, runs it, observes what happens and revises the code. Prior work has shown that language models can write short robot programs from instructions<sup class="ref"><a href="#ref-7" data-refs="7">7</a></sup>; a code agent can go further and carry out the whole loop. If it succeeds, any robot that exposes a programming interface could acquire a new behavior from a plain-language instruction, with no new demonstrations and no engineer in the loop (Figure 2).</p>
     <figure class="fig">
       <div class="cards">
         <div class="card muted"><span class="k">Today</span><h4>Train a policy</h4><p>Learns from many demonstrations. Good at the skills it was trained on, but a new task needs new data.</p></div>
@@ -440,13 +440,13 @@
 
     <h3 id="references">References</h3>
     <ol class="refs">
-      <li id="ref-1">C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press and K. Narasimhan. SWE-bench: Can Language Models Resolve Real-World GitHub Issues? ICLR, 2024.</li>
-      <li id="ref-2">M. A. Merrill, A. G. Shaw, et al. Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces. ICLR, 2026.</li>
-      <li id="ref-3">A. Ouyang, S. Guo, S. Arora, A. L. Zhang, W. Hu, C. Ré and A. Mirhoseini. KernelBench: Can LLMs Write Efficient GPU Kernels? ICML, 2025.</li>
-      <li id="ref-4">A. Brohan et al. RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control. CoRL, 2023.</li>
-      <li id="ref-5">M. J. Kim et al. OpenVLA: An Open-Source Vision-Language-Action Model. CoRL, 2024.</li>
-      <li id="ref-6">K. Black et al. π0: A Vision-Language-Action Flow Model for General Robot Control. arXiv:2410.24164, 2024.</li>
-      <li id="ref-7">J. Liang, W. Huang, F. Xia, P. Xu, K. Hausman, B. Ichter, P. Florence and A. Zeng. Code as Policies: Language Model Programs for Embodied Control. ICRA, 2023.</li>
+      <li id="ref-1"><span class="rf-a">C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press and K. Narasimhan.</span> <a class="rf-t" href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</a> <span class="rf-v">ICLR 2024.</span></li>
+      <li id="ref-2"><span class="rf-a">M. A. Merrill, A. G. Shaw, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2601.11868" target="_blank" rel="noopener">Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces</a> <span class="rf-v">ICLR 2026.</span></li>
+      <li id="ref-3"><span class="rf-a">A. Ouyang, S. Guo, S. Arora, A. L. Zhang, W. Hu, C. Ré and A. Mirhoseini.</span> <a class="rf-t" href="https://arxiv.org/abs/2502.10517" target="_blank" rel="noopener">KernelBench: Can LLMs Write Efficient GPU Kernels?</a> <span class="rf-v">ICML 2025.</span></li>
+      <li id="ref-4"><span class="rf-a">A. Brohan et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2307.15818" target="_blank" rel="noopener">RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control</a> <span class="rf-v">CoRL 2023.</span></li>
+      <li id="ref-5"><span class="rf-a">M. J. Kim et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2406.09246" target="_blank" rel="noopener">OpenVLA: An Open-Source Vision-Language-Action Model</a> <span class="rf-v">CoRL 2024.</span></li>
+      <li id="ref-6"><span class="rf-a">K. Black et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2410.24164" target="_blank" rel="noopener">π0: A Vision-Language-Action Flow Model for General Robot Control</a> <span class="rf-v">arXiv 2024.</span></li>
+      <li id="ref-7"><span class="rf-a">J. Liang, W. Huang, F. Xia, P. Xu, K. Hausman, B. Ichter, P. Florence and A. Zeng.</span> <a class="rf-t" href="https://arxiv.org/abs/2209.07753" target="_blank" rel="noopener">Code as Policies: Language Model Programs for Embodied Control</a> <span class="rf-v">ICRA 2023.</span></li>
     </ol>
 
     <h3 id="cite">Data and citation</h3>
