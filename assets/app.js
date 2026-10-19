@@ -541,11 +541,15 @@ function renameSuites(sum) {
 let runSummaryP;
 const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
-// runs the owners took off the site (GPT-6 Luna's, 2026-10-19): not listed, not counted as a setting, not watched
+// runs the owners took off the leaderboard (GPT-6 Luna's, 2026-10-19): never ranked; their runs are not listed, not
+// counted as a setting and not watched, except the solved runs of SOLVED_RUNS_SHOWN
 const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
-const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
+// of those, the runs whose solved runs can be watched, on every task of the All set (owner, 2026-10-19: GPT-6 Luna's
+// successes); their unsolved runs stay hidden. Keep in step with SOLVED_ONLY_RUNS in the runs index builder.
+const SOLVED_RUNS_SHOWN = new Set(['codex-gpt6_luna-xhigh']);
+const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run) || (SOLVED_RUNS_SHOWN.has(r.run) && (r.success === 1 || r.state === 'success')));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
-  for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
+  for (const id of HIDDEN_RUNS) if (d.settings && !SOLVED_RUNS_SHOWN.has(id)) delete d.settings[id];
   if (d.runs) d.runs = shown(d.runs).map(siteNow);
   if (d.v >= 2) return splitSuites(renameSuites(d));
   const by = {}, settings = {};
@@ -592,6 +596,7 @@ const watchable = (suite) => {
   if (!watchP.has(suite)) watchP.set(suite, runShard(suite).then((rows) => {
     const m = new Map();
     for (const r of rows) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
+    for (const v of m.values()) v.sort((a, b) => SOLVED_RUNS_SHOWN.has(a.run) - SOLVED_RUNS_SHOWN.has(b.run));   // unranked runs last
     return m;
   }).catch((e) => { console.warn('runs', suite, e); watchP.delete(suite); return Object.assign(new Map(), { failed: true }); }));
   return watchP.get(suite);
