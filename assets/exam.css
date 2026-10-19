@@ -1336,6 +1336,7 @@ code.fx-sim { background: var(--surface); }
 .lbh-res.lbh-rh span { display: inline-flex; align-items: center; gap: 7px; }
 .lbh-res.lbh-rh .sw { width: 16px; }
 .lbh-res .mk { width: 26px; height: 26px; background: var(--bg-2); }
+.unranked-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border: 1px solid var(--line-2); border-radius: 999px; font: 500 9.5px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); vertical-align: 2px; }
 .lbh-v { justify-self: start; padding: 4px 10px; border-radius: 6px; font: 600 11px/1 var(--mono); white-space: nowrap; color: var(--ink-3); border: 1px solid var(--line-2); }
 .lbh-v.na { border: 0; padding-left: 4px; }
 .lbh-v.S.s { background: var(--ink); border-color: var(--ink); color: var(--bg); }

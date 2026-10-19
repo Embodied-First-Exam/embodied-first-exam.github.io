@@ -51,7 +51,10 @@ const pctText = (s, n) => (n ? `${Math.round((100 * s) / n)}%` : '–');
 
 let examData, taskData;
 const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
-const loadExam = () => (examData ??= getJSON('data/exam.json'));
+// runs listed but not ranked (exam.json unranked_runs; GPT-6 Luna, owners, 2026-10-19): their per-task results are in
+// tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them
+const UNRANKED_RUNS = new Set(['codex-gpt6_luna-xhigh']);
+const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
 /* ------------------------------------------------------------------------------------------- page chrome */
@@ -486,7 +489,7 @@ const dotsKey = () => `<p class="dots-key"><span class="dk-lab">Squares</span> E
   <span class="dk"><i class="S p"></i>privileged</span> <span class="dk"><i class="S s"></i>standard</span> <span class="dk"><i class="S t"></i>standard (real-time)</span> <span class="dk"><i class="F"></i>not solved</span> <span class="dk"><i class="none"></i>not run</span>.</p>`;
 /** The ranked runs, best first in the Core setting; hidden runs left out. */
 function boardRuns(ex) {
-  const ids = (ex.leaderboard?.shared?.runs || []).filter((id) => !HIDDEN_RUNS.has(id));
+  const ids = (ex.leaderboard?.shared?.runs || []).filter((id) => !HIDDEN_RUNS.has(id) && !UNRANKED_RUNS.has(id));
   const sc = ex.leaderboard?.shared?.views?.core?.scores || {};
   const v = (id) => (sc[id]?.[1] ? sc[id][0] / sc[id][1] : 0);
   return ex.runs.filter((r) => ids.includes(r.id)).sort((a, b) => v(b.id) - v(a.id));
@@ -541,15 +544,12 @@ function renameSuites(sum) {
 let runSummaryP;
 const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
-// runs the owners took off the leaderboard (GPT-6 Luna's, 2026-10-19): never ranked; their runs are not listed, not
-// counted as a setting and not watched, except the solved runs of SOLVED_RUNS_SHOWN
-const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
-// of those, the runs whose solved runs can be watched, on every task of the All set (owner, 2026-10-19: GPT-6 Luna's
-// successes); their unsolved runs stay hidden. Keep in step with SOLVED_ONLY_RUNS in the runs index builder.
-const SOLVED_RUNS_SHOWN = new Set(['codex-gpt6_luna-xhigh']);
-const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run) || (SOLVED_RUNS_SHOWN.has(r.run) && (r.success === 1 || r.state === 'success')));
+// runs the owners took off the site: not listed, not counted as a setting, not watched (none since 2026-10-19: GPT-6 Luna
+// is listed with all its runs, every task of the All set, and only kept out of the rankings, UNRANKED_RUNS)
+const HIDDEN_RUNS = new Set();
+const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
-  for (const id of HIDDEN_RUNS) if (d.settings && !SOLVED_RUNS_SHOWN.has(id)) delete d.settings[id];
+  for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
   if (d.runs) d.runs = shown(d.runs).map(siteNow);
   if (d.v >= 2) return splitSuites(renameSuites(d));
   const by = {}, settings = {};
@@ -596,7 +596,7 @@ const watchable = (suite) => {
   if (!watchP.has(suite)) watchP.set(suite, runShard(suite).then((rows) => {
     const m = new Map();
     for (const r of rows) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
-    for (const v of m.values()) v.sort((a, b) => SOLVED_RUNS_SHOWN.has(a.run) - SOLVED_RUNS_SHOWN.has(b.run));   // unranked runs last
+    for (const v of m.values()) v.sort((a, b) => UNRANKED_RUNS.has(a.run) - UNRANKED_RUNS.has(b.run));   // unranked runs last
     return m;
   }).catch((e) => { console.warn('runs', suite, e); watchP.delete(suite); return Object.assign(new Map(), { failed: true }); }));
   return watchP.get(suite);
@@ -609,7 +609,8 @@ function openTask(ex, t, runs) {
   if (m.video) media = `<div class="media"><video src="${esc(site(m.video))}" ${m.poster ? `poster="${esc(site(m.poster))}"` : ''} controls muted loop autoplay playsinline></video><span class="note">demo</span></div>`;
   else if (m.watch) media = `<div class="media">${m.poster ? `<img src="${esc(site(m.poster))}" alt="">` : ''}<span class="note"><a href="${esc(m.watch)}" target="_blank" rel="noopener">watch the official demo ↗</a></span></div>`;
   else if (m.poster) media = `<div class="media"><img src="${esc(site(m.poster))}" alt=""><span class="note">${m.still ? 'the scene the task starts from' : 'preview'}</span></div>`;
-  const allRuns = ex.runs.filter((r) => t.results?.[r.id]);
+  const allRuns = [...ex.runs.filter((r) => t.results?.[r.id]),
+    ...(ex.unranked_runs || []).filter((r) => t.results?.[r.id]).map((r) => ({ ...r, unranked: true }))];
   // one row per model, as the ranked rows: its maker's mark, then each mode's verdict, standard in ink, privileged grey hatched
   // a column per mode the task has: standard, standard-realtime, privileged (owners, 2026-10-19)
   const RK = { standard: 's', 'standard-realtime': 't', privileged: 'p' };
@@ -621,7 +622,7 @@ function openTask(ex, t, runs) {
       const cls = c.r ? 'rs' : c.s === 'S' ? `S ${RK[mode]}` : c.s;
       return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
     };
-    return `<div class="lbh-res">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
+    return `<div class="lbh-res${r.unranked ? ' unranked' : ''}">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}${r.unranked ? ' <span class="unranked-tag" title="Not ranked: the screening run that chose the core set. It counts in no ranking or score.">not ranked</span>' : ''}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
   }).join('');
   const facts = [
     ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}?id=${s.id}">${esc(s.name)}</a>`],
@@ -683,7 +684,7 @@ function drawerShell() {
 
 /** A task's results over every model: 'solved' (by some model), 'unsolved' (graded, never solved) or 'unrun'. */
 function resultOf(t) {
-  const cells = Object.values(t.results || {}).flatMap((r) => Object.values(r).map(scored));
+  const cells = Object.entries(t.results || {}).filter(([id]) => !UNRANKED_RUNS.has(id)).flatMap(([, r]) => Object.values(r).map(scored));
   return cells.includes('S') ? 'solved' : cells.some((c) => GRADED.has(c)) ? 'unsolved' : 'unrun';
 }
 
