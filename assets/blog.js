@@ -162,11 +162,25 @@ function compute(ex, tasks, b, atlas) {
   const train = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.train || 0), 0), sampled = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.n || 0), 0);
   const tot = ex.totals;
   const oracle = (k) => tasks.filter((t) => t.oracle === k).length;
+  // Overall results: the Core view by task type (mean of the three strongest) and by suite (who leads)
+  const ttLab = (x) => (atlas?.taxonomy?.tt?.[x] || x);
+  const byT = {};
+  for (const x of CORE) for (const k of ttOf(x[0])) (byT[k] ??= []).push(x);
+  const tRank = Object.entries(byT).map(([k, L]) => ({ k, n: L.length, m: mean3(L) / (3 * L.length), a: solved(L, TOP[0]) / L.length,
+    o: Math.max(solved(L, TOP[1]), solved(L, TOP[2])) / L.length })).sort((x, y) => y.m - x.m);
+  const LOW = { 'deformable-fluid': 'deformable objects and fluids', locomotion: 'locomotion', 'precision-contact': 'precise contact', navigation: 'navigation and search' };
+  const low = (k) => LOW[k] || ttLab(k).toLowerCase().replace(/ & /g, ' and ');
+  const edge = [...tRank].sort((x, y) => (y.a - y.o) - (x.a - x.o)).slice(0, 2);
+  const bySuite = {};
+  for (const x of CORE) (bySuite[x[0].suite] ??= []).push(x);
+  const suiteRows = Object.values(bySuite).filter((L) => L.length >= MIN_BENCH);
+  const leads = (r) => suiteRows.filter((L) => runs.every((o) => solved(L, o) <= solved(L, r))).length;
   const S = {
     tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots), simulators: int(tot.simulators),
     core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs), default_run: int(tot.default_run),
     core_p: int(coreModes('p')), core_s: int(coreModes('s')), core_t: int(coreModes('t')),
     oracle_full: int(oracle('full')), oracle_partial: int(oracle('partial')), oracle_none: int(oracle('none')),
+    n_runs_lc: ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][runs.length] || int(runs.length),
     n_runs_word: ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'][runs.length] || int(runs.length),
     np: int(M.p.length), ns_only: int(M.s.length), nt: int(M.t.length), ns: int(LB.length),
     best: board[0].name, best_s: `${int(board[0].s)}/${int(LB.length)}`, best_s_pct: P(board[0].s, LB.length),
@@ -232,10 +246,13 @@ function compute(ex, tasks, b, atlas) {
     // Finding 6: closed-loop programs among all sampled standard-realtime attempts; the kinds of privileged program
     ap_t_closed_all: kinds.t && mix.t ? Q(kinds.t.closed, mix.t.n) : null,
     ap_p_kinds: kinds.p ? `${int(kinds.p.closed)} closed-loop, ${int(kinds.p.open)} open-loop and ${int(kinds.p.search)} parameter searches` : null,
-    views_note: sameOrderCore ? 'the top three keep the same order in each of them' : 'the order of the top three changes between them',
+    types_best: low(tRank[0].k), types_worst: list(tRank.slice(-2).reverse().map((x) => low(x.k))),
+    types_edge: list(edge.map((x) => `${low(x.k)} (${pct(x.a * x.n, x.n)}% against at most ${pct(x.o * x.n, x.n)}% for the other two)`)),
+    suites_n: int(suiteRows.length), suites_astra: int(leads(TOP[0])), suites_opus: int(leads(TOP[1])), suites_argon: int(leads(TOP[2])),
+    views_note: sameOrderCore ? 'The three keep this order in all four views' : 'The order of the three changes between views',
   };
   return { S, M: { ...M, c: CORE }, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
-    none3, mean3, name, short, ok, solved, flash };
+    none3, mean3, name, short, ok, solved, flash, ttOf, ttLab: (x) => atlas?.taxonomy?.tt?.[x] || x, suiteName };
 }
 
 function fill(S) {
@@ -258,25 +275,77 @@ const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</su
 const frac = (a, n) => `${int(a)}/${int(n)}`;
 const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The three Flash-class models</span></div>`;
 
-/** Overall results (the analysis's figure 1.1, with the leaderboard's Core view added first): each agent's share of the
- *  Core view's tests and of all the core tests of each setting, one block per view, the three strongest in their colours,
- *  the Flash-class models in grey. */
+/* Overall results: every agent in its own colour, the three Flash-class models in three greys */
+const FLASH_O = [1, 0.62, 0.36];
+const colOf = (R, r) => (TOP.includes(r) ? { c: `var(${AG[r]})`, o: 1 } : { c: 'var(--flash)', o: FLASH_O[R.flash.indexOf(r)] ?? 1 });
+const legend6 = (R) => `<div class="legend">${R.order.map((r) => { const k = colOf(R, r);
+  return `<span><i class="sw" style="background:${k.c};opacity:${k.o}"></i>${esc(R.name(r))}</span>`; }).join('')}</div>`;
+
+/** Figure 7: grouped bars, one group per view (Core, then each setting), one bar per agent. */
 function figModes(el, R) {
-  const block = (k) => `<div class="hb"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(R.M[k].length)} tests</small></p>${R.order.map((r) => {
-    const s = R.solved(R.M[k], r), n = R.M[k].length;
-    return `<div class="hb-row${TOP.includes(r) ? '' : ' fl'}" title="${esc(`${R.name(r)} · ${MODE_LABEL[k].toLowerCase()}: ${s} of ${n} solved`)}"><span class="who">${esc(R.name(r))}</span>`
-      + `<span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${agc(r)})"></span></span><span class="val"><b>${pct(s, n)}%</b> ${frac(s, n)}</span></div>`;
-  }).join('')}</div>`;
-  const V = ['c', 'p', 's', 't'], lead = R.order[0];
-  // the sentence on top only says what holds in all four views
+  const V = ['c', 'p', 's', 't'], lead = R.order[0], N = R.order.length;
+  const W = 760, H = 300, L = 34, B = 46, T = 16, gw = (W - L - 8) / V.length, bw = Math.min(18, (gw - 22) / N), top = 80;
+  const y = (v) => T + (H - T - B) * (1 - v / top);
+  let svg = '';
+  for (let g = 0; g <= top; g += 20) svg += `<line x1="${L}" x2="${W - 4}" y1="${y(g)}" y2="${y(g)}" class="gl"/><text x="${L - 6}" y="${y(g) + 3.5}" class="ax" text-anchor="end">${g}%</text>`;
+  V.forEach((k, gi) => {
+    const n = R.M[k].length, x0 = L + gi * gw + (gw - N * bw - (N - 1) * 3) / 2;
+    R.order.forEach((r, i) => {
+      const s = R.solved(R.M[k], r), v = n ? (100 * s) / n : 0, x = x0 + i * (bw + 3), c = colOf(R, r);
+      svg += `<rect x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(0.5, y(0) - y(v))}" rx="2" style="fill:${c.c};opacity:${c.o}"><title>${esc(`${R.name(r)} · ${MODE_LABEL[k]}: ${s} of ${n} (${pct(s, n)}%)`)}</title></rect>`;
+      if (TOP.includes(r) || v >= 3) svg += `<text x="${x + bw / 2}" y="${y(v) - 4}" class="bv" text-anchor="middle">${pct(s, n)}</text>`;
+    });
+    svg += `<text x="${L + gi * gw + gw / 2}" y="${H - B + 18}" class="gx ${MODE_CLS[k]}" text-anchor="middle">${MODE_LABEL[k]}</text>`
+      + `<text x="${L + gi * gw + gw / 2}" y="${H - B + 33}" class="ax" text-anchor="middle">${int(n)} tests</text>`;
+  });
   const leads = V.every((k) => R.order.every((r) => R.solved(R.M[k], r) <= R.solved(R.M[k], lead)));
-  const flashLast = V.every((k) => Math.max(...R.flash.map((r) => R.solved(R.M[k], r))) < Math.min(...TOP.map((r) => R.solved(R.M[k], r))));
-  const say = leads && flashLast ? `In the Core view and in every setting, ${R.name(lead)} solves the most tests and the three Flash-class models the fewest.`
-    : leads ? `In the Core view and in every setting, ${R.name(lead)} solves the most tests.` : `${R.name(lead)} solves the most tests in the Core view.`;
-  el.innerHTML = head(say, 'Share of the core tests each agent solves: the Core view, then each setting',
-    'each bar is the share of a view’s tests that one agent solved; Core counts each core task once, in its default setting, and the other three count every core test of one setting. The verifier decides pass or fail.')
-    + agentLegend(R) + `<div class="hbs">${V.map(block).join('')}</div>`
+  el.innerHTML = head(leads ? `${R.name(lead)} leads in the Core view and in every setting, and every agent solves by far its largest share of tests in privileged mode.` : `${R.name(lead)} leads in the Core view.`,
+    'Success rate of each agent on the core set, in the Core view and in each setting',
+    'each bar is the share of a view’s tests that one agent solved (the number on top is the percentage). Core counts each core task once, in its default setting; the other three count every core test of one setting.')
+    + legend6(R) + `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Success rate by agent and setting">${svg}</svg></div>`
     + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
+}
+
+/** Figure 8: a radar of the Core view by task type, one outline per agent. */
+function figTypes(el, R) {
+  const by = {};
+  for (const [t, m] of R.M.c) for (const x of R.ttOf(t)) (by[x] ??= []).push([t, m]);
+  const axes = Object.entries(by).sort((a, z) => z[1].length - a[1].length).map(([x]) => x);
+  const val = (r, x) => (100 * R.solved(by[x], r)) / by[x].length;
+  const top = Math.max(10, Math.ceil(Math.max(...R.order.flatMap((r) => axes.map((x) => val(r, x)))) / 10) * 10);
+  const S = 460, cx = S / 2, cy = S / 2 + 4, rad = 150, n = axes.length;
+  const pt = (i, v) => { const a = -Math.PI / 2 + (2 * Math.PI * i) / n; return [cx + rad * (v / top) * Math.cos(a), cy + rad * (v / top) * Math.sin(a)]; };
+  let svg = '';
+  for (let g = 10; g <= top + 1e-9; g += 10) svg += `<polygon points="${axes.map((_, i) => pt(i, g).join(',')).join(' ')}" class="gl"/>`
+    + `<text x="${cx + 3}" y="${pt(0, g)[1] - 3}" class="ax">${Math.round(g)}%</text>`;
+  axes.forEach((x, i) => { const [ex, ey] = pt(i, top), [lx, ly] = pt(i, top * 1.17);
+    svg += `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" class="gl"/>`
+      + `<text x="${lx}" y="${ly}" class="rl" text-anchor="${Math.abs(lx - cx) < 8 ? 'middle' : lx > cx ? 'start' : 'end'}" dominant-baseline="middle">${esc(R.ttLab(x))}<tspan class="ax"> ${by[x].length}</tspan></text>`; });
+  [...R.order].reverse().forEach((r) => { const c = colOf(R, r), top3 = TOP.includes(r);
+    svg += `<polygon points="${axes.map((x, i) => pt(i, val(r, x)).join(',')).join(' ')}" style="stroke:${c.c};fill:${top3 ? c.c : 'none'};opacity:${c.o}" class="rp${top3 ? '' : ' fl'}"><title>${esc(R.name(r))}</title></polygon>`; });
+  el.innerHTML = head(`The three strongest agents do best on ${R.S.types_best} and worst on ${R.S.types_worst}.`,
+    'Success rate in the Core view by task type',
+    'each axis is one task type (with its number of core tasks; a task can have several types), and each outline is one agent. Further from the center is better.')
+    + legend6(R) + `<div class="chart radar"><svg viewBox="0 0 ${S} ${S}" role="img" aria-label="Success rate by task type">${svg}</svg></div>`
+    + numbers(['Task type', ...R.order.map((r) => esc(R.short(r)))], axes.map((x) => [`${esc(R.ttLab(x))} (${by[x].length})`, ...R.order.map((r) => `${Math.round(val(r, x))}%`)]));
+}
+
+const HEAT_NAME = (n) => n.replace(/^GPT-6 /, '').replace(/^Claude /, '').replace(/^Gemini 4 /, '').replace(/^Gemini 3\.8 Flash$/, 'Gem. Flash').replace(/ V4\.1 Flash$/, '').replace(/ 5\.3 Flash$/, '');
+/** Figure 9: a heatmap of the Core view, one row per suite (suites with fewer than MIN_BENCH core tasks together), one column per agent. */
+function figSuites(el, R) {
+  const g = {};
+  for (const [t, m] of R.M.c) (g[t.suite] ??= []).push([t, m]);
+  const big = Object.entries(g).filter(([, L]) => L.length >= MIN_BENCH), small = Object.entries(g).filter(([, L]) => L.length < MIN_BENCH);
+  const mean = (L) => TOP.reduce((a, r) => a + R.solved(L, r), 0) / (3 * L.length);
+  const rows = big.sort((a, z) => mean(z[1]) - mean(a[1]) || z[1].length - a[1].length).map(([id, L]) => [esc(R.suiteName[id] || id), L]);
+  if (small.length) rows.push([`Other suites <small>(${small.length})</small>`, small.flatMap(([, L]) => L)]);
+  const cell = (L, r) => { const s = R.solved(L, r), v = pct(s, L.length);
+    return `<td style="--v:${v}" class="${v >= 50 ? 'hi' : ''}" title="${esc(`${R.name(r)}: ${s} of ${L.length}`)}">${v}</td>`; };
+  el.innerHTML = head(`The leader changes from suite to suite: of the ${R.S.suites_n} suites with at least five core tasks, GPT-6 Astra leads or ties in ${R.S.suites_astra}, Claude Opus 5.5 in ${R.S.suites_opus} and Gemini 4 Argon in ${R.S.suites_argon}.`,
+    'Success rate in the Core view by suite and agent (%)',
+    'each row is a suite with its number of core tasks, sorted by the mean of the three strongest agents; deeper blue is higher. Suites with fewer than five core tasks are grouped as Other.')
+    + `<div class="tscroll"><table class="heat"><thead><tr><th>Suite</th>${R.order.map((r) => `<th title="${esc(R.name(r))}">${esc(HEAT_NAME(R.name(r)))}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(([nm, L]) => `<tr><th scope="row">${nm} <small>${L.length}</small></th>${R.order.map((r) => cell(L, r)).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 /** Finding 2 (the analysis's figure 1.2): a waffle per setting, each cell about 1% of the tests, coloured by which of the
@@ -535,7 +604,7 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
     kinds.textContent = Object.entries(c).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${(ex.bodies?.[k] || k).toLowerCase()} (${int(n)} tasks)`).join(', ');
     const nk = $('#body-kinds'); if (nk) nk.textContent = nw(Object.keys(c).length);
   }
-  const figs = { modes: figModes, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach };
+  const figs = { modes: figModes, types: figTypes, suites: figSuites, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
   // each figure's number before its caption
   $$('.fig-body[data-fig]').forEach((el) => $('.fig-cap', el)?.insertAdjacentHTML('afterbegin', `<b>Figure ${el.dataset.fig}.</b> `));

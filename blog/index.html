@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/exam.css?v=baf769d5">
-<link rel="stylesheet" href="../assets/blog.css?v=59559bfa">
+<link rel="stylesheet" href="../assets/blog.css?v=2c2fb761">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=99302ff4"></script>
-<script type="module" src="../assets/blog.js?v=8fa66074"></script>
+<script type="module" src="../assets/blog.js?v=4c1416f4"></script>
 </head>
 <body data-page="blog">
 <div id="nav"></div>
@@ -23,7 +23,6 @@
   <header class="page-head post-head">
     <p class="kicker">Blog · Embodied First Exam</p>
     <h1 class="post-q"><span>Code agents have passed many exams in the digital world.</span> <em>What is their first exam to enter the physical world?</em></h1>
-    <p class="lead">The Embodied First Exam has coding agents program robots in simulation and shows where they succeed and where they fail: in planning, in contact, in control and in recovering from mistakes.</p>
     <p class="byline"><span>Embodied First Exam Team</span><span>October 2026</span></p>
   </header>
 
@@ -56,16 +55,17 @@
 
     <!-- ===================================================================================== 1 -->
     <h2 id="motivation" data-short="Motivation"><span class="num">01</span>Motivation</h2>
-    <p>Coding agents now fix bugs in real repositories, work in the terminal and tune kernels. Robots, meanwhile, are mostly controlled in one of two ways: by a policy trained on many demonstrations, such as a vision-language-action model, or by a controller that an engineer writes, tunes and debugs for one robot and one job. A coding agent could take over the engineer’s part and do it at the speed of software: read the robot’s interface, write a controller, run it, watch what happens and fix it. If that works, you could ask any robot with a programming interface for a new behavior in plain language.</p>
+    <p>Code agents now handle a wide range of software work. They resolve issues in real repositories [<a class="cite" href="#ref-1">1</a>], complete hard tasks in the terminal [<a class="cite" href="#ref-2">2</a>] and write efficient GPU kernels [<a class="cite" href="#ref-3">3</a>]. All of these exams, however, take place in the digital world. Robots remain largely outside the reach of code agents: a robot behavior today comes either from a policy trained on many demonstrations, such as a vision-language-action model [<a class="cite" href="#ref-4">4</a>, <a class="cite" href="#ref-5">5</a>, <a class="cite" href="#ref-6">6</a>], or from a controller that an engineer writes, tunes and debugs for one robot and one task.</p>
+    <p>The second route is, to a large extent, software engineering. The engineer reads the interface of the robot, writes a controller, runs it, observes what happens and revises the code. Prior work has shown that language models can write short robot programs from instructions [<a class="cite" href="#ref-7">7</a>]; a code agent can go further and carry out the whole loop. If it succeeds, any robot that exposes a programming interface could acquire a new behavior from a plain-language instruction, with no new demonstrations and no engineer in the loop (Figure 2).</p>
     <figure class="fig">
       <div class="cards">
         <div class="card muted"><span class="k">Today</span><h4>Train a policy</h4><p>Learns from many demonstrations. Good at the skills it was trained on, but a new task needs new data.</p></div>
         <div class="card muted"><span class="k">Today</span><h4>An engineer writes a controller</h4><p>Kinematics, waypoints, feedback loops and tuning, for one robot and one job.</p></div>
         <div class="card hi"><span class="k">This exam</span><h4>A coding agent writes, runs and fixes one</h4><p>The same engineering loop, run by an agent from a plain-language instruction.</p></div>
       </div>
-      <figcaption><b>Figure 2.</b> Three ways to give a robot a new behavior. The exam tests the third.</figcaption>
+      <figcaption><b>Figure 2.</b> Three ways to give a robot a new behavior. A trained policy needs new demonstrations for each new task, and an engineer writes a controller for one robot and one task; in this exam, a code agent writes, runs and fixes the controller from a plain-language instruction.</figcaption>
     </figure>
-    <p>Testing this takes more than pick-and-place. Most robot benchmarks ask an arm to move objects around a table, but a robotics engineer gets a much wider range of jobs, and each kind tests a different skill. The exam covers these kinds of job:</p>
+    <p>Whether code agents can do this remains an open question, and answering it requires more than pick-and-place. Most robot benchmarks ask an arm to move objects on a table, whereas a robotics engineer also faces dynamic interaction, whole-body control of humanoids and quadrupeds, dexterous manipulation with tools, physical puzzles and long household activities (Figure 3).</p>
     <figure class="fig">
       <div class="kinds">
         <div><b>Dynamic interaction</b><p>Catch a thrown object, return a ball, play a match against an opponent.</p><span>RoboDynamicExam · RoboOlympics-Match</span></div>
@@ -77,7 +77,7 @@
       </div>
       <figcaption><b>Figure 3.</b> Some of the kinds of task in the exam, with suites that contain them. The <span data-s="tasks"></span> tasks use <span data-s="robots"></span> robots of <span id="body-kinds">eight</span> kinds: <span id="bodies"></span>.</figcaption>
     </figure>
-    <p>We do not yet know whether coding agents can do this, or where they break down. Finding out takes many robots, many kinds of task, and grading that an agent cannot game. We built the Embodied First Exam to provide all three.</p>
+    <p>An answer also needs a common interface that runs any agent on any task, and a verifier that judges what physically happened in the simulator rather than what the agent reports. The Embodied First Exam is built to meet these requirements, and it serves as a first exam for code agents that are about to enter the physical world.</p>
 
     <!-- ===================================================================================== 2 -->
     <h2 id="introduction" data-short="Introduction"><span class="num">02</span>Introduction</h2>
@@ -91,7 +91,7 @@
       <li><b>Model and harness.</b> Any model can run in any harness, such as Codex or Claude Code. The harness runs unchanged and receives the goal as its prompt. It works in a container with a terminal and can reach only its model’s API and the package registries, with web search off; the RoboOlympics-Fun tasks are the exception, with open network access.</li>
       <li><b>The coding agent is the policy.</b> Whatever the agent writes turns what the robot senses into actions. It can control the robot directly, sending commands and choosing the next one after it sees the result; write code that controls the robot, such as a planner or a feedback controller; or train a model, such as a reinforcement-learning policy, that controls it. The exam leaves the choice to the agent.</li>
       <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. The three settings are defined below the list.</li>
-      <li><b>Simulators.</b> Each suite keeps its own simulator behind the same interface: <span data-s="simulators"></span> simulators in all, among them MuJoCo, Isaac Sim, OmniGibson, SAPIEN and Genesis, running <span data-s="robots"></span> robots.</li>
+      <li><b>Simulators.</b> Each suite keeps its own simulator behind the same interface, among them MuJoCo, Isaac Sim, OmniGibson, SAPIEN and Genesis, and together they run <span data-s="robots"></span> robots.</li>
       <li><b>Episode trajectory.</b> The episode is recorded as a POMDP rollout: at every step, the simulator’s state <i>s</i>, what the robot observed <i>o</i> (its camera images) and the action <i>a</i> it took.</li>
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
     </ol>
@@ -143,16 +143,19 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p><span data-s="n_runs_word"></span> agents were tested on the core set. Each pairs a model with a harness, and all ran at high reasoning effort. GPT-6 Astra runs in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI. The other three are Flash-class models: Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek’s own harness.</p>
-    <p>The leaderboard’s Core view counts each of the <span data-s="core_tasks"></span> core tasks once, in its default setting. There the top three are <span data-s="core_top3"></span>. The best Flash-class model reaches <span data-s="core_rest_max"></span>. The other three views in the figure count every core test of one setting, and <span data-s="views_note"></span>. The <a href="../leaderboard/">leaderboard</a> has the same results for each suite.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set leaves out tests that we judged easy and tests that an early screening run solved, so it is hard by design.</p>
     <figure class="fig">
       <div class="fig-body" id="fig-modes" data-fig="7"></div>
     </figure>
-    <div class="aside">
-      <p class="label">How we count</p>
-      <p>We count tests: one task in one setting. For each agent and test we take the latest finished attempt, as the leaderboard does, and we keep the three settings apart: <span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime tests. Every percentage comes with its count. The core set leaves out tests we judged easy and tests that an early screening run solved, so it is hard by design. Data as of <span data-s="built"></span>.</p>
-      <p>The six findings and their figures come from our cross-benchmark analysis of these runs, recomputed here from the site’s data. A few numbers (which approach an agent took, and the point after which an attempt could no longer succeed) exist only for a random sample of about a third of the attempts (<span data-s="cb_sample"></span> analyzed, snapshot of <span data-s="cb_snapshot"></span>). An agent labeled them by reading each run’s logs, and no one has checked them by hand yet; we mark them where they appear. Every case shown is a real run: the clip shows that run, and clicking it opens a step-by-step view of the run.</p>
-    </div>
+    <p>Figure 7 shows a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. The setting matters as much as the agent: every agent solves by far its largest share of tests in privileged mode, and Findings 1 to 3 examine what is lost in standard and standard-realtime mode.</p>
+    <figure class="fig">
+      <div class="fig-body" id="fig-types" data-fig="8"></div>
+    </figure>
+    <p>Broken down by task type (Figure 8), the three strongest agents do best on <span data-s="types_best"></span> and worst on <span data-s="types_worst"></span>. The lead of GPT-6 Astra is widest in <span data-s="types_edge"></span>. Figure 9 breaks the Core view down by suite. No single agent is best everywhere: of the <span data-s="suites_n"></span> suites with at least five core tasks, GPT-6 Astra leads or ties in <span data-s="suites_astra"></span>, Claude Opus 5.5 in <span data-s="suites_opus"></span> and Gemini 4 Argon in <span data-s="suites_argon"></span>.</p>
+    <figure class="fig">
+      <div class="fig-body" id="fig-suites" data-fig="9"></div>
+    </figure>
+    <p class="fig-note">Data as of <span data-s="built"></span>. The approach labels in Finding 6 come from a random sample of <span data-s="cb_sample"></span> attempts (snapshot of <span data-s="cb_snapshot"></span>), labelled by an agent that read the logs of each run and not yet checked by hand. Every clip in this post shows the run it names, and clicking it opens a step-by-step view of that run. The <a href="../leaderboard/">leaderboard</a> lists the same results for every suite.</p>
 
     <!-- ===================================================================================== 4 -->
     <h2 id="findings" data-short="Findings"><span class="num">04</span>Findings</h2>
@@ -163,10 +166,10 @@
       <div class="finding-body" id="f1-body" hidden="until-found">
         <ul class="claims">
             <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
-            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 8).</li>
+            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 10).</li>
             <li><span data-s="order_note"></span> Every agent’s results by setting are in <a href="#results">Figure 7</a>.</li>
         </ul>
-        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 8.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
+        <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 10.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=humanoidbench-manip-cube-i00-standard--5uz2mv2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-manip-cube-i00-standard--5uz2mv2/video.mp4"></video>
               <span class="case-k">The only one of six agents to solve it</span><b>HumanoidBench · Two-handed cube</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">With no access to the cubes’ orientation, it kept the humanoid standing using IMU feedback, tilted the palms and curled the fingers into a cage, measured the cube faces with stereo depth and corrected its moves from the camera images. It passed on its 21st episode, after 20 resets and 40 minutes.</span></a>
@@ -205,7 +208,7 @@
             <li>The tests that only one agent solves are of different kinds: for GPT-6 Astra mostly <span data-s="uniq_types_0"></span>; for Claude Opus 5.5 mostly <span data-s="uniq_types_1"></span>; for Gemini 4 Argon mostly <span data-s="uniq_types_2"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-overlap" data-fig="9"></div>
+          <div class="fig-body" id="fig-overlap" data-fig="11"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=maniguard-jar-transport-i25-standard--kz3tvs9"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/maniguard-jar-transport-i25-standard--kz3tvs9/replay.mp4"></video>
@@ -253,7 +256,7 @@
             <li>In an agent-labeled sample (not yet checked by hand), <span data-s="nr_s"></span> of failed standard attempts and <span data-s="nr_t"></span> of failed standard-realtime attempts reached a point of no return, after which the test could no longer succeed. In privileged mode, where unlimited resets make this almost impossible, it happened in <span data-s="nr_p"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-paired" data-fig="10"></div>
+          <div class="fig-body" id="fig-paired" data-fig="12"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=behavior-bringing-in-wood-i00-standard--myaibvy"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay_last.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/behavior-bringing-in-wood-i00-standard--myaibvy/replay.mp4"></video>
@@ -300,7 +303,7 @@
             <li>Standard-realtime has too few tests per benchmark for the figure. In the <span data-s="hard_t_n"></span> benchmarks with at least five, the share of tests that none of the three solves is <span data-s="hard_t_list"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-hard" data-fig="11"></div>
+          <div class="fig-body" id="fig-hard" data-fig="13"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../run/?r=humanoidbench-loco-hurdle-i00-standard--h8pcbpw"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-loco-hurdle-i00-standard--h8pcbpw/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/humanoidbench-loco-hurdle-i00-standard--h8pcbpw/video.mp4"></video>
@@ -350,7 +353,7 @@
             <li>In standard mode, <span data-s="easy_s_claim"></span>. In standard-realtime, no benchmark with at least five tests comes close; the best is <span data-s="easy_t_best"></span>.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-easy" data-fig="12"></div>
+          <div class="fig-body" id="fig-easy" data-fig="14"></div>
         </figure>
           <div class="cases rep">
             <a class="case p" href="../run/?r=mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/mujoco_playground_aloha_single_peg_insertion-privileged--kbikpjm/video.mp4"></video>
@@ -395,7 +398,7 @@
             <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-approach" data-fig="13"></div>
+          <div class="fig-body" id="fig-approach" data-fig="15"></div>
         </figure>
           <div class="cases rep">
             <a class="case p" href="../run/?r=maniguard-jar-transport-i25-privileged--rz5z7ys"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/maniguard-jar-transport-i25-privileged--rz5z7ys/video.mp4"></video>
@@ -420,36 +423,34 @@
 
     <!-- ===================================================================================== 5 -->
     <h2 id="future" data-short="Future work"><span class="num">05</span>Future work</h2>
-    <ul>
-      <li><b>Say why each attempt failed.</b> Today a test only says pass or fail. We will tag every failed attempt with one cause: the agent misread the task, missed the grasp, lost control of the robot, or said it was done too early. A person will check each tag against the replay.</li>
-      <li><b>Run each test more than once.</b> Each agent now gets one attempt per test, so one lucky or unlucky run can flip a result. Several attempts per test will show which failures are real.</li>
-      <li><b>More realtime tasks.</b> Only <span data-s="nt"></span> core tests run in the realtime setting. We will add more, and check whether agents notice a mistake and recover when the simulator cannot pause or reset.</li>
-      <li><b>Real robots.</b> Standard mode gives the agent only what a real robot gives: cameras, joint readings and a control API. So the same tests can run on real arms, and we plan to run them there.</li>
-    </ul>
-    <p>Take part:</p>
-    <ul>
-      <li><b>Test your model or harness:</b> one command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, from the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>.</li>
-      <li><b>Add tasks or a benchmark:</b> see <a href="../contribute/">how to contribute</a>.</li>
-      <li><b>Look at the runs:</b> every run’s video and trace are on the <a href="../run/">runs page</a>.</li>
-      <li><b>Have real robots?</b> Talk to us on <a href="https://discord.gg/gMEfvXNDc" target="_blank" rel="noopener">Discord</a>.</li>
-    </ul>
-    <details class="more">
-      <summary>Limitations, data and citation</summary>
-      <h4 id="limits">Limitations</h4>
-      <ul>
-        <li>Each result is for a model in a particular harness, so how the harness uses tools, handles context and decides when to stop is part of what we measure.</li>
-        <li>There is one attempt per test. Averaging over many tests smooths out the noise of single runs, but any one test could have gone either way.</li>
-        <li>The core set leaves out tests judged easy and tests that an early screening run solved, so its success rates are lower than the full exam’s, and the effect differs from suite to suite.</li>
-      </ul>
-      <h4>Data and citation</h4>
-      <p>Tasks, results and many agent runs, which you can step through, are on this site (<a href="../tasks/">tasks</a>, <a href="../leaderboard/">leaderboard</a>, <a href="../run/">runs</a>); videos and run records are in the <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</p>
-      <pre class="cite">@misc{embodiedfirstexam2026,
+    <p>The exam currently reports whether an attempt passed, not why it failed. We plan to label every failed attempt with a single cause: the agent misread the task, the grasp missed, the controller lost the robot, or the agent declared success before the goal was met. Each label will be checked by a person against the trace and the replay, so that statements such as the one in Finding 4 can rest on counted causes rather than on the suites in which failures occur.</p>
+    <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 to 3.</p>
+    <p>Only <span data-s="nt"></span> core tests run in the standard-realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
+    <p>Finally, the standard setting gives the agent only what a real robot provides: camera images, depth, joint readings and a control interface. The same tests can therefore run on physical hardware, and we plan to evaluate agents on real robots under the standard rules.</p>
+    <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/gMEfvXNDc" target="_blank" rel="noopener">Discord</a>.</p>
+
+    <h3 id="limits">Limitations</h3>
+    <p>Each result belongs to a model in a particular harness, so the way the harness uses tools, manages context and decides when to stop is part of what we measure. Every test has a single attempt, as discussed above. The core set leaves out tests that we judged easy and tests that an early screening run solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite. The labels of approach and of the point of no return in Finding 6 come from a sample of attempts labelled by an agent and not yet checked by hand.</p>
+
+    <h3 id="references">References</h3>
+    <ol class="refs">
+      <li id="ref-1">C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press and K. Narasimhan. SWE-bench: Can Language Models Resolve Real-World GitHub Issues? ICLR, 2024.</li>
+      <li id="ref-2">M. A. Merrill, A. G. Shaw, et al. Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces. ICLR, 2026.</li>
+      <li id="ref-3">A. Ouyang, S. Guo, S. Arora, A. L. Zhang, W. Hu, C. Ré and A. Mirhoseini. KernelBench: Can LLMs Write Efficient GPU Kernels? ICML, 2025.</li>
+      <li id="ref-4">A. Brohan et al. RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control. CoRL, 2023.</li>
+      <li id="ref-5">M. J. Kim et al. OpenVLA: An Open-Source Vision-Language-Action Model. CoRL, 2024.</li>
+      <li id="ref-6">K. Black et al. π0: A Vision-Language-Action Flow Model for General Robot Control. arXiv:2410.24164, 2024.</li>
+      <li id="ref-7">J. Liang, W. Huang, F. Xia, P. Xu, K. Hausman, B. Ichter, P. Florence and A. Zeng. Code as Policies: Language Model Programs for Embodied Control. ICRA, 2023.</li>
+    </ol>
+
+    <h3 id="cite">Data and citation</h3>
+    <p>Tasks, results and agent runs are on this site (<a href="../tasks/">tasks</a>, <a href="../leaderboard/">leaderboard</a>, <a href="../run/">runs</a>); videos and run records are in the <a href="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media">media dataset</a>.</p>
+    <pre class="cite">@misc{embodiedfirstexam2026,
   title  = {Embodied First Exam},
   author = {Embodied First Exam Team},
   year   = {2026},
   url    = {https://www.embodied-first-exam.ai}
 }</pre>
-    </details>
 
   </article>
 </main>
