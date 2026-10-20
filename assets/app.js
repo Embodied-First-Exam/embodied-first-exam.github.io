@@ -760,7 +760,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
 
 /** The suites the exam's team built and releases with the exam (owners, 2026-10-18): first everywhere, in this order,
  *  each with the EFE Original tag beside its name. */
-const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'embodied-olympics-fun', 'embodied-olympics-match', 'embodied-safety-exam', 'dexhand', 'roboengineer'];
+const OUR_RELEASE = ['robopaint', 'roboarc', 'pandadyn', 'embodied-olympics-fun', 'embodied-olympics-match', 'dexhand', 'roboengineer', 'embodied-safety-exam', 'ispatialgym'];   // the nine original suites (owner, 2026-10-19)
 const isOurs = (s) => OUR_RELEASE.includes(s?.id);
 // beside the name, small (nameTag), and on the picture's top right corner, as a frosted chip (owners, 2026-10-18)
 const nameTag = (s) => (isOurs(s) ? `<span class="name-tag" title="Built by the Embodied First Exam team and released with the exam"><i aria-hidden="true">✦</i>EFE Original</span>` : '');
