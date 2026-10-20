@@ -934,6 +934,40 @@ a.st::after { content: "log ↗"; font-weight: 500; opacity: .75; }
 .run-log, .run-side, .rl-steps, .rstep, .rc, .ro { min-width: 0; }
 .rc summary { min-width: 0; overflow: hidden; }
 .run-log.run-index { grid-column: 1 / -1; }
+/* a loaded run is one screen-high stage below the bar: the strip, what the agent saw and the replay stay in view, and only
+   the log scrolls, in its own box, so playing never moves the page (owners, 2026-10-19). The run list keeps the page flow. */
+.run-stage.on { display: flex; flex-direction: column; gap: 16px; max-width: var(--maxw); height: calc(100svh - 88px); min-height: 600px;
+  margin: 26px auto 0; padding: 0 var(--gutter); box-sizing: border-box; scroll-margin-top: 76px; }
+.run-stage.on > .run-strip-wrap { position: static; flex: none; max-width: none; margin: 0; padding: 0; }
+.run-stage.on > .run-body { flex: 1 1 0; min-height: 0; max-width: none; margin: 0; padding: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+.run-stage.on .run-side { position: static; display: flex; flex-direction: column; min-height: 0; overflow: hidden auto; }
+.run-stage.on .rv-card { flex: 1 1 0; min-height: 150px; display: flex; flex-direction: column; }
+.run-stage.on .rv-pic { flex: 1 1 0; min-height: 80px; aspect-ratio: auto; }
+.run-stage.on .rv-out video { flex: 1 1 0; min-height: 80px; height: 100%; object-fit: contain; }
+.run-stage.on .run-log { position: relative; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding-right: 4px; border-radius: 14px; }
+.run-stage.on .rl-head { position: sticky; top: 0; z-index: 2; padding: 0 0 12px; background: var(--bg); }
+.run-stage.on .rl-bar { margin: 0; }
+.run-stage.on .rl-steps { padding-bottom: 4px; }
+.rl-follow { position: absolute; right: 8px; top: calc(100% + 6px); box-shadow: var(--shadow); background: var(--surface) !important; color: var(--ink) !important; }
+.rl-follow[hidden] { display: none !important; }
+@media (max-width: 900px) {
+  /* stacked: the strip, the agent's view and the replay side by side in small, then the log in the rest of the screen */
+  .run-stage.on { gap: 10px; min-height: 520px; padding-bottom: 8px; }
+  .run-stage.on > .run-body { display: flex; flex-direction: column; gap: 10px; }
+  .run-stage.on .run-side { flex: none; flex-direction: row; gap: 10px; overflow: visible; }
+  .run-stage.on .rv-card { flex: 1 1 0; min-width: 0; min-height: 0; padding: 8px; border-radius: 12px; }
+  .run-stage.on .rv-label { font-size: 11.5px; margin-bottom: 6px; } .run-stage.on .rv-label .rk-ic { display: none; }
+  .run-stage.on .rv-pic { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+  .run-stage.on .rv-out video { flex: none; height: auto; aspect-ratio: 16 / 10; min-height: 0; }
+  .run-stage.on .rv-cap { font-size: 11px; margin-top: 4px; } .run-stage.on .rv-out .rv-cap { display: none; }
+  .run-stage.on .rv-pic, .run-stage.on .rv-out video { max-height: 24svh; }
+  .run-stage.on .rl-head { padding-bottom: 10px; }
+  .run-stage.on .rl-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .run-stage.on .rl-bar .chip { flex: none; }
+  .run-stage.on .rv-none { padding: 8px; font-size: 11.5px; }
+  .run-stage.on .run-log { flex: 1 1 0; min-height: 220px; }
+  .run-stage.on .rs-svg { height: 64px; }
+}
 .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
 .ri-card { display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); transition: transform .2s, box-shadow .2s; }
 .ri-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }

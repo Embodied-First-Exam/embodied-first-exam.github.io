@@ -2291,12 +2291,24 @@ async function runPage(ex) {
       <div class="rt"><span class="rt-time"${estTip}>${at(st.t)}</span><span class="rt-n">step ${i + 1}</span>${sim}<span class="rt-tok" title="prompt tokens · new output tokens · cost">${kTok(st.tok?.in)} ctx · +${int(st.tok?.out)} · $${(st.tok?.usd || 0).toFixed(2)}</span></div>
       ${st.say ? `<div class="rsay">${prose(st.say)}</div>` : ''}${calls}${out}</article>`;
   };
-  $('#run-log').innerHTML = `<div class="rl-bar">${filters.map((f) => `<button type="button" class="chip${f === 'all' ? ' on' : ''}" data-f="${f}">${f !== 'all' && f !== 'say' ? runIcon(f) : ''}${fname[f]}</button>`).join('')}</div>
+  $('#run-log').innerHTML = `<div class="rl-head"><div class="rl-bar">${filters.map((f) => `<button type="button" class="chip${f === 'all' ? ' on' : ''}" data-f="${f}">${f !== 'all' && f !== 'say' ? runIcon(f) : ''}${fname[f]}</button>`).join('')}</div><button type="button" class="chip rl-follow" hidden>↓ Current step</button></div>
     <div class="rl-steps">${steps.map(stepHTML).join('')}</div>
     <div class="rl-end ${solved ? 'ok' : 'no'}">${solved ? 'The verifier replayed the final trajectory and the task was solved.' : 'The run ended without solving the task.'}</div>`;
 
   // ---- behaviour: the current step drives the strip's playhead and the agent's view
+  // The strip, the agent's view and the replay stay on screen (one screen-high stage); only the log scrolls, inside its
+  // own box. Playing follows the current step there and never moves the page; scrolling the log by hand stops the following.
+  $('#run-stage').classList.add('on');
+  const log = $('#run-log'), followBtn = $('.rl-follow');
   const arts = $$('.rstep');
+  let follow = true, quietIO = 0;
+  const showStep = (a, smooth = true) => {
+    if (!a || a.hidden) return;
+    const bar = $('.rl-head', log).offsetHeight, room = log.clientHeight - bar;
+    const off = Math.min(room * 0.3, Math.max(12, room - a.offsetHeight - 12));
+    quietIO = performance.now() + 900;
+    log.scrollTo({ top: Math.max(0, log.scrollTop + a.getBoundingClientRect().top - log.getBoundingClientRect().top - bar - off), behavior: smooth ? 'smooth' : 'instant' });
+  };
   const picAt = (i) => { for (let k = i; k >= 0; k--) if (steps[k].out?.pics?.length) return [k, steps[k].out.pics[steps[k].out.pics.length - 1]]; return [-1, null]; };
   let cur = -1;
   const setStep = (i, scroll) => {
@@ -2311,21 +2323,25 @@ async function runPage(ex) {
     if (p && img.dataset.src !== p) { img.classList.remove('in'); img.parentElement.classList.add('loading'); img.onload = () => { img.classList.add('in'); img.parentElement.classList.remove('loading'); }; img.src = runURL(p); img.dataset.src = p; }
     $('#rv-none').hidden = !!p; img.hidden = !p;
     $('#rv-cap').textContent = p ? `Step ${k + 1} · ${at(steps[k].t)}${k < i ? ` (the latest picture by step ${i + 1})` : ''}` : '';
-    if (scroll) arts[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (scroll) showStep(arts[i]);
   };
   const io = new IntersectionObserver((es) => {
-    if (playing) return;
+    if (playing || performance.now() < quietIO) return;
     const vis = es.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
     if (vis.length) setStep(+vis[0].target.dataset.i);
-  }, { rootMargin: '-35% 0px -55% 0px' });
+  }, { root: log, rootMargin: '-35% 0px -55% 0px' });
   arts.forEach((a) => io.observe(a));
   setStep(0);
+  // a link to one step (?s=<step number>) opens the log there
+  const s0 = parseInt(Q.get('s'), 10) - 1;
+  if (s0 > 0 && s0 < steps.length) { setStep(s0); requestAnimationFrame(() => showStep(arts[s0], false)); }
   // the strip: click or drag to a moment
   const svg = $('.rs-svg');
   const seek = (ev) => {
     const b = svg.getBoundingClientRect(), t = ((ev.clientX - b.left) / b.width) * total;
     let i = 0; while (i + 1 < steps.length && steps[i + 1].t <= t) i++;
-    const hidden = arts[i].hidden; if (hidden) { $$('.rl-bar .chip').forEach((c) => c.classList.toggle('on', c.dataset.f === 'all')); arts.forEach((a) => { a.hidden = false; }); }
+    const hidden = arts[i].hidden; if (hidden) { $$('.rl-bar .chip[data-f]').forEach((c) => c.classList.toggle('on', c.dataset.f === 'all')); arts.forEach((a) => { a.hidden = false; }); }
+    follow = true; followBtn.hidden = true;
     setStep(i, true);
   };
   let drag = false;
@@ -2338,23 +2354,35 @@ async function runPage(ex) {
   const tick = () => {
     if (!playing) return;
     const n = cur + 1;
-    if (n >= steps.length) { playing = false; btn.classList.remove('on'); return; }
-    setStep(n, true);
+    if (n >= steps.length) { playing = false; btn.classList.remove('on'); followBtn.hidden = true; return; }
+    setStep(n, follow);
     const st = steps[n];
     timer = setTimeout(tick, 900 + (st.say ? 1400 : 0) + (st.out?.pics?.length ? 700 : 0));
   };
   btn.addEventListener('click', () => {
     playing = !playing; btn.classList.toggle('on', playing);
     clearTimeout(timer);
+    follow = true; followBtn.hidden = true;
     if (playing) { if (cur >= steps.length - 1) cur = -1; tick(); }
   });
+  // the viewer scrolls the log while it plays: stop following until Play is pressed again or "Current step"
+  const byHand = (e) => {
+    if (!playing || !follow || (e.type === 'pointerdown' && e.target !== log)) return;
+    if (e.type === 'keydown' && !['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) return;
+    follow = false; followBtn.hidden = false;
+  };
+  ['wheel', 'touchmove', 'pointerdown', 'keydown'].forEach((t) => log.addEventListener(t, byHand, { passive: true }));
+  followBtn.addEventListener('click', () => { follow = true; followBtn.hidden = true; showStep(arts[cur]); });
   // filters
-  $$('.rl-bar .chip').forEach((c) => c.addEventListener('click', () => {
-    $$('.rl-bar .chip').forEach((d) => d.classList.toggle('on', d === c));
+  $$('.rl-bar .chip[data-f]').forEach((c) => c.addEventListener('click', () => {
+    $$('.rl-bar .chip[data-f]').forEach((d) => d.classList.toggle('on', d === c));
     arts.forEach((a) => { a.hidden = !a.dataset.kinds.split(' ').includes(c.dataset.f); });
   }));
   // a picture in the log opens large
   $('#run-log').addEventListener('click', (e) => {
+    // a click on a step makes it the current one (the playhead, the agent's view); the page stays where it is
+    const a = e.target.closest('.rstep');
+    if (a) setStep(+a.dataset.i);
     const im = e.target.closest('.ro-pics img');
     if (!im) return;
     document.body.insertAdjacentHTML('beforeend', `<div class="rv-zoom" role="dialog"><img src="${esc(im.src)}" alt=""></div>`);
