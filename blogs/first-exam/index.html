@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="../../assets/blog.css?v=4f47e9ee">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../../assets/app.js?v=e51f9474"></script>
-<script type="module" src="../../assets/blog.js?v=b087f5d3"></script>
+<script type="module" src="../../assets/blog.js?v=7d61c17b"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -147,9 +147,9 @@
     <p>Click a finding to open it. Each one shows the main numbers, a figure and one representative run, followed by a section you can expand with more evidence, more cases and caveats.</p>
 
     <div class="finding">
-      <h3 id="f1" data-short="Standard mode is far from solved"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard mode is far from solved, and no single agent covers it.</button></h3>
+      <h3 id="f1" data-short="Standard mode is far from solved"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard mode is far from solved, and no single agent covers it.</button></h3>
       <p class="finding-sum">GPT-6 Astra, the strongest agent, solves only about a third of the standard and standard-realtime tests. In privileged mode it solves nearly every test that Claude Opus 5.5 or Gemini 4 Argon solves, but in standard mode those two solve dozens of tests that it fails.</p>
-      <div class="finding-body" id="f1-body" hidden="until-found">
+      <div class="finding-body" id="f1-body">
         <ul class="claims">
             <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
             <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 9).</li>
@@ -206,9 +206,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f2" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f2-body"><span class="fn">Finding 2</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
+      <h3 id="f2" data-short="Privileged-mode successes transfer poorly to standard mode"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f2-body"><span class="fn">Finding 2</span>Privileged-mode successes transfer poorly to standard mode.</button></h3>
       <p class="finding-sum">For every agent, most tasks solved in privileged mode become failures when rerun in standard mode.</p>
-      <div class="finding-body" id="f2-body" hidden="until-found">
+      <div class="finding-body" id="f2-body">
         <ul class="claims">
             <li>On the <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test, each agent fails in standard mode between <span data-s="ps_lose_lo"></span> (<span data-s="ps_lose_lo_who"></span>) and <span data-s="ps_lose_hi"></span> (<span data-s="ps_lose_hi_who"></span>) of the tasks it solves in privileged mode. GPT-6 Astra, for example, solves <span data-s="ps_astra_a"></span> of these tasks in privileged mode and only <span data-s="ps_astra_both"></span> of those in standard mode.</li>
             <li>Standard-realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a standard-realtime test, each of the three strongest agents solves fewer in standard-realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
@@ -258,9 +258,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f3" data-short="Dexterity, dynamic control and long-horizon execution are common failure points"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f3-body"><span class="fn">Finding 3</span>Dexterity, dynamic control and long-horizon execution are common failure points.</button></h3>
+      <h3 id="f3" data-short="Dexterity, dynamic control and long-horizon execution are common failure points"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>Dexterity, dynamic control and long-horizon execution are common failure points.</button></h3>
       <p class="finding-sum">In both privileged and standard mode, many of the benchmarks that the strongest agents fail most often involve tool use and assembly, balance and rapid reactions, or long household chores, although hard tasks are not limited to these kinds.</p>
-      <div class="finding-body" id="f3-body" hidden="until-found">
+      <div class="finding-body" id="f3-body">
         <ul class="claims">
             <li>In standard mode, in <span data-s="hard_s_frac"></span> benchmarks (counting benchmarks with at least five tests), at least half of the tests are solved by none of the three strongest agents.</li>
             <li><span data-s="hard_groups"></span></li>
@@ -312,9 +312,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f4" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f4-body"><span class="fn">Finding 4</span>Planning, retries, and explicit rules favor success.</button></h3>
+      <h3 id="f4" data-short="Planning, retries, and explicit rules favor success"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f4-body"><span class="fn">Finding 4</span>Planning, retries, and explicit rules favor success.</button></h3>
       <p class="finding-sum">Agents perform best when motions can be planned in advance, privileged access allows unrestricted resets and retries, or task rules are explicitly specified.</p>
-      <div class="finding-body" id="f4-body" hidden="until-found">
+      <div class="finding-body" id="f4-body">
         <ul class="claims">
             <li>We call a benchmark easy when the three strongest agents’ mean success rate on it is high: 70% or more in privileged mode, 60% or more in standard mode. Each test counts once per agent (agent-attempts).</li>
             <li>In privileged mode, <span data-s="easy_p_frac"></span> benchmarks reach a mean success rate of 70% or more: <span data-s="easy_p_list"></span>.</li>
@@ -361,9 +361,9 @@
     </div>
 
     <div class="finding">
-      <h3 id="f5" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="false" aria-controls="f5-body"><span class="fn">Finding 5</span>Control strategies shift with the evaluation mode.</button></h3>
+      <h3 id="f5" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f5-body"><span class="fn">Finding 5</span>Control strategies shift with the evaluation mode.</button></h3>
       <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in standard-realtime.</p>
-      <div class="finding-body" id="f5-body" hidden="until-found">
+      <div class="finding-body" id="f5-body">
         <ul class="claims">
             <li>Agents control the robot in one of three ways: they write a program that moves it (code to control), send it commands themselves one segment at a time (direct control), or first train a model that then controls it. The figure also splits programs into three kinds and counts attempts that mixed approaches or never settled on one.</li>
             <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>

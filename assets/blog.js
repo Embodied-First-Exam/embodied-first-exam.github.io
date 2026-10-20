@@ -538,8 +538,9 @@ function toc() {
   onScroll();
 }
 
-/** The findings fold: each shows its label and its conclusion, and the button that is its heading opens the rest (the
- *  body is hidden="until-found", so the browser's find in page opens it too). A link to a finding or into one, from the
+/** The findings fold: each shows its label and its conclusion, and the button that is its heading hides or shows the
+ *  rest. Every finding starts open (owner, 2026-10-20); a hidden body is hidden="until-found", so the browser's find in
+ *  page opens it again. A link to a finding or into one, from the
  *  contents, the text or the address (#f3), opens it; printing opens every finding (blog.css) and every inner fold. */
 function findings() {
   const set = (b, open) => {
