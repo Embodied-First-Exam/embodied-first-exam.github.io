@@ -728,6 +728,22 @@ a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0
 .cover { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg-2); }
 .cover img, .cover video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* a suite's videos on a real robot (realRobot in app.js): the content column's full width, the video's own aspect */
+#real-robot { padding-bottom: 0; }          /* the results' own top padding keeps them apart */
+#real-robot .sec-head { margin-bottom: clamp(20px, 2.4vw, 32px); }
+.real-fig { margin: 0; }
+.real-fig + .real-fig { margin-top: clamp(32px, 4vw, 56px); }
+.real-media { overflow: hidden; background: #0f141a; }
+.real-media video { display: block; width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+.real-btn { position: absolute; z-index: 4; right: 14px; top: 14px; display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 50%; background: rgba(15, 20, 26, .62); color: #fff; cursor: pointer; transition: opacity .2s, background .2s; }
+.real-btn:hover, .real-btn:focus-visible { background: rgba(15, 20, 26, .85); }
+.real-btn svg { width: 18px; height: 18px; fill: currentColor; }
+.real-media:hover .real-btn { opacity: 0; pointer-events: none; }   /* the browser's own controls take over on hover */
+@media (hover: none) { .real-media:hover .real-btn { opacity: 1; pointer-events: auto; } }
+.real-fig figcaption { margin: 14px 0 0; font-size: 17px; line-height: 1.55; color: var(--ink-2); }
+@media (max-width: 760px) { .real-btn { right: 8px; top: 8px; width: 32px; height: 32px; } .real-btn svg { width: 15px; height: 15px; } .real-fig figcaption { font-size: 16px; } }
+
 /* ---------- where a new suite helps most (contribution page) ---------- */
 
 .thin { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 22px; }

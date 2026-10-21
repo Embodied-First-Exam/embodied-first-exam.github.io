@@ -2009,10 +2009,42 @@ async function suitePage(ex) {
  <div><div class="cover frame">${releaseTag(s, true)}${cover ? (cover.video ? `<video src="${esc(site(cover.video))}" poster="${esc(site(cover.poster || ''))}" muted loop autoplay playsinline${crop ? ` class="${crop}"` : ''}></video>` : poster(cover, crop)) : `<div class="placeholder-art">${esc(s.code)}</div>`}</div>
         <table class="facts-table" style="margin-top:16px"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table></div>
     </div>`;
+  realRobot($('#real-robot'), s.real_robot);
   const tasks = (await loadTasks()).filter((t) => t.suite === s.id);
   $('#suite-tasks-count').textContent = tasksTests(tasks.length, tasks.reduce((n, t) => n + (t.modes?.length || 0), 0));
   suiteResults($('#suite-results'), ex, tasks);
   taskBrowser($('#tasks'), ex, tasks, { suite: s.id });
+}
+
+/** A suite's videos on a real robot (data/exam.yml `real_robot` in the source: video, poster, aspect, caption), above
+ * its results: full width, muted and looping, playing only while in view (and not for reduced motion); the button and a
+ * click on the video pause or play it, the browser's controls show on hover. The section stays hidden without videos. */
+function realRobot(sec, videos) {
+  if (!sec || !videos?.length) return;
+  const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+  const PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+  $('#real-robot-videos', sec).innerHTML = videos.map((v) => `<figure class="real-fig">
+      <div class="real-media frame"${v.aspect ? ` style="aspect-ratio:${Number(v.aspect)}"` : ''}>
+        <video src="${esc(site(v.video))}"${v.poster ? ` poster="${esc(site(v.poster))}"` : ''} muted loop playsinline preload="metadata"></video>
+        <button class="real-btn" type="button" aria-label="Play">${PLAY}</button>
+      </div>
+      ${v.caption ? `<figcaption>${esc(v.caption)}</figcaption>` : ''}
+    </figure>`).join('');
+  sec.hidden = false;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $$('.real-media', sec).forEach((box) => {
+    const vid = $('video', box), btn = $('.real-btn', box);
+    let seen = false, held = still;          // held: paused by the viewer (or reduced motion) until they press play
+    const show = () => { const on = !vid.paused; btn.innerHTML = on ? PAUSE : PLAY; btn.setAttribute('aria-label', on ? 'Pause' : 'Play'); };
+    const run = () => { if (seen && !held) vid.play().catch(() => {}); else vid.pause(); };
+    const toggle = () => { held = !vid.paused; if (held) vid.pause(); else vid.play().catch(() => {}); };
+    vid.addEventListener('play', show); vid.addEventListener('pause', show);
+    btn.addEventListener('click', toggle);
+    vid.addEventListener('click', (e) => { if (!vid.controls) { e.preventDefault(); toggle(); } });
+    box.addEventListener('mouseenter', () => { if (matchMedia('(hover: hover)').matches) vid.controls = true; });
+    box.addEventListener('mouseleave', () => { vid.controls = false; });
+    new IntersectionObserver(([e]) => { seen = e.isIntersecting; run(); }, { threshold: 0.35 }).observe(box);
+  });
 }
 
 async function tasksPage(ex) {
