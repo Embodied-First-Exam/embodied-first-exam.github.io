@@ -455,13 +455,30 @@ function coverageInfo(ex) {
   return { groups, suites, total: suites.reduce((a, s) => a + s.instances, 0) };
 }
 
+/** Where a new suite helps most (owner, 2026-10-21): first the open directions the exam wants next, then the task
+ *  domains and robot bodies the suites so far cover least (from the data). `suites` names the suites already there, so
+ *  a card counts only suites that are on the site. */
+const OPEN_DIRECTIONS = [
+  { icon: 'tactile', label: 'Sensing', name: 'Tactile sensing', what: 'Touch and force at the fingertips: feeling a slip, finding a pose in the hand, contact-rich insertion.', suites: [] },
+  { icon: 'deformable', label: 'Objects', name: 'Deformable objects & fluids', what: 'Cloth, cables, dough and liquids, whose shape the robot changes as it works.', few: true },
+  { icon: 'real-world', label: 'Scenarios', name: 'Real-world scenarios', what: 'Scenes rebuilt from real homes, labs and workplaces, and tests that can also run on a physical robot.', few: true },
+  { icon: 'safety', label: 'Safety', name: 'Safety & alignment', what: 'Refusing what would hurt someone, keeping every safety rule on the way, and doing what people actually want.', suites: ['embodied-safety-exam', 'maniguard'] },
+];
 function thinSpots(el, ex, info) {
   const tags = info.groups.flatMap((g) => g.tags.map((t) => ({ ...t, group: g.name, n: info.suites.reduce((a, s) => a + (s.tags?.[t.id] || 0), 0) })));
   const thin = tags.filter((t) => t.n / info.total < 0.12).sort((a, b) => a.n - b.n);
   const bodies = BODY_ORDER.map((b) => ({ b, n: ranked(ex).filter((s) => s.body === b).length })).filter((x) => x.n <= 1);
+  const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five'];
+  const status = (d) => {
+    if (d.few) return 'Only a few suites so far';
+    const n = (d.suites || []).filter((id) => (ex.suites || []).some((s) => s.id === id)).length;
+    return n ? `${words[n] || int(n)} suite${n === 1 ? '' : 's'} so far` : 'No suite yet';
+  };
+  const card = (icon, label, name, note, title = '') => `<a href="${exam('contribute/')}#propose">${tagIcon(icon)}<span class="label">${esc(label)}</span><b>${esc(name)}</b><span${title ? ` title="${esc(title)}"` : ''}>${note}</span></a>`;
   const items = [
-    ...thin.map((t) => `<a href="${exam('contribute/')}#propose">${tagIcon(t.id)}<span class="label">${esc(t.group)}</span><b>${esc(t.name)}</b><span title="${esc(t.description)}">${int(t.n)} task${t.n === 1 ? '' : 's'} so far</span></a>`),
-    ...bodies.map((x) => `<a href="${exam('contribute/')}#propose"><span class="ic" data-icon="arm"></span><span class="label">Robot body</span><b>${esc(ex.bodies?.[x.b] || x.b)}</b><span>${x.n ? 'One suite so far' : 'A first suite is welcome'}</span></a>`),
+    ...OPEN_DIRECTIONS.map((d) => card(d.icon, d.label, d.name, esc(status(d)), d.what).replace('</b>', `</b><em>${esc(d.what)}</em>`)),
+    ...thin.map((t) => card(t.id, t.group, t.name, `${int(t.n)} task${t.n === 1 ? '' : 's'} so far`, t.description)),
+    ...bodies.map((x) => card('body', 'Robot body', ex.bodies?.[x.b] || x.b, x.n ? 'One suite so far' : 'A first suite is welcome')),
   ];
   el.innerHTML = items.join('');
 }
@@ -1081,6 +1098,12 @@ const TAG_ICON = {
   'navigation-exploration': '<circle cx="12" cy="12" r="9"/><path d="M15.8 8.2l-2.4 5.2-5.2 2.4 2.4-5.2z"/>',
   'mobile-whole-body-manipulation': '<rect x="3.5" y="13" width="12" height="5" rx="1.5"/><circle cx="6.5" cy="20" r="1.5"/><circle cx="12.5" cy="20" r="1.5"/><path d="M9.5 13V7.5l6-3 3.5 2.5"/>',
   'interaction-collaboration': '<circle cx="7.5" cy="7" r="2.5"/><circle cx="16.5" cy="7" r="2.5"/><path d="M3 20c0-3.3 2-5.5 4.5-5.5S12 16.7 12 20M12 20c0-3.3 2-5.5 4.5-5.5S21 16.7 21 20"/>',
+  // the open directions on Contribute, and a robot body
+  tactile: '<path d="M8 21v-9.5a2 2 0 0 1 4 0V9a2 2 0 0 1 4 0v8.5c0 2-1.5 3.5-3.5 3.5H8"/><path d="M8 13.5l-1.8-1.6a1.8 1.8 0 0 0-2.6 2.5L8 19"/><path d="M15 3.5c1.6.5 2.8 1.6 3.4 3M17.5 2c2.2.8 3.8 2.4 4.5 4.5"/>',
+  deformable: '<path d="M3 8c3-3 6 3 9 0s6-3 9 0M3 14c3-3 6 3 9 0s6-3 9 0"/><path d="M12 17.5c-1.5 1.8-2 2.8-2 3.6a2 2 0 0 0 4 0c0-.8-.5-1.8-2-3.6z"/>',
+  'real-world': '<path d="M3.5 10.5L12 4l8.5 6.5"/><path d="M5.5 9v11h13V9"/><rect x="9.5" y="13.5" width="5" height="6.5" rx="1"/>',
+  safety: '<path d="M12 2.5l7.5 3v6c0 4.6-3.1 8.4-7.5 10-4.4-1.6-7.5-5.4-7.5-10v-6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+  body: '<path d="M5 20.5h9M9.5 20.5v-4"/><circle cx="9.5" cy="14.5" r="2"/><path d="M10.8 13l4.7-5.5"/><circle cx="16.5" cy="6.5" r="1.6"/><path d="M17.6 5.3l2.4-2M18 7.8l2.6.7"/>',
 };
 const tagIcon = (id) => `<svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAG_ICON[id] || '<circle cx="12" cy="12" r="8"/>'}</svg>`;
 

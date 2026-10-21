@@ -1776,3 +1776,6 @@ button.as-link:hover { color: var(--ink); }
 
 /* a guard: nothing may make a phone's page wider than the screen (a wide line once pushed the bar's buttons off it) */
 html { overflow-x: clip; }
+/* Contribute, where a new suite helps most: the open directions carry one line on what is wanted (owner, 2026-10-21) */
+.thin em { display: block; margin-top: 6px; font: 400 13.5px/1.45 var(--body); font-style: normal; color: var(--ink-2); }
+.thin em + span { margin-top: 8px; color: var(--ink-3); }
