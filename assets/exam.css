@@ -1779,3 +1779,7 @@ html { overflow-x: clip; }
 /* Contribute, where a new suite helps most: the open directions carry one line on what is wanted (owner, 2026-10-21) */
 .thin em { display: block; margin-top: 6px; font: 400 13.5px/1.45 var(--body); font-style: normal; color: var(--ink-2); }
 .thin em + span { margin-top: 8px; color: var(--ink-3); }
+/* Contribute: the three ways to take part, side by side (owner, 2026-10-21) */
+.routes.routes3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.routes3 .route .btn { margin-top: auto; align-self: flex-start; }
+@media (max-width: 1000px) { .routes.routes3 { grid-template-columns: minmax(0, 1fr); } }

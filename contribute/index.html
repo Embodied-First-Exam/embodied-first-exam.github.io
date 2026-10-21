@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=fd654188">
+<link rel="stylesheet" href="../assets/exam.css?v=17a29cdf">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../assets/app.js?v=e28e9c04"></script>
 </head>
@@ -21,7 +21,7 @@
   <header class="page-head">
     <p class="kicker">Contribute</p>
     <h1>Call for contributors</h1>
-    <p class="lede">The exam is open, and it grows with its community. New tasks, whole benchmark suites and real-robot evaluations are all very welcome, from labs, companies and individual researchers alike. If you have a robot task that today’s coding agents cannot yet solve, we would love to hear from you: <a class="link" href="#propose">here is how to contribute</a>.</p>
+    <p class="lede">The exam is open, and it grows with its community. There are three ways to take part: evaluate a model, integrate an agent harness, or integrate tasks. All are very welcome, from labs, companies and individual researchers alike, and we would love to hear from you: <a class="link" href="#propose">here is how to contribute</a>.</p>
   </header>
 
   <section class="section numbers">
@@ -32,21 +32,27 @@
     <div class="head reveal">
       <h2>How to contribute</h2>
     </div>
-    <div class="routes reveal">
+    <div class="routes routes3 reveal">
+      <div class="propose-mail route frame">
+        <span class="ic" data-icon="podium" aria-hidden="true"></span>
+        <h3>Evaluate a model</h3>
+        <p>Have a new model? We run it on the exam with an existing harness, under the same budgets as every other agent, and its results join the leaderboard.</p>
+        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Model%20evaluation">Get in touch by e-mail <span class="arr">→</span></a>
+      </div>
+      <div class="propose-mail route frame">
+        <span class="ic" data-icon="terminal" aria-hidden="true"></span>
+        <h3>Integrate a harness</h3>
+        <p>Bring your agent harness to the exam, so that any model can be tested in it and compared with Codex, Claude Code and the other harnesses on the same tests.</p>
+        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Harness%20integration">Get in touch by e-mail <span class="arr">→</span></a>
+      </div>
       <div class="propose-mail route frame">
         <span class="ic" data-icon="layers" aria-hidden="true"></span>
-        <h3>Propose a suite</h3>
-        <p>Send a short description of the benchmark: the upstream version, the scope, a reference solution if there is one, how success is verified, and why it is hard for today’s coding agents.</p>
-        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Suite%20proposal">Propose by e-mail <span class="arr">→</span></a>
-      </div>
-      <div class="propose-mail route frame" id="real-robot">
-        <span class="ic" data-icon="arm" aria-hidden="true"></span>
-        <h3>Provide real-robot evaluation and analysis</h3>
-        <p>Run the exam’s tasks, or their real-robot counterparts, on physical robots, and share the evaluation and your analysis of where simulation and reality agree and where they part.</p>
-        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Real-robot%20evaluation">Get in touch by e-mail <span class="arr">→</span></a>
+        <h3>Integrate tasks</h3>
+        <p>Add a single task or a whole benchmark suite: frozen scenes, a program that decides success and, where there is one, a reference solution. <a class="link" href="#criteria">What a suite needs</a>.</p>
+        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Task%20integration">Get in touch by e-mail <span class="arr">→</span></a>
       </div>
     </div>
-    <p class="note reveal">Both go to <a href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. For questions, join the exam’s <a data-discord href="https://discord.gg/AhC6utNyfk">Discord</a> or its <button class="as-link" data-wechat type="button">WeChat group</button>.</p>
+    <p class="note reveal">All three go to <a href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. For questions, join the exam’s <a data-discord href="https://discord.gg/AhC6utNyfk">Discord</a> or its <button class="as-link" data-wechat type="button">WeChat group</button>.</p>
   </section>
 
   <section class="section" id="criteria">
@@ -94,7 +100,7 @@
   <section class="section closing" id="contact">
     <div class="closing-inner reveal">
       <h2>Have an idea? Let’s talk.</h2>
-      <p>Whatever the question, a suite, a single task or a real robot, write to us and we will work it out together.</p>
+      <p>A model, a harness or a task, write to us and we will work it out together.</p>
       <div class="cta">
         <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com <span class="arr">→</span></a>
       </div>
