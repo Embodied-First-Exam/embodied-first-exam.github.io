@@ -99,8 +99,6 @@
         <p>E-mail it to <a class="link" href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. The exam’s code is <a class="link" href="https://github.com/mll-lab-nu/embodied-first-exam">on GitHub</a>; the pull request follows once a proposal is approved.</p></details>
       <details><summary>My benchmark has no scripted expert. Can it still come in?</summary>
         <p>Yes. A family without a full reference solution needs a positive example (a successful model trial, an upstream policy rollout or a hand-built trajectory) and a human review. Its results are reported apart from the tasks with a verified solution until it has one.</p></details>
-      <details><summary>Does my suite need both modes?</summary>
-        <p>Each task is offered as a privileged and a standard test. Standard mode needs a service that runs the simulator behind the standard protocol (eai-standard/2.x); the services of the suites already in are the templates.</p></details>
       <details><summary>Which simulators are accepted?</summary>
         <p>Any that runs headless in a pinned Docker image and replays a frozen scene deterministically on the reference hardware, an RTX 4090. The exam already runs MuJoCo, Isaac Sim, SAPIEN and Genesis, among others.</p></details>
       <details><summary>What if the simulator or its assets cannot be redistributed?</summary>
