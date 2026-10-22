@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Contribute · Embodied First Exam</title>
-<meta name="description" content="How to bring a suite, or real-robot evaluation and analysis, to the Embodied First Exam.">
+<meta name="description" content="How to contribute a model, a harness, tasks or anything else to the Embodied First Exam, and who contributes now.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=494b7673">
+<link rel="stylesheet" href="../assets/exam.css?v=f5411f82">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=06cabad8"></script>
+<script type="module" src="../assets/app.js?v=87ac272a"></script>
 </head>
 <body data-page="contribute">
 <div id="nav"></div>
@@ -21,7 +21,7 @@
   <header class="page-head">
     <p class="kicker">Contribute</p>
     <h1>Call for contributors</h1>
-    <p class="lede">The exam is open, and it grows with its community. There are three ways to take part: evaluate a model, integrate an agent harness, or integrate tasks. All are very welcome, from labs, companies and individual researchers alike, and we would love to hear from you: <a class="link" href="#propose">here is how to contribute</a>.</p>
+    <p class="lede">The exam is open, and it grows with its community. You can evaluate a model, integrate an agent harness, integrate tasks, or bring anything else that would make the exam better. All are very welcome, from labs, companies and individual researchers alike, and we would love to hear from you: <a class="link" href="#propose">here is how to contribute</a>.</p>
   </header>
 
   <section class="section numbers">
@@ -32,7 +32,7 @@
     <div class="head reveal">
       <h2>How to contribute</h2>
     </div>
-    <div class="routes routes3 reveal">
+    <div class="routes routes4 reveal">
       <div class="propose-mail route frame">
         <span class="ic" data-icon="podium" aria-hidden="true"></span>
         <h3>Evaluate a model</h3>
@@ -51,8 +51,14 @@
         <p>Add a single task or a whole benchmark suite: frozen scenes, a program that decides success and, where there is one, a reference solution. <a class="link" href="#criteria">What a suite needs</a>.</p>
         <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Task%20integration">Get in touch by e-mail <span class="arr">→</span></a>
       </div>
+      <div class="propose-mail route frame">
+        <span class="ic" data-icon="spark" aria-hidden="true"></span>
+        <h3>Something else</h3>
+        <p>Real-robot evaluation, analysis of the agents’ runs, tools, or an idea we have not thought of: tell us what you have in mind and we will find a way to make it part of the exam.</p>
+        <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com?subject=Contribution">Get in touch by e-mail <span class="arr">→</span></a>
+      </div>
     </div>
-    <p class="note reveal">All three go to <a href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. For questions, join the exam’s <a data-discord href="https://discord.gg/AhC6utNyfk">Discord</a> or its <button class="as-link" data-wechat type="button">WeChat group</button>.</p>
+    <p class="note reveal">All go to <a href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. For questions, join the exam’s <a data-discord href="https://discord.gg/AhC6utNyfk">Discord</a> or its <button class="as-link" data-wechat type="button">WeChat group</button>.</p>
   </section>
 
   <section class="section" id="criteria">
@@ -100,11 +106,44 @@
   <section class="section closing" id="contact">
     <div class="closing-inner reveal">
       <h2>Have an idea? Let’s talk.</h2>
-      <p>A model, a harness or a task, write to us and we will work it out together.</p>
+      <p>A model, a harness, a task or anything else, write to us and we will work it out together.</p>
       <div class="cta">
         <a class="btn primary" href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com <span class="arr">→</span></a>
       </div>
     </div>
+  </section>
+
+  <section class="section" id="contributors">
+    <div class="head reveal">
+      <h2>Current contributors</h2>
+    </div>
+    <ul class="people reveal">
+      <li><a href="https://jameskrw.github.io/">Kangrui Wang</a><sup>*</sup></li>
+      <li><a href="https://ca.linkedin.com/in/changhe-chen-10a544204">Changhe Chen</a><sup>*</sup></li>
+      <li><a href="https://qinengwang-aiden.github.io/">Qineng Wang</a><sup>*</sup></li>
+      <li><a href="https://chigui0.github.io/">Chi Gui</a><sup>*</sup></li>
+      <li><a href="https://williamzhangsjtu.github.io/">Pingyue Zhang</a><sup>*</sup></li>
+      <li><a href="https://fisher-wang.github.io/">Feishi Wang</a></li>
+      <li><a href="https://canyuchen.com/">Canyu Chen</a></li>
+      <li><a href="https://wenlixiao.com/">Wenli Xiao</a></li>
+      <li><a href="https://scholar.google.com/citations?user=G-x_szsAAAAJ">Xiaoyu Huang</a></li>
+      <li><a href="https://tonghezhang.com/">Tonghe Zhang</a></li>
+      <li><a href="https://scholar.google.com/citations?user=WR875gYAAAAJ">Linjie (Lindsey) Li</a></li>
+      <li><a href="https://sunyiyou.github.io/">Yiyou Sun</a></li>
+      <li><a href="https://mingkaid.github.io/">Mingkai Deng</a></li>
+      <li><span>Jinyu Hou</span></li>
+      <li><a href="https://www.xiangyi.li/">Xiangyi Li</a></li>
+      <li><a href="https://www.cs.cmu.edu/~epxing/">Eric P. Xing</a></li>
+      <li><a href="https://www.huaxiuyao.io/">Huaxiu Yao</a></li>
+      <li><a href="https://zhiwenfan.github.io/">Zhiwen Fan</a></li>
+      <li><a href="https://yuejiangliu.github.io/">Yuejiang Liu</a></li>
+      <li><a href="https://jiajunwu.com/">Jiajun Wu</a></li>
+      <li><a href="https://www.cs.utexas.edu/~yukez/">Yuke Zhu</a></li>
+      <li><a href="https://www.guanyashi.com/">Guanya Shi</a><sup>†</sup></li>
+      <li><a href="https://ruohanzhang.com/">Ruohan Zhang</a><sup>†</sup></li>
+      <li><a href="https://limanling.github.io/">Manling Li</a><sup>†</sup></li>
+    </ul>
+    <p class="note reveal"><sup>*</sup> Equal contribution. <sup>†</sup> Equal advising.</p>
   </section>
 
 </main>
