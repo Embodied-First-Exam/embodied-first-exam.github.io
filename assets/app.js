@@ -11,8 +11,8 @@ const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
 // suites' earlier ids, in links from before 2026-10-19: the Embodied Safety Exam was robosafe; Embodied Olympics - Fun and
 // - Match were roboolympics-fun and roboolympics-match (and one suite, roboolympics, before 2026-10-18: its tasks are found
-// in either, see taskKey). IKEA MuJoCo (ikea-mujoco), a folder of the exam's repository, is shown as part of RoboARC
-// (exam-site-source data/exam.yml merge_suites), so its suite, task and runs links open RoboARC. The address is rewritten
+// in either, see taskKey). IKEA MuJoCo (ikea-mujoco), shown inside RoboARC since 2026-10-17, is RoboARC's IKEA suite
+// since 2026-10-23 (task ids ikea_<item>): its suite and runs links open RoboARC, its task links the task (TASK_ALIAS). The address is rewritten
 // too, so the Tasks page's filters (search.js) read the new id.
 const SUITE_ALIAS = { robosafe: 'embodied-safety-exam', 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match',
   roboolympics: 'embodied-olympics-fun', 'ikea-mujoco': 'roboarc' };
@@ -26,11 +26,22 @@ const suiteNow = (id) => SUITE_ALIAS[id] || id;
   }
   if (moved) history.replaceState(history.state, '', `${location.pathname}?${Q}${location.hash}`);
 }
-/** A task's key ("<suite>/<id>") in `index`, also from a link to a suite that was split since (roboolympics/<id>). */
+// task keys renamed with their dirs in the exam's repository (exam.json task_alias, from the generator): IKEA MuJoCo's
+// ikea-mujoco/lack and roboarc/lack (as the site showed it inside RoboARC) -> roboarc/ikea_lack (2026-10-23)
+const TASK_ALIAS = {};
+/** A task's key ("<suite>/<id>") in `index`, also from a link to a suite that was split since (roboolympics/<id>) or to a
+ *  task's earlier key (TASK_ALIAS). */
 const taskKey = (want, index) => {
   if (!want || index.has(want)) return want;
+  if (TASK_ALIAS[want] && index.has(TASK_ALIAS[want])) return TASK_ALIAS[want];
   const [s, id] = want.split('/');
   return (SUITE_SPLIT[s] || []).map((x) => `${x}/${id}`).find((k) => index.has(k)) || want;
+};
+/** The task the address asks for (?task=), its key in `index`; an earlier key is rewritten in the address too. */
+const wantedTask = (index) => {
+  const q = Q.get('task'), k = taskKey(q, index);
+  if (k && k !== q && index.has(k)) { Q.set('task', k); history.replaceState(history.state, '', `${location.pathname}?${Q}${location.hash}`); }
+  return k;
 };
 const MODES = ['privileged', 'standard'];
 const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
@@ -56,7 +67,7 @@ const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!
 // runs listed but not ranked (exam.json unranked_runs; GPT-6 Luna, owners, 2026-10-19): their per-task results are in
 // tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them
 const UNRANKED_RUNS = new Set(['codex-gpt6_luna-xhigh']);
-const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); return ex; }));
+const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
 /* ------------------------------------------------------------------------------------------- page chrome */
@@ -549,7 +560,12 @@ const runSuite = (r) => (r.site ? r.site.split('/')[0] : BENCH_SUITE[r.bench] ||
 // runPage finds a run by either name. An index built after the rename has the new ids and none of this applies.
 const RUN_SUITE_RENAMED = { 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 const shardFile = new Map();   // the site's suite id -> the shard's name in the index, where they differ
-const siteNow = (r) => { const [s, id] = (r.site || '').split('/'); return RUN_SUITE_RENAMED[s] ? { ...r, site: `${RUN_SUITE_RENAMED[s]}/${id}` } : r; };
+// a row whose task was renamed since its index was built (an earlier task key, TASK_ALIAS) is read under the new key
+const siteNow = (r) => {
+  const [s, id] = (r.site || '').split('/');
+  const site = RUN_SUITE_RENAMED[s] ? `${RUN_SUITE_RENAMED[s]}/${id}` : r.site;
+  return site && TASK_ALIAS[site] ? { ...r, site: TASK_ALIAS[site] } : site !== r.site ? { ...r, site } : r;
+};
 function renameSuites(sum) {
   for (const [old, now] of Object.entries(RUN_SUITE_RENAMED)) {
     if (!sum.suites?.[old] || sum.suites[now]) continue;
@@ -771,7 +787,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
   import('./search.js?v=fad66359').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
-  const want = taskKey(Q.get('task'), index);
+  const want = wantedTask(index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
 
@@ -1590,11 +1606,9 @@ function oneLine(opener, ex) {
     const n = pool.reduce((a, f) => a + at(f)[i], 0);
     // the core set without a mode flag runs each task once, in its default mode; otherwise every chosen mode of each task
     const tests = !all() && !st.mode ? n : pool.reduce((a, f) => a + modes.reduce((b, m) => b + (F[f]?.modes?.[m] || [0, 0])[i], 0), 0);
-    // suites as the site counts them: the repository's ikea-mujoco folder is part of RoboARC (owners, 2026-10-19: said
-    // once, here, where a reader compares with the repository's folders)
+    // suites: one per folder of the repository (IKEA MuJoCo, shown inside RoboARC, is in tasks/roboarc since 2026-10-23)
     const used = pool.filter((f) => at(f)[i]);
-    return { n, tests, k: new Set(used.map((f) => (f === 'ikea-mujoco' ? 'roboarc' : f))).size, folders: used.length,
-      modes: !all() && !st.mode ? ['each in its default mode'] : modes };
+    return { n, tests, k: used.length, modes: !all() && !st.mode ? ['each in its default mode'] : modes };
   };
   const opt = (g, v, label, note) => `<button type="button" class="ol-opt" data-g="${g}" data-v="${v}" aria-pressed="false"><b>${label}</b><small>${note}</small></button>`;
   const dlg = document.createElement('div');
@@ -1617,7 +1631,7 @@ function oneLine(opener, ex) {
   const card = $('.ol-card', dlg), cmdEl = $('.cmd', dlg), outEl = $('.out', dlg), copy = $('.ol-copy', dlg);
   const out = () => {
     const t = tally();
-    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${all() ? '' : ' of the core set'} · ${t.k} suite${t.k === 1 ? '' : 's'}${st.set && !st.mode && t.folders !== t.k ? ` (${t.folders} folders in the repository: ikea-mujoco is part of RoboARC)` : ''} · ${t.modes.join(' + ')}\n`
+    outEl.innerHTML = `\n<span class="ok">▸</span> <b>${int(t.n)}</b> tasks · <b>${int(t.tests)}</b> tests${all() ? '' : ' of the core set'} · ${t.k} suite${t.k === 1 ? '' : 's'} · ${t.modes.join(' + ')}\n`
       + `<span class="ok">▸</span> ${st.agent === 'oracle' ? 'the reference solutions, marked like any answer' : 'each answer marked by a fresh simulator'}`;
   };
   let prev = {};
@@ -2066,7 +2080,7 @@ async function tasksPage(ex) {
     result: resultOf, bodies: BODY_ORDER, legend: dotsKey(),
     models: runs.map((r) => ({ id: r.id, name: named(r), title: [r.model, r.harness, r.effort].filter(Boolean).join(' · '), mark: makerMark(r.model) })) });
   el.addEventListener('click', (e) => { const b = e.target.closest('[data-task]'); if (b && index.has(b.dataset.task)) openTask(ex, index.get(b.dataset.task), runs); });
-  const want = taskKey(Q.get('task'), index);
+  const want = wantedTask(index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
 
@@ -2144,7 +2158,7 @@ async function runIndex(ex, head) {
     $('#run-log').innerHTML = `<div class="empty-state">The list of runs could not be loaded (${esc(e.message)}). <a class="link" href="${esc(location.href)}">Try again</a></div>`;
     return;
   }
-  const titleOf = (r) => r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+  const titleOf = (r) => r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
     .replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const modeOf = (t) => (/-standard-realtime$/.test(t) ? 'standard-realtime' : /-standard$/.test(t) ? 'standard' : 'privileged');
   $('#run-log').classList.add('run-index');
@@ -2255,8 +2269,9 @@ async function runIndex(ex, head) {
   loadScope();
 }
 
-// a run's slug under its suite's other name (runs built before a rename keep theirs; a rebuilt index may use the new one)
-const SLUG_RENAMED = [['roboolympics-fun-', 'embodied-olympics-fun-'], ['roboolympics-match-', 'embodied-olympics-match-']];
+// a run's slug under its task dir's other name (runs built before a rename keep theirs; a rebuilt index may use the new
+// one): Embodied Olympics (2026-10-19), IKEA MuJoCo's ikea-* dirs that became RoboARC's roboarc-ikea-* (2026-10-23)
+const SLUG_RENAMED = [['roboolympics-fun-', 'embodied-olympics-fun-'], ['roboolympics-match-', 'embodied-olympics-match-'], ['ikea-', 'roboarc-ikea-']];
 const otherSlug = (slug) => { for (const [a, b] of SLUG_RENAMED) { if (slug.startsWith(a)) return b + slug.slice(a.length); if (slug.startsWith(b)) return a + slug.slice(b.length); } return null; };
 async function runPage(ex) {
   let slug = Q.get('r');
@@ -2268,7 +2283,7 @@ async function runPage(ex) {
   try { r = await runJSON(`${slug}.json`).catch((e) => { const alt = otherSlug(slug); if (!alt) throw e; return runJSON(`${alt}.json`).then((x) => { slug = alt; return x; }, () => { throw e; }); }); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
   const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
   const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
-  const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+  const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
     .replace(/[-_]+/g, ' ')).replace(/\b\w/g, (c) => c.toUpperCase());
   document.title = `${title} · run · Embodied First Exam`;
   const steps = r.steps || [];
@@ -2296,10 +2311,12 @@ async function runPage(ex) {
 
   // the task this run sat and the other runs of it: from the run's suite's rows only (watchable), not the whole index
   watchable(BENCH_SUITE[r.bench] || r.bench).then((m) => {
-    const mine = [...m.values()].find((rows) => rows.some((x) => x.slug === slug)) || [];
-    const me = mine.find((x) => x.slug === slug);
+    // the index may list the run under its other name (a run renamed with its task dir: SLUG_RENAMED)
+    const alt = otherSlug(slug), isMe = (x) => x.slug === slug || x.slug === alt;
+    const mine = [...m.values()].find((rows) => rows.some(isMe)) || [];
+    const me = mine.find(isMe);
     if (!me?.site || !$('#run-links')) return;
-    const others = mine.filter((x) => x.slug !== slug);
+    const others = mine.filter((x) => !isMe(x));
     $('#run-links').insertAdjacentHTML('afterbegin', `<a class="btn small primary" href="${exam('tasks/')}?task=${encodeURIComponent(me.site)}">Open the task <span class="arr">→</span></a>`
       + others.map((o) => `<a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(o.slug)}">${esc(settingOf(o))} · ${/-standard/.test(o.task) ? 'standard' : 'privileged'}</a>`).join(''));
   });
