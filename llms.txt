@@ -1,0 +1,58 @@
+# Embodied First Exam
+
+> The first exam for code agents in the physical world. Each question is a frozen simulation scene with a goal written for a person; the answer is a program, marked by replaying it in a fresh simulator. The questions come from many benchmark suites and are sat in two modes: privileged, with the simulator open to the agent, and standard, with only the robot. A Terminal-Bench for coding agents in robotics.
+
+## Key facts
+
+- 1108 tasks (449 core) from 33 benchmark suites, 46 robots, 22 simulators, 5177 graded trials.
+- Settings: privileged (the agent works inside the simulator); standard (real-robot rules: the agent reaches the robot only through the robot's API); standard-realtime (standard on a running clock that never stops, offered where timing matters, mostly for dynamic tasks with moving objects or opponents). Core is the leaderboard's default view: each core task once, in its default setting.
+- Marking: The answer is a program, marked by replaying it in a fresh simulator (privileged) or on the live episode (standard and standard-realtime).
+- Agents ranked: Antigravity + Gemini 3.8 Flash, Antigravity + Gemini 4 Argon, Claude Code + Claude Opus 5.5, Claude Code + GLM 5.3 Flash, Codex + GPT-6 Astra, dsh + DeepSeek V4.1 Flash. Also run, unranked: Codex + GPT-6 Luna.
+- Run it with Harbor: `harbor run -d embodied-first-exam -a <agent> -m <model>`. Code: https://github.com/mll-lab-nu/embodied-first-exam
+
+## Pages
+
+- Home: https://www.embodied-first-exam.ai/
+- Leaderboard: https://www.embodied-first-exam.ai/leaderboard/
+- Suites: https://www.embodied-first-exam.ai/suites/
+- Every task: https://www.embodied-first-exam.ai/tasks/
+- How a test is marked: https://www.embodied-first-exam.ai/how/
+- Contribute: https://www.embodied-first-exam.ai/contribute/
+- Report: https://www.embodied-first-exam.ai/blogs/first-exam/
+- Full text for language models: https://www.embodied-first-exam.ai/llms-full.txt
+
+## Suites
+
+- BEHAVIOR-1K: Full household activities in house-scale scenes, for a mobile two-armed robot. https://www.embodied-first-exam.ai/suite/?id=behavior-1k
+- RoboLab: Tabletop tasks that test language grounding, from colours and counts to relations and order. https://www.embodied-first-exam.ai/suite/?id=robolab
+- RoboCasa: Everyday kitchen skills for a mobile manipulator in procedurally generated kitchens. https://www.embodied-first-exam.ai/suite/?id=robocasa
+- RoboCasa365: Atomic and long composite kitchen activities from RoboCasa's 365-task suite. https://www.embodied-first-exam.ai/suite/?id=robocasa365
+- RoboCasa-GR1: A Fourier GR1 humanoid with dexterous hands, picking and placing at a counter. https://www.embodied-first-exam.ai/suite/?id=robocasa-gr1
+- MetaWorld+: All 50 Meta-World v3 environments for a Sawyer arm, one frozen instance each. https://www.embodied-first-exam.ai/suite/?id=metaworldplus
+- VLABench: Manipulation from language: attributes, common sense and multi-step chores. https://www.embodied-first-exam.ai/suite/?id=vlabench
+- HumanoidBench: Whole-body locomotion and manipulation for a Unitree H1 humanoid. https://www.embodied-first-exam.ai/suite/?id=humanoidbench
+- MolmoSpaces: Zero-shot episodes in unseen houses, for a Franka FR3 and an RB-Y1 mobile robot. https://www.embodied-first-exam.ai/suite/?id=molmospaces
+- KinDER: Physical reasoning for planning and control: throw, balance, sweep, scoop, pack. https://www.embodied-first-exam.ai/suite/?id=kinder
+- RoboPaint: A robot arm with a brush paints the picture it is shown, stroke by stroke, from calligraphy to oils. https://www.embodied-first-exam.ai/suite/?id=robopaint
+- RoboTwin 2.0: Fifty bimanual tabletop tasks for a dual-arm ALOHA-AgileX. https://www.embodied-first-exam.ai/suite/?id=robotwin-2
+- MuJoCo Playground: Quadrupeds that walk, get up and balance, and manipulation for ALOHA 2 and a Franka Panda. https://www.embodied-first-exam.ai/suite/?id=mujoco-playground
+- DexToolBench: Dexterous tool use with a hammer, a marker, an eraser, a brush, a spatula or a screwdriver. https://www.embodied-first-exam.ai/suite/?id=dextoolbench
+- DexJoCo: A 16-DoF Allegro hand on a Franka arm, one hand or two. https://www.embodied-first-exam.ai/suite/?id=dexjoco
+- MyoSuite: Musculoskeletal hands, arms and legs, driven one muscle excitation at a time. https://www.embodied-first-exam.ai/suite/?id=myosuite
+- RoboARC: Topological puzzles, ropes, chains, cloth and IKEA furniture: separate, thread, untie, fold, assemble. https://www.embodied-first-exam.ai/suite/?id=roboarc
+- RoboDojo: Bimanual manipulation over five capabilities: generalization, memory, precision, long horizons, open tasks. https://www.embodied-first-exam.ai/suite/?id=robodojo
+- RoboDynamicExam: Catch, strike, carry and hand over objects that move by themselves. https://www.embodied-first-exam.ai/suite/?id=pandadyn
+- BiGym 2.0: Household loco-manipulation on a walking Unitree G1. https://www.embodied-first-exam.ai/suite/?id=bigym2
+- YAMLab: Two I2RT YAM arms: set a pot on a cooktop, hand a mug over and hang it. https://www.embodied-first-exam.ai/suite/?id=yamlab
+- LIBERO-MAX: LIBERO tasks with one change in the middle of the task. https://www.embodied-first-exam.ai/suite/?id=libero-max
+- Embodied Olympics - Fun (Robo Olympics, RoboOlympics): Humanoid sports at official sizes, from sprints and jumps to dunks and backflips, judged by a referee. https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-fun
+- Embodied Olympics - Match (Robo Olympics, RoboOlympics): Whole matches against scripted and learned opponents: table tennis, badminton, soccer, foosball, fencing. https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-match
+- AM-Bench: Aerial manipulation: a flying hexarotor with an arm presses, pulls, turns and picks. https://www.embodied-first-exam.ai/suite/?id=ambench
+- AutoBio: A biology bench: thermal cycler, mixer, centrifuge, screw caps and a pipette. https://www.embodied-first-exam.ai/suite/?id=autobio
+- LabUtopia: A chemistry laboratory: glassware, a heater, an instrument panel, an oven and drawers. https://www.embodied-first-exam.ai/suite/?id=labutopia
+- Embodied Safety Exam: Do what is harmless, refuse what would hurt someone, and say why. https://www.embodied-first-exam.ai/suite/?id=embodied-safety-exam
+- DexHandExam: Five-finger hands: reorient, regrasp, fold paper, sweep and build a hamburger. https://www.embodied-first-exam.ai/suite/?id=dexhand
+- iSpatialGym: The goal is a picture: make the scene look like it. https://www.embodied-first-exam.ai/suite/?id=ispatialgym
+- RoboWits: Tabletop tasks that need a physical insight, like a ruler to align things or a funnel to pour. https://www.embodied-first-exam.ai/suite/?id=robowits
+- ManiGuard: Manipulation safety. A task counts only if no safety rule was broken on the way. https://www.embodied-first-exam.ai/suite/?id=maniguard
+- RoboEngineer: Simulate real-world sim2real engineering: train, deploy, diagnose failures, and improve. https://www.embodied-first-exam.ai/suite/?id=roboengineer

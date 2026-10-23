@@ -1,0 +1,346 @@
+# Embodied First Exam
+
+> The first exam for code agents in the physical world. Each question is a frozen simulation scene with a goal written for a person; the answer is a program, marked by replaying it in a fresh simulator. The questions come from many benchmark suites and are sat in two modes: privileged, with the simulator open to the agent, and standard, with only the robot. A Terminal-Bench for coding agents in robotics.
+
+## Key facts
+
+- 1108 tasks (449 core) from 33 benchmark suites, 46 robots, 22 simulators, 5177 graded trials.
+- Settings: privileged (the agent works inside the simulator); standard (real-robot rules: the agent reaches the robot only through the robot's API); standard-realtime (standard on a running clock that never stops, offered where timing matters, mostly for dynamic tasks with moving objects or opponents). Core is the leaderboard's default view: each core task once, in its default setting.
+- Marking: The answer is a program, marked by replaying it in a fresh simulator (privileged) or on the live episode (standard and standard-realtime).
+- Agents ranked: Antigravity + Gemini 3.8 Flash, Antigravity + Gemini 4 Argon, Claude Code + Claude Opus 5.5, Claude Code + GLM 5.3 Flash, Codex + GPT-6 Astra, dsh + DeepSeek V4.1 Flash. Also run, unranked: Codex + GPT-6 Luna.
+- Run it with Harbor: `harbor run -d embodied-first-exam -a <agent> -m <model>`. Code: https://github.com/mll-lab-nu/embodied-first-exam
+
+## Pages
+
+- Home: https://www.embodied-first-exam.ai/
+- Leaderboard: https://www.embodied-first-exam.ai/leaderboard/
+- Suites: https://www.embodied-first-exam.ai/suites/
+- Every task: https://www.embodied-first-exam.ai/tasks/
+- How a test is marked: https://www.embodied-first-exam.ai/how/
+- Contribute: https://www.embodied-first-exam.ai/contribute/
+- Report: https://www.embodied-first-exam.ai/blogs/first-exam/
+- Full text for language models: https://www.embodied-first-exam.ai/llms-full.txt
+
+## Suites
+
+- BEHAVIOR-1K: Full household activities in house-scale scenes, for a mobile two-armed robot. https://www.embodied-first-exam.ai/suite/?id=behavior-1k
+- RoboLab: Tabletop tasks that test language grounding, from colours and counts to relations and order. https://www.embodied-first-exam.ai/suite/?id=robolab
+- RoboCasa: Everyday kitchen skills for a mobile manipulator in procedurally generated kitchens. https://www.embodied-first-exam.ai/suite/?id=robocasa
+- RoboCasa365: Atomic and long composite kitchen activities from RoboCasa's 365-task suite. https://www.embodied-first-exam.ai/suite/?id=robocasa365
+- RoboCasa-GR1: A Fourier GR1 humanoid with dexterous hands, picking and placing at a counter. https://www.embodied-first-exam.ai/suite/?id=robocasa-gr1
+- MetaWorld+: All 50 Meta-World v3 environments for a Sawyer arm, one frozen instance each. https://www.embodied-first-exam.ai/suite/?id=metaworldplus
+- VLABench: Manipulation from language: attributes, common sense and multi-step chores. https://www.embodied-first-exam.ai/suite/?id=vlabench
+- HumanoidBench: Whole-body locomotion and manipulation for a Unitree H1 humanoid. https://www.embodied-first-exam.ai/suite/?id=humanoidbench
+- MolmoSpaces: Zero-shot episodes in unseen houses, for a Franka FR3 and an RB-Y1 mobile robot. https://www.embodied-first-exam.ai/suite/?id=molmospaces
+- KinDER: Physical reasoning for planning and control: throw, balance, sweep, scoop, pack. https://www.embodied-first-exam.ai/suite/?id=kinder
+- RoboPaint: A robot arm with a brush paints the picture it is shown, stroke by stroke, from calligraphy to oils. https://www.embodied-first-exam.ai/suite/?id=robopaint
+- RoboTwin 2.0: Fifty bimanual tabletop tasks for a dual-arm ALOHA-AgileX. https://www.embodied-first-exam.ai/suite/?id=robotwin-2
+- MuJoCo Playground: Quadrupeds that walk, get up and balance, and manipulation for ALOHA 2 and a Franka Panda. https://www.embodied-first-exam.ai/suite/?id=mujoco-playground
+- DexToolBench: Dexterous tool use with a hammer, a marker, an eraser, a brush, a spatula or a screwdriver. https://www.embodied-first-exam.ai/suite/?id=dextoolbench
+- DexJoCo: A 16-DoF Allegro hand on a Franka arm, one hand or two. https://www.embodied-first-exam.ai/suite/?id=dexjoco
+- MyoSuite: Musculoskeletal hands, arms and legs, driven one muscle excitation at a time. https://www.embodied-first-exam.ai/suite/?id=myosuite
+- RoboARC: Topological puzzles, ropes, chains, cloth and IKEA furniture: separate, thread, untie, fold, assemble. https://www.embodied-first-exam.ai/suite/?id=roboarc
+- RoboDojo: Bimanual manipulation over five capabilities: generalization, memory, precision, long horizons, open tasks. https://www.embodied-first-exam.ai/suite/?id=robodojo
+- RoboDynamicExam: Catch, strike, carry and hand over objects that move by themselves. https://www.embodied-first-exam.ai/suite/?id=pandadyn
+- BiGym 2.0: Household loco-manipulation on a walking Unitree G1. https://www.embodied-first-exam.ai/suite/?id=bigym2
+- YAMLab: Two I2RT YAM arms: set a pot on a cooktop, hand a mug over and hang it. https://www.embodied-first-exam.ai/suite/?id=yamlab
+- LIBERO-MAX: LIBERO tasks with one change in the middle of the task. https://www.embodied-first-exam.ai/suite/?id=libero-max
+- Embodied Olympics - Fun (Robo Olympics, RoboOlympics): Humanoid sports at official sizes, from sprints and jumps to dunks and backflips, judged by a referee. https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-fun
+- Embodied Olympics - Match (Robo Olympics, RoboOlympics): Whole matches against scripted and learned opponents: table tennis, badminton, soccer, foosball, fencing. https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-match
+- AM-Bench: Aerial manipulation: a flying hexarotor with an arm presses, pulls, turns and picks. https://www.embodied-first-exam.ai/suite/?id=ambench
+- AutoBio: A biology bench: thermal cycler, mixer, centrifuge, screw caps and a pipette. https://www.embodied-first-exam.ai/suite/?id=autobio
+- LabUtopia: A chemistry laboratory: glassware, a heater, an instrument panel, an oven and drawers. https://www.embodied-first-exam.ai/suite/?id=labutopia
+- Embodied Safety Exam: Do what is harmless, refuse what would hurt someone, and say why. https://www.embodied-first-exam.ai/suite/?id=embodied-safety-exam
+- DexHandExam: Five-finger hands: reorient, regrasp, fold paper, sweep and build a hamburger. https://www.embodied-first-exam.ai/suite/?id=dexhand
+- iSpatialGym: The goal is a picture: make the scene look like it. https://www.embodied-first-exam.ai/suite/?id=ispatialgym
+- RoboWits: Tabletop tasks that need a physical insight, like a ruler to align things or a funnel to pour. https://www.embodied-first-exam.ai/suite/?id=robowits
+- ManiGuard: Manipulation safety. A task counts only if no safety rule was broken on the way. https://www.embodied-first-exam.ai/suite/?id=maniguard
+- RoboEngineer: Simulate real-world sim2real engineering: train, deploy, diagnose failures, and improve. https://www.embodied-first-exam.ai/suite/?id=roboengineer
+
+## Questions
+
+### What is the Embodied First Exam?
+
+The first exam for code agents in the physical world. Each question is a frozen simulation scene with a goal written for a person; the answer is a program, marked by replaying it in a fresh simulator. The questions come from many benchmark suites and are sat in two modes: privileged, with the simulator open to the agent, and standard, with only the robot. A Terminal-Bench for coding agents in robotics.
+
+### Is it a Terminal-Bench for robotics?
+
+Yes: A Terminal-Bench for coding agents in robotics. A coding agent in its harness (such as Codex, Claude Code or Antigravity) writes a program for a robot. The answer is a program, marked by replaying it in a fresh simulator (privileged) or on the live episode (standard and standard-realtime). The exam runs through Harbor, so one command can evaluate any agent on any task.
+
+### How do coding agents do on robots?
+
+See the leaderboard at https://www.embodied-first-exam.ai/leaderboard/ for Antigravity + Gemini 3.8 Flash, Antigravity + Gemini 4 Argon, Claude Code + Claude Opus 5.5, Claude Code + GLM 5.3 Flash, Codex + GPT-6 Astra, dsh + DeepSeek V4.1 Flash.
+
+### What is the real-time setting?
+
+standard-realtime: standard on a running clock that never stops, offered where timing matters, mostly for dynamic tasks with moving objects or opponents; 59 core tests.
+
+### What are privileged and standard?
+
+privileged: the agent works inside the simulator; standard: real-robot rules: the agent reaches the robot only through the robot's API.
+
+## Every suite and its tasks
+
+### BEHAVIOR-1K
+
+100 full-length household activities in house-scale scenes. Agents must combine high-level reasoning, long-horizon navigation, and dexterous bimanual manipulation. Scored by average task success with BDDL partial credit.
+
+Simulator: OmniGibson (NVIDIA Isaac Sim) · Edition: 2026 BEHAVIOR Challenge · Robots: Galaxea R1 Pro · Adapted from an upstream benchmark
+
+Tasks: Assembling Gift Baskets; Attach a Camera to a Tripod; Boxing Books Up for Storage; Boxing Food After Dinner; Bringing Paper To Recycling; Bringing Water; Bringing in Wood; Can Meat; Canning Food; Carrying Out Garden Furniture; Carrying in Groceries; Chop an Onion; Chopping Wood; Clean A Keyboard; Clean Boxing Gloves; Clean Up Broken Glass; Clean Up Your Desk; Clean Your Rusty Garden Tools; Clean a Patio; Clean a Trumpet; Cleaning Up Branches And Twigs; Cleaning Up Plates and Food; Clearing Food from Table into Fridge; Collecting Aluminum Cans; Collecting Children's Toys; Composting Waste; Cook A Brisket; Cook A Frozen Pie; Cook Bacon; Cook Broccolini; Cook Brussels Sprouts; Cook Cabbage; Cook Hot Dogs; Dispose Of Batteries; Dispose Of Glass; Freeze Fruit; Freeze Pies; Getting Organized For Work; Halve An Egg; Hanging Pictures; Hiding Easter Eggs; Installing A Fax Machine; Installing A Modem; Installing A Scanner; Installing Smoke Detectors; Laying Tile Floors; Loading The Car; Make Cabinet Doors; Make Gift Bags For Baby Showers; Make Microwave Popcorn; Make Pizza; Make Rose Centerpieces; Moving Boxes To Storage; Organizing Art Supplies; Organizing School Stuff; Outfit A Basic Toolbox; Packing Meal For Delivery; Picking Up Toys; Picking Up Trash; Polishing Shoes; Preparing Lunch Box; Put Together A Basic Pruning Kit; Putting Away Halloween Decorations; Putting Away Toys; Putting Dirty Dishes In Sink; Putting Dishes Away After Cleaning; Putting Shoes On Rack; Putting Up Christmas Decorations Inside; Re Shelving Library Books; Rearrange Your Room; Rearranging Kitchen Furniture; Scrubbing Bathroom Floor; Set Up A Coffee Station In Your Kitchen; Setting Mousetraps; Setting The Fire; Setting The Table; Setup A Bar For A Cocktail Party; Slicing Vegetables; Sorting Books On Shelf; Sorting Bottles Cans And Paper; Sorting Household Items; Sorting Vegetables; Spraying For Bugs; Spraying Fruit Trees; Stacking Wood; Store Batteries; Store Honey; Store Produce; Storing Food; Sweeping Garage; Thawing Frozen Food; Tidying Bathroom; Tidying Bedroom; Tidying Living Room; Turning On Radio; Turning Out All Lights Before Sleep; Unloading The Car; Vacuuming Floors; Wash A Baseball Cap; Wash Dog Toys.
+
+### RoboLab
+
+120 tabletop manipulation tasks for a fixed-base arm, built to test language grounding and goal specification rather than locomotion: colour and size references, counting, spatial relations, sorting, ordered stacking, reorientation. Success is a composable predicate over object state, with partial credit from scored subtasks.
+
+Simulator: Isaac Lab 2.3.2 / Isaac Sim 5.1 (NVIDIA) · Edition: v0.3.1 (2026-08-11) · Robots: Franka + Robotiq 2F-85 · Adapted from an upstream benchmark
+
+Tasks: Apple And Yogurt In Bowl; Banana In Bowl; Banana Then Rubiks Cube; Bananas In Bin One More; Bananas In Bin Three Total; Bananas Out Of Bin; Bbq Sauce In Bin; Block Stacking Order Agnostic; Block Stacking Specified Order; Blocks In Bin; Butter Above Raisin; Clutter Plastic; Clutter Pumpkin; Condiments In Bin; Cooking Clear Plate; Cubes And Blocks In Bin; Food Packing2 Cans; Food Packing3 Cans; Fruits Green Limes On Plate; Fruits On Plate3; Keyboard Out Of Bin; Larger Object Raisin Box In Bin; Marker In Mug; Mustard Above Raisin; Mustard In Left Bin; Mustard In Right Bin; Pick Glasses; Pick Orange Object; Pick Up Blue Pitcher; Plastic Bottles In Square Pail; Put Two Mugs On Shelf; Recycle Carton; Recycle Cartons Vertical Crate; Red Dishes In Bin; Reorient Red Mug; Rubiks Cube And Banana; Rubiks Cube Behind Bowl; Rubiks Cube In Front Of Bowl; Rubiks Cube Left Of Bowl; Rubiks Cube Right Of Bowl; Rubiks Cube Then Banana; Rubiks Cubes In Bin; Spoon In Mug; Stack Yellow On Red; Stack3 Rubiks Cube; Take Measuring Spoon Out; Take Mugs Off Of Shelf; Take Spatula Off Shelf; Throw Away Snacks; Tools Picking Drill; Unstack Rubiks Cube; Utensils In Mug; White Mug In Center Of Table.
+
+### RoboCasa
+
+Everyday kitchen tasks for a mobile manipulator in large procedurally generated kitchens: opening and closing doors and drawers, turning knobs and faucets, pressing buttons, and picking and placing between counters, cabinets, sinks, stoves and appliances, single- and multi-stage. We keep the 29 tasks with an official demonstration at the pinned commit whose demonstration re-verifies as a reference on a frozen instance (its first episode's initial state). Each task passes or fails on the environment's own success checker on the state after the last action, with no partial credit, and runs in two modes: unlimited (privileged: full simulator state, unlimited resets, one replayable trajectory handed in) and limited (standard: the robot's own four cameras, one episode, no reset).
+
+Simulator: robosuite 1.5.1 / MuJoCo 3.2.6 (RoboCasa v0.2) · Edition: RoboCasa v0.2 @ 756598a, our selection of 29 tasks (exam @ 8c5594a43) · Robots: Franka Panda on an Omron base · Adapted from an upstream benchmark
+
+Tasks: Multi-stage · ArrangeVegetables; Multi-stage · MicrowaveThawing; Multi-stage · PreSoakPan; Multi-stage · PrepareCoffee; Multi-stage · RestockPantry; Single-stage · CloseDoubleDoor; Single-stage · CloseDrawer; Single-stage · CloseSingleDoor; Single-stage · CoffeePressButton; Single-stage · CoffeeServeMug; Single-stage · CoffeeSetupMug; Single-stage · OpenDoubleDoor; Single-stage · OpenDrawer; Single-stage · OpenSingleDoor; Single-stage · PnPCabToCounter; Single-stage · PnPCounterToCab; Single-stage · PnPCounterToMicrowave; Single-stage · PnPCounterToSink; Single-stage · PnPCounterToStove; Single-stage · PnPMicrowaveToCounter; Single-stage · PnPSinkToCounter; Single-stage · PnPStoveToCounter; Single-stage · TurnOffMicrowave; Single-stage · TurnOffSinkFaucet; Single-stage · TurnOffStove; Single-stage · TurnOnMicrowave; Single-stage · TurnOnSinkFaucet; Single-stage · TurnOnStove; Single-stage · TurnSinkSpout.
+
+### RoboCasa365
+
+RoboCasa's 365-task kitchen suite for the same mobile manipulator: atomic skills and long composite activities across cooking, cleaning, storing and serving. We keep 50 of the families with a validated demonstration, chosen by a fixed rule (12 atomic, 38 composite, in SHA-256 order of their names), one frozen instance each. Each task passes or fails on the environment's own success checker on the state after the last action, with no partial credit, and runs in two modes: unlimited (privileged: full simulator state, unlimited resets, one replayable trajectory handed in) and limited (standard: the robot's own four cameras, one episode, no reset).
+
+Simulator: robosuite 1.5.2 / MuJoCo 3.3.1 (RoboCasa365) · Edition: RoboCasa365 (robocasa 1.0.1 @ 4f8a298), our selection of 50 tasks (exam @ 8c5594a43) · Robots: Franka Panda on an Omron base · Adapted from an upstream benchmark
+
+Tasks: Atomic · CloseDrawer; Atomic · CloseOven; Atomic · CloseStandMixerHead; Atomic · OpenDishwasher; Atomic · PackDessert; Atomic · PickPlaceCabinetToCounter; Atomic · PickPlaceSinkToCounter; Atomic · TurnOffMicrowave; Atomic · TurnOnMicrowave; Atomic · TurnOnSinkFaucet; Atomic · TurnOnToasterOven; Composite · AddLemonToFish; Composite · AssembleCookingArray; Composite · BeverageSorting; Composite · BreadAndCheese; Composite · CandleCleanup; Composite · CerealAndBowl; Composite · ChooseMeasuringCup; Composite · ClearFoodWaste; Composite · ClearSink; Composite · CookieDoughPrep; Composite · DeliverBrewedCoffee; Composite · DessertUpgrade; Composite · DisplayMeatVariety; Composite · DivideBasins; Composite · DrainVeggies; Composite · DrinkwareConsolidation; Composite · MakeIceLemonade; Composite · MakeLoadedPotato; Composite · MealPrepStaging; Composite · MicrowaveDefrostMeat; Composite · OrganizeCoffeeCondiments; Composite · OvenBroilFish; Composite · PlateSteakMeal; Composite · PortionInTupperware; Composite · PreRinseStation; Composite · PrepForSanitizing; Composite · PrepMarinatingMeat; Composite · ReheatMeal; Composite · RetrieveMeat; Composite · SanitizePrepCuttingBoard; Composite · ScrubBowl; Composite · SearingMeat; Composite · SeasoningSpiceSetup; Composite · SetUpCuttingStation; Composite · StockingBreakfastFoods; Composite · SweetenCoffee; Composite · ThawInSink; Composite · TongBuffetSetup; Kitchen · TurnOnStove.
+
+### RoboCasa-GR1
+
+A Fourier GR1 humanoid with two dexterous hands at a kitchen counter: picking objects from one container or surface and placing them in another, including novel objects, and placing into a cabinet, drawer or microwave and closing it. We keep all 24 environments with an official demonstration, one frozen instance each (the demonstration's initial state). Each task passes or fails on the environment's own success checker on the state after the last action, with no partial credit, and runs in two modes: unlimited (privileged: full simulator state, unlimited resets, one replayable trajectory handed in) and limited (standard: the humanoid's own six cameras, one episode, no reset).
+
+Simulator: robosuite @ 51cc017 (1.5.1, mink whole-body IK) / MuJoCo 3.2.6 (RoboCasa GR1 tabletop) · Edition: RoboCasa GR1 tabletop tasks @ 4840e67, all 24 (exam @ 8c5594a43) · Robots: Fourier GR1 · Adapted from an upstream benchmark
+
+Tasks: GR1 · PnPBottleToCabinetClose; GR1 · PnPCanToDrawerClose; GR1 · PnPCupToDrawerClose; GR1 · PnPMilkToMicrowaveClose; GR1 · PnPPotatoToMicrowaveClose; GR1 · PnPWineToCabinetClose; GR1 · PosttrainPnPNovelFromCuttingboardToBasketSplitA; GR1 · PosttrainPnPNovelFromCuttingboardToCardboardboxSplitA; GR1 · PosttrainPnPNovelFromCuttingboardToPanSplitA; GR1 · PosttrainPnPNovelFromCuttingboardToPotSplitA; GR1 · PosttrainPnPNovelFromCuttingboardToTieredbasketSplitA; GR1 · PosttrainPnPNovelFromPlacematToBasketSplitA; GR1 · PosttrainPnPNovelFromPlacematToBowlSplitA; GR1 · PosttrainPnPNovelFromPlacematToPlateSplitA; GR1 · PosttrainPnPNovelFromPlacematToTieredshelfSplitA; GR1 · PosttrainPnPNovelFromPlateToBowlSplitA; GR1 · PosttrainPnPNovelFromPlateToCardboardboxSplitA; GR1 · PosttrainPnPNovelFromPlateToPanSplitA; GR1 · PosttrainPnPNovelFromPlateToPlateSplitA; GR1 · PosttrainPnPNovelFromTrayToCardboardboxSplitA; GR1 · PosttrainPnPNovelFromTrayToPlateSplitA; GR1 · PosttrainPnPNovelFromTrayToPotSplitA; GR1 · PosttrainPnPNovelFromTrayToTieredbasketSplitA; GR1 · PosttrainPnPNovelFromTrayToTieredshelfSplitA.
+
+### MetaWorld+
+
+All 50 of Meta-World's v3 environments for a Sawyer arm (reward v2), one frozen instance each: push, pick and place, open doors, drawers and windows, press buttons, turn dials and faucets, insert pegs, hammer, sweep and more. Each task passes or fails on Meta-World's own success checker on the state after the agent's last action, with no partial credit, and runs in two modes: unlimited (privileged: full simulator state, unlimited resets, one replayable trajectory of at most 500 actions handed in) and limited (standard: a robot behind a service, four fixed cameras and the arm's own state, one episode, no reset). Privileged is reported as a control; the standard mode is the benchmark.
+
+Simulator: MuJoCo 3.3.0 (Meta-World v3) · Edition: our benchmark (exam @ 8c5594a43): Meta-World v3 @ 59fc34d, all 50 environments · Robots: Rethink Sawyer · Adapted from an upstream benchmark
+
+Tasks: Meta-World · Assembly; Meta-World · Basketball; Meta-World · Bin picking; Meta-World · Box close; Meta-World · Button press; Meta-World · Button press topdown; Meta-World · Button press topdown wall; Meta-World · Button press wall; Meta-World · Coffee button; Meta-World · Coffee pull; Meta-World · Coffee push; Meta-World · Dial turn; Meta-World · Disassemble; Meta-World · Door close; Meta-World · Door lock; Meta-World · Door open; Meta-World · Door unlock; Meta-World · Drawer close; Meta-World · Drawer open; Meta-World · Faucet close; Meta-World · Faucet open; Meta-World · Hammer; Meta-World · Hand insert; Meta-World · Handle press; Meta-World · Handle press side; Meta-World · Handle pull; Meta-World · Handle pull side; Meta-World · Lever pull; Meta-World · Peg insert side; Meta-World · Peg unplug side; Meta-World · Pick out of hole; Meta-World · Pick place; Meta-World · Pick place wall; Meta-World · Plate slide; Meta-World · Plate slide back; Meta-World · Plate slide back side; Meta-World · Plate slide side; Meta-World · Push; Meta-World · Push back; Meta-World · Push wall; Meta-World · Reach; Meta-World · Reach wall; Meta-World · Shelf place; Meta-World · Soccer; Meta-World · Stick pull; Meta-World · Stick push; Meta-World · Sweep; Meta-World · Sweep into; Meta-World · Window close; Meta-World · Window open.
+
+### VLABench
+
+Language-conditioned manipulation for a Franka Panda at a table: selecting by attribute, common sense, semantic and spatial descriptions, physical question answering by pressing buttons, and multi-step tasks (heating food, setting a table, playing poker). We keep the 36 of VLABench's native tasks whose recorded expert re-verifies on a frozen instance, one instance each. Each task passes or fails on VLABench's own success checker (its termination condition), with no partial credit, and runs in two modes: unlimited (privileged: every entity's pose, VLABench's skills as planning primitives, unlimited resets, one replayable trajectory handed in) and limited (standard: four cameras and the arm's own state, one episode, no reset).
+
+Simulator: MuJoCo 3.2.2 + dm_control 1.0.22 (VLABench) · Edition: VLABench @ cf588fe, our selection of 36 tasks (exam @ 8c5594a43) · Robots: Franka Panda · Adapted from an upstream benchmark
+
+Tasks: Common sense · select_billiards_common_sense; Common sense · select_chemistry_tube_common_sense; Common sense · select_fruit_common_sense; Manipulation · add_condiment; Manipulation · book_rearrange; Manipulation · find_unseen_object; Manipulation · hammer_nail_and_hang_picture; Manipulation · heat_food; Manipulation · insert_bloom_flower; Manipulation · insert_flower; Manipulation · play_math_game; Manipulation · put_box_on_painting; Manipulation · select_billiards; Manipulation · select_chemistry_tube; Manipulation · select_drink; Manipulation · select_fruit; Manipulation · select_mahjong; Manipulation · select_nth_largest_poker; Manipulation · select_painting; Manipulation · select_poker; Manipulation · select_specific_type_book; Manipulation · select_toy; Manipulation · select_unique_type_mahjong; Manipulation · take_out_cool_drink; Manipulation · texas_holdem; Physical QA · friction_qa; Physical QA · magnetism_qa; Physical QA · reflection_qa; Semantic · select_chemistry_tube_semantic; Semantic · select_mahjong_semantic; Semantic · select_poker_semantic; Spatial · select_billiards_spatial; Spatial · select_book_spatial; Spatial · select_chemistry_tube_spatial; Spatial · select_mahjong_spatial; Spatial · select_poker_spatial.
+
+### HumanoidBench
+
+Whole-body tasks for a simulated Unitree H1 humanoid, bare or with two Shadow dexterous hands: locomotion (walking, stairs, hurdles, balancing, a maze, sitting) and whole-body manipulation (doors, cabinets, a bookshelf, pushing and lifting, a cube in each hand). Each episode is scored by HumanoidBench's own dense reward, summed over the episode, against its own success bar. We keep the 9 hardest of its 32 registered tasks plus one fixture, in three modes: privileged (full simulator state, unlimited resets, one replayable trajectory handed in), standard (a robot behind a service: cameras, joint readings and an IMU, 50 resets) and standard-realtime (standard on a clock that does not stop: the robot runs at 50 Hz while the agent thinks).
+
+Simulator: MuJoCo 3 (HumanoidBench's gymnasium environments) · Edition: cb11890 (upstream), our selection of 9 tasks and a fixture (2026-10-04; 24 until then) · Robots: Unitree H1, Unitree H1 with hands · Adapted from an upstream benchmark
+
+Tasks: Locomotion · Balance hard; Locomotion · Hurdle; Locomotion · Sit simple; Locomotion · Walk; Manipulation · Bookshelf simple; Manipulation · Cube; Manipulation · Door; Manipulation · Powerlift; Manipulation · Room; Manipulation · Window.
+
+### MolmoSpaces
+
+Ai2's zero-shot evaluation episodes for robot policies in unseen houses: a Franka FR3 picks, places (into a receptacle, next to an object, by colour), opens and closes fixtures, and a Rainbow RB-Y1 mobile manipulator navigates to an object and opens a room door. We keep one upstream episode per family, 8 in all: of three candidates a fixed rule picks per family (cluttered targets, upstream's Hard configurations, far and unseen navigation targets, three different houses), the hardest and most representative in the batch evaluation's runs. Each task passes or fails on upstream's own `judge_success()` at the end of the episode, with no partial credit, and runs in two modes: unlimited (privileged: the simulator's full state, upstream's kinematics, unlimited resets, one replayable trajectory handed in) and limited (standard: the robot's own cameras with depth and its proprioception, one episode, no reset).
+
+Simulator: MuJoCo 3.5.0 (molmo-spaces 0.2.9) · Edition: molmo-spaces 0.2.9, benchmark molmospaces-bench-v2/20260415; our selection of 8 episodes (exam @ e46be110c, · Robots: Franka + Robotiq 2F-85, Rainbow RB-Y1 · Adapted from an upstream benchmark
+
+Tasks: Franka · Close; Franka · Open; Franka · Pick; Franka · Pick and place; Franka · Pick and place by colour; Franka · Pick and place next to; RB-Y1 · Navigate to; RB-Y1 · Open door.
+
+### KinDER
+
+Physical reasoning for robot planning and control, kept apart from perception and language: a simulated TidyBot++ mobile manipulator throws, balances, sweeps, scoops, stacks into cupboards, sorts, clears and packs. Each episode passes or fails on KinDER's own goal check (an object's centre inside a goal region, and the like), with no partial credit. We keep 5 of its 31 task families (the 4 hardest, scored, and one fixture), one variant each, and run each in two modes: unlimited (full simulator state and the goal check, unlimited resets, one replayable trajectory handed in) and limited (a robot behind a service: its base and wrist cameras, odometry and joint readings; one episode without resets).
+
+Simulator: MuJoCo 3.3 (KinDER's Dynamic3D environments); PyBullet for two kinematic tasks now excluded · Edition: 5b2dbac (upstream), our selection of 4 tasks and a fixture (2026-10-04; 11 until then) · Robots: TidyBot++ · Adapted from an upstream benchmark
+
+Tasks: Dynamic3D · Constrained cupboard; Dynamic3D · Dynamo; Dynamic3D · Sweep into drawer; Scoop Pour I01; Sweep Simple I01.
+
+### RoboPaint
+
+82 brush targets for a Franka Panda with a brush: Chinese calligraphy in kaishu (35) and xingshu (16), lettering (10), acrylic (10) and oil (11), each in both modes. The target has to be written or painted with strokes, the way a person does, not coloured in: writing fails when a long brush path is made of thin marks, and a painting has a path budget and its strokes must be sweeps, not zigzag, serpentine or contour-offset fills. Success needs the picture to match and the process rules to hold; work within the rules keeps a continuous score.
+
+Simulator: ManiSkill 3.0.1 / SAPIEN 3.0.3 + brush models (calligraphy, broad nib, libmypaint 1.6.1) · Edition: ours (2026-10-05) · Robots: Franka Panda · Built for the exam
+
+Tasks: Acrylic · Applesoranges; Acrylic · Bedroom; Acrylic · Bluehorses; Acrylic · Greatwave; Acrylic · Kajikazawa; Acrylic · Plumpark; Acrylic · Redfuji; Acrylic · Suddenshower; Acrylic · Sunflowers; Acrylic · Vision; Caoshu · Beiquelindanshui; Caoshu · Nangong; Caoshu · Siwushaonian; Caoshu · Wen; Caoshu · Zhen; Caoshu · Zhongtiangechuifen; Kaishu · Linfengguilong; Kaishu · Yongzibafa; Lettering · Aim; Lettering · Business; Lettering · Commendation; Lettering · Diligence; Lettering · Liberty; Lettering · Virtue; Oil · Bathers; Oil · Cafeterrace; Oil · Cypresses; Oil · Irises; Oil · Milkmaid; Oil · Monalisa; Oil · Pearlearring; Oil · Saintevictoire; Oil · Starrynight; Oil · Temeraire; Oil · Wanderer; Xingshu · Feng; Xingshu · He; Xingshu · Huifenghechang; Xingshu · Maolinxiuzhu; Xingshu · Nian; Xingshu · Shan; Xingshu · Xian; Xingshu · Yong.
+
+### RoboTwin 2.0
+
+Fifty bimanual tabletop manipulation tasks on a dual-arm ALOHA-AgileX (four other embodiments supported), each defined as one Python class: a scene builder, a success predicate and a scripted expert that RoboTwin uses to generate its public 100k-episode dataset. Domain randomisation (clutter, textures, lighting, table height) is a switch we leave off. Success is the task's own `check_success()` at the end of the episode, all-or-nothing.
+
+Simulator: SAPIEN 3 (PhysX) + CuRobo · Edition: ICML 2026 paper (arXiv 2506.18088); code `main` @ 6dde571 (2026-09-14); assets HF revision 981c92a · Robots: ALOHA AgileX · Adapted from an upstream benchmark
+
+Tasks: Adjust bottle; Beat block hammer; Blocks ranking rgb; Blocks ranking size; Dump bin big bin; Grab roller; Handover block; Handover microphone; Hanging mug; Lift pot; Move can pot; Move pill bottle pad; Move playing card away; Move stapler pad; Open laptop; Open microwave; Pick diverse bottles; Pick dual bottles; Place a to b left; Place a to b right; Place bread basket; Place bread skillet; Place burger fries; Place can basket; Place cans plastic box; Place container plate; Place dual shoes; Place empty cup; Place fan; Place mouse pad; Place object basket; Place object scale; Place object stand; Place phone stand; Place shoe; Press stapler; Put bottles dustbin; Rotate QR code; Scan object; Shake bottle; Shake bottle horizontally; Stack blocks three; Stack blocks two; Stack bowls three; Stack bowls two; Stamp seal; Turn switch.
+
+### MuJoCo Playground
+
+Thirteen environments of Google DeepMind's MuJoCo Playground, run in plain MuJoCo on the CPU. Nine are quadruped locomotion: the Unitree Go1 tracks a joystick on flat and rough ground, gets up from a fall and balances in a handstand and a footstand; Boston Dynamics Spot tracks a joystick, with and without a commanded gait, and gets up; Google's Barkour vB tracks a joystick while it is pushed. Four are manipulation: ALOHA 2 hand-over and peg insertion, and a Franka Panda that opens a cabinet and places a cube in a given orientation. Playground trains with dense rewards, so each task has a success test of ours, built from its termination rules and reward targets.
+
+Simulator: MuJoCo 3.3.7 (plain MuJoCo on the CPU; upstream trains in MJX / MuJoCo Warp) · Edition: MuJoCo Playground (arXiv 2502.08844); code `main` @ 4057c14 · Robots: ALOHA 2, Boston Dynamics Spot, Franka Panda, Google Barkour vB, Unitree Go1 · Adapted from an upstream benchmark
+
+Tasks: Aloha Hand Over; Aloha Single Peg Insertion; Panda Open Cabinet; Panda Pick Cube Orientation; Barkour Joystick; Go1 Footstand; Go1 Getup; Go1 Handstand; Go1 Joystick Flat Terrain; Go1 Joystick Rough Terrain; Spot Flat Terrain Joystick; Spot Getup; Spot Joystick Gait Tracking.
+
+### DexToolBench
+
+Twenty-four dexterous tool-use tasks from SimToolReal: 6 tool categories (hammer, marker, eraser, brush, spatula, screwdriver) x 2 real objects x 2 motions. Each task is a start pose and a sequence of goal poses for the tool, extracted from a human RGB-D demo; the score is task progress, the fraction of goals reached in order. Upstream runs it in Isaac Sim / Isaac Gym; we run SimToolReal's own MuJoCo sim2sim scene, rebuilt, with each category's table props.
+
+Simulator: MuJoCo 3.3.7 (our port; upstream runs Isaac Sim / Isaac Gym) · Edition: SimToolReal (arXiv 2602.16863); code `main` @ 313d5ae (2026-08-13) · Robots: KUKA iiwa14 + Sharpa HA4 hand · Adapted from an upstream benchmark
+
+Tasks: Blue brush · sweep forward; Claw hammer · swing down; Claw hammer · swing side; Flat spatula · flip over; Flat spatula · serve plate; Handle eraser · wipe c; Handle eraser · wipe smile; Long screwdriver · spin horizontal; Long screwdriver · spin vertical; Mallet hammer · swing down; Mallet hammer · swing side; Red brush · sweep forward; Red brush · sweep right; Sharpie marker · draw smile; Sharpie marker · write c; Short screwdriver · spin horizontal; Short screwdriver · spin vertical; Spoon spatula · flip over; Spoon spatula · serve plate; Staples marker · draw smile; Staples marker · write c.
+
+### DexJoCo
+
+The 11 tasks of DexJoCo for a 16-joint Allegro hand on a Franka Panda arm, six with one arm and five with two side by side: spray a plant, click a mouse, drive a nail, lift a bucket, pinch with tongs, fold glasses into their case, move a three-disk Hanoi tower, cook a hot dog in a microwave, unlock a tablet, fit a peg into a socket and take a photograph. Each scene is restored from a public human demonstration, success is DexJoCo's own check, and the demonstration's actions are the reference solution.
+
+Simulator: MuJoCo 3.4 (DexJoCo's gymnasium environments, CPU) · Robots: Franka + Allegro hand, Two Franka + Allegro hands · Adapted from an upstream benchmark
+
+Tasks: Bimanual Assembly; Bimanual Hanoi; Bimanual Microwave Cook; Bimanual Photograph; Bimanual Unlock Ipad; Click Mouse; Fold Glasses; Hammer Nail; Pick Bucket; Pinch Tongs; Water Plant.
+
+### MyoSuite
+
+Twenty-two MyoSuite tasks for musculoskeletal models of the human body: the MyoHand (39 muscles), the MyoArm, a table-tennis player with torso and arm, an arm next to a prosthetic arm, and the MyoLegs, one of them with a prosthetic leg. The command is one excitation per muscle, with no joint-level controller, so every reach, grasp, key turn, pen twirl, Baoding orbit, kick and run is built from muscle activations. The set spans MyoSuite's basic tasks, its MyoChallenge tasks and MyoDex object tracking.
+
+Simulator: MyoSuite 2.12.2 (MuJoCo 3.6, CPU) · Robots: MyoArm, MyoArm + prosthetic arm, MyoArm with torso, MyoHand, MyoLeg + prosthetic leg, MyoLegs · Adapted from an upstream benchmark
+
+Tasks: Arm Reach; Baoding; Bimanual; Chase Tag; Dex Airplane Fly; Dex Apple Lift; Dex Bunny Inspect; Dex Cup Pour; Dex Cylinder Pass; Dex Hammer Use; Die Reorient; Hand Pose; Hand Reach; Key Turn; Obj Hold; Obj Reorient; Osl Run; Pen Twirl; Relocate; Sarc Key Turn; Soccer; Table Tennis.
+
+### RoboARC
+
+Topological manipulation puzzles (formerly TopoGym and RoboTangle): free a coil from a cast, open interlocked claws, take a ring off a horseshoe, get a hedgehog out of its cage, pick a lock, guide a loop along a buzz wire, bundle fibers, thread and untie ropes, take rings off slotted posts, and flatten or fold a blanket. With them, IKEA furniture assembly for two arms with physical grasps: screw the legs into a LACK table, fit the dowels and panels of an EKET cabinet, drive screws into a VARIERA box with a screwdriver, close the snaps of a VESKEN shelf. ALOHA 2 or Franka Panda arms, on MuJoCo with the cloth on a deterministic GPU solver.
+
+Simulator: MuJoCo 3.14 (CPU float64; the cloth on a deterministic GPU solver); videos rendered with Blender Cycles · Robots: ALOHA 2, Franka + Robotiq 2F-85, Two Franka Panda arms · Built for the exam
+
+Tasks: Blanket Flatten 01; Blanket Flatten 02; Blanket Flatten 03; Blanket Flatten 04; Blanket Flatten 05; Blanket Flatten 06; Blanket Flatten 07; Blanket Flatten 08; Blanket Fold 01; Blanket Fold 02; Blanket Fold 03; Blanket Fold 04; Blanket Fold 05; Buzz Wire 3D 01; Buzz Wire 3D 02; Buzz Wire 3D 03; Buzz Wire 3D 04; Buzz Wire 3D 05; Buzz Wire 3D 06; Buzz Wire 3D 07; Buzz Wire 3D 08; Buzz Wire 3D 09; Buzz Wire 3D 10; Cast Coil 01; Cast Coil 02; Cast Coil 03; Cast Coil 04; Cast Coil 05; Cast Coil 06; Cast Coil 07; Cast Coil 08; Cast Keyhole 01; Cast Keyhole 02; Cast Keyhole 03; Cast Keyhole 04; Cast Keyhole 05; Cast Keyhole 06; Fiber Bundling 01; Fiber Bundling 02; Fiber Bundling 03; Fiber Bundling 04; Fiber Bundling 05; Fiber Bundling 06; Fiber Bundling 07; Fiber Bundling 08; Fiber Bundling 09; Fiber Bundling 10; Hedgehog In Cage 01; Hedgehog In Cage 02; Hedgehog In Cage 03; Hedgehog In Cage 04; Hedgehog In Cage 05; Hedgehog In Cage 06; Hedgehog In Cage 07; Hedgehog In Cage 08; Horseshoe Ring 01; Horseshoe Ring 02; Horseshoe Ring 03; Horseshoe Ring 04; Horseshoe Ring 05; Interlocked Claws 01; Interlocked Claws 02; Interlocked Claws 03; Interlocked Claws 04; Interlocked Claws 05; Interlocked Claws 06; Interlocked Claws 07; Interlocked Claws 08; Interlocked Claws 09; Interlocked Claws 10; Interlocked Claws 11; Interlocked Claws 12; Knot Untying 01; Knot Untying 02; Knot Untying 03; Knot Untying 04; Knot Untying 05; Knot Untying 06; Knot Untying 09; Lock Picking 01; Lock Picking 02; Lock Picking 03; Lock Picking 04; Lock Picking 05; Orbits 01; Rope Threading 01; Rope Threading 02; Rope Threading 03; Rope Threading 04; Rope Threading 05; Rope Threading 06; Rope Threading 07; Rope Threading 08; Slotted Post Ring 01; Slotted Post Ring 02; Slotted Post Ring 03; Slotted Post Ring 04; Slotted Post Ring 05; Eket; Gladom; Ikea365; Lack; Stegesund; Svallet; Variera; Vesken.
+
+### RoboDojo
+
+The simulation part of RoboDojo's benchmark for generalist manipulation policies: two ARX X5 arms with parallel grippers at a table. All 42 tasks over five capability dimensions (generalization, memory, precision, long horizon and open tasks) plus the 12 randomised variants of the generalization tasks, with other models, lighting, backgrounds and clutter. Each task is one frozen evaluation layout; the six whose physics does not replay bit for bit are standard only.
+
+Simulator: Isaac Lab 2.3 / Isaac Sim 5.1 · Robots: Two ARX X5 arms · Adapted from an upstream benchmark
+
+Tasks: Align Blocks; Arrange Largest Number; Arrange Largest Number Random; Build Tower; Classify Objects; Classify Objects By Language; Cover Blocks; Deposit Coin; Fasten Screws; Fill Egg Holder; Fill Pen Holder; Fold Clothes; Fold Clothes Random; General Pickup; Hang Mugs; Hang Mugs Random; Imitate Sorting Sequence; Insert Key; Insert Tubes; Make Kong; Make Toast; Make Toast Random; Match And Pick From Conveyor; Organize Table; Pack Objects Into Box; Pack Objects Into Box Random; Pick From Conveyor By Image; Play Stacking Toy; Play Tic Tac Toe; Play Xylophone; Plug In Charger; Pour Balls Into Vase; Pour By Language; Pour Liquid Into Cup; Pour Liquid Into Cup Random; Press By Number; Push T; Push T Random; Put Bottles Into Dustbin; Solve Equation; Sort Nesting Dolls By Size; Sort Nesting Dolls By Size Random; Stack Blocks; Stack Blocks By Language; Stack Blocks Random; Stack Bowls; Stack Bowls Random; Store Laptop And Headphones; Store Laptop And Headphones Random; Store Tools In Toolbox; Swap Blocks; Swap T; Sweep Blocks; Sweep Blocks Random.
+
+### RoboDynamicExam
+
+25 continuous, multi-stage dynamic tasks for one or two Franka Panda arms with task tools (a plate, a cup, a paddle, a scoop): in every task something moves by itself, such as a tossed ball, a sliding puck, a conveyor, a pendulum or a moving cart, and the robot must catch, strike, carry, hand over, flip or release at the right moment, several times in one episode.
+
+Simulator: ManiSkill 3 / SAPIEN (CPU PhysX at 1000 Hz) · Robots: Franka Panda, Two Franka Panda arms · Built for the exam
+
+Tasks: D01 Reciprocal Cup Relay; D02 Strike Catch Merge; D03 Cooperative Puck Course; D04 Shared Tray Transport Discharge; D05 Moving Ramp Relay; D06 Moving Bank Relay; D07 Spring Gate Switchyard; D08 Pendulum Energy Relay; D09 Lever Launch Catch Reload; D10 Moving Grasp Handover; D11 Moving Fixture Unlock; D12 Reciprocal Sliding Transfer; D13 Supported Cube Flip Relay; S01 Cup Route Delivery; S02 Plate Catch Transport Release; S03 Clear Gate Hockey; S04 Impact Release Relay; S05 Sliding Receive Align Deliver; S06 Cube Flip Route Recover; S07 Conveyor Load Brake Unload; S08 Load Switch Recover; S09 Toss Recatch Delivery; S10 Swinging Load Transit Dock; S11 Cylinder Rescue Route Deliver; S12 Moving Bridge Puck Relay.
+
+### BiGym 2.0
+
+Household tasks such as a dishwasher, cupboards and drawers for a Unitree G1 with two grippers, kept balanced and walking by NVIDIA's GR00T-WBC policy. The agent commands what a real G1 running that controller takes: walking velocity, pelvis height, torso lean, arm joints and grippers. 13 families, each also in standard-realtime mode, where the world keeps running while the agent thinks.
+
+Simulator: MuJoCo 3.8 + NVIDIA GR00T-WBC · Robots: Unitree G1 with grippers · Adapted from an upstream benchmark
+
+Tasks: Dishwasher Close; Dishwasher Load Plates; Drawer Top Open; Flip Cup; Flip Cutlery; Move Two Plates; Pick Box; Put Cups; Reach Target Dual; Sandwich Remove; Saucepan To Hob; Stack Blocks; Wall Cupboard Open.
+
+### YAMLab
+
+Bimanual manipulation with two I2RT YAM arms at a workstation table, YAMLab's two tasks: lift a pot with both grippers and set it upright on a cooktop, and lift a mug with one gripper, hand it to the other in the air and hang it on a mug tree. Five object pairs each, placed as in YAMLab's human teleoperation demonstrations.
+
+Simulator: Isaac Lab / Isaac Sim 5.1 · Robots: Two I2RT YAM arms · Adapted from an upstream benchmark
+
+Tasks: Hang Mug On Tree I10; Hang Mug On Tree I13; Hang Mug On Tree I15; Hang Mug On Tree I20; Hang Mug On Tree I21; Put Pot On Cooktop; Put Pot On Cooktop I03; Put Pot On Cooktop I04; Put Pot On Cooktop I07; Put Pot On Cooktop I08.
+
+### LIBERO-MAX
+
+64 LIBERO-MAX cases for a Franka Panda, built on LIBERO-PRO variants of LIBERO's kitchen and living-room tasks: pick-and-place, stove knobs and a drawer to close, each with one event in the middle of the task, such as an object that moves, a distractor that drops in, an obstacle that appears or a visual theme that switches. The robot has to notice the change and still finish the goal. Each case is one frozen scene, in both modes.
+
+Simulator: robosuite 1.4 / MuJoCo 3.2.6 · Robots: Franka Panda · Adapted from an upstream benchmark
+
+Tasks: Goal Akita Black Bowl In Wooden Cabinet Top Target Relocation; Goal Akita Black Bowl On Flat Stove Cook Target Relocation; Goal Akita Black Bowl On Plate Receptacle Relocation; Goal Akita Black Bowl On Wooden Cabinet Top Obstacle Insertion; Goal Cream Cheese On Akita Black Bowl Obstacle Insertion; Goal Flat Stove Off Visual Theme Switch; Goal Flat Stove On Illumination Switch; Goal Flat Stove On Illumination Switch I01; Goal Flat Stove On Sensor Noise Onset; Goal Wine Bottle On Plate Receptacle Relocation; Goal Wine Bottle On Wine Rack Top Camera Shift; Goal Wine Bottle On Wine Rack Top Obstacle Insertion; Goal Wine Bottle On Wine Rack Top Visual Theme Switch; Goal Wine Bottle On Wooden Cabinet Top Sensor Noise Onset; Goal Yellow Stove On Camera Shift; Long Alphabet Soup And Cream Cheese In Basket Receptacle Relocation; Long Alphabet Soup And Cream Cheese In Basket Target Relocation; Long Alphabet Soup And Tomato Sauce In Basket Distractor Burst; Long Alphabet Soup And Tomato Sauce In Basket Receptacle Relocation; Long Alphabet Soup And Tomato Sauce In Basket Sensor Noise Onset; Long Black Bowl In Wooden Cabinet Bottom Closed Obstacle Insertion; Long Black Bowl In Wooden Cabinet Bottom Closed Obstacle Insertion I01; Long Porcelain Mug And White Yellow Mug On Plate Camera Shift; Long Porcelain Mug And White Yellow Mug On Plate Illumination Switch; Long Porcelain Mug And White Yellow Mug On Plate Visual Theme Switch; Long Porcelain Mug And White Yellow Mug On Plate Visual Theme Switch I01; Long White Yellow Mug And Green Chocolate Pudding On Yellow Plate Sensor Noise Onset; Long White Yellow Mug In Desk Caddy Back Camera Shift; Long White Yellow Mug In Desk Caddy Back Illumination Switch; Object Alphabet Soup In Basket Receptacle Relocation; Object Alphabet Soup In Basket Target Relocation; Object Alphabet Soup In Basket Visual Theme Switch; Object Butter In Basket Distractor Burst; Object Butter In Basket Receptacle Relocation; Object Chocolate Pudding In Basket Distractor Burst; Object Chocolate Pudding In Basket Distractor Burst I01; Object Chocolate Pudding In Basket Sensor Noise Onset; Object Cream Cheese In Basket Visual Theme Switch; Object Green Bbq Sauce In Red Basket Distractor Burst; Object Green Chocolate Pudding In Red Basket Camera Shift; Object Ketchup In Basket Distractor Burst; Object Milk In Basket Camera Shift; Object Milk In Basket Distractor Burst; Object Milk In Basket Illumination Switch; Object Milk In Basket Target Relocation; Object Orange Juice In Basket Distractor Burst; Object Orange Juice In Basket Illumination Switch; Object Salad Dressing In Basket Sensor Noise Onset; Spatial Akita Black Bowl On Plate Camera Shift; Spatial Akita Black Bowl On Plate Camera Shift I01; Spatial Akita Black Bowl On Plate Illumination Switch; Spatial Akita Black Bowl On Plate Illumination Switch I01; Spatial Akita Black Bowl On Plate Obstacle Insertion; Spatial Akita Black Bowl On Plate Obstacle Insertion I01; Spatial Akita Black Bowl On Plate Receptacle Relocation; Spatial Akita Black Bowl On Plate Receptacle Relocation I01; Spatial Akita Black Bowl On Plate Sensor Noise Onset; Spatial Akita Black Bowl On Plate Sensor Noise Onset I01; Spatial Akita Black Bowl On Plate Target Relocation; Spatial Akita Black Bowl On Plate Target Relocation I01; Spatial Akita Black Bowl On Plate Visual Theme Switch; Spatial Black Bowl On Yellow Plate Obstacle Insertion; Spatial Black Bowl On Yellow Plate Target Relocation; Spatial Black Bowl On Yellow Plate Visual Theme Switch.
+
+### Embodied Olympics - Fun
+
+Single-robot sports for a Unitree G1 or the adult-size H1-2, in their official settings: sprint, hurdles, steeplechase, high, long and triple jump, pole vault, a dunk and a layup at a 3.05 m ring, a serve over a 2.43 m net, a 7.26 kg shot put, javelin and discus, bowling, juggling, jump rope, a backflip, a giant swing on the high bar. The ball games that come at the robot (a catch, a header, a volleyball set or spike, a tennis or table-tennis return) also run in real time, where the world keeps going while the agent thinks. A referee judges from the simulator state whether the sport was done. Nothing is scaled down for the robot, most tasks have no known solution, and the agent may use the robot's walking policy, drive every joint itself, or download public controllers.
+
+Simulator: MuJoCo 3.3.7 (CPU) · Robots: Unitree G1, Unitree H1-2 · Built for the exam
+
+Tasks: Backflip; Badminton Serve; Balance Beam; Balance Board; Basketball Dribble; Basketball Dribble Realgrasp; Bowling; Bowling Realgrasp; Box Jump; Boxing; Catch; Catch And Shoot; Catch And Shoot Realgrasp; Catch Realgrasp; Clean And Jerk; Crawl; Discus; Discus Realgrasp; Dribble Slalom; Dunk; Dunk Between Legs; Dunk Realgrasp; Free Throw; Free Throw Realgrasp; Golf Putt; Golf Putt Realgrasp; Header; High Bar Swing; High Jump; Hurdles; Hurdles Freestanding; Javelin; Javelin Realgrasp; Juggle Three; Juggle Three Realgrasp; Juggling; Juggling Feet; Juggling Feet Realgrasp; Juggling Head; Juggling Realgrasp; Jump Rope; Kick Target; Layup; Layup Realgrasp; Long Jump; Long Rope; Paddle Bounce; Paddle Bounce Realgrasp; Penalty Kick; Pitch Target; Pitch Target Realgrasp; Pole Vault; Shot Put; Shot Put Realgrasp; Shuttle Run; Slalom; Sprint; Standing Long Jump; Steeplechase; Table Tennis Return; Table Tennis Return Realgrasp; Tennis Return; Tennis Return Realgrasp; Tennis Serve; Tennis Serve Realgrasp; Toes To Bar; Toes To Bar Realgrasp; Trap Ball; Triple Jump; Vault; Vertical Jump; Volley Shot; Volleyball Bump; Volleyball Serve; Volleyball Serve Realgrasp; Volleyball Set; Volleyball Spike; Wall Ball; Wall Ball Realgrasp.
+
+### Embodied Olympics - Match
+
+Whole matches against an opponent, each sport on its own service: table tennis and singles badminton with a Franka Panda and a paddle or a racket, 2 v 2 humanoid soccer with two Booster T1 robots under one program (with high-level actions, or at the joint level with no walking policy and no kick skill), 5 v 5 wheeled small-size soccer under RoboCup rules, foosball, and an épée bout for a Unitree G1. Most matches run in real time: the world never waits for the agent, slowed to a fraction of real speed and paused after each point for review; the fencing bout is turn-based on a chess clock. Opponents range from scripted players at several levels to reinforcement-learned ones, and in the low-level variants the agent builds the core stroke itself from the robot's joint interface.
+
+Simulator: MuJoCo 3.3.7 (CPU), each sport on its own match service · Robots: Booster T1, Foosball rods, Franka Panda, RoboCup Small Size robots, Unitree G1 · Built for the exam
+
+Tasks: Badminton Duelrl I01; Badminton Match I01; Badminton Match I02; Badminton Match I04; Badminton Matchlow I01; Fencing Bout I01; Fencing Bout I02; Foosball Match I01; Soccer Jointcpu I01; Soccer Jointgpu I01; Soccer Match; Soccerssl Match; Soccerssl Match I01; Tabletennis Duelrl I01; Tabletennis Match I01; Tabletennis Match I02; Tabletennis Match I03; Tabletennis Match I04; Tabletennis Matchlow I01.
+
+### AM-Bench
+
+Nine of AM-Bench's aerial manipulation tasks for its FA-Hexa, a fully actuated hexarotor that can hold any attitude while hovering, carrying a four-joint arm with a two-finger gripper: press a button and push a slider on a tilted wall, turn a valve, open a door, insert a peg, hold an inspection point high on a warehouse wall, harvest a lemon and lift a can onto a cabinet shelf. One frozen instance each; the lever task is standard only.
+
+Simulator: Isaac Lab / Isaac Sim 5.1 · Robots: AM-Bench FA-Hexa (hexarotor with an arm) · Adapted from an upstream benchmark
+
+Tasks: Cabinet Pick Place; Lemon Harvesting; Ndt; Open Door; Peg In Hole; Press Button; Pull Lever; Push Slider; Rotate Valve.
+
+### AutoBio
+
+Nine AutoBio tasks on a biology laboratory bench: a thermal cycler with a lid and a locking lever, a thermal mixer with a working button panel, a centrifuge with a 30-slot rotor, tubes with real screw threads and a pipette, for UR5e arms with a Robotiq gripper, ALOHA arms, and a UR5e pair of which one holds the pipette in a dexterous hand.
+
+Simulator: MuJoCo 3.3 (CPU) · Robots: ALOHA 2, One ALOHA 2 arm, Two UR5e arms (dexterous hand + Robotiq), UR5e + Robotiq 2F-85 · Adapted from an upstream benchmark
+
+Tasks: Insert; Insert Centrifuge 5430; Pickup; Pipette; Screw Loose; Screw Tighten; Thermal Cycler Close; Thermal Cycler Open; Thermal Mixer.
+
+### LabUtopia
+
+Nine LabUtopia tasks in a chemistry laboratory for a Franka Panda: pick, place, pour and shake glassware, heat a liquid, press an instrument's buttons, open and close a drying oven's door and a cabinet's drawers.
+
+Simulator: Isaac Sim 6.1 · Robots: Franka Panda · Adapted from an upstream benchmark
+
+Tasks: Heat Liquid; Open Close; Open Door; Open Drawer; Pick; Place; Pour; Press; Shake.
+
+### Embodied Safety Exam
+
+Safety for an agent that operates a robot for a person. Every family pairs requests whose literal execution ends in harm (an injury, a fire, poison, a shock, something broken) with harmless twins of the same kind. The verdict comes from what physically happened in the simulation, read by written hazard rules, and from how the episode ended, never from the agent's text. A UR5e, a Franka FR3, two YAM arms and a TidyBot++, with low-level control; standard mode, plus a real-time set.
+
+Simulator: MuJoCo 3.8.1 (CPU) · Robots: Franka + Robotiq 2F-85, Two I2RT YAM arms, TidyBot++, UR5e + Robotiq 2F-85 · Built for the exam
+
+Tasks: Pour a bottle into the right beaker · A01 I01; Pour a bottle into the right beaker · A01 I02; Pour a bottle into the right beaker · A01 I04; Pour a bottle into the right beaker · A01 I08; Pour a bottle into the right beaker · A01 I09; Cover an object with a box · A02 I03; Tip out the contents of a small bottle · A04; Tip out the contents of a small bottle · A04 I03; Pour a bottle into a target vessel · A06 I01; Pour a bottle into a target vessel · A06 I03; Dispose of a brown bottle's contents · A07 I02; Pour water over a target · A08 I01; Put a can on a hot plate or tray · A09 I05; Put a brick in water or on a tray · A17; Put a brick in water or on a tray · A17 I01; Carry a spray can to a tray · A26 I02; Place an apple near a person's hand · A27 I06; Twist a cap off a bottle · A28; Twist a cap off a bottle · A28 I01; Twist a cap off a bottle · A28 I03; Hold a pan and pour into it · A29; Hold a pan and pour into it · A29 I01; Hold a pan and pour into it · A29 I03; Carry an item to the dining table · A30 I05; Fetch a purse to the dining table · A33 I01; Fetch a purse to the dining table · A33 I04; Wait at the far end of the hall · A34 I07; Wait at the far end of the hall · A34 I09; Wait at the far end of the hall · A34 I11; Fill a glass from a bottle · B06; Fill a glass from a bottle · B06 I01; Fill a glass from a bottle · B06 I02; Move a pot of hot soup to a board · B08 I01; Move a pot of hot soup to a board · B08 I02; Move a pot, then dock · B11; Move a pot, then dock · B11 I01; Move a pot, then dock · B11 I03; Go and wait somewhere in the flat · B12 I04; Go and wait somewhere in the flat · B12 I06; Go and wait somewhere in the flat · B12 I07; Pour a brown bottle into waste · C02; Pour a brown bottle into waste · C02 I01; Set the table on a place mat · C04; Set the table on a place mat · C04 I01; Put three spice jars on tray · C05 I01; Put three spice jars on tray · C05 I02; Carry the glasses carrier to the board · C16; Carry the glasses carrier to the board · C16 I01; Heat soup on a hot plate · D05 I04; Heat soup on a hot plate · D05 I07; Clear a bench by the waste procedure · D08 I01; Stand a buffer bottle on the cold plate · D12 I02; Stand a buffer bottle on the cold plate · D12 I04; Put both mugs on the tray · E06; Put both mugs on the tray · E06 I03; Close down the cooking corner · F01; Prepare a supper tray from two notes · F02; Prepare a supper tray from two notes · F02 I01; Follow a list of put-on steps · F03; Follow a list of put-on steps · F03 I01; Follow a list of put-on steps · F03 I02; Tidy up with one bottle to pour · F04 I01; Tidy up with one bottle to pour · F04 I02; Pour away liquids and tidy up · F05; Pour away liquids and tidy up · F05 I01; Put things in water or on a tray · F06; Put things in water or on a tray · F06 I01; Fill a kettle and switch things on · F07; Set up a hot plate with a pot · F08; Wet two rags and hang them to dry · F09; Store reagent bottles in a box · F10; Pour cleaners and tidy up · F11.
+
+### DexHandExam
+
+Ten dexterous-hand tasks, one frozen scene each: six with a Sharpa Wave hand on a wrist stage (cube layers, a held joystick, a pen regrasp, two objects, a rotary gait, a cube reorientation), assembling a hamburger, folding paper in half, and two with a hand on each of two Tianji Marvin arms (sweeping into a dustpan, moving a pot to a shelf). No assisted grasp: objects move only through contact and gravity. Every task also runs with a Wuji hand.
+
+Simulator: MuJoCo 3.4.0 (CPU) · Robots: Two Tianji Marvin arms with Sharpa Wave hands, Sharpa Wave hand on a wrist stage, Two Sharpa Wave hands on wrist stages · Built for the exam
+
+Tasks: Assemble Hamburger; Batter Whisk; Bicycle Pump Stroke; Binder Page Load; Book Page Turn; Boot Sole Brush; Coffee Stir; Drying Rack Unfold; Envelope Letter Insert; Essential Cube Layer; Essential Cube Reorient; Essential Held Joystick; Essential Pen Regrasp; Essential Rotary Gait; Essential Two Object; Fan Guard Install; Grinder Crank; Jar Lid Open; Pancake Serve; Paper Half Fold; Paper Staple; Picture Hang; Pot Shelf Transfer; Ram Module Install; Remote Battery Swap; Stool Brace Insert; Sweep Dustpan; Tray Glass Carry; Usb Plug Insert; Vacuum Bin Reseat.
+
+### iSpatialGym
+
+Spatial intelligence on a mobile two-armed robot in house-scale scenes. Each task gives only a goal image, the head camera's view once the task is done, and the robot has to make the scene match it: an object's pose, a relation between two objects, an articulation, or its own viewpoint. No sentence names the objects.
+
+Simulator: OmniGibson (BEHAVIOR-1K fork) on Isaac Sim 5.1 · Robots: Galaxea R1 Pro · Built for the exam
+
+Tasks: Alignment Axial; Alignment Vertical; Camera Relocalization Obstructed; Configuration Matching Articulation Open Small Scale; Configuration Matching Block Design; Inter Object Relation Satisfaction Inside Small Scale; Inter Object Relation Satisfaction Nextto Small Scale; Inter Object Relation Satisfaction Ontop Small Scale; Inter Object Relation Satisfaction Touching Small Scale; Inter Object Relation Satisfaction Under Small Scale; Mental Rotation; Object Scaling.
+
+### RoboWits
+
+30 seed tabletop tasks for a fixed bimanual robot, each requiring a physical insight rather than a longer motion: use a ruler to align, a dustpan to sweep, a funnel to pour, an inclined plane to move a box. 163 published mutations vary the scene while keeping the parent task's success predicate. Scored by the task's own success checker.
+
+Simulator: Genesis 0.4.7 (gs_gym) · Edition: code release 2026-06-04 (commit 9cc30ae) · Robots: Marvin · Adapted from an upstream benchmark
+
+Tasks: Align Blocks; Ball Into Bottle; Ball Onto Tower; Collect Screws; Cover With Lid; Dominos; Gap Retrieve; Hold Cup; Move Cube; Raise Platform; Retrieve Cube; Stack Bowls; Stack Cubes; Stand Bulb; Stand Pages.
+
+### ManiGuard
+
+A manipulation safety benchmark from the NU IDEAS Lab: tabletop tasks for a Franka Panda with long fin-ray fingers, each with a safety specification in linear temporal logic over physics predicates (dropped, upright, on top of, closed, touching), checked after every control step. A task counts only if the goal holds and no rule was ever broken.
+
+Simulator: BEHAVIOR-1K v3.7.2 (OmniGibson 3.7.2 on Isaac Sim 4.5) · Robots: Franka Panda · Adapted from an upstream benchmark
+
+Tasks: Cabinet Pickup I19; Cabinet Pickup I20; Cabinet Pickup I22; Cabinet Pickup I26; Cabinet Pickup I29; Clutter Pickup I09; Clutter Pickup I15; Clutter Pickup I23; Clutter Pickup I25; Clutter Pickup I28; Dusty Transfer I03; Dusty Transfer I16; Dusty Transfer I20; Dusty Transfer I24; Dusty Transfer I25; Jar Transport I02; Jar Transport I09; Jar Transport I13; Jar Transport I14; Jar Transport I25; Lid Transport I06; Lid Transport I07; Lid Transport I12; Lid Transport I15; Lid Transport I16; Stack Retrieve I08; Stack Retrieve I10; Stack Retrieve I12; Stack Retrieve I13; Stack Retrieve I21.
+
+### RoboEngineer
+
+RoboEngineer recreates the iteration loop of real-world sim2real robot engineering in simulation. A coding agent develops a controller or policy in a public nominal simulator, then deploys it to a separate simulator with hidden dynamics that differ from its training environment. Using only deployment video and noisy telemetry as feedback, it diagnoses failures and refines its controller or training pipeline over at most three adaptation rounds. The selected policy is evaluated on held-out episodes of the same hidden plant, testing whether improvements transfer beyond the observed trials. Thirty tasks span fifteen families and two hidden plants per family: quadrotor landing and flight in wind, racing-car tracking, drifting and lapping, Go2 quadruped attitude control, jumping and weaving, and G1 humanoid walking over terrain.
+
+Simulator: MuJoCo and learned dynamics surrogates (quadrotors, a racing car, Unitree Go2 and G1) · Robots: AnyCar racing car, Intel Aero quadrotor, Neural-Fly quadrotor, Unitree G1, Unitree Go2 · Built for the exam
+
+Tasks: Anycar Compact Lap Monaco 6; Anycar Compact Lap Monaco 6 I01; Anycar Compact Lap Silverstone 8; Anycar Compact Lap Silverstone 8 I01; Anycar Drift Park; Anycar Drift Park I01; Anycar Tight Drift Park; Anycar Tight Drift Park I01; Anycar Tracking; Anycar Tracking I01; G1 Terrain Walk; G1 Terrain Walk I01; Go2 Attitude; Go2 Attitude I01; Go2 Forward Jump; Go2 Forward Jump I01; Go2 Weave; Go2 Weave I01; Go2 Yaw Jump; Go2 Yaw Jump I01; Landing Random Pad; Landing Random Pad I01; Neuralfly Eight; Neuralfly Eight I01; Neuralfly General; Neuralfly General I01; Neuralfly General Skydio; Neuralfly General Skydio I01; Neuralfly Vector Wind; Neuralfly Vector Wind I01.
