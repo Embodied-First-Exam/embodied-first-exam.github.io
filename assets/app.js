@@ -11,9 +11,11 @@ const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
 // suites' earlier ids, in links from before 2026-10-19: the Embodied Safety Exam was robosafe; Embodied Olympics - Fun and
 // - Match were roboolympics-fun and roboolympics-match (and one suite, roboolympics, before 2026-10-18: its tasks are found
-// in either, see taskKey). The address is rewritten too, so the Tasks page's filters (search.js) read the new id.
+// in either, see taskKey). IKEA MuJoCo (ikea-mujoco), a folder of the exam's repository, is shown as part of RoboARC
+// (exam-site-source data/exam.yml merge_suites), so its suite, task and runs links open RoboARC. The address is rewritten
+// too, so the Tasks page's filters (search.js) read the new id.
 const SUITE_ALIAS = { robosafe: 'embodied-safety-exam', 'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match',
-  roboolympics: 'embodied-olympics-fun' };
+  roboolympics: 'embodied-olympics-fun', 'ikea-mujoco': 'roboarc' };
 const SUITE_SPLIT = { roboolympics: ['embodied-olympics-fun', 'embodied-olympics-match'] };
 const suiteNow = (id) => SUITE_ALIAS[id] || id;
 {

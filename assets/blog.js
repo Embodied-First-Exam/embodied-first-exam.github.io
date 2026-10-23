@@ -177,6 +177,7 @@ function compute(ex, tasks, b, atlas) {
   const leads = (r) => suiteRows.filter((L) => runs.every((o) => solved(L, o) <= solved(L, r))).length;
   const S = {
     tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots), simulators: int(tot.simulators),
+    suites_adapted: int(ex.suites.filter((x) => x.origin !== 'ours').length),
     core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs), default_run: int(tot.default_run),
     core_p: int(coreModes('p')), core_s: int(coreModes('s')), core_t: int(coreModes('t')),
     oracle_full: int(oracle('full')), oracle_partial: int(oracle('partial')), oracle_none: int(oracle('none')),
