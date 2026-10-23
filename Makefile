@@ -11,7 +11,7 @@ HFPY ?= $(PY)
 export MEDIA_DIR
 
 .DEFAULT_GOAL := help
-.PHONY: help serve data media stamp check release
+.PHONY: help serve data media seo stamp check release
 
 help: ## List the targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-8s\033[0m %s\n", $$1, $$2}'
@@ -27,10 +27,13 @@ data: ## Refresh data/ from the exam's source checkout (SRC=path), then the Atla
 media: ## Upload new or replaced media from the stage to HF (site/); DRY=1 only lists, PRUNE=1 also removes unused files
 	$(HFPY) scripts/upload_media.py $(if $(DRY),--dry-run,) $(if $(PRUNE),--prune,)
 
+seo: ## Rewrite what search engines read but visitors do not see (JSON-LD, keywords, sitemap, robots.txt, llms*.txt) from data/
+	$(PY) scripts/seo.py
+
 stamp: ## Give the pages' CSS and JS links a content hash
 	$(PY) scripts/stamp.py
 
 check: ## Check every link, that every picture and video is on HF, and that nothing points at other sites' internals
 	$(PY) scripts/check.py
 
-release: stamp check ## What to run before a commit: stamp, then check
+release: seo stamp check ## What to run before a commit: seo, stamp, then check

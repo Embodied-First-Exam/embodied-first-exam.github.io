@@ -14,7 +14,8 @@ public HF dataset [MLL-Lab/embodied-exam-media](https://huggingface.co/datasets/
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
 assets/exam.css, assets/app.js                                        the look and the drawing of every page
 data/exam.json, data/tasks.json                                       suites, results, the label map; every question
-scripts/                                                              export.py, media.py, upload_media.py, stamp.py, check.py
+scripts/                                                              export.py, media.py, upload_media.py, seo.py, stamp.py, check.py
+sitemap.xml, robots.txt, llms.txt, llms-full.txt                      written by scripts/seo.py (make seo); do not edit by hand
 CNAME                                                                 the custom domain, www.embodied-first-exam.ai
 ```
 
@@ -25,7 +26,8 @@ make serve                 # preview at http://127.0.0.1:8870/ (PORT=... to chan
 make data SRC=<checkout>   # refresh data/ from the exam's source (its public mode); new or replaced media are made
                            #   into web copies in a local stage (MEDIA_DIR, default ~/.cache/efe-export/media)
 make media                 # upload what make data listed as not on HF yet (needs an HF token with write access)
-make release               # stamp the CSS and JS links, then check every link, and every picture and video on HF
+make release               # rewrite the search metadata (make seo), stamp the CSS and JS links, then check every link,
+                           #   and every picture and video on HF
 git push                   # GitHub Pages publishes main within a minute or two
 ```
 
