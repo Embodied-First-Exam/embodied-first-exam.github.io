@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
 # the source's suite ids shown here under another id (as in scripts/export.py and the generator's merge_suites)
-SUITE_IDS = {"robopaint-strict": "robopaint", "ikea-mujoco": "roboarc"}
+SUITE_IDS = {"robopaint-strict": "robopaint", "ikea-mujoco": "roboarc"}   # ikea-mujoco: inventories before 2026-10-23
 EXCLUDE = {"robopaint"}               # source suite left out of the exam (its strict version is shown as robopaint)
 MODES = ("privileged", "standard", "standard-realtime", "realtime")
 # directory prefixes per suite shown here, for deriving a base without the inventory
@@ -37,9 +37,11 @@ PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco
           "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "embodied-safety-exam": ["ese-", "rsb-"]}
 # directory prefixes renamed in the repository after the Atlas package was built (new -> the Atlas's): RoboOlympics split
 # into -fun and -match (2026-10-18), then became Embodied Olympics' embodied-olympics-fun-* / -match-* (exam #442,
-# 2026-10-19); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19)
+# 2026-10-19); RoboSafeBench's rsb-* became the Embodied Safety Exam's ese-* (2026-10-19); IKEA MuJoCo's ikea-* became
+# RoboARC's roboarc-ikea-* (2026-10-23)
 FORMER_PREFIX = [("embodied-olympics-fun-", "roboolympics-"), ("embodied-olympics-match-", "roboolympics-"),
-                 ("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-")]
+                 ("roboolympics-fun-", "roboolympics-"), ("roboolympics-match-", "roboolympics-"), ("ese-", "rsb-"),
+                 ("roboarc-ikea-", "ikea-")]
 # suites renamed after their questions were first placed on the sphere (Embodied Olympics, 2026-10-19): a question
 # without an Atlas record keeps the small offset of its earlier key, so a rename does not move its dot
 FORMER_SUITE = {"embodied-olympics-fun": "roboolympics-fun", "embodied-olympics-match": "roboolympics-match"}
@@ -115,6 +117,8 @@ def derive_base(t: dict, atlas: dict) -> str | None:
             for i in ([inst] if inst else ["i00", "i01"]):
                 cands += [f"{p}{s}-{i}", f"{p}{s}-fahexa-{i}"]
             cands.append(f"{p}{s}")
+    # a base renamed after the Atlas was built (roboarc-ikea-lack-i00, ikea-lack-i00 in the Atlas)
+    cands += [old + c[len(new):] for c in list(cands) for new, old in FORMER_PREFIX if c.startswith(new)]
     return next((b for b in cands if b in atlas), None)
 
 
