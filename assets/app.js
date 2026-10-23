@@ -187,11 +187,16 @@ const LB_SETTINGS = [
   { id: 'privileged', label: 'Privileged', key: 'p' },
 ];
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
+/** First-attempt success (owner, 2026-10-23): a standard or standard-realtime test solved on the first try, with no reset
+ *  (a result cell's `f`: 1 yes, 0 no, none not decided). Shown beside the score in those two settings, on the same tests and
+ *  denominator; a test without a result or without a first-attempt verdict counts as not solved on the first try. */
+const FIRST_LINE = 'First attempt: solved on the first try, with no reset.';
+const hasFirst = (set) => set.key === 's' || set.key === 't';
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
   core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, standard-realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
-  standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
-  'standard-realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in standard-realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
+  standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. ${FIRST_LINE}`,
+  'standard-realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in standard-realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks. ${FIRST_LINE}`,
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
@@ -200,7 +205,8 @@ const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
  *  without a finished result counts as failed (owners, 2026-10-19). {tests: the setting's core tests,
  *  scores: {run: {v: [solved, tests], suites: {suite: [solved, the suite's tests]}}}} */
 function scoreGroup(group, tasks, set) {
-  const scores = Object.fromEntries(group.map((r) => [r.id, { v: [0, 0], suites: {} }]));
+  const first = hasFirst(set);
+  const scores = Object.fromEntries(group.map((r) => [r.id, { v: [0, 0], suites: {}, ...(first ? { f: [0, 0] } : {}) }]));
   let tests = 0;
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
@@ -208,10 +214,12 @@ function scoreGroup(group, tasks, set) {
     if (!k || !t.core || !t.core.includes(k)) continue;   // the core set only (owners, 2026-10-18)
     tests += 1;
     for (const r of group) {
-      const ok = scored(t.results?.[r.id]?.[k]) === 'S';
+      const c = t.results?.[r.id]?.[k];
+      const ok = scored(c) === 'S';
       const o = scores[r.id];
       o.v[0] += ok;
       o.v[1] += 1;
+      if (first) { o.f[0] += ok && c.f === 1; o.f[1] += 1; }
       const ss = (o.suites[t.suite] ??= [0, 0]);
       ss[0] += ok;
       ss[1] += 1;
@@ -257,16 +265,18 @@ function suiteBars(ex, suites, set) {
 
 /** One ranked row in one setting: place (gold, silver, bronze), maker's mark, model and harness, the share solved as an
  *  ink bar (deeper for higher, relative to `best`), then the share and solved / sat. `part`: a smaller run, not ranked. */
-function lbRow(r, v, rank, best, set, { part = false, open = false, still = false } = {}) {
+function lbRow(r, v, rank, best, set, { part = false, open = false, still = false, first = null } = {}) {
   const q = pctOf(v);
+  const fq = first ? pctOf(first) : null;
   const k = Math.round(38 + 62 * (q ?? 0) / Math.max(best || 0, 1));
   const tag = still ? 'div' : 'button';
-  return `<${still ? 'div' : 'button type="button"'} class="lbh-row lb1${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
-      aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%` : 'not sat'}">
+  return `<${still ? 'div' : 'button type="button"'} class="lbh-row lb1${first ? ' fa' : ''}${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
+      aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%` : 'not sat'}${fq != null ? `; ${first[0]} solved on the first attempt` : ''}">
     <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
     <span class="lbh-name"><span class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></span></span>
     <span class="lbh-track">${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
     <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${solvedOf(v)}</em></span>
+    ${first ? `<span class="lbh-fa" title="${esc(FIRST_LINE)} ${fq != null ? `${first[0]} of ${first[1]}` : ''}"><i>1st</i><b>${fq != null ? `${Math.round(fq)}<small>%</small>` : '–'}</b><em>${solvedOf(first)}</em></span>` : ''}
   </${tag}>`;
 }
 
@@ -277,13 +287,14 @@ function lbDetail(ex, r, sc, set, href = true) {
   return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
       <div class="lbh-pair"><span class="s"><b>${q != null ? Math.round(q) : '–'}%</b>${esc(set.label)}</span>
         <span class="s"><b>${solvedOf(sc.v)}</b>Solved</span>
+        ${sc.f ? `<span class="s" title="${esc(FIRST_LINE)}"><b>${solvedOf(sc.f)}</b>First attempt</span>` : ''}
         ${usd != null ? `<span class="x" title="Model use per test at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per test</span>` : ''}
         ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
       ${href ? `<a class="btn small" href="${exam('leaderboard/')}?${set.id === 'core' ? '' : `mode=${set.id}&`}open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
     ${suiteBars(ex, sc.suites || {}, set)}</div>`;
 }
 /** The scale over the rows, and the setting's fixed denominator at its end: every agent is counted on all these tests. */
-const lbAxis = (tests) => `<div class="lbh-axis lb1"><span></span><span class="lbh-ticks" aria-hidden="true">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span><span class="lbh-n">${int(tests)} test${tests === 1 ? '' : 's'}</span></div>`;
+const lbAxis = (tests, first = false) => `<div class="lbh-axis lb1${first ? ' fa' : ''}"><span></span><span class="lbh-ticks" aria-hidden="true">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span><span class="lbh-n">${int(tests)} test${tests === 1 ? '' : 's'}</span>${first ? `<span class="lbh-fa-h" title="${esc(FIRST_LINE)}">First attempt</span>` : ''}</div>`;
 
 /** The leaderboard page: the setting switch (remembered in ?mode=), the ranked board, a model's suites on a click. */
 function lbBoard(ex, tasks, onDraw) {
@@ -302,7 +313,7 @@ function lbBoard(ex, tasks, onDraw) {
     const scores = g.scores, pscores = g.scores;
     const key = (sc) => pctOf(sc.v) ?? -1;
     main.sort((a, b) => key(scores[b.id]) - key(scores[a.id]) || a.model.localeCompare(b.model));
-    const row = (r, sc, rank, part, best) => lbRow(r, sc.v, rank, best, set, { part, open: state.open === r.id }) + (state.open === r.id ? lbDetail(ex, r, sc, set, false) : '');
+    const row = (r, sc, rank, part, best) => lbRow(r, sc.v, rank, best, set, { part, open: state.open === r.id, first: sc.f }) + (state.open === r.id ? lbDetail(ex, r, sc, set, false) : '');
     let html = '';
     if (!main.length && !partial.length) {
       html = `<div class="empty-state">${state.kind === 'vla' ? 'No VLA policy has sat the exam yet.' : 'No run with this harness yet.'}</div>`;
@@ -310,7 +321,7 @@ function lbBoard(ex, tasks, onDraw) {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
       { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
-      html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
+      html = lbAxis(g.tests, hasFirst(set)) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
@@ -637,7 +648,10 @@ function openTask(ex, t, runs) {
       const c = t.results[r.id]?.[RK[mode]];
       if (!c) return '<span class="lbh-c"><span class="lbh-v na">–</span></span>';
       const cls = c.r ? 'rs' : c.s === 'S' ? `S ${RK[mode]}` : c.s;
-      return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
+      // a solved standard / standard-realtime test: solved on the first try (1st ✓) or only after a reset (1st ✗)
+      const fa = mode !== 'privileged' && c.s === 'S' && !c.r && (c.f === 1 || c.f === 0)
+        ? `<small class="fa-mark ${c.f ? 'y' : 'n'}" title="${c.f ? 'Solved on the first try, with no reset' : 'Not solved on the first try: solved after a reset'}">1st ${c.f ? '✓' : '✗'}</small>` : '';
+      return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${fa}${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
     };
     return `<div class="lbh-res${r.unranked ? ' unranked' : ''}">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}${r.unranked ? ' <span class="unranked-tag" title="Not ranked: the screening run that chose the core set. It counts in no ranking or score.">not ranked</span>' : ''}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
   }).join('');
@@ -659,6 +673,7 @@ function openTask(ex, t, runs) {
     <div id="drawer-watch" data-task="${esc(t.suite)}/${esc(t.id)}">${hasRuns(t) ? '<p class="watch-run wait"><span class="spin"></span>Looking for runs to watch…</p>' : ''}</div>
     <div id="drawer-atlas"></div>
     ${res ? `<h3>Results</h3><div class="lbh-task" style="--ncol:${cols.length}"><div class="lbh-res lbh-rh"><span></span><span>Model</span>${cols.map((m) => `<span><i class="sw ${RK[m]}"></i>${{ standard: 'Standard', 'standard-realtime': 'Standard-realtime', privileged: 'Privileged' }[m]}</span>`).join('')}</div>${res}</div>` : ''}
+    ${allRuns.some((r) => ['s', 't'].some((k) => t.results[r.id]?.[k]?.s === 'S' && t.results[r.id]?.[k]?.f != null)) ? '<p class="board-foot">1st ✓: solved on the first try, with no reset. 1st ✗: solved only after a reset.</p>' : ''}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
@@ -1726,10 +1741,10 @@ function homeBoard(el, ex) {
     const order = [...sh.runs].sort((a, b) => P(b) - P(a) || (runs[a]?.model || a).localeCompare(runs[b]?.model || b));
     const best = Math.max(0, P(order[0]));
     let rank = 0, prev = null;
-    list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set); }).join('');
+    list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set, { first: vw.first?.[id] }); }).join('');
     det.hidden = true;
     el.classList.remove('picked');
-    $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0);
+    $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0, !!vw.first);
     $('#lbh-desc', el).textContent = lbDesc(set.id, vw.tests || 0);
     if (note) note.innerHTML = `<a href="${exam('leaderboard/')}${set.id === 'core' ? '' : `?mode=${set.id}`}">Full leaderboard, per suite →</a>`;
   };
@@ -1742,7 +1757,7 @@ function homeBoard(el, ex) {
     if (was) { det.hidden = true; return; }
     b.setAttribute('aria-expanded', 'true'); b.classList.add('on');
     const id = b.dataset.id, r = runs[id] || { model: id }, vw = sh.views[set.id] || {};
-    det.innerHTML = lbDetail(ex, r, { v: vw.scores?.[id], suites: vw.suites?.[id] || {} }, set).replace(/^<div class="lbh-detail in">|<\/div>$/g, '');
+    det.innerHTML = lbDetail(ex, r, { v: vw.scores?.[id], f: vw.first?.[id], suites: vw.suites?.[id] || {} }, set).replace(/^<div class="lbh-detail in">|<\/div>$/g, '');
     b.after(det);
     det.hidden = false;
     det.classList.remove('in'); void det.offsetWidth; det.classList.add('in');
@@ -2328,7 +2343,10 @@ async function runPage(ex) {
       <div class="rv-cap" id="rv-cap"></div></div>
     ${r.replay ? `<div class="rv-card rv-out"><div class="rv-label">${runIcon('robot')} What the robot did</div>
       <video src="${esc(runURL(r.replay))}" ${r.replay_last ? `poster="${esc(runURL(r.replay_last))}"` : ''} controls muted loop playsinline preload="metadata"></video>
-      <div class="rv-cap">The verifier replays the agent's final trajectory in a fresh simulator; this is that replay.</div></div>` : ''}`;
+      <div class="rv-cap">The verifier replays the agent's final trajectory in a fresh simulator; this is that replay.</div></div>` : ''}
+    ${r.replay_first ? `<div class="rv-card rv-out rv-first"><div class="rv-label">${runIcon('robot')} First attempt</div>
+      <video src="${esc(runURL(r.replay_first))}" controls muted loop playsinline preload="metadata"></video>
+      <div class="rv-cap">The agent's first attempt, up to its first reset. The episode above is the one that was graded.</div></div>` : ''}`;
 
   // ---- the log
   const filters = ['all', 'say', ...KIND_ORDER];

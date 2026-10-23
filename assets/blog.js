@@ -89,7 +89,7 @@ function compute(ex, tasks, b, atlas) {
   const dur = (min) => (min % 60 ? `${min} minutes` : `${['', 'one', 'two', 'three', 'four', 'five', 'six'][min / 60] || min / 60} hour${min > 60 ? 's' : ''}`);
   const cb = b.crossbench || {};
   const coreModes = (m) => core.filter((t) => (t.core || '').includes(m)).length;
-  const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`;
+  const P = (a, n) => `${pct(a, n)}%`, F = (a, n) => `${int(a)} of ${int(n)}`, frac = (a, n) => `${int(a)}/${int(n)}`;
   const Q = (a, n) => `${a && !pct(a, n) ? '<1' : pct(a, n)}% (${int(a)}/${int(n)})`;
   const HQ = (a, n) => `${a && !pct(a, n) ? '&lt;1' : pct(a, n)}%<small class="cnt"> (${int(a)}/${int(n)})</small>`;
   const QL = (L, f) => Q(f(L || []), (L || []).length);
@@ -175,6 +175,18 @@ function compute(ex, tasks, b, atlas) {
   for (const x of CORE) (bySuite[x[0].suite] ??= []).push(x);
   const suiteRows = Object.values(bySuite).filter((L) => L.length >= MIN_BENCH);
   const leads = (r) => suiteRows.filter((L) => runs.every((o) => solved(L, o) <= solved(L, r))).length;
+  // Finding 6: first-attempt success (owner, 2026-10-23), a standard or standard-realtime test solved on the first try,
+  // with no reset (a result cell's `f`). Embodied Olympics - Fun is left out on both sides: its standard tests are being
+  // rerun with the first attempt recorded, and the results on the site come from runs that did not record it.
+  const FA_OUT = new Set(['embodied-olympics-fun']);
+  const first = (t, r, m) => ok(t, r, m) && t.results?.[r]?.[m]?.f === 1;
+  const FA = { s: M.s.filter(([t]) => !FA_OUT.has(t.suite)), t: M.t.filter(([t]) => !FA_OUT.has(t.suite)) };
+  const faN = (L, r) => L.filter(([t, m]) => first(t, r, m)).length;
+  const fa = order.map((r) => ({ id: r, name: name(r), s: solved(FA.s, r), sf: faN(FA.s, r), t: solved(FA.t, r), tf: faN(FA.t, r) }));
+  const faSum = (k) => fa.reduce((a, x) => a + x[k], 0);
+  const faOf = (r) => fa.find((x) => x.id === r);
+  const faMost = [...fa].sort((x, y) => (y.s - y.sf) - (x.s - x.sf))[0];
+  const faRank = (k) => [...fa].sort((x, y) => y[k] - x[k]).map((x) => x.id).join();
   const S = {
     tasks: int(tot.instances), tests: int(tot.task_dirs), suites: int(tot.suites), robots: int(tot.robots), simulators: int(tot.simulators),
     core_tasks: int(tot.core_tasks), core_tests: int(tot.core_dirs), default_run: int(tot.default_run),
@@ -249,8 +261,18 @@ function compute(ex, tasks, b, atlas) {
     types_edge: list(edge.map((x) => `${low(x.k)} (${pct(x.a * x.n, x.n)}% against at most ${pct(x.o * x.n, x.n)}% for the other two)`)),
     suites_n: int(suiteRows.length), suites_astra: int(leads(TOP[0])), suites_opus: int(leads(TOP[1])), suites_argon: int(leads(TOP[2])),
     views_note: sameOrderCore ? 'The three keep this order in all four views' : 'The order of the three changes between views',
+    // Finding 6: graded successes against first-attempt successes, standard and standard-realtime
+    fa_n_s: int(FA.s.length), fa_n_t: int(FA.t.length),
+    fa_out_s: int(M.s.length - FA.s.length), fa_out_t: int(M.t.length - FA.t.length),
+    fa_all_s: `${int(faSum('s'))}`, fa_all_sf: `${int(faSum('sf'))}`, fa_all_t: `${int(faSum('t'))}`, fa_all_tf: `${int(faSum('tf'))}`,
+    fa_drop_s: Q(faSum('s') - faSum('sf'), faSum('s')), fa_drop_t: Q(faSum('t') - faSum('tf'), faSum('t')),
+    fa_most: faMost?.name, fa_most_s: faMost ? `${int(faMost.s)} standard tests, ${int(faMost.sf)} of them on the first attempt (${int(faMost.s - faMost.sf)} only after a reset)` : null,
+    fa_top_line: list(TOP.filter((r) => r !== faMost?.id).map((r) => { const x = faOf(r); return `${x.name} ${int(x.s)}→${int(x.sf)}`; })),
+    fa_t_line: list(TOP.map((r) => { const x = faOf(r); return `${x.name} ${int(x.t)}→${int(x.tf)}`; })),
+    fa_order: faRank('s') === faRank('sf') && faRank('t') === faRank('tf') ? 'The agents rank in the same order either way' : 'Counting only first attempts changes the order of some agents',
+    fa_evidence: list(fa.map((x) => `${x.name} ${frac(x.sf, FA.s.length)} on the first attempt against ${frac(x.s, FA.s.length)} graded (standard), ${frac(x.tf, FA.t.length)} against ${frac(x.t, FA.t.length)} (standard-realtime)`)),
   };
-  return { S, M: { ...M, c: CORE }, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
+  return { S, fa, FA, M: { ...M, c: CORE }, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, name, short, ok, solved, flash, ttOf, ttLab: (x) => atlas?.taxonomy?.tt?.[x] || x, suiteName };
 }
 
@@ -423,6 +445,27 @@ function dotPlots(el, R, o) {
   el.innerHTML = head(o.say, o.cap, o.how) + `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r], ' dotk')}${esc(R.name(r))}</span>`).join('')}<span><i class="sw barkey"></i>${esc(o.valueName)} (right)</span></div>`
     + `<div class="dps">${panel('p')}${panel('s')}</div><p class="fig-note">${o.note}</p>`
     + numbers(['Benchmark', 'Setting', 'Tests', ...TOP.map((r) => esc(R.short(r))), o.valueName], ['p', 's'].flatMap((k) => o.rows(k).map((r) => [esc(R.benchName(r.id)), MODE_LABEL[k], r.n, ...r.per, `${o.valueText(...o.value(r))}`])));
+}
+
+/** Finding 6: per agent and setting, its graded successes split into those on the first attempt and those only after a
+ *  reset, on the tests the finding counts (each row is the setting's tests; the rest of the row is not solved). */
+function figFirst(el, R) {
+  const segs = [['f', 'Solved on the first attempt', 'var(--std)', ''], ['r', 'Solved only after a reset', 'var(--std)', ';opacity:.4'], ['x', 'Not solved', 'var(--wf-none)', '']];
+  const block = (k) => {
+    const n = R.FA[k].length;
+    return `<p class="dp-h ${MODE_CLS[k]}">${MODE_LABEL[k]} · ${int(n)} tests</p><div class="sb">${R.fa.map((x) => {
+      const v = { f: x[`${k}f`], r: x[k] - x[`${k}f`], x: n - x[k] };
+      return `<div class="sb-row"><span class="who">${esc(x.name)}</span><span class="sb-trk">${segs.map(([s, l, c, o]) => (v[s]
+        ? `<span style="flex:${v[s]} 1 0;background:${c}${o}" title="${esc(`${x.name} · ${MODE_LABEL[k]} · ${l}: ${v[s]} of ${n}`)}">${s !== 'x' && (100 * v[s]) / n >= 6 ? `<em>${v[s]}</em>` : ''}</span>` : '')).join('')}</span><span class="n">${pct(x[`${k}f`], n)}%</span></div>`;
+    }).join('')}</div>`;
+  };
+  el.innerHTML = head('Most graded successes come on the first attempt; resets add the most for the strongest agent.',
+    'Graded success and first-attempt success, per agent, standard and standard-realtime',
+    'each row is one agent on all the setting’s core tests counted here; the right-hand number is its first-attempt success rate.')
+    + `<div class="legend">${segs.map(([, l, c, o]) => `<span><i class="sw" style="background:${c}${o}"></i>${esc(l)}</span>`).join('')}</div>`
+    + block('s') + block('t')
+    + numbers(['Agent', 'Standard, graded', 'Standard, first attempt', 'Standard-realtime, graded', 'Standard-realtime, first attempt'],
+      R.fa.map((x) => [esc(x.name), frac(x.s, R.FA.s.length), frac(x.sf, R.FA.s.length), frac(x.t, R.FA.t.length), frac(x.tf, R.FA.t.length)]));
 }
 
 function figHard(el, R) {
@@ -668,7 +711,7 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
     kinds.textContent = Object.entries(c).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${(ex.bodies?.[k] || k).toLowerCase()} (${int(n)} tasks)`).join(', ');
     const nk = $('#body-kinds'); if (nk) nk.textContent = nw(Object.keys(c).length);
   }
-  const figs = { modes: figModes, types: figTypes, suites: figSuites, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach };
+  const figs = { modes: figModes, types: figTypes, suites: figSuites, overlap: figOverlap, paired: figPaired, steps: figSteps, hard: figHard, easy: figEasy, approach: figApproach, first: figFirst };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
   // each figure's number before its caption
   $$('.fig-body[data-fig]').forEach((el) => $('.fig-cap', el)?.insertAdjacentHTML('afterbegin', `<b>Figure ${el.dataset.fig}.</b> `));

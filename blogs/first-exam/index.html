@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../assets/exam.css?v=dbf325f1">
+<link rel="stylesheet" href="../../assets/exam.css?v=39562e34">
 <link rel="stylesheet" href="../../assets/blog.css?v=4f47e9ee">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=87ac272a"></script>
-<script type="module" src="../../assets/blog.js?v=7d61c17b"></script>
+<script type="module" src="../../assets/app.js?v=d7250b83"></script>
+<script type="module" src="../../assets/blog.js?v=72b9c5d3"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -393,6 +393,36 @@
           <h4>Scope</h4>
           <ul>
             <li>The counts are from a random sample of about a third of the attempts (<span data-s="cb_sample"></span> analyzed, snapshot of <span data-s="cb_snapshot"></span>), labeled by an agent from the run logs and not yet checked by hand.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="finding">
+      <h3 id="f6" data-short="Most standard-mode successes need no reset"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f6-body"><span class="fn">Finding 6</span>Most standard-mode successes need no reset, and resets help the strongest agent most.</button></h3>
+      <p class="finding-sum">An attempt counts as solved first time if the task was solved without any reset. Counted that way, every agent keeps most of its standard and standard-realtime successes; GPT-6 Astra loses the most.</p>
+      <div class="finding-body" id="f6-body">
+        <ul class="claims">
+            <li>On the <span data-s="fa_n_s"></span> standard tests counted here, the agents’ <span data-s="fa_all_s"></span> graded successes include <span data-s="fa_all_sf"></span> on the first attempt, so resets account for <span data-s="fa_drop_s"></span> of them. In standard-realtime (<span data-s="fa_n_t"></span> tests), <span data-s="fa_all_t"></span> successes include <span data-s="fa_all_tf"></span> first attempts; resets account for <span data-s="fa_drop_t"></span>.</li>
+            <li><span data-s="fa_most"></span> gains the most from resets: it solves <span data-s="fa_most_s"></span>. For the other two strong agents, graded → first attempt in standard mode: <span data-s="fa_top_line"></span>. In standard-realtime: <span data-s="fa_t_line"></span>.</li>
+            <li><span data-s="fa_order"></span>.</li>
+        </ul>
+        <figure class="fig">
+          <div class="fig-body" id="fig-first" data-fig="15"></div>
+        </figure>
+        <details class="more">
+          <summary>Evidence and scope</summary>
+          <h4>Evidence</h4>
+          <p>Per agent: <span data-s="fa_evidence"></span>.</p>
+          <p><a href="../../leaderboard/?mode=standard">The leaderboard</a> shows first-attempt success beside the score in the Standard and Standard-realtime views, and the task pages mark each solved standard test 1st ✓ or 1st ✗.</p>
+          <h4>Interpretation <small>(inferred)</small></h4>
+          <ul>
+            <li>Where a task allows resets, the strongest agent uses them to turn some failed first attempts into successes; for the other agents, resets add only a few successes.</li>
+          </ul>
+          <h4>Scope</h4>
+          <ul>
+            <li>Embodied Olympics - Fun is left out of this finding (<span data-s="fa_out_s"></span> standard and <span data-s="fa_out_t"></span> standard-realtime tests): its standard tests are being rerun with the first attempt recorded, and the results shown here come from runs that did not record it. The leaderboard’s first-attempt column counts every core test, so a success there without a first-attempt record counts as not solved on the first attempt.</li>
+            <li>A success on a task that allows no reset is a first attempt. Each test has one attempt per agent, as in the other findings.</li>
           </ul>
         </details>
       </div>
