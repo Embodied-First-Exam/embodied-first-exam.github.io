@@ -200,8 +200,8 @@ const LB_SETTINGS = [
   { id: 'privileged', label: 'Privileged', key: 'p' },
 ];
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
-// the leaderboard page's two switches (owner, 2026-10-23): the task set, Core or All (every task of the exam), and the
-// mode inside it, where Default is each task once in its default mode
+// the leaderboard page's switches (owner, 2026-10-23): the mode, where Default is each task once in its default mode, and,
+// for the suite-by-suite table only, the task set, Core or All (every task of the exam); the board itself stays on Core
 const LB_SCOPES = [{ id: 'core', label: 'Core' }, { id: 'all', label: 'All' }];
 const LB_MODES = LB_SETTINGS.map((s) => (s.id === 'core' ? { ...s, label: 'Default' } : s));
 /** A setting of the leaderboard page: a mode of LB_SETTINGS in the task set chosen. */
@@ -210,7 +210,7 @@ function pageSetting(scope, mode) {
   if (scope !== 'all') return m;
   return { ...m, all: true, label: m.id === 'core' ? 'All' : `All · ${m.label}` };
 }
-const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (the count beside its score), and these numbers are not comparable between models.';
+const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (a number’s tooltip gives the count), and these numbers are not comparable between models.';
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
   core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, standard-realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
@@ -219,9 +219,6 @@ const LB_DESC = {
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
-/** The line under the switches for a setting of the All set. */
-const allDesc = (set, n) => `${set.id === 'core' ? `Every task of the exam, ${int(n)} of them, core or not, each once in its default mode (as in Core: standard-realtime for dynamic environments, standard for static ones).`
-  : `The ${int(n)} tasks of the exam, core or not, that have ${set.label.replace('All · ', '').toLowerCase()} mode, in that mode.`} ${LB_NOT_COMPARABLE}`;
 
 /** Scores of a group of runs in one setting, on all the core tests of that setting: the denominator is fixed, and a test
  *  without a finished result counts as failed (owners, 2026-10-19). A setting of the All set is the exception: every task
@@ -331,7 +328,7 @@ function lbBoard(ex, tasks, onDraw) {
   const state = { scope: Q.get('set') === 'all' || Q.get('mode') === 'all' ? 'all' : 'core', set: lbSetting(Q.get('mode')).id,
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
   function draw() {
-    const set = pageSetting(state.scope, state.set);
+    const set = pageSetting('core', state.set);
     const pool = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
     const main = pool.filter((r) => (r.suites?.length || 0) >= minSuites);
     const partial = pool.filter((r) => (r.suites?.length || 0) < minSuites).sort((a, b) => (b.suites?.length || 0) - (a.suites?.length || 0));
@@ -346,7 +343,7 @@ function lbBoard(ex, tasks, onDraw) {
     } else {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
-      { const d = $('#lb-desc'); if (d) d.textContent = set.all ? allDesc(set, g.tests) : lbDesc(set.id, g.tests); }
+      { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
       html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
@@ -357,7 +354,9 @@ function lbBoard(ex, tasks, onDraw) {
     board.innerHTML = html;
     $('[data-small]', board)?.addEventListener('click', () => { state.small = !state.small; if (!state.small && partial.some((r) => r.id === state.open)) state.open = null; draw(); });
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
-    if (onDraw) onDraw({ state, main, scores, set });
+    // the suite-by-suite table may show the All set, on the same runs in the board's order
+    const sset = pageSetting(state.scope, state.set);
+    if (onDraw) onDraw({ state, main, scores: sset.all ? scoreGroup([...main, ...partial], tasks, sset).scores : scores, set: sset });
   }
   function sync() {
     $('#lb-harness').value = state.harness;
@@ -373,8 +372,9 @@ function lbBoard(ex, tasks, onDraw) {
   // the harness: one choice from a list (owners, 2026-10-19)
   $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<option value="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</option>`).join('');
   $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
-  // the same two switches above the board and above the suite-by-suite table, kept in step (owner, 2026-10-23)
-  const scopePresses = ['#lb-scope', '#lb-suites-scope'].map((q) => $(q)).filter(Boolean).map((el) => {
+  // the mode switch above the board and above the suite-by-suite table, kept in step; the task set above the table only
+  // (owner, 2026-10-23)
+  const scopePresses = ['#lb-suites-scope'].map((q) => $(q)).filter(Boolean).map((el) => {
     const press = settingSwitch(el, state.scope, (id) => { state.scope = id; sync(); }, LB_SCOPES);
     el.setAttribute('aria-label', 'Task set');
     return press;
