@@ -32,7 +32,7 @@ const moreThan = (x) => { const f = [...FRACS].reverse().find(([v]) => x > v); r
 const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
 // Finding 4's groups of hard benchmarks, as the analysis groups them; a hard benchmark outside them is named after them
 const HARD_GROUPS = [
-  ['precise manipulation and assembly', ['dextoolbench', 'ikea', 'robopaint']],
+  ['precise manipulation and assembly', ['dextoolbench', 'robopaint']],
   ['balance and fast dynamics', ['humanoidbench', 'pandadyn', 'myosuite']],
   ['long multi-step tasks', ['behavior-1k', 'robodojo']],
   ['reasoning before precise manipulation', ['roboarc']],
@@ -80,11 +80,11 @@ function compute(ex, tasks, b, atlas) {
   const flashTop = flash.flatMap((r) => ['p', 's', 't'].map((k) => [solved(M[k], r), M[k].length])).reduce((a, x) => (x[0] / (x[1] || 1) > a[0] / (a[1] || 1) ? x : a), [0, 1]);
   const group = (L, keys) => { const g = {}; for (const x of L) for (const k of keys(x[0])) (g[k] ??= []).push(x); return g; };
   const ttOf = (t) => atlas?.tasks?.[`${t.suite}/${t.id}`]?.tt || [];
-  // benchmarks as the analysis counts them: the IKEA assembly tasks (family ikea_*) apart from the rest of RoboARC
-  const benchOf = (t) => [(t.family || '').startsWith('ikea_') ? 'ikea' : t.suite];
+  // benchmarks are the site's suites: the IKEA assembly tasks count with the rest of RoboARC, their suite
+  const benchOf = (t) => [t.suite];
   const benchH = { p: group(M.p, benchOf), s: group(M.s, benchOf) };
   const suiteName = Object.fromEntries(ex.suites.map((x) => [x.id, x.name]));
-  const benchName = (k) => (k === 'ikea' ? 'IKEA assembly' : suiteName[k] || k);
+  const benchName = (k) => suiteName[k] || k;
   const budgets = core.map((t) => t.budget_min).filter(Boolean);
   const dur = (min) => (min % 60 ? `${min} minutes` : `${['', 'one', 'two', 'three', 'four', 'five', 'six'][min / 60] || min / 60} hour${min > 60 ? 's' : ''}`);
   const cb = b.crossbench || {};
