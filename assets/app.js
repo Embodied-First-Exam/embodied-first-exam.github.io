@@ -199,39 +199,51 @@ const LB_SETTINGS = [
   { id: 'standard-realtime', label: 'Standard-realtime', key: 't' },
   { id: 'privileged', label: 'Privileged', key: 'p' },
 ];
-const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
+// All: every test of the exam in every setting, on the leaderboard page only (owner, 2026-10-23)
+const LB_ALL = { id: 'all', label: 'All', key: '*' };
+const LB_PAGE_SETTINGS = [...LB_SETTINGS, LB_ALL];
+const lbSetting = (id) => LB_PAGE_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
   core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, standard-realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
   standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
   'standard-realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in standard-realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
+  all: (n) => `All ${int(n)} tests of the exam, core or not, in every setting. Not every model has been run on every test, so each model is scored only on the tests it was run on (the count beside its score), and these numbers are not comparable between models.`,
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
 
 /** Scores of a group of runs in one setting, on all the core tests of that setting: the denominator is fixed, and a test
- *  without a finished result counts as failed (owners, 2026-10-19). {tests: the setting's core tests,
- *  scores: {run: {v: [solved, tests], suites: {suite: [solved, the suite's tests]}}}} */
+ *  without a finished result counts as failed (owners, 2026-10-19). All is the exception: every test of the exam, core or
+ *  not, in every setting, and each run is counted only on the tests it has a result for (owner, 2026-10-23), so its numbers
+ *  are not comparable between models. {tests: the setting's tests, scores: {run: {v: [solved, tests], suites: {suite:
+ *  [solved, the suite's tests]}}}} */
 function scoreGroup(group, tasks, set) {
   const scores = Object.fromEntries(group.map((r) => [r.id, { v: [0, 0], suites: {} }]));
+  const all = set.key === '*';
   let tests = 0;
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
-    const k = set.key ?? t.default;
-    if (!k || !t.core || !t.core.includes(k)) continue;   // the core set only (owners, 2026-10-18)
-    tests += 1;
-    for (const r of group) {
-      const ok = scored(t.results?.[r.id]?.[k]) === 'S';
-      const o = scores[r.id];
-      o.v[0] += ok;
-      o.v[1] += 1;
-      const ss = (o.suites[t.suite] ??= [0, 0]);
-      ss[0] += ok;
-      ss[1] += 1;
+    const keys = all ? (t.modes || []).map((m) => MODE_KEY[m]).filter(Boolean) : [set.key ?? t.default];
+    for (const k of keys) {
+      if (!all && (!k || !t.core || !t.core.includes(k))) continue;   // the core set only (owners, 2026-10-18)
+      tests += 1;
+      for (const r of group) {
+        const st = scored(t.results?.[r.id]?.[k]);
+        if (all && st === undefined) continue;
+        const ok = st === 'S';
+        const o = scores[r.id];
+        o.v[0] += ok;
+        o.v[1] += 1;
+        const ss = (o.suites[t.suite] ??= [0, 0]);
+        ss[0] += ok;
+        ss[1] += 1;
+      }
     }
   }
   return { tests, scores };
 }
+const MODE_KEY = { standard: 's', 'standard-realtime': 't', privileged: 'p' };
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 const solvedOf = (v) => (v?.[1] ? `${int(v[0])}/${int(v[1])}` : '–');
@@ -349,7 +361,7 @@ function lbBoard(ex, tasks, onDraw) {
   $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
   // the same switch above the board and above the suite-by-suite table, kept in step (owner, 2026-10-23)
   const presses = ['#lb-mode', '#lb-suites-mode'].map((q) => $(q)).filter(Boolean)
-    .map((el) => settingSwitch(el, state.set, (id) => { state.set = id; sync(); }));
+    .map((el) => settingSwitch(el, state.set, (id) => { state.set = id; sync(); }, LB_PAGE_SETTINGS));
   // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
 }
@@ -362,7 +374,8 @@ function lbSuites(el, ex, runs, scores, set) {
   if (h) h.textContent = set.label;
   // a note on why some suites have few tests in a setting (readers' question, 2026-10-19)
   const sn = $('#lb-suites-note');
-  if (sn) sn.textContent = set.id === 'standard-realtime' ? 'Standard-realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
+  if (sn) sn.textContent = set.id === 'all' ? 'All counts every test of the exam, but not every model has been run on every test: each model is scored only on the tests it was run on, so these numbers are not comparable between models.'
+    : set.id === 'standard-realtime' ? 'Standard-realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
     : 'The number of tests each suite has in this setting is under its name.';
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
   const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
@@ -387,7 +400,7 @@ function lbSuites(el, ex, runs, scores, set) {
     const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
     // how many tests the suite has in this setting, so a 100% on one test reads as one test (owners' readers, 2026-10-19)
     const n = Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${n} test${n === 1 ? '' : 's'}</small></span></a>
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${set.id === 'all' ? 'up to ' : ''}${n} test${n === 1 ? '' : 's'}</small></span></a>
       ${runs.map((r, i) => cell(r, s, vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
