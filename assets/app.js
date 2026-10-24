@@ -379,8 +379,9 @@ function lbBoard(ex, tasks, onDraw) {
     el.setAttribute('aria-label', 'Task set');
     return press;
   });
-  const presses = ['#lb-mode', '#lb-suites-mode'].map((q) => $(q)).filter(Boolean)
-    .map((el) => settingSwitch(el, state.set, (id) => { state.set = id; sync(); }, LB_MODES));
+  // the board's switch names the default mode Core, as before; the table's says Default, next to its Core/All (owner, 2026-10-23)
+  const presses = [['#lb-mode', LB_SETTINGS], ['#lb-suites-mode', LB_MODES]].filter(([q]) => $(q))
+    .map(([q, list]) => settingSwitch($(q), state.set, (id) => { state.set = id; sync(); }, list));
   // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
 }
