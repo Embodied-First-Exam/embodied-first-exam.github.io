@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/exam.css?v=ffccb520">
+<link rel="stylesheet" href="../assets/exam.css?v=00444ddc">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../assets/app.js?v=8554f4df"></script>
+<script type="module" src="../assets/app.js?v=33d216da"></script>
 </head>
 <body data-page="leaderboard">
 <div id="nav"></div>
@@ -24,6 +24,7 @@
 
   <section class="section tight">
     <div class="lb-bar">
+      <div class="seg lb-set" id="lb-scope" role="group" aria-label="Task set"></div>
       <div class="seg lb-set" id="lb-mode" role="group" aria-label="Setting">
         <button type="button" data-set="core" class="on" aria-pressed="true">Core</button><button type="button" data-set="standard" aria-pressed="false">Standard</button><button type="button" data-set="standard-realtime" aria-pressed="false">Standard-realtime</button><button type="button" data-set="privileged" aria-pressed="false">Privileged</button>
       </div>
@@ -37,7 +38,7 @@
   <section class="section">
     <div class="head reveal">
       <h2>Suite by suite · <span id="lb-suites-set">Core</span></h2>
-      <div class="seg lb-set lb-suites-mode" id="lb-suites-mode"></div>
+      <div class="lb-suites-switches"><div class="seg lb-set" id="lb-suites-scope"></div><div class="seg lb-set" id="lb-suites-mode"></div></div>
       <p class="lb-suites-note" id="lb-suites-note"></p>
     </div>
     <div class="sdots reveal" id="lb-suites"></div>
