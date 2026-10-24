@@ -337,6 +337,7 @@ function lbBoard(ex, tasks, onDraw) {
   }
   function sync() {
     $('#lb-harness').value = state.harness;
+    presses.forEach((press) => press(state.set));
     // the setting in the address, so a link can point at a view; Core, the default, needs none
     const u = new URL(location.href);
     if (state.set === 'core') u.searchParams.delete('mode'); else u.searchParams.set('mode', state.set);
@@ -346,7 +347,9 @@ function lbBoard(ex, tasks, onDraw) {
   // the harness: one choice from a list (owners, 2026-10-19)
   $('#lb-harness').innerHTML = ['all', ...harnesses].map((h) => `<option value="${esc(h)}">${h === 'all' ? 'All harnesses' : esc(h)}</option>`).join('');
   $('#lb-harness').addEventListener('change', (e) => { state.harness = e.target.value; sync(); });
-  settingSwitch($('#lb-mode'), state.set, (id) => { state.set = id; sync(); });
+  // the same switch above the board and above the suite-by-suite table, kept in step (owner, 2026-10-23)
+  const presses = ['#lb-mode', '#lb-suites-mode'].map((q) => $(q)).filter(Boolean)
+    .map((el) => settingSwitch(el, state.set, (id) => { state.set = id; sync(); }));
   // (no code agent / VLA policy switch: only code agents sit the exam; owners, 2026-10-19)
   sync();
 }
