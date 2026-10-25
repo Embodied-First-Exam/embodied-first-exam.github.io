@@ -27,7 +27,8 @@ const suiteNow = (id) => SUITE_ALIAS[id] || id;
   if (moved) history.replaceState(history.state, '', `${location.pathname}?${Q}${location.hash}`);
 }
 // task keys renamed with their dirs in the exam's repository (exam.json task_alias, from the generator): IKEA MuJoCo's
-// ikea-mujoco/lack and roboarc/lack (as the site showed it inside RoboARC) -> roboarc/ikea_lack (2026-10-23)
+// ikea-mujoco/lack and roboarc/lack (as the site showed it inside RoboARC) -> roboarc/ikea_lack (2026-10-23); ids a release
+// changed in place: embodied-olympics-fun/free_throw_realgrasp -> embodied-olympics-fun/free_throw (2026-10-24)
 const TASK_ALIAS = {};
 /** A task's key ("<suite>/<id>") in `index`, also from a link to a suite that was split since (roboolympics/<id>) or to a
  *  task's earlier key (TASK_ALIAS). */
@@ -35,7 +36,7 @@ const taskKey = (want, index) => {
   if (!want || index.has(want)) return want;
   if (TASK_ALIAS[want] && index.has(TASK_ALIAS[want])) return TASK_ALIAS[want];
   const [s, id] = want.split('/');
-  return (SUITE_SPLIT[s] || []).map((x) => `${x}/${id}`).find((k) => index.has(k)) || want;
+  return (SUITE_SPLIT[s] || []).map((x) => `${x}/${id}`).map((k) => (index.has(k) ? k : TASK_ALIAS[k])).find((k) => k && index.has(k)) || want;
 };
 /** The task the address asks for (?task=), its key in `index`; an earlier key is rewritten in the address too. */
 const wantedTask = (index) => {
@@ -2162,7 +2163,7 @@ const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playgr
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
 const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5',
-  glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
+  glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 const settingOf = (r) => {
   const id = r.run || '';
   const h = Object.keys(HARNESS_NAME).find((k) => id.startsWith(k + '-'));
@@ -2175,7 +2176,7 @@ const settingOf = (r) => {
   return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}`;
 };
 const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5',
-  'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
+  'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'qwen3.8-max': 'Qwen3.8 Max', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
 
 /** A setting's name from its run id alone (the summary has no rows to fall back on); the id itself if it is not one. */
 const settingName = (id) => (Object.keys(HARNESS_NAME).some((h) => id.startsWith(h + '-')) ? settingOf({ run: id }) : id);
