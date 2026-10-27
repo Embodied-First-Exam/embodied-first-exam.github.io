@@ -1802,7 +1802,7 @@ html { overflow-x: clip; }
 .routes3 .route .btn { margin-top: auto; align-self: flex-start; }
 @media (max-width: 1000px) { .routes.routes3 { grid-template-columns: minmax(0, 1fr); } }
 .routes4 .route .btn { margin-top: auto; align-self: flex-start; }
-/* GPT-6 Luna's results, listed (not ranked) in the leaderboard's All view (owner, 2026-10-27): the suite-by-suite table's
+/* GPT-6 Luna's results, listed (not ranked) under the leaderboard in every view (owner, 2026-10-27): the suite-by-suite table's
    look, each cell a share and its count, a Total row under the suites */
 #lb-luna .sx-grid { --c: color-mix(in srgb, var(--ink) 52%, var(--surface)); grid-template-columns: minmax(210px, 240px) repeat(var(--n), minmax(84px, 1fr)); min-width: calc(220px + var(--n) * 92px); }
 #lb-luna .sx-head .sx-col { display: flex; flex-direction: column; justify-content: flex-end; }

@@ -429,7 +429,8 @@ function lbSuites(el, ex, runs, scores, set) {
   el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
-/** GPT-6 Luna's results, suite by suite, in the All view only (owner, 2026-10-27). The run is listed but not ranked: it
+/** GPT-6 Luna's results, suite by suite, on every test (owner, 2026-10-27): shown in every view and drawn once from all
+ *  the tasks, so a view or filter does not change them. The run is listed but not ranked: it
  *  stays out of the board, the suite-by-suite table and every score (UNRANKED_RUNS); this block only lists its results.
  *  Per suite: the share of tests solved over all modes pooled, per mode, and the share of tasks (a task = one scene with
  *  all its modes) solved in at least one mode. A test without a valid result (not run, or ended by an infrastructure
@@ -2088,13 +2089,9 @@ async function leaderboardPage(ex) {
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
   lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
-  // GPT-6 Luna's results, listed (not ranked) in the All view only (owner, 2026-10-27)
+  // GPT-6 Luna's results, listed (not ranked): a section of its own, the same in every view (owner, 2026-10-27)
   lbLuna($('#lb-luna'), ex, tasks);
-  lbBoard(ex, tasks, (d) => {
-    lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set);
-    const lu = $('#luna-results');
-    if (lu) lu.hidden = !d.set.all;
-  });
+  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
 }
 
 async function suitesPage(ex) {
