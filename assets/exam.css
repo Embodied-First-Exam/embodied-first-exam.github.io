@@ -942,6 +942,7 @@ a.st::after { content: "log ↗"; font-weight: 500; opacity: .75; }
 .ro-more[open] .ro-expand { display: none; }
 .ro-pics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .ro-pics img { height: 120px; width: auto; border-radius: 8px; cursor: zoom-in; border: 1px solid var(--line); }
+.ro-pics img:not([src]) { width: 160px; background: var(--bg-2); color: transparent; }   /* a picture still being read out of steps.bin */
 .rl-end { margin-top: 16px; padding: 14px 16px; border-radius: 14px; font-weight: 600; }
 .rl-end.ok { background: color-mix(in srgb, var(--std) 14%, transparent); color: var(--std-ink); }
 .rl-end.no { background: color-mix(in srgb, var(--priv) 12%, transparent); color: var(--priv-ink); }
