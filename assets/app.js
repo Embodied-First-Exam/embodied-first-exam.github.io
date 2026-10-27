@@ -578,13 +578,45 @@ function taskCard(ex, t, runs) {
       ${runs.length && resultOf(t) !== 'unrun' ? `<div class="res">${dots(ex, t, runs)}</div>` : ''}</div></button>`;
 }
 
-// Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-media (runs/), previews included
-// (no probe for a local copy, which logged a 404 on every page that reads runs).
-const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/';
-const runBase = async () => RUNS_REMOTE;
-let RUN_BASE = RUNS_REMOTE;
-const runURL = (p) => RUN_BASE + p;
-const runJSON = async (p) => { RUN_BASE = await runBase(); const r = await fetch(runURL(p)); if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); };
+// Where the step-by-step runs live: the public HF dataset MLL-Lab/embodied-exam-runs, previews included. Its layout
+// (index.json "v": 3, run.json "format": 3): index.json, index/<suite>.json, and one folder per run,
+// runs/<h2>/<slug>/{run.json, replay.mp4, poster.jpg, steps.bin, trajectory.jsonl.gz}, h2 = the first two hex
+// characters of sha1(slug), so a run's folder follows from its slug alone. Paths in run.json and in index rows are
+// relative to the run's folder; the pictures the agent saw are byte ranges of steps.bin.
+const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/';
+// TEMPORARY (the move to embodied-exam-runs, 2026-10): the old flat layout (the runs folder of embodied-exam-media: <slug>.json,
+// <slug>/<file>, paths relative to runs/), read while the new dataset has no index or no run.json for a slug. Remove
+// RUNS_OLD and every use marked TEMPORARY once the new index is live and nothing links a run outside it.
+const RUNS_OLD = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/';
+let RUNS_LAYOUT = 3;           // the layout of the index in use: 3, or 2 while the TEMPORARY fallback serves it
+/** sha1 of a string, hex (small and synchronous: the run's folder is needed before anything is fetched). */
+function sha1hex(str) {
+  const b = new TextEncoder().encode(str), n = ((b.length + 8) >> 6) + 1, w = new Uint32Array(n * 16), x = new Uint32Array(80);
+  for (let i = 0; i < b.length; i++) w[i >> 2] |= b[i] << (24 - (i & 3) * 8);
+  w[b.length >> 2] |= 0x80 << (24 - (b.length & 3) * 8);
+  w[n * 16 - 1] = b.length * 8;
+  const rol = (v, k) => (v << k) | (v >>> (32 - k));
+  const h = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
+  for (let i = 0; i < w.length; i += 16) {
+    for (let t = 0; t < 80; t++) x[t] = t < 16 ? w[i + t] : rol(x[t - 3] ^ x[t - 8] ^ x[t - 14] ^ x[t - 16], 1);
+    let [a, bb, c, d, e] = h;
+    for (let t = 0; t < 80; t++) {
+      const f = t < 20 ? (bb & c) | (~bb & d) : t < 40 || t >= 60 ? bb ^ c ^ d : (bb & c) | (bb & d) | (c & d);
+      const k = t < 20 ? 0x5a827999 : t < 40 ? 0x6ed9eba1 : t < 60 ? 0x8f1bbcdc : 0xca62c1d6;
+      const tmp = (rol(a, 5) + f + e + k + x[t]) >>> 0;
+      e = d; d = c; c = rol(bb, 30) >>> 0; bb = a; a = tmp;
+    }
+    h[0] = (h[0] + a) >>> 0; h[1] = (h[1] + bb) >>> 0; h[2] = (h[2] + c) >>> 0; h[3] = (h[3] + d) >>> 0; h[4] = (h[4] + e) >>> 0;
+  }
+  return h.map((v) => v.toString(16).padStart(8, '0')).join('');
+}
+/** A run's folder on the dataset (ends with a slash). */
+const runBase = (slug) => `${RUNS_REMOTE}runs/${sha1hex(slug).slice(0, 2)}/${slug}/`;
+const fetchRunJSON = async (u) => { const r = await fetch(u); if (!r.ok) throw Object.assign(new Error(`${u}: HTTP ${r.status}`), { status: r.status }); return r.json(); };
+/** An index file (index.json, index/<suite>.json) of the layout in use. */
+const runJSON = (p) => fetchRunJSON((RUNS_LAYOUT >= 3 ? RUNS_REMOTE : RUNS_OLD) + p);
+/** The poster of an index row, or ''. */
+const rowPoster = (r) => (!r.poster ? '' : RUNS_LAYOUT >= 3 ? runBase(r.slug) + r.poster : RUNS_OLD + r.poster);   // TEMPORARY: the RUNS_OLD branch
 
 // The runs' index comes in two layouts. v2 (index.json has "v": 2): index.json is a summary (counts by suite and by
 // setting) and index/<suite>.json holds one suite's rows, so a page fetches only the suites it shows. v1 (older
@@ -620,7 +652,9 @@ const runShards = new Map();   // suite id -> promise of its rows
 // is listed with all its runs, every task of the All set, and only kept out of the rankings, UNRANKED_RUNS)
 const HIDDEN_RUNS = new Set();
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
-const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
+// TEMPORARY: while the new dataset has no index (an HTTP error), the old one is read, with the old layout
+const runIndexFile = () => runJSON('index.json').catch((e) => { if (!e.status) throw e; RUNS_LAYOUT = 2; return runJSON('index.json'); });
+const runSummary = () => (runSummaryP ??= runIndexFile().then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
   if (d.runs) d.runs = shown(d.runs).map(siteNow);
   if (d.v >= 2) return splitSuites(renameSuites(d));
@@ -2231,7 +2265,7 @@ async function runIndex(ex, head) {
   const row = (r) => {
     const s = suiteOf(r), ok = okOf(r);
     return `<a class="rr" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
-      <span class="rr-pic">${r.poster ? `<img loading="lazy" src="${esc(runURL(r.poster))}" alt="">` : ''}</span>
+      <span class="rr-pic">${r.poster ? `<img loading="lazy" src="${esc(rowPoster(r))}" alt="">` : ''}</span>
       <span class="rr-task"><b>${esc(titleOf(r))}</b><small>${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</small></span>
       <span class="rr-model">${esc(settingOf(r))}</span>
       <span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span>
@@ -2242,7 +2276,7 @@ async function runIndex(ex, head) {
   const card = (r) => {
     const s = suiteOf(r), ok = okOf(r);
     return `<a class="ri-card" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
-      <div class="ri-pic">${r.poster ? `<img loading="lazy" src="${esc(runURL(r.poster))}" alt="">` : ''}<span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span></div>
+      <div class="ri-pic">${r.poster ? `<img loading="lazy" src="${esc(rowPoster(r))}" alt="">` : ''}<span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span></div>
       <div class="ri-body"><div class="ri-k">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</div><h4>${esc(titleOf(r))}</h4>
         <div class="ri-meta">${esc(settingOf(r))} · ${clock(r.wall_s)} · ${int(r.steps)} steps</div>
         <div class="ri-bars">${KIND_ORDER.map((k) => `<span class="k-${k}" style="flex:${r.kinds?.[k] || 0}" title="${esc(RUN_KINDS[k].name)}: ${int(r.kinds?.[k] || 0)}"></span>`).join('')}</div></div></a>`;
@@ -2310,6 +2344,47 @@ async function runIndex(ex, head) {
 // one): Embodied Olympics (2026-10-19), IKEA MuJoCo's ikea-* dirs that became RoboARC's roboarc-ikea-* (2026-10-23)
 const SLUG_RENAMED = [['roboolympics-fun-', 'embodied-olympics-fun-'], ['roboolympics-match-', 'embodied-olympics-match-'], ['ikea-', 'roboarc-ikea-']];
 const otherSlug = (slug) => { for (const [a, b] of SLUG_RENAMED) { if (slug.startsWith(a)) return b + slug.slice(a.length); if (slug.startsWith(b)) return a + slug.slice(b.length); } return null; };
+/** A run by its slug (or the slug's other name): {r, slug, file(name) -> URL of one of its files}. */
+async function loadRun(slug) {
+  const names = [slug, otherSlug(slug)].filter(Boolean);
+  for (const s of names) {
+    try { const r = await fetchRunJSON(runBase(s) + 'run.json'); return { r, slug: s, file: (f) => runBase(s) + f }; } catch (e) { if (!e.status) throw e; }
+  }
+  // TEMPORARY: a run the new dataset does not hold yet, from the old flat layout (its paths are relative to runs/)
+  for (const s of names) {
+    try { const r = await fetchRunJSON(`${RUNS_OLD}${s}.json`); return { r, slug: s, file: (f) => RUNS_OLD + f }; } catch (e) { if (!e.status) throw e; }
+  }
+  throw new Error(`run ${slug} not found`);
+}
+// The pictures of a run are one file, steps.bin; run.json gives each as [offset, length]. HF answers the dataset's
+// address with a redirect to a signed CDN address (valid about an hour): it is resolved once per run and the pictures
+// are read from it with Range requests, so they cost no further requests on HF itself; when the CDN address stops
+// working (expired, refused) it is resolved again. Each picture becomes a blob URL, read once.
+function stepPictures(url, mime) {
+  let cdn = null, resolving = null;
+  const got = new Map();
+  const resolve = () => (resolving ??= fetch(url, { headers: { Range: 'bytes=0-0' } }).then(async (r) => {
+    if (!r.ok) throw new Error(`steps.bin: HTTP ${r.status}`);
+    await r.arrayBuffer(); cdn = r.url || url; return cdn;
+  }).finally(() => { resolving = null; }));
+  const read = async ([off, len, type]) => {
+    for (let k = 0; k < 2; k++) {
+      const u = cdn || await resolve();
+      const r = await fetch(u, { headers: { Range: `bytes=${off}-${off + len - 1}` } }).catch(() => null);
+      if (r && (r.status === 206 || r.status === 200)) {
+        let b = await r.blob();
+        if (r.status === 200) b = b.slice(off, off + len);            // a server that ignored the range
+        return URL.createObjectURL(new Blob([b], { type: type || mime || 'image/jpeg' }));
+      }
+      cdn = null;
+    }
+    throw new Error(`steps.bin: the picture at ${off} could not be read`);
+  };
+  return (p) => {
+    if (!got.has(p[0])) { const q = read(p); got.set(p[0], q); q.catch(() => got.delete(p[0])); }
+    return got.get(p[0]);
+  };
+}
 async function runPage(ex) {
   let slug = Q.get('r');
   const head = $('#run-head');
@@ -2317,7 +2392,8 @@ async function runPage(ex) {
   let r;
   head.innerHTML = '<p class="kicker">Run</p><h1>&nbsp;</h1>';
   $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the run: every step, command and picture…</div>';
-  try { r = await runJSON(`${slug}.json`).catch((e) => { const alt = otherSlug(slug); if (!alt) throw e; return runJSON(`${alt}.json`).then((x) => { slug = alt; return x; }, () => { throw e; }); }); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
+  let file;
+  try { ({ r, slug, file } = await loadRun(slug)); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
   const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
   const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
   const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
@@ -2332,10 +2408,19 @@ async function runPage(ex) {
   const est = r.step_times === 'estimated', at = (t) => `${est ? '≈' : ''}${clock(t)}`, estTip = est ? ' title="Estimated: this harness does not record when each step happened"' : '';
   const solved = r.success === 1 || r.state === 'success';
   const model = settingOf(r);
+  // the files of the run: run.json format 3 names them relative to the run's folder; TEMPORARY: the old layout's
+  // replay_last and picture paths (relative to the old runs/)
+  const v3 = r.format >= 3;
+  const poster = v3 ? r.poster : r.replay_last;
+  const pictureOf = v3 && r.steps_bin ? stepPictures(file(r.steps_bin.file || 'steps.bin'), r.steps_bin.mime) : null;
+  const picSrc = (p) => (Array.isArray(p) ? (pictureOf ? pictureOf(p) : Promise.reject(new Error('no steps.bin'))) : Promise.resolve(file(p)));
+  const picKey = (p) => (Array.isArray(p) ? `@${p[0]}` : p);
+  const mb = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)} MB` : `${Math.max(1, Math.round(n / 1e3))} kB`);
+  const trajLink = v3 && r.trajectory ? `<a class="btn small" href="${esc(file(r.trajectory.file))}" download="${esc(slug)}.trajectory.jsonl.gz" title="The agent's full trajectory: one JSON event per line, gzipped">Download trajectory <small>${mb(r.trajectory.size)}</small></a>` : '';
   head.innerHTML = `<p class="kicker">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(mode)} · one run</p>
     <h1>${esc(title)}</h1>
     <div class="run-who"><span class="run-model">${esc(model)}</span><span class="run-verdict ${solved ? 'ok' : 'no'}">${solved ? 'Solved' : 'Not solved'}</span>
-      <span class="run-links" id="run-links"><a class="btn small" href="${exam('run/')}">All runs</a></span></div>
+      <span class="run-links" id="run-links"><a class="btn small" href="${exam('run/')}">All runs</a>${trajLink}</span></div>
     <dl class="run-stats">
       <div><dt>Time</dt><dd>${clock(r.wall_s)}</dd></div>
       <div><dt>Model calls</dt><dd>${int(steps.length)}</dd></div>
@@ -2383,7 +2468,7 @@ async function runPage(ex) {
       <div class="rv-pic"><img id="rv-img" alt=""><div class="rv-none" id="rv-none">No picture yet: the agent has not looked at the robot.</div></div>
       <div class="rv-cap" id="rv-cap"></div></div>
     ${r.replay ? `<div class="rv-card rv-out"><div class="rv-label">${runIcon('robot')} What the robot did</div>
-      <video src="${esc(runURL(r.replay))}" ${r.replay_last ? `poster="${esc(runURL(r.replay_last))}"` : ''} controls muted loop playsinline preload="metadata"></video>
+      <video src="${esc(file(r.replay))}" ${poster ? `poster="${esc(file(poster))}"` : ''} controls muted loop playsinline preload="metadata"></video>
       <div class="rv-cap">The verifier replays the agent's final trajectory in a fresh simulator; this is that replay.</div></div>` : ''}`;
 
   // ---- the log
@@ -2397,7 +2482,7 @@ async function runPage(ex) {
     const outLines = (o.text || '').split('\n');
     const out = o.text || o.pics?.length ? `<div class="ro ${bad ? 'bad' : ''}"><div class="ro-head"><span>Back to the agent</span>${(o.exit || []).length ? `<span class="ro-exit">exit ${o.exit.map((e) => esc(e)).join(', ')}</span>` : ''}</div>
       ${o.text ? (outLines.length > 6 || o.text.length > 520 ? `<details class="ro-more"><summary><pre>${esc(outLines.slice(0, 5).join('\n').slice(0, 480))}</pre><span class="ro-expand">show all ${int(outLines.length)} lines</span></summary><pre>${esc(o.text)}</pre></details>` : `<pre>${esc(o.text)}</pre>`) : ''}
-      ${o.pics?.length ? `<div class="ro-pics">${o.pics.map((p) => `<img loading="lazy" src="${esc(runURL(p))}" alt="what the agent saw">`).join('')}</div>` : ''}</div>` : '';
+      ${o.pics?.length ? `<div class="ro-pics">${o.pics.map((p, j) => `<img data-i="${i}" data-j="${j}" alt="what the agent saw">`).join('')}</div>` : ''}</div>` : '';
     const sim = st.sim?.submit || st.sim?.reset ? `<span class="rt-sim">${st.sim.submit ? `${st.sim.submit} command${st.sim.submit > 1 ? 's' : ''} to the robot` : ''}${st.sim.reset ? ` · reset` : ''}</span>` : '';
     return `<article class="rstep" data-i="${i}" data-kinds="${['all', ...(st.say ? ['say'] : []), ...kinds].join(' ')}">
       <div class="rt"><span class="rt-time"${estTip}>${at(st.t)}</span><span class="rt-n">step ${i + 1}</span>${sim}<span class="rt-tok" title="prompt tokens · new output tokens · cost">${kTok(st.tok?.in)} ctx · +${int(st.tok?.out)} · $${(st.tok?.usd || 0).toFixed(2)}</span></div>
@@ -2432,7 +2517,12 @@ async function runPage(ex) {
     $$('.lane-mark').forEach((m) => m.classList.toggle('on', +m.dataset.i === i));
     const [k, p] = picAt(i);
     const img = $('#rv-img');
-    if (p && img.dataset.src !== p) { img.classList.remove('in'); img.parentElement.classList.add('loading'); img.onload = () => { img.classList.add('in'); img.parentElement.classList.remove('loading'); }; img.src = runURL(p); img.dataset.src = p; }
+    if (p && img.dataset.src !== picKey(p)) {
+      const key = picKey(p);
+      img.classList.remove('in'); img.parentElement.classList.add('loading'); img.dataset.src = key;
+      img.onload = () => { img.classList.add('in'); img.parentElement.classList.remove('loading'); };
+      picSrc(p).then((u) => { if (img.dataset.src === key) img.src = u; }, (e) => { console.warn('runs', e); img.parentElement.classList.remove('loading'); });
+    }
     $('#rv-none').hidden = !!p; img.hidden = !p;
     $('#rv-cap').textContent = p ? `Step ${k + 1} · ${at(steps[k].t)}${k < i ? ` (the latest picture by step ${i + 1})` : ''}` : '';
     if (scroll) showStep(arts[i]);
@@ -2443,6 +2533,15 @@ async function runPage(ex) {
     if (vis.length) setStep(+vis[0].target.dataset.i);
   }, { root: log, rootMargin: '-35% 0px -55% 0px' });
   arts.forEach((a) => io.observe(a));
+  // the log's pictures load when they come near the view (they are byte ranges of one file, not plain URLs)
+  const picIO = new IntersectionObserver((es) => {
+    for (const e of es) {
+      if (!e.isIntersecting) continue;
+      const im = e.target; picIO.unobserve(im);
+      picSrc(steps[+im.dataset.i].out.pics[+im.dataset.j]).then((u) => { im.src = u; }, (err) => console.warn('runs', err));
+    }
+  }, { root: log, rootMargin: '600px 0px' });
+  $$('.ro-pics img', log).forEach((im) => picIO.observe(im));
   setStep(0);
   // a link to one step (?s=<step number>) opens the log there
   const s0 = parseInt(Q.get('s'), 10) - 1;
