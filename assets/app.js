@@ -429,6 +429,72 @@ function lbSuites(el, ex, runs, scores, set) {
   el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
+/** GPT-6 Luna's results, suite by suite, in the All view only (owner, 2026-10-27). The run is listed but not ranked: it
+ *  stays out of the board, the suite-by-suite table and every score (UNRANKED_RUNS); this block only lists its results.
+ *  Per suite: the share of tests solved over all modes pooled, per mode, and the share of tasks (a task = one scene with
+ *  all its modes) solved in at least one mode. A test without a valid result (not run, or ended by an infrastructure
+ *  failure) has no entry in data/tasks.json: it is left out of the denominators, not counted as failed, and counted apart. */
+const LUNA_RUN = 'codex-gpt6_luna-xhigh';
+const LUNA_COLS = [
+  { id: 'all', label: 'All modes', sub: 'tests solved' },
+  { id: 's', label: 'Standard', sub: 'tests solved' },
+  { id: 't', label: 'Standard-realtime', sub: 'tests solved' },
+  { id: 'p', label: 'Privileged', sub: 'tests solved' },
+  { id: 'task', label: 'Any mode', sub: 'tasks solved' },
+];
+function lunaStats(tasks) {
+  const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0] });
+  const per = {}, total = blank();
+  for (const t of tasks) {
+    if (t.suite === 'robosuite') continue;
+    const r = t.results?.[LUNA_RUN] || {};
+    const o = (per[t.suite] ??= blank());
+    let graded = false, solved = false;
+    for (const m of t.modes || []) {
+      const k = MODE_KEY[m] || 's';
+      const st = r[k]?.s;
+      for (const x of [o, total]) x.tests += 1;
+      if (st !== 'S' && st !== 'F') { o.missing += 1; total.missing += 1; continue; }
+      graded = true;
+      solved ||= st === 'S';
+      for (const x of [o, total]) { x[k][0] += st === 'S'; x[k][1] += 1; x.all[0] += st === 'S'; x.all[1] += 1; }
+    }
+    for (const x of [o, total]) {
+      x.tasks += 1;
+      if (graded) { x.task[0] += solved; x.task[1] += 1; }
+    }
+  }
+  return { per, total };
+}
+function lbLuna(el, ex, tasks) {
+  if (!el) return;
+  const who = (ex.unranked_runs || []).find((r) => r.id === LUNA_RUN);
+  const { per, total } = lunaStats(tasks);
+  if (!who || !total.all[1]) { el.closest('section')?.remove(); return; }
+  const lead = $('#lb-luna-lead');
+  if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
+  const note = $('#lb-luna-note');
+  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests (the No result column). A task counts as solved when any of its modes was solved.`;
+  const cell = (name, col, v) => {
+    if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
+    const q = pctOf(v);
+    const what = col.id === 'task' ? 'tasks solved in at least one mode' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
+    return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
+  };
+  const miss = (n) => `<span class="sx-cell lu-miss${n ? '' : ' none'}" title="${int(n)} test${n === 1 ? '' : 's'} without a valid result">${int(n)}</span>`;
+  const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}<span class="sx-col"><b>No result</b><small>tests</small></span></div>`;
+  const row = (s) => {
+    const o = per[s.id];
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${int(o.tasks)} task${o.tasks === 1 ? '' : 's'} · ${int(o.tests)} test${o.tests === 1 ? '' : 's'}</small></span></a>
+      ${LUNA_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}${miss(o.missing)}</div>`;
+  };
+  const suites = ranked(ex).filter((s) => per[s.id]);
+  const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp"><span>${title}</span></div>${list.map(row).join('')}`).join('');
+  const tot = `<div class="sx-row lu-total"><span class="sd-name"><span class="code-mark lu-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
+      ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}${miss(total.missing)}</div>`;
+  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length + 1}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
+}
+
 /** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
 function lbRules(el, ex) {
   if (!el) return;
@@ -2022,7 +2088,13 @@ async function leaderboardPage(ex) {
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
   lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
-  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
+  // GPT-6 Luna's results, listed (not ranked) in the All view only (owner, 2026-10-27)
+  lbLuna($('#lb-luna'), ex, tasks);
+  lbBoard(ex, tasks, (d) => {
+    lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set);
+    const lu = $('#luna-results');
+    if (lu) lu.hidden = !d.set.all;
+  });
 }
 
 async function suitesPage(ex) {
