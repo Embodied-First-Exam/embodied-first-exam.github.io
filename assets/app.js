@@ -429,26 +429,25 @@ function lbSuites(el, ex, runs, scores, set) {
   el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
-/** The core set's screening, shown in the All view only (owner, 2026-10-27): the reference run that sat every test of the
- *  exam before the core set was drawn, suite by suite. It is a screening statistic, not a ranking: the run stays out of the
- *  board, the suite-by-suite table and every score (UNRANKED_RUNS). Per suite: the share of tests solved over all modes
- *  pooled, per mode, and the share of tasks solved in at least one mode (a task = one scene with all its modes; the unit
- *  the core filter uses). A test without a valid result (not run, or ended by an infrastructure failure) has no entry in
- *  data/tasks.json: it is left out of the denominators, not counted as failed, and the tests left out are counted. */
-const SCREENING_RUN = 'codex-gpt6_luna-xhigh';
-const SCREENING_COLS = [
+/** GPT-6 Luna's results, suite by suite, in the All view only (owner, 2026-10-27). The run is listed but not ranked: it
+ *  stays out of the board, the suite-by-suite table and every score (UNRANKED_RUNS); this block only lists its results.
+ *  Per suite: the share of tests solved over all modes pooled, per mode, and the share of tasks (a task = one scene with
+ *  all its modes) solved in at least one mode. A test without a valid result (not run, or ended by an infrastructure
+ *  failure) has no entry in data/tasks.json: it is left out of the denominators, not counted as failed, and counted apart. */
+const LUNA_RUN = 'codex-gpt6_luna-xhigh';
+const LUNA_COLS = [
   { id: 'all', label: 'All modes', sub: 'tests solved' },
   { id: 's', label: 'Standard', sub: 'tests solved' },
   { id: 't', label: 'Standard-realtime', sub: 'tests solved' },
   { id: 'p', label: 'Privileged', sub: 'tests solved' },
   { id: 'task', label: 'Any mode', sub: 'tasks solved' },
 ];
-function screeningStats(tasks) {
+function lunaStats(tasks) {
   const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0] });
   const per = {}, total = blank();
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
-    const r = t.results?.[SCREENING_RUN] || {};
+    const r = t.results?.[LUNA_RUN] || {};
     const o = (per[t.suite] ??= blank());
     let graded = false, solved = false;
     for (const m of t.modes || []) {
@@ -467,33 +466,33 @@ function screeningStats(tasks) {
   }
   return { per, total };
 }
-function lbScreening(el, ex, tasks) {
+function lbLuna(el, ex, tasks) {
   if (!el) return;
-  const who = (ex.unranked_runs || []).find((r) => r.id === SCREENING_RUN);
-  const { per, total } = screeningStats(tasks);
+  const who = (ex.unranked_runs || []).find((r) => r.id === LUNA_RUN);
+  const { per, total } = lunaStats(tasks);
   if (!who || !total.all[1]) { el.closest('section')?.remove(); return; }
-  const lead = $('#lb-screening-lead');
-  if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) sat every test of the exam before the core set was drawn. The core set keeps the tasks this run did not solve in any mode, refined by human judgment. It is a screening run and is not ranked.`;
-  const note = $('#lb-screening-note');
+  const lead = $('#lb-luna-lead');
+  if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
+  const note = $('#lb-luna-note');
   if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests (the No result column). A task counts as solved when any of its modes was solved.`;
   const cell = (name, col, v) => {
     if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
     const q = pctOf(v);
     const what = col.id === 'task' ? 'tasks solved in at least one mode' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
-    return `<span class="sx-cell scr-cell${col.id === 'task' ? ' key' : ''}" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
+    return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
   };
-  const miss = (n) => `<span class="sx-cell scr-miss${n ? '' : ' none'}" title="${int(n)} test${n === 1 ? '' : 's'} without a valid result">${n ? int(n) : '0'}</span>`;
-  const head = `<div class="sx-row sx-head"><span></span>${SCREENING_COLS.map((c) => `<span class="sx-col${c.id === 'task' ? ' key' : ''}"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}<span class="sx-col"><b>No result</b><small>tests</small></span></div>`;
+  const miss = (n) => `<span class="sx-cell lu-miss${n ? '' : ' none'}" title="${int(n)} test${n === 1 ? '' : 's'} without a valid result">${int(n)}</span>`;
+  const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}<span class="sx-col"><b>No result</b><small>tests</small></span></div>`;
   const row = (s) => {
     const o = per[s.id];
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${int(o.tasks)} task${o.tasks === 1 ? '' : 's'} · ${int(o.tests)} test${o.tests === 1 ? '' : 's'}</small></span></a>
-      ${SCREENING_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}${miss(o.missing)}</div>`;
+      ${LUNA_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}${miss(o.missing)}</div>`;
   };
   const suites = ranked(ex).filter((s) => per[s.id]);
   const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp"><span>${title}</span></div>${list.map(row).join('')}`).join('');
-  const tot = `<div class="sx-row scr-total"><span class="sd-name"><span class="code-mark scr-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
-      ${SCREENING_COLS.map((c) => cell('Total', c, total[c.id])).join('')}${miss(total.missing)}</div>`;
-  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid scr-grid" style="--n:${SCREENING_COLS.length + 1}">${head}${rows}<div class="scr-rule" aria-hidden="true"></div>${tot}</div></div>`;
+  const tot = `<div class="sx-row lu-total"><span class="sd-name"><span class="code-mark lu-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
+      ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}${miss(total.missing)}</div>`;
+  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length + 1}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
 }
 
 /** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
@@ -2089,12 +2088,12 @@ async function leaderboardPage(ex) {
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
   lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
-  // the core set's screening run, in the All view only (owner, 2026-10-27)
-  lbScreening($('#lb-screening'), ex, tasks);
+  // GPT-6 Luna's results, listed (not ranked) in the All view only (owner, 2026-10-27)
+  lbLuna($('#lb-luna'), ex, tasks);
   lbBoard(ex, tasks, (d) => {
     lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set);
-    const scr = $('#screening');
-    if (scr) scr.hidden = !d.set.all;
+    const lu = $('#luna-results');
+    if (lu) lu.hidden = !d.set.all;
   });
 }
 
