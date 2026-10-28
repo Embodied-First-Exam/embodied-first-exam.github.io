@@ -430,6 +430,14 @@ main { min-height: 70vh; }
 .sd-legend > span { display: inline-flex; align-items: center; gap: 7px; }
 .sd-legend .sep { width: 1px; height: 18px; background: var(--line-2); }
 .sd-scroll { overflow-x: auto; }
+/* the suite-by-suite tables are long: their header row stays under the nav while the table scrolls (owner, 2026-10-28).
+   Sticky needs no scrolling ancestor, so the horizontal scroller is off where the table fits; on phones it scrolls sideways
+   and the header scrolls with it. */
+@media (min-width: 1000px) {
+  .sd-scroll { overflow-x: visible; }
+  .sx-head > * { position: sticky; top: 62px; z-index: 4; background: var(--surface); box-shadow: 0 0 0 4px var(--surface); }
+  .sx-head > .sx-col { padding-top: 18px; }
+}
 .sd-grid { min-width: calc(200px + var(--n) * 88px); }
 .sd-row { display: grid; grid-template-columns: minmax(170px, 230px) repeat(var(--n), minmax(88px, 1fr)); align-items: center; border-radius: 10px; }
 .sd-head { margin-bottom: 4px; padding-bottom: 10px; border-bottom: 1px solid var(--line-2); border-radius: 0; }
