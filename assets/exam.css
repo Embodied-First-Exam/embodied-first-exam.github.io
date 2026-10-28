@@ -1829,22 +1829,23 @@ html { overflow-x: clip; }
 
 /* home: the core team at the bottom, in author order: round headshots, the name links to the person's page */
 .team { padding-top: 0; }
-.team-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 30px 16px; }
+.team-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 24px 10px; }
+@media (min-width: 1100px) { .team-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); } .team-grid b { font-size: 13px; white-space: nowrap; letter-spacing: -.01em; } }
 .team-grid .tm { display: flex; flex-direction: column; align-items: center; text-align: center; color: inherit; }
-.team-grid img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; background: var(--bg-3);
+.team-grid img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--bg-3);
   box-shadow: 0 0 0 1px var(--line), 0 6px 18px -10px rgba(15, 23, 42, .35); transition: transform .3s ease, box-shadow .3s ease; }
 .team-grid .tm:hover img, .team-grid .tm:focus-visible img { transform: translateY(-2px); box-shadow: 0 0 0 2px var(--priv), 0 10px 24px -12px rgba(15, 23, 42, .45); }
-.team-grid b { display: block; margin-top: 12px; font: 650 15px/1.25 var(--display); letter-spacing: -.005em; }
+.team-grid b { display: block; margin-top: 10px; font: 650 14px/1.25 var(--display); letter-spacing: -.005em; }
 .team-grid .tm:hover b { color: var(--priv-ink); }
 .team-grid sup, .team-legend sup { font: 600 .72em/0 var(--mono); color: var(--priv); margin-left: 1px; }
-.team-grid span { display: block; margin-top: 3px; font: 400 12.5px/1.35 var(--body); color: var(--ink-3); }
+.team-grid span { display: block; margin-top: 2px; font: 400 12px/1.35 var(--body); color: var(--ink-3); }
 .team-legend { margin: 30px 0 0; font-size: 13px; color: var(--ink-3); }
 .team-legend > span { white-space: nowrap; }
 @media (max-width: 560px) {
-  .team-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 10px; }
-  .team-grid img { width: 76px; height: 76px; }
-  .team-grid b { font-size: 13.5px; }
-  .team-grid span { font-size: 11.5px; }
+  .team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 8px; }
+  .team-grid img { width: 64px; height: 64px; }
+  .team-grid b { font-size: 12.5px; }
+  .team-grid span { font-size: 11px; }
 }
 
 /* the intro video (the report's), on its own between the hero (below the search) and the numbers */
