@@ -145,7 +145,7 @@ function footer(ex) {
       <li><a href="${exam('tasks/')}">Tasks</a></li><li><a href="${exam('run/')}">Runs</a></li></ul></div>
     <div><h5>About</h5><ul>
       <li><a href="${exam('blogs/')}">Blogs</a></li>
-      <li><a href="${exam('how/')}">How it is marked</a></li><li><a href="${exam('contribute/')}">Contribute</a></li></ul></div>
+      <li><a href="${exam('contribute/')}">Contribute</a></li></ul></div>
     <div><h5>Community</h5><ul>
       ${GITHUB_URL ? `<li><a href="${GITHUB_URL}">GitHub</a></li>` : ''}<li><a data-discord href="${DISCORD_URL}"${DISCORD_ATTRS}>Discord</a></li>
       <li><a data-wechat href="${WECHAT_URL}" target="_blank" rel="noopener">WeChat group</a></li></ul></div>
@@ -493,26 +493,6 @@ function lbLuna(el, ex, tasks) {
   const tot = `<div class="sx-row lu-total"><span class="sd-name"><span class="code-mark lu-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
       ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}</div>`;
   el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
-}
-
-/** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
-function lbRules(el, ex) {
-  if (!el) return;
-  const lb = ex.leaderboard || {};
-  const commit = (ex.task_set?.commit || '').slice(0, 9);
-  const visual = {
-    states: `<div class="rv-states"><span class="lbl">Counted</span><span class="chip-st ok">✓ solved</span><span class="chip-st">✗ failed</span><span class="chip-st">! error</span>
-      <span class="lbl">Left out</span><span class="chip-st out">stopped</span><span class="chip-st out">withdrawn</span><span class="chip-st out">still running</span></div>`,
-    modes: `<div class="rv-modes">${LB_SETTINGS.map((x) => `<span>${x.label}</span>`).join('<span class="ne">≠</span>')}</div>`,
-    budget: `<div class="rv-states"><span class="chip-st">1 hour</span><span class="chip-st">100M tokens in</span><span class="chip-st">10M out</span><span class="chip-st out">no web search</span></div>`,
-    venn: `<svg class="rv-venn" viewBox="0 0 120 92" aria-hidden="true"><defs><clipPath id="vv-a"><circle cx="46" cy="38" r="28"/></clipPath><clipPath id="vv-b"><circle cx="74" cy="38" r="28"/></clipPath></defs>
-      <g clip-path="url(#vv-a)"><g clip-path="url(#vv-b)"><circle cx="60" cy="60" r="28" class="in"/></g></g>
-      <circle cx="46" cy="38" r="28"/><circle cx="74" cy="38" r="28"/><circle cx="60" cy="60" r="28"/></svg>`,
-  };
-  const fill = (x) => String(x || '').replaceAll('{commit}', commit).replaceAll('{min_suites}', lb.min_suites || 10);
-  el.innerHTML = (lb.notes || []).map((n) => `<div class="rule6">
-      <span class="tr-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[n.icon] || FF_ICONS.shield}</svg></span>
-      <b>${esc(fill(n.title))}</b><p>${esc(fill(n.text))}</p>${visual[n.visual] || ''}</div>`).join('');
 }
 
 /* ---------------------------------------------------------------------------------------------- suites */
@@ -2075,7 +2055,6 @@ async function home(ex) {
 async function leaderboardPage(ex) {
   const lb = ex.leaderboard || {};
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
-  lbRules($('#lb-rules'), ex);
   const tasks = await loadTasks();
   // GPT-6 Luna's results, listed (not ranked): a section of its own, the same in every view (owner, 2026-10-27)
   lbLuna($('#lb-luna'), ex, tasks);
@@ -2666,7 +2645,7 @@ loadExam().then(async (raw) => {
   footer(ex);
   headWall(ex);
   const pages = { home, leaderboard: leaderboardPage, suites: suitesPage, suite: suitePage, tasks: tasksPage, contribute: contributePage,
-    how: async (ex) => flowDiagram($('#flowfig'), ex), run: runPage, blogpost: async (ex) => { flowDiagram($('#flowfig'), ex); ways($('#ways')); }, blog: blogPage, notfound: async () => {} };
+    run: runPage, blogpost: async (ex) => { flowDiagram($('#flowfig'), ex); ways($('#ways')); }, blog: blogPage, notfound: async () => {} };
   await (pages[PAGE] || home)(ex);
   fillIcons();
   reveal();

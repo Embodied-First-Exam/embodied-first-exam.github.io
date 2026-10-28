@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../assets/exam.css?v=34908553">
+<link rel="stylesheet" href="../../assets/exam.css?v=65c141ae">
 <link rel="stylesheet" href="../../assets/blog.css?v=b3929030">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=6f6ac6f8"></script>
+<script type="module" src="../../assets/app.js?v=62491e83"></script>
 <script type="module" src="../../assets/blog.js?v=1abee98e"></script>
 </head>
 <body data-page="blogpost">
@@ -127,7 +127,7 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code and Gemini 4 Argon in the Antigravity CLI, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in the Antigravity CLI and Qwen3.8 Max in Claude Code, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. Every agent gets one attempt per test under the same limits (typically one hour of agent time, 100M input and 10M output tokens, web search off), and an agent is ranked once it has results in 10 suites; smaller runs are listed below the leaderboard. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
       <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</figcaption>

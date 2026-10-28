@@ -300,13 +300,7 @@ main { min-height: 70vh; }
 .compare tbody th { width: 22%; font: 500 12px/1.5 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
 .compare td { width: 39%; color: var(--ink-2); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.honest { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.honest li { padding: 20px 22px 22px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); }
-.honest li::before { content: ""; display: block; width: 22px; height: 22px; margin-bottom: 14px; border-radius: 50%;
-  background: color-mix(in srgb, var(--std) 16%, transparent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23187287' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 14px no-repeat; }
-.honest b { display: block; font: 650 17px/1.25 var(--display); }
-.honest p { margin: 6px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
-@media (max-width: 1080px) { .pipeline { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 18px; } .pipeline li:nth-child(3)::after { display: none; } .honest { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1080px) { .pipeline { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 18px; } .pipeline li:nth-child(3)::after { display: none; } }
 @media (max-width: 720px) {
   .pipeline { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .pipeline li { padding: 0 0 26px 50px; }
@@ -320,7 +314,6 @@ main { min-height: 70vh; }
   .compare td::before { content: attr(data-mode); display: block; margin-bottom: 4px; font: 600 12px/1.3 var(--body); }
   .compare td:nth-of-type(1)::before { color: var(--priv-ink); } .compare td:nth-of-type(2)::before { color: var(--std-ink); }
   .compare tbody tr:first-child { border-top: 0; }
-  .honest { grid-template-columns: minmax(0, 1fr); }
 }
 .closing-inner { padding: clamp(36px, 5vw, 72px); border-radius: 24px; background: var(--primary-bg); color: var(--primary-ink); }
 .closing-inner h2 { margin: 0; font: 750 clamp(32px, 4vw, 54px)/1.02 var(--display); letter-spacing: -.03em; }
@@ -416,22 +409,6 @@ main { min-height: 70vh; }
   .fx-ver { margin-top: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .fx-arrow { animation: none; } }
-
-/* what keeps the marks honest: an icon and a few words, the sentence on hover */
-.trust { margin-top: clamp(40px, 5vw, 64px); }
-.trust .label { margin: 0 0 16px; }
-.trust ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
-.trust li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 10px 16px; border-radius: 16px;
-  border: 1px solid var(--line); background: var(--surface); text-align: center; outline: none; transition: border-color .15s, transform .15s; }
-.trust li:hover, .trust li:focus-visible { border-color: var(--ink-3); transform: translateY(-2px); }
-.tr-ic { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: color-mix(in srgb, var(--std) 12%, transparent); }
-.tr-ic svg { width: 22px; height: 22px; fill: none; stroke: var(--std-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.trust b { font: 600 13.5px/1.25 var(--body); }
-.trust .tip { position: absolute; z-index: 5; bottom: calc(100% + 10px); left: 50%; width: 230px; padding: 12px 14px; border-radius: 12px; background: var(--ink); color: var(--bg);
-  font: 400 13px/1.45 var(--body); text-align: left; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translate(-50%, 4px); transition: opacity .15s, transform .15s; }
-.trust li:hover .tip, .trust li:focus-visible .tip { opacity: 1; transform: translate(-50%, 0); }
-@media (max-width: 980px) { .trust ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .trust ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } .trust .tip { width: 190px; } }
 
 /* the map's reading when nothing is pointed at: capabilities per question, the most common mix */
   color: var(--surface); font: 600 12px/1 var(--mono); }
@@ -541,20 +518,7 @@ a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0
 .sx-cell.zero { color: var(--ink-3); font-size: 12.5px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
 .sx-cell.na { color: var(--ink-3); font-weight: 500;
   background: repeating-linear-gradient(135deg, transparent 0 4px, var(--line) 4px 5px), var(--surface); }
-.rules6 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.rule6 { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); }
-.rule6 b { font: 650 18px/1.25 var(--display); letter-spacing: -.01em; }
-.rule6 p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
-.rv-states { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; }
-.rv-states .lbl { width: 100%; margin-top: 4px; font: 500 10.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-.chip-st { padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line-2); font: 500 12px/1.2 var(--body); color: var(--ink-2); }
-.chip-st.ok { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-.chip-st.out { border-style: dashed; color: var(--ink-3); }
-.rv-venn { width: 120px; height: 92px; margin-top: 2px; }
-.rv-venn circle { fill: none; stroke: var(--ink-3); stroke-width: 1.4; }
-.rv-venn circle.in { fill: var(--priv); stroke: none; opacity: .85; }
-@media (max-width: 980px) { .rules6 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .rules6 { grid-template-columns: minmax(0, 1fr); } 
+@media (max-width: 640px) {
   .sdots { padding: 16px 12px 12px; } }
 
 /* ---------- the suites page: coverage as a dot lattice ---------- */
