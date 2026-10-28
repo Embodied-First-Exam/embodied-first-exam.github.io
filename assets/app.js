@@ -437,11 +437,11 @@ function lbSuites(el, ex, runs, scores, set) {
  *  failure) has no entry in data/tasks.json: it is left out of the denominators, not counted as failed, and counted apart. */
 const LUNA_RUN = 'codex-gpt6_luna-xhigh';
 const LUNA_COLS = [
-  { id: 'all', label: 'All modes', sub: 'tests solved' },
-  { id: 's', label: 'Standard', sub: 'tests solved' },
-  { id: 't', label: 'Standard-realtime', sub: 'tests solved' },
-  { id: 'p', label: 'Privileged', sub: 'tests solved' },
-  { id: 'task', label: 'Any mode', sub: 'tasks solved' },
+  { id: 'all', label: 'All modes', sub: 'tests solved', ratio: 'solved / total tests' },
+  { id: 's', label: 'Standard', sub: 'tests solved', ratio: 'solved / total tests' },
+  { id: 't', label: 'Standard-realtime', sub: 'tests solved', ratio: 'solved / total tests' },
+  { id: 'p', label: 'Privileged', sub: 'tests solved', ratio: 'solved / total tests' },
+  { id: 'task', label: 'Any mode', sub: 'tasks solved', ratio: 'solved / all tasks' },
 ];
 function lunaStats(tasks) {
   const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0] });
@@ -475,25 +475,24 @@ function lbLuna(el, ex, tasks) {
   const lead = $('#lb-luna-lead');
   if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
   const note = $('#lb-luna-note');
-  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests (the No result column). A task counts as solved when any of its modes was solved.`;
+  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests. A task counts as solved when any of its modes was solved.`;
   const cell = (name, col, v) => {
     if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
     const q = pctOf(v);
     const what = col.id === 'task' ? 'tasks solved in at least one mode' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
     return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
   };
-  const miss = (n) => `<span class="sx-cell lu-miss${n ? '' : ' none'}" title="${int(n)} test${n === 1 ? '' : 's'} without a valid result">${int(n)}</span>`;
-  const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}<span class="sx-col"><b>No result</b><small>tests</small></span></div>`;
+  const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small><small class="lu-ratio">${c.ratio}</small></span>`).join('')}</div>`;
   const row = (s) => {
     const o = per[s.id];
     return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${int(o.tasks)} task${o.tasks === 1 ? '' : 's'} · ${int(o.tests)} test${o.tests === 1 ? '' : 's'}</small></span></a>
-      ${LUNA_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}${miss(o.missing)}</div>`;
+      ${LUNA_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}</div>`;
   };
   const suites = ranked(ex).filter((s) => per[s.id]);
   const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp"><span>${title}</span></div>${list.map(row).join('')}`).join('');
   const tot = `<div class="sx-row lu-total"><span class="sd-name"><span class="code-mark lu-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
-      ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}${miss(total.missing)}</div>`;
-  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length + 1}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
+      ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}</div>`;
+  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
 }
 
 /** How it is counted: one icon, one rule and one line each, a small picture where it says more. */
@@ -1602,6 +1601,7 @@ const wayLogRow = ([t, kind, text]) => `<li class="wl-${kind}"><time>${esc(t)}</
 let wayDlg;
 async function wayDemo(k, opener) {
   const w = WAYS[k]; if (!w) return;
+  const cw = CONTROL_WAYS[WAY_ORDER.indexOf(k)];   // its flow and description (the home page's former "ways" table, owner 2026-10-27)
   if (!wayDlg) {
     wayDlg = document.createElement('div');
     wayDlg.className = 'ol-modal way-modal';
@@ -1625,7 +1625,7 @@ async function wayDemo(k, opener) {
       <button type="button" class="ol-x" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="way-tabs">${tabs}</div>
       <h3 id="way-title">${esc(w.title)}</h3>
-      ${w.def ? `<p class="way-def">${esc(w.def)}</p>` : ''}
+      ${cw ? `<p class="way-flow cw-f"><b>${cw[1]}</b><i>${cw[2]}</i><b>${cw[3]}</b></p><p class="way-def">${esc(cw[4])} The exam does not prescribe a way, and agents mix them.</p>` : w.def ? `<p class="way-def">${esc(w.def)}</p>` : ''}
       <p class="ol-sub">${esc(w.line)}</p>
       <div class="way-body${w.log ? ' log' : ''}">
         <figure class="way-vid"><video src="${esc(wayMedia(w.vid, 'mp4'))}" poster="${esc(wayMedia(w.vid, 'jpg'))}"${w.aspect ? ` style="aspect-ratio:${w.aspect}"` : ''} autoplay muted loop playsinline></video>
@@ -1646,21 +1646,6 @@ async function wayDemo(k, opener) {
   } else {
     wayDlg.classList.add('on');
   }
-}
-
-/** What keeps the marks honest: one icon and a few words each, the sentence on hover or focus. */
-function trustRow(el) {
-  if (!el) return;
-  const items = [
-    ['sandbox', 'A separate marker', 'The verifier runs in its own sandbox, without network, and sees only the declared answer.'],
-    ['nokey', 'No answer key', 'Reference solutions never enter the agent’s container; upstream experts are removed from the images.'],
-    ['controls', 'Controls', 'Doing nothing must score 0, and a full reference solution must score 1.'],
-    ['cheat', 'A cheat trial', 'An agent is told to pass without doing the task. Any success blocks the suite until the verifier is fixed.'],
-    ['review', 'Human review', 'A task without a full reference solution is checked by a reviewer who did not write it.'],
-    ['snow', 'Frozen tasks', 'A published task never changes. Fixing a scene makes a new task.'],
-  ];
-  el.innerHTML = items.map(([icon, name, tip]) => `<li tabindex="0"><span class="tr-ic"><svg viewBox="0 0 24 24" aria-hidden="true">${FF_ICONS[icon]}</svg></span>
-    <b>${esc(name)}</b><span class="tip" role="tooltip">${esc(tip)}</span></li>`).join('');
 }
 
 /** Numbers with their icons: [[icon, value, label], ...]. */
@@ -2072,12 +2057,15 @@ async function home(ex) {
   heroWall(ex);
   bigNumbers($('#bignums'), ex);
   flowDiagram($('#flowfig'), ex);
-  ways($('#ways'));
-  trustRow($('#trust'));
   homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
   oneLine($('.ol-open'), ex);
   gallery($('#gallery'), ex);
+  // the intro video plays (muted) while it is on screen, unless the viewer prefers less motion
+  const iv = $('#video video[data-inview]');
+  if (iv && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) iv.play().catch(() => {}); else iv.pause(); }, { threshold: 0.4 }).observe(iv);
+  }
   getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
   import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));

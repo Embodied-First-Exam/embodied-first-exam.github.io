@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/exam.css?v=3f2c0810">
+<link rel="stylesheet" href="assets/exam.css?v=205f1062">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=f82b60d2"></script>
+<script type="module" src="assets/app.js?v=6f6ac6f8"></script>
 </head>
 <body data-page="home">
 <div id="nav"></div>
@@ -31,11 +31,16 @@
           <a class="btn primary" href="leaderboard/">See the leaderboard <span class="arr">→</span></a>
           <a class="btn gh-start" data-gh>Get started</a>
           <a class="btn" href="tasks/">Browse the tasks</a>
+          <a class="btn" href="contribute/">Contribute</a>
         </div>
         <div class="home-search" id="home-search"></div>
       </div>
     </div>
-    <a class="scroll-cue" href="#statement" aria-label="Scroll down">↓</a>
+    <a class="scroll-cue" href="#video" aria-label="Scroll down">↓</a>
+  </section>
+
+  <section class="section intro">
+    <figure class="intro-video reveal" id="video"><video src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/blog/efe-intro.mp4?v=4a7c81f6" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/blog/efe-intro.jpg?v=eb698885" controls muted loop playsinline preload="metadata" data-inview></video></figure>
   </section>
 
   <section class="section numbers" id="statement">
@@ -70,21 +75,44 @@
       <h2>The unified framework</h2>
     </div>
     <figure class="flowfig reveal" id="flowfig"></figure>
-    <div class="cways reveal" id="ways"></div>
-    <div class="trust reveal">
-      <p class="label">What keeps the marks honest</p>
-      <ul id="trust"></ul>
-    </div>
-    <p class="note reveal"><a href="how/">Every rule, step by step →</a></p>
   </section>
 
-  <section class="section closing">
-    <div class="closing-inner reveal">
-      <h2>Bring a suite to the exam.</h2>
-      <div class="cta">
-        <a class="btn primary" href="contribute/">How to contribute <span class="arr">→</span></a>
-      </div>
+  <section class="section team" id="team">
+    <div class="head reveal">
+      <h2>Our Team</h2>
     </div>
+    <ul class="team-grid reveal">
+      <li><a class="tm" href="https://jameskrw.github.io/" target="_blank" rel="noopener"><img src="assets/people/kangrui-wang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Kangrui Wang<sup>*§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://qinengwang-aiden.github.io/" target="_blank" rel="noopener"><img src="assets/people/qineng-wang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Qineng Wang<sup>*§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://scholar.google.com/citations?user=PfhZFzYAAAAJ" target="_blank" rel="noopener"><img src="assets/people/changhe-chen.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Changhe Chen<sup>*§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://williamzhangsjtu.github.io/" target="_blank" rel="noopener"><img src="assets/people/pingyue-zhang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Pingyue Zhang<sup>*§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://chigui0.github.io/" target="_blank" rel="noopener"><img src="assets/people/chi-gui.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Chi Gui<sup>*§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://fisher-wang.github.io/" target="_blank" rel="noopener"><img src="assets/people/feishi-wang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Feishi Wang<sup>§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://canyuchen.com/" target="_blank" rel="noopener"><img src="assets/people/canyu-chen.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Canyu Chen<sup>§</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://wenlixiao.com/" target="_blank" rel="noopener"><img src="assets/people/wenli-xiao.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Wenli Xiao<sup>§</sup></b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://whoknowsssss.github.io/al-folio/" target="_blank" rel="noopener"><img src="assets/people/xiaoyu-huang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Xiaoyu Huang<sup>§</sup></b><span title="UC Berkeley">UC Berkeley</span></a></li>
+      <li><a class="tm" href="https://tonghezhang.com/" target="_blank" rel="noopener"><img src="assets/people/tonghe-zhang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Tonghe Zhang<sup>§</sup></b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://scholar.google.com/citations?user=WR875gYAAAAJ" target="_blank" rel="noopener"><img src="assets/people/linjie-li.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Linjie Li<sup>§</sup></b><span title="University of Washington">UW</span></a></li>
+      <li><a class="tm" href="https://zihanwang314.github.io/" target="_blank" rel="noopener"><img src="assets/people/zihan-wang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Zihan Wang</b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://scholar.google.com/citations?user=Jh3S9aAAAAAJ" target="_blank" rel="noopener"><img src="assets/people/minyeong-kim.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Minyeong Kim</b><span title="Stanford University">Stanford</span></a></li>
+      <li><a class="tm" href="https://sunyiyou.github.io/" target="_blank" rel="noopener"><img src="assets/people/yiyou-sun.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Yiyou Sun</b><span title="UC Berkeley">UC Berkeley</span></a></li>
+      <li><a class="tm" href="https://mingkaid.github.io/" target="_blank" rel="noopener"><img src="assets/people/mingkai-deng.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Mingkai Deng</b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://www.lti.cs.cmu.edu/people/students/hou-jinyu.html" target="_blank" rel="noopener"><img src="assets/people/jinyu-hou.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Jinyu Hou</b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://www.cs.cmu.edu/~epxing/" target="_blank" rel="noopener"><img src="assets/people/eric-xing.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Eric P. Xing</b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://magics.cs.northwestern.edu/" target="_blank" rel="noopener"><img src="assets/people/han-liu.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Han Liu</b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://www.mccormick.northwestern.edu/research-faculty/directory/profiles/zhu-qi.html" target="_blank" rel="noopener"><img src="assets/people/qi-zhu.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Qi Zhu</b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://huaxiuyao.io/" target="_blank" rel="noopener"><img src="assets/people/huaxiu-yao.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Huaxiu Yao</b><span title="UNC-Chapel Hill">UNC-Chapel Hill</span></a></li>
+      <li><a class="tm" href="https://zhiwenfan.github.io/" target="_blank" rel="noopener"><img src="assets/people/zhiwen-fan.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Zhiwen Fan</b><span title="Texas A&amp;M University">Texas A&amp;M</span></a></li>
+      <li><a class="tm" href="https://yuejiangliu.github.io/" target="_blank" rel="noopener"><img src="assets/people/yuejiang-liu.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Yuejiang Liu</b><span title="Stanford University">Stanford</span></a></li>
+      <li><a class="tm" href="https://dawnsong.io/" target="_blank" rel="noopener"><img src="assets/people/dawn-song.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Dawn Song</b><span title="UC Berkeley">UC Berkeley</span></a></li>
+      <li><a class="tm" href="https://people.eecs.berkeley.edu/~pabbeel/" target="_blank" rel="noopener"><img src="assets/people/pieter-abbeel.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Pieter Abbeel</b><span title="UC Berkeley">UC Berkeley</span></a></li>
+      <li><a class="tm" href="https://jiajunwu.com/" target="_blank" rel="noopener"><img src="assets/people/jiajun-wu.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Jiajun Wu</b><span title="Stanford University">Stanford</span></a></li>
+      <li><a class="tm" href="https://yukezhu.me/" target="_blank" rel="noopener"><img src="assets/people/yuke-zhu.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Yuke Zhu</b><span title="UT Austin">UT Austin</span></a></li>
+      <li><a class="tm" href="https://www.gshi.me/" target="_blank" rel="noopener"><img src="assets/people/guanya-shi.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Guanya Shi<sup>†</sup></b><span title="Carnegie Mellon University">CMU</span></a></li>
+      <li><a class="tm" href="https://ruohanzhang.com/" target="_blank" rel="noopener"><img src="assets/people/ruohan-zhang.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Ruohan Zhang<sup>†</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+      <li><a class="tm" href="https://limanling.github.io/" target="_blank" rel="noopener"><img src="assets/people/manling-li.webp" alt="" width="256" height="256" loading="lazy" decoding="async"><b>Manling Li<sup>†</sup></b><span title="Northwestern University">Northwestern</span></a></li>
+    </ul>
+    <p class="team-legend reveal"><span><sup>*</sup> Equal contribution</span> · <span><sup>§</sup> Core contributor</span> · <span><sup>†</sup> Equal advising</span></p>
   </section>
 
 </main>

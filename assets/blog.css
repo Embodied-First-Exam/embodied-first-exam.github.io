@@ -622,10 +622,11 @@ table.heat thead th:first-child { width: 26%; text-align: left; }
 .post .cw-lead { margin: 0 0 18px !important; } .post .cw-row p { font-size: 15.5px; }
 
 /* the report's authors under the title */
-.post-head .authors { margin: 22px 0 0; max-width: 980px; font: 500 15px/1.65 var(--body); color: var(--ink); }
+.post-head .authors { margin: 22px 0 0; max-width: 660px; font: 500 15px/1.65 var(--body); color: var(--ink); }
 .post-head .authors .au { white-space: nowrap; }
 .post-head .authors sup, .post-head .au-note sup { font: 600 .72em/0 var(--mono); color: var(--priv); margin-left: 1px; }
-.post-head .au-note { margin: 8px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
+.post-head .au-note { margin: 8px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); max-width: 660px; }
+.post-head .au-note > span { white-space: nowrap; }  /* one affiliation or mark per unbreakable piece */
 .post-head .au-note + .byline { margin-top: 12px; }
 
 /* the report's intro video, under the byline */
