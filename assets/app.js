@@ -2238,7 +2238,7 @@ const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt
   glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
 // the run viewer with their rule in the setting's name, after the other runs; in no ranking (one suite, under min_suites)
-const RUN_VARIANT = { rdsteps: 'RoboDojo step limit in prompt + agent must /finish' };
+const RUN_VARIANT = {};
 const runVariant = (id) => Object.keys(RUN_VARIANT).find((v) => (id || '').endsWith(`_${v}-${(id || '').split('-').pop()}`));
 const settingOf = (r) => {
   const id = r.run || '';
