@@ -175,7 +175,7 @@ export function tasksSearch(grid, ex, tasks, kit) {
   // tests count, as on the leaderboard: a task without a core test in the setting matches no results filter.
   // URL: setting=<setting id>, solved=<run ids>, notsolved=<run ids>, solvers=none|one|all
   const MODELS = kit.models || [];
-  const RSET = [['', 'Any setting', ''], ['privileged', 'Privileged', 'p'], ['standard', 'Standard', 's'], ['standard-realtime', 'Standard-realtime', 't']];
+  const RSET = [['', 'Any setting', ''], ['privileged', 'Privileged', 'p'], ['standard', 'Standard', 's'], ['realtime', 'Realtime', 't']];
   const RN = [['none', 'Solved by no model'], ['one', 'Solved by exactly one'], ['all', 'Solved by every model']];
   const runIds = (k) => [...new Set((Q.get(k) || '').split(',').filter((x) => MODELS.some((m) => m.id === x)))];
   state.rset = RSET.some(([k]) => k && k === Q.get('setting')) ? Q.get('setting') : '';

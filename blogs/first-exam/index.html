@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../assets/exam.css?v=3a164247">
+<link rel="stylesheet" href="../../assets/exam.css?v=bd5fd222">
 <link rel="stylesheet" href="../../assets/blog.css?v=b3929030">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=0aa718aa"></script>
-<script type="module" src="../../assets/blog.js?v=1abee98e"></script>
+<script type="module" src="../../assets/app.js?v=77a79015"></script>
+<script type="module" src="../../assets/blog.js?v=a72bcd24"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -90,7 +90,7 @@
     <p>A task can be run in up to three settings, and each one is a separate test, scored on its own. The rest of this post uses these three names exactly as defined here.</p>
     <figure class="fig">
       <div class="tscroll"><table class="settings">
-        <thead><tr><th></th><th class="m-p">Privileged<small>inside the simulator</small></th><th class="m-s">Standard<small>real-robot rules</small></th><th class="m-r">Standard-realtime<small>on a running clock</small></th></tr></thead>
+        <thead><tr><th></th><th class="m-p">Privileged<small>inside the simulator</small></th><th class="m-s">Standard<small>real-robot rules</small></th><th class="m-r">Realtime<small>on a running clock</small></th></tr></thead>
         <tbody>
           <tr><th scope="row">Reaches</th><td>the simulator directly, in the agent’s container</td><td>the robot only, through its API</td><td>the robot only, through its API</td></tr>
           <tr><th scope="row">Sees</th><td>the full state, every object pose</td><td>RGB, depth and joints; no object poses</td><td>as in standard</td></tr>
@@ -99,7 +99,7 @@
           <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
           <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
         </tbody></table></div>
-      <figcaption><b>Figure 4.</b> The three settings. Most tasks have a privileged and a standard test. Standard-realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and standard-realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../../how/">how a test is graded</a>.</figcaption>
+      <figcaption><b>Figure 4.</b> The three settings. Most tasks have a privileged and a standard test. Realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../../how/">how a test is graded</a>.</figcaption>
     </figure>
 
     <h3 id="run">How one test runs</h3>
@@ -112,7 +112,7 @@
       <li><b>Question.</b> A test starts from a goal written in words, as you would explain the job to a person, with every convention the agent cannot guess (frames, units, the action layout, the time limit), and from a frozen scene. The scene is rebuilt bit for bit, its start state is checked before the agent begins, and both modes of a task start from the same scene.</li>
       <li><b>Model and harness.</b> Any model can run in any harness, such as Codex or Claude Code. The harness runs unchanged and receives the goal as its prompt. It works in a sandboxed container through a command-line shell and can reach only its model’s API and the package registries, with web search off; the Embodied Olympics - Fun tasks are the exception, with open network access.</li>
       <li><b>The coding agent is the policy.</b> Whatever the agent writes turns what the robot senses into actions. It can control the robot directly, sending commands and choosing the next one after it sees the result; write code that controls the robot, such as a planner or a feedback controller; or train a model, such as a reinforcement-learning policy, that controls it. The exam leaves the choice to the agent.</li>
-      <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and standard-realtime is the same with a clock that never stops. In both standard settings the agent cannot reset the episode by default, although a task’s author can allow a fixed number of resets. The three settings are defined above.</li>
+      <li><b>Interface.</b> How the agent’s code reaches the robot depends on the setting. In privileged mode the agent works inside the simulator; in standard mode it reaches the robot only through the robot’s API, and realtime is the same with a clock that never stops. In both standard settings the agent cannot reset the episode by default, although a task’s author can allow a fixed number of resets. The three settings are defined above.</li>
       <li><b>Simulators.</b> Each suite keeps its original simulation setup behind the same interface. The exam covers various simulators, including MuJoCo, Isaac Sim, OmniGibson (built on Isaac Sim), SAPIEN and Genesis, with <span data-s="robots"></span> different robot models running across them.</li>
       <li><b>Episode trajectory.</b> Every episode is recorded step by step as a rollout: the full simulator state <i>s</i>, the robot’s observation <i>o</i> (camera images and joint readings) and the action <i>a</i>. What the agent itself can read depends on the setting: in privileged mode it reads the full state <i>s</i>, while in the two standard settings it sees only the observation <i>o</i>, as with a real robot. The verifier always works from the recorded state.</li>
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In standard mode it gives a verdict on the live episode; in privileged mode it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
@@ -127,10 +127,10 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in the Antigravity CLI and Qwen3.8 Max in Claude Code, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. Every agent gets one attempt per test under the same limits (typically one hour of agent time, 100M input and 10M output tokens, web search off), and an agent is ranked once it has results in 10 suites; smaller runs are listed below the leaderboard. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> standard-realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in the Antigravity CLI and Qwen3.8 Max in Claude Code, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. Every agent gets one attempt per test under the same limits (typically one hour of agent time, 100M input and 10M output tokens, web search off), and an agent is ranked once it has results in 10 suites; smaller runs are listed below the leaderboard. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
-      <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and standard-realtime mode.</figcaption>
+      <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and realtime mode.</figcaption>
     </figure>
     
     <figure class="fig fig-wide">
@@ -149,14 +149,14 @@
 
     <div class="finding">
       <h3 id="f1" data-short="Standard mode is far from solved"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f1-body"><span class="fn">Finding 1</span>Standard mode is far from solved, and no single agent covers it.</button></h3>
-      <p class="finding-sum">GPT-6 Astra, the strongest agent, solves only about a third of the standard and standard-realtime tests. In privileged mode it solves nearly every test that Claude Opus 5.5 or Gemini 4 Argon solves, but in standard mode those two solve dozens of tests that it fails.</p>
+      <p class="finding-sum">GPT-6 Astra, the strongest agent, solves only about a third of the standard and realtime tests. In privileged mode it solves nearly every test that Claude Opus 5.5 or Gemini 4 Argon solves, but in standard mode those two solve dozens of tests that it fails.</p>
       <div class="finding-body" id="f1-body">
         <ul class="claims">
-            <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In standard-realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
-            <li>For the other two strong agents, standard-realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their standard-realtime attempts (Figure 9).</li>
+            <li>The strongest agent, <span data-s="best"></span>, solves <span data-s="a_p"></span> of the tests in privileged mode but only <span data-s="a_s"></span> in standard mode, so it fails <span data-s="a_s_fail_word"></span> of the standard tests. In realtime it solves <span data-s="a_t"></span>, <span data-s="a_t_cmp"></span>.</li>
+            <li>For the other two strong agents, realtime is harder than standard: Claude Opus 5.5 solves <span data-s="o_t"></span> there against <span data-s="o_s"></span> in standard mode, and Gemini 4 Argon <span data-s="g_t"></span> against <span data-s="g_s"></span>. Together, the three strongest agents solve <span data-s="m3_s"></span> of their standard attempts and <span data-s="m3_t"></span> of their realtime attempts (Figure 9).</li>
             <li>In privileged mode, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves.</li>
             <li>In standard mode, Claude Opus 5.5 and Gemini 4 Argon solve <span data-s="rival_s_extra"></span> tests that GPT-6 Astra fails. Between them, the three solve <span data-s="u_s_any"></span> of the standard tests; GPT-6 Astra solves <span data-s="u_s_astra"></span>.</li>
-            <li>In standard-realtime, GPT-6 Astra again solves <span data-s="rival_t"></span> of the tests its rivals solve; they add <span data-s="rival_t_extra"></span> that it fails.</li>
+            <li>In realtime, GPT-6 Astra again solves <span data-s="rival_t"></span> of the tests its rivals solve; they add <span data-s="rival_t_extra"></span> that it fails.</li>
         </ul>
         <figure class="fig steps"><div id="fig-steps"></div><figcaption><b>Figure 9.</b> The three strongest agents’ combined success rate in each setting.</figcaption></figure>
         <figure class="fig">
@@ -199,7 +199,7 @@
           <ul>
             <li>One attempt per test, on a core set that leaves out easy tests by design.</li>
             <li>The verifier alone decides pass or fail. Time limits differ by benchmark, from <span data-s="budget_lo"></span> to <span data-s="budget_hi"></span>.</li>
-            <li>There are only <span data-s="nt"></span> standard-realtime tests, so a single test shifts a standard-realtime success rate by about 2 percentage points.</li>
+            <li>There are only <span data-s="nt"></span> realtime tests, so a single test shifts a realtime success rate by about 2 percentage points.</li>
             <li>With one attempt per test, we cannot yet tell whether these differences come from the models or from the luck of a single attempt; that needs repeated attempts.</li>
           </ul>
         </details>
@@ -212,7 +212,7 @@
       <div class="finding-body" id="f2-body">
         <ul class="claims">
             <li>On the <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test, each agent fails in standard mode between <span data-s="ps_lose_lo"></span> (<span data-s="ps_lose_lo_who"></span>) and <span data-s="ps_lose_hi"></span> (<span data-s="ps_lose_hi_who"></span>) of the tasks it solves in privileged mode. GPT-6 Astra, for example, solves <span data-s="ps_astra_a"></span> of these tasks in privileged mode and only <span data-s="ps_astra_both"></span> of those in standard mode.</li>
-            <li>Standard-realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a standard-realtime test, each of the three strongest agents solves fewer in standard-realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
+            <li>Realtime is harder still. On the <span data-s="st_n"></span> tasks that have both a standard and a realtime test, each of the three strongest agents solves fewer in realtime (GPT-6 Astra <span data-s="st_astra"></span> tasks, Claude Opus 5.5 <span data-s="st_opus"></span>, Gemini 4 Argon <span data-s="st_argon"></span>), though there are too few tasks to generalize from.</li>
         </ul>
         <figure class="fig">
           <div class="fig-body" id="fig-paired" data-fig="11"></div>
@@ -252,7 +252,7 @@
           <ul>
             <li>Each agent’s row covers all <span data-s="ps_n"></span> core tasks that have both a privileged and a standard test.</li>
             <li>Time limits differ by benchmark.</li>
-            <li>There are <span data-s="nt"></span> standard-realtime tests: <span data-s="rt_mix"></span>.</li>
+            <li>There are <span data-s="nt"></span> realtime tests: <span data-s="rt_mix"></span>.</li>
           </ul>
         </details>
       </div>
@@ -266,7 +266,7 @@
             <li>In standard mode, in <span data-s="hard_s_frac"></span> benchmarks (counting benchmarks with at least five tests), at least half of the tests are solved by none of the three strongest agents.</li>
             <li><span data-s="hard_groups"></span></li>
             <li>In privileged mode, that is true of <span data-s="hard_p_frac"></span> benchmarks: <span data-s="hard_p_list"></span>. The next two, <span data-s="hard_p_more"></span>, <span data-s="hard_p_more_in"></span>.</li>
-            <li>Standard-realtime has too few tests per benchmark for the figure. In the <span data-s="hard_t_n"></span> benchmarks with at least five, the share of tests that none of the three solves is <span data-s="hard_t_list"></span>.</li>
+            <li>Realtime has too few tests per benchmark for the figure. In the <span data-s="hard_t_n"></span> benchmarks with at least five, the share of tests that none of the three solves is <span data-s="hard_t_list"></span>.</li>
         </ul>
         <figure class="fig">
           <div class="fig-body" id="fig-hard" data-fig="12"></div>
@@ -319,7 +319,7 @@
         <ul class="claims">
             <li>We call a benchmark easy when the three strongest agents’ mean success rate on it is high: 70% or more in privileged mode, 60% or more in standard mode. Each test counts once per agent (agent-attempts).</li>
             <li>In privileged mode, <span data-s="easy_p_frac"></span> benchmarks reach a mean success rate of 70% or more: <span data-s="easy_p_list"></span>.</li>
-            <li>In standard mode, <span data-s="easy_s_claim"></span>. In standard-realtime, no benchmark with at least five tests comes close; the best is <span data-s="easy_t_best"></span>.</li>
+            <li>In standard mode, <span data-s="easy_s_claim"></span>. In realtime, no benchmark with at least five tests comes close; the best is <span data-s="easy_t_best"></span>.</li>
         </ul>
         <figure class="fig">
           <div class="fig-body" id="fig-easy" data-fig="13"></div>
@@ -363,11 +363,11 @@
 
     <div class="finding">
       <h3 id="f5" data-short="Control strategies shift with the evaluation mode"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f5-body"><span class="fn">Finding 5</span>Control strategies shift with the evaluation mode.</button></h3>
-      <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in standard-realtime.</p>
+      <p class="finding-sum">Agents primarily write robot-control programs in privileged mode, steer the robot step by step in standard mode, and write closed-loop controllers in realtime.</p>
       <div class="finding-body" id="f5-body">
         <ul class="claims">
             <li>Agents control the robot in one of three ways: they write a program that moves it (code to control), send it commands themselves one segment at a time (direct control), or first train a model that then controls it. The figure also splits programs into three kinds and counts attempts that mixed approaches or never settled on one.</li>
-            <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In standard-realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
+            <li>In an agent-labeled sample (not yet checked by hand), the agent wrote a program in <span data-s="ap_p"></span> of privileged attempts and sent commands step by step in <span data-s="ap_s"></span> of standard attempts. In realtime, <span data-s="ap_t_code"></span> of attempts used a program, and <span data-s="ap_t_closed_all"></span> a closed-loop one that reads the robot’s state as it runs. Training a model is rare: <span data-s="ap_train"></span> attempts.</li>
         </ul>
         <figure class="fig">
           <div class="fig-body" id="fig-approach" data-fig="14"></div>
@@ -386,10 +386,10 @@
             <a class="case s" href="../../run/?r=robotwin_2_0_put_bottles_dustbin-standard--ydhsp73"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/robotwin_2_0_put_bottles_dustbin-standard--ydhsp73/video.mp4"></video>
               <span class="case-k">Direct control</span><b>RoboTwin 2.0 · Bottles into a dustbin</b><span class="case-m">GPT-6 Astra · standard · solved</span><span class="case-t">It sent end-effector commands one at a time and looked at the camera images after each. It knocked over the cola bottle and picked it up again with the other arm; the last hand-over took several tries and succeeded at minute 29, about 30 seconds before the time limit.</span></a>
           </div>
-          <p>In standard-realtime, the agent writes a program to play and lets it run:</p>
+          <p>In realtime, the agent writes a program to play and lets it run:</p>
           <div class="cases">
-            <a class="case t" href="../../run/?r=roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-standard-realtime--bw6qbpb/video.mp4"></video>
-              <span class="case-k">The program plays</span><b>Embodied Olympics - Match · Badminton match</b><span class="case-m">Claude Opus 5.5 · standard-realtime · solved</span><span class="case-t">A program running in the background located the shuttlecock from two cameras, fitted its flight with a drag model and swung the racket. At each pause the agent read the logs and patched the program, and it came back from 7–10 down to win 12–10 against a scripted opponent.</span></a>
+            <a class="case t" href="../../run/?r=roboolympics-match-badminton-match-i01-realtime--bw6qbpb"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-realtime--bw6qbpb/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/blog/roboolympics-match-badminton-match-i01-realtime--bw6qbpb/video.mp4"></video>
+              <span class="case-k">The program plays</span><b>Embodied Olympics - Match · Badminton match</b><span class="case-m">Claude Opus 5.5 · realtime · solved</span><span class="case-t">A program running in the background located the shuttlecock from two cameras, fitted its flight with a drag model and swung the racket. At each pause the agent read the logs and patched the program, and it came back from 7–10 down to win 12–10 against a scripted opponent.</span></a>
           </div>
           <h4>Scope</h4>
           <ul>
@@ -404,7 +404,7 @@
     <p>The exam currently reports whether an attempt passed, not why it failed. We plan to label every failed attempt with a single cause: the agent misread the task, the grasp missed, the robot went out of control, or the agent declared success before the goal was met. Each label will be checked by a person against the trace and the replay, so that statements such as the one in Finding 3 can rest on counted causes rather than on the suites in which failures occur.</p>
     <p>Each agent currently makes one attempt per test. Averaged over hundreds of tests, this is enough to rank agents, but a single test can still go either way. Running every core test several times will separate failures that an agent repeats from failures that come from one unlucky run, and will put confidence intervals on the comparisons in Findings 1 and 2.</p>
     <p>Most agents in this post pair a model with its maker's own harness: GPT-6 Astra runs in Codex, Claude Opus 5.5 in Claude Code and the Gemini models in the Antigravity CLI. The exam runs any model in any harness, so the same model can also be tested in several harnesses, for example an open-weight model in Claude Code and in the harness of its maker. Such comparisons would separate what the harness contributes, through its tools, its handling of context and its decision of when to stop, from what the model contributes, and we plan to add them to the results.</p>
-    <p>Only <span data-s="nt"></span> core tests run in the standard-realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
+    <p>Only <span data-s="nt"></span> core tests run in the realtime setting, yet this is the setting in which every agent does worst. We will add more tasks in which the world keeps moving, and study whether agents notice when an attempt goes wrong and recover from it when the simulator can neither pause nor reset.</p>
     <p>Finally, the standard setting gives the agent only what a real robot provides: camera images, depth, joint readings and a control interface. The same tests can therefore run on physical hardware, and we plan to evaluate agents on real robots under the standard rules.</p>
     <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole benchmarks are welcome (see <a href="../../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/AhC6utNyfk" target="_blank" rel="noopener">Discord</a>.</p>
 

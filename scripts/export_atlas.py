@@ -31,7 +31,7 @@ DATA = ROOT / "data"
 # the source's suite ids shown here under another id (as in scripts/export.py and the generator's merge_suites)
 SUITE_IDS = {"robopaint-strict": "robopaint", "ikea-mujoco": "roboarc"}   # ikea-mujoco: inventories before 2026-10-23
 EXCLUDE = {"robopaint"}               # source suite left out of the exam (its strict version is shown as robopaint)
-MODES = ("privileged", "standard", "standard-realtime", "realtime")
+MODES = ("privileged", "standard", "realtime")
 # directory prefixes per suite shown here, for deriving a base without the inventory
 PREFIX = {"behavior-1k": ["behavior-"], "robotwin-2": ["robotwin_2_0_"], "mujoco-playground": ["mujoco_playground_"],
           "dextoolbench": ["dextoolbench_"], "roboarc": ["roboarc-", "ikea-"], "embodied-safety-exam": ["ese-", "rsb-"]}

@@ -45,7 +45,7 @@ const wantedTask = (index) => {
   return k;
 };
 const MODES = ['privileged', 'standard'];
-const MK = { privileged: 'p', standard: 's', 'standard-realtime': 's' };   // standard-realtime is standard on a running clock
+const MK = { privileged: 'p', standard: 's', 'realtime': 's' };   // realtime is standard on a running clock
 const MODE_LABEL = { privileged: 'Privileged', standard: 'Standard' };
 const BODY_ORDER = ['arm', 'bimanual', 'mobile', 'humanoid', 'quadruped', 'hand', 'musculoskeletal', 'aerial'];
 const GRADED = new Set(['S', 'F', 'E']);
@@ -192,12 +192,12 @@ function poster(media, cls = '') {
 
 /** The leaderboard's settings, shown one at a time behind a switch (owners, 2026-10-19). Core is the core set as the
  *  default command runs it, each core task once in its default mode, and it is the default view; then standard,
- *  standard-realtime and privileged, each the core set's tests in that one mode (real time is no longer standard).
+ *  realtime and privileged, each the core set's tests in that one mode (real time is no longer standard).
  *  `key` is the result key of a task's cell (data/tasks.json); Core takes each task's own default key. */
 const LB_SETTINGS = [
   { id: 'core', label: 'Core', key: null },
   { id: 'standard', label: 'Standard', key: 's' },
-  { id: 'standard-realtime', label: 'Standard-realtime', key: 't' },
+  { id: 'realtime', label: 'Realtime', key: 't' },
   { id: 'privileged', label: 'Privileged', key: 'p' },
 ];
 const lbSetting = (id) => LB_SETTINGS.find((s) => s.id === id) || LB_SETTINGS[0];
@@ -214,9 +214,9 @@ function pageSetting(scope, mode) {
 const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (a number’s tooltip gives the count), and these numbers are not comparable between models.';
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
-  core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, standard-realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
+  core: (n) => `We run each of the ${int(n)} core tasks once in its default mode: standard mode for static environments, realtime mode for dynamic ones. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
   standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses.`,
-  'standard-realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in standard-realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
+  'realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
@@ -249,10 +249,10 @@ function scoreGroup(group, tasks, set) {
   }
   return { tests, scores };
 }
-/** A task's default mode: the core set's where it has one, else the same rule (owner, 2026-10-23): standard-realtime for a
+/** A task's default mode: the core set's where it has one, else the same rule (owner, 2026-10-23): realtime for a
  *  dynamic environment, standard for a static one, privileged where there is no other. */
-const defaultKey = (t) => t.default || (t.modes?.includes('standard-realtime') ? 't' : t.modes?.includes('standard') ? 's' : t.modes?.includes('privileged') ? 'p' : null);
-const MODE_KEY = { standard: 's', 'standard-realtime': 't', privileged: 'p' };
+const defaultKey = (t) => t.default || (t.modes?.includes('realtime') ? 't' : t.modes?.includes('standard') ? 's' : t.modes?.includes('privileged') ? 'p' : null);
+const MODE_KEY = { standard: 's', 'realtime': 't', privileged: 'p' };
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 const solvedOf = (v) => (v?.[1] ? `${int(v[0])}/${int(v[1])}` : '–');
@@ -396,7 +396,7 @@ function lbSuites(el, ex, runs, scores, set) {
   // a note on why some suites have few tests in a setting (readers' question, 2026-10-19)
   const sn = $('#lb-suites-note');
   if (sn) sn.textContent = set.all ? `All counts every task of the exam. ${LB_NOT_COMPARABLE}`
-    : set.id === 'standard-realtime' ? 'Standard-realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
+    : set.id === 'realtime' ? 'Realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
     : 'The number of tests each suite has in this setting is under its name.';
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
   const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
@@ -439,7 +439,7 @@ const LUNA_RUN = 'codex-gpt6_luna-xhigh';
 const LUNA_COLS = [
   { id: 'all', label: 'All modes', sub: 'tests solved', ratio: 'solved / total tests' },
   { id: 's', label: 'Standard', sub: 'tests solved', ratio: 'solved / total tests' },
-  { id: 't', label: 'Standard-realtime', sub: 'tests solved', ratio: 'solved / total tests' },
+  { id: 't', label: 'Realtime', sub: 'tests solved', ratio: 'solved / total tests' },
   { id: 'p', label: 'Privileged', sub: 'tests solved', ratio: 'solved / total tests' },
   { id: 'task', label: 'Any mode', sub: 'tasks solved', ratio: 'solved / all tasks' },
 ];
@@ -582,9 +582,9 @@ function thinSpots(el, ex, info) {
 /* ----------------------------------------------------------------------------------------------- tasks */
 
 // A card's squares: one per ranked model (columns, in leaderboard order) and per setting of the task (rows: privileged,
-// standard, standard-realtime), filled in the setting's colour when that model solved that test (owners, 2026-10-19)
-const RKEY = { privileged: 'p', standard: 's', 'standard-realtime': 't' };
-const RKEY_LABEL = { p: 'Privileged', s: 'Standard', t: 'Standard-realtime' };
+// standard, realtime), filled in the setting's colour when that model solved that test (owners, 2026-10-19)
+const RKEY = { privileged: 'p', standard: 's', 'realtime': 't' };
+const RKEY_LABEL = { p: 'Privileged', s: 'Standard', t: 'Realtime' };
 const cardKeys = (t) => { const ks = ['p', 's', 't'].filter((k) => (t.modes || []).some((m) => RKEY[m] === k)); return ks.length ? ks : ['p', 's']; };
 function dots(ex, t, runs) {
   const ks = cardKeys(t);
@@ -766,9 +766,9 @@ function openTask(ex, t, runs) {
   const allRuns = [...ex.runs.filter((r) => t.results?.[r.id]),
     ...(ex.unranked_runs || []).filter((r) => t.results?.[r.id]).map((r) => ({ ...r, unranked: true }))];
   // one row per model, as the ranked rows: its maker's mark, then each mode's verdict, standard in ink, privileged grey hatched
-  // a column per mode the task has: standard, standard-realtime, privileged (owners, 2026-10-19)
-  const RK = { standard: 's', 'standard-realtime': 't', privileged: 'p' };
-  const cols = ['standard', 'standard-realtime', 'privileged'].filter((m) => (t.modes || []).includes(m) || allRuns.some((r) => t.results[r.id]?.[RK[m]]));
+  // a column per mode the task has: standard, realtime, privileged (owners, 2026-10-19)
+  const RK = { standard: 's', 'realtime': 't', privileged: 'p' };
+  const cols = ['standard', 'realtime', 'privileged'].filter((m) => (t.modes || []).includes(m) || allRuns.some((r) => t.results[r.id]?.[RK[m]]));
   const res = allRuns.map((r) => {
     const cell = (mode) => {
       const c = t.results[r.id]?.[RK[mode]];
@@ -795,7 +795,7 @@ function openTask(ex, t, runs) {
     ${media}
     <div id="drawer-watch" data-task="${esc(t.suite)}/${esc(t.id)}">${hasRuns(t) ? '<p class="watch-run wait"><span class="spin"></span>Looking for runs to watch…</p>' : ''}</div>
     <div id="drawer-atlas"></div>
-    ${res ? `<h3>Results</h3><div class="lbh-task" style="--ncol:${cols.length}"><div class="lbh-res lbh-rh"><span></span><span>Model</span>${cols.map((m) => `<span><i class="sw ${RK[m]}"></i>${{ standard: 'Standard', 'standard-realtime': 'Standard-realtime', privileged: 'Privileged' }[m]}</span>`).join('')}</div>${res}</div>` : ''}
+    ${res ? `<h3>Results</h3><div class="lbh-task" style="--ncol:${cols.length}"><div class="lbh-res lbh-rh"><span></span><span>Model</span>${cols.map((m) => `<span><i class="sw ${RK[m]}"></i>${{ standard: 'Standard', 'realtime': 'Realtime', privileged: 'Privileged' }[m]}</span>`).join('')}</div>${res}</div>` : ''}
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
@@ -811,7 +811,7 @@ function openTask(ex, t, runs) {
     if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
-  import('./search.js?v=fad66359').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
+  import('./search.js?v=2e053108').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
     const x = all.find((y) => `${y.suite}/${y.id}` === k);
     if (x) { openTask(ex, x, runs); $('#drawer').scrollTop = 0; }
   }) })).catch((e) => console.error(e));
@@ -905,7 +905,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   });
   draw();
   // [task search] tasks whose title is only a code get the Atlas short name as their title (search.js); then redraw
-  import('./search.js?v=fad66359').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
+  import('./search.js?v=2e053108').then((m) => m.nameCodedTasks?.(tasks)).then((n) => n && draw()).catch((e) => console.error(e));
   const want = wantedTask(index);
   if (want && index.has(want)) openTask(ex, index.get(want), runs);
 }
@@ -1704,7 +1704,7 @@ function oneLine(opener, ex) {
   const command = () => parts().map(([, t]) => t).join(' ');
   const tally = () => {
     const pool = st.bench ? [st.bench] : Object.keys(F);
-    const modes = st.mode ? [st.mode] : ['privileged', 'standard', 'standard-realtime'];
+    const modes = st.mode ? [st.mode] : ['privileged', 'standard', 'realtime'];
     // tasks (a scene with all its modes); with a mode chosen, the tasks that have that mode
     const i = all() ? 1 : 0;
     const at = (f) => (st.mode ? F[f]?.modes?.[st.mode] : F[f]?.tasks) || [0, 0];
@@ -1729,7 +1729,7 @@ function oneLine(opener, ex) {
         <pre class="term-body"><span class="pr" aria-hidden="true">$ </span><span class="cmd"></span><span class="caret" aria-hidden="true"></span><span class="out"></span></pre></div>
       <div class="ol-groups">
         <div class="ol-g"><span class="ol-k">Tasks</span>${opt('set', 'all', 'Every task', '@all, not only the core set')}${opt('bench', 'roboarc', 'RoboARC', '@all -p tasks/roboarc')}${opt('bench', 'robocasa365', 'RoboCasa365', '@all -p tasks/robocasa365')}</div>
-        <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'standard-realtime', 'Real-time', 'a clock that does not stop')}</div>
+        <div class="ol-g"><span class="ol-k">Mode</span>${opt('mode', 'standard', 'Standard', 'robot’s own sensors')}${opt('mode', 'privileged', 'Privileged', 'open book')}${opt('mode', 'realtime', 'Real-time', 'a clock that does not stop')}</div>
         <div class="ol-g"><span class="ol-k">Agent</span>${opt('agent', 'claude', 'Claude Code', 'Opus 5.5')}${opt('agent', 'oracle', 'Reference solution', '-a oracle')}</div>
       </div></div>`;
   document.body.append(dlg);
@@ -1989,7 +1989,7 @@ function suiteDialog(ex, s, opener) {
  *  2026-10-19: readers from language models do not know these terms). Drawn wherever an element #ways exists. */
 const CONTROL_WAYS = [
   ['Direct control', 'Agent', '⇄', 'Robot', 'The agent is the controller: it sends a command, reads what the robot sensed, and chooses the next command, step by step, inside its own reasoning loop. Most standard-mode attempts work this way.'],
-  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program that turns goals into actions through tools such as inverse kinematics, a motion planner or a feedback controller, and the program drives the robot on its own; between runs the agent reads the outcome and fixes the code. Most privileged and standard-realtime attempts work this way.'],
+  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program that turns goals into actions through tools such as inverse kinematics, a motion planner or a feedback controller, and the program drives the robot on its own; between runs the agent reads the outcome and fixes the code. Most privileged and realtime attempts work this way.'],
   ['Train model to control', 'Model', '→', 'Robot', 'The agent trains a policy, for example with reinforcement learning in simulation, and lets the trained model drive the robot. The model can be any policy, not only a vision-language-action model. This is the rarest of the three.'],
 ];
 function ways(el) {
@@ -2050,7 +2050,7 @@ async function home(ex) {
   }
   getJSON('data/tasks.json').then((tasks) => budgets($('#budgets'), tasks)).catch(() => budgets($('#budgets'), []));
   // the task search (a small box under the title) and the task sphere: modules of their own, loaded when needed
-  import('./search.js?v=fad66359').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
+  import('./search.js?v=2e053108').then((m) => m.homeSearch?.($('#home-search'), ex)).catch((e) => console.error(e));
   import('./sphere.js?v=8f724915').then((m) => m.homeSphere?.($('#sphere'), ex)).catch((e) => console.error(e));
 }
 
@@ -2176,7 +2176,7 @@ function realRobot(sec, videos) {
 async function tasksPage(ex) {
   // [task search] search.js draws this page's search, filters and ranking (taskBrowser stays for a suite's page, and
   // here if the module fails to load); app.js lends it the cards, the results and the drawer.
-  const mod = import('./search.js?v=fad66359').then((m) => { m.loadSearch(); return m; });
+  const mod = import('./search.js?v=2e053108').then((m) => { m.loadSearch(); return m; });
   const tasks = await loadTasks();
   const m = await mod.catch((e) => { console.error(e); });
   if (!m?.tasksSearch) return taskBrowser($('#tasks'), ex, tasks);
@@ -2272,9 +2272,9 @@ async function runIndex(ex, head) {
     $('#run-log').innerHTML = `<div class="empty-state">The list of runs could not be loaded (${esc(e.message)}). <a class="link" href="${esc(location.href)}">Try again</a></div>`;
     return;
   }
-  const titleOf = (r) => r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+  const titleOf = (r) => r.task.replace(/-(privileged|standard|realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
     .replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  const modeOf = (t) => (/-standard-realtime$/.test(t) ? 'standard-realtime' : /-standard$/.test(t) ? 'standard' : 'privileged');
+  const modeOf = (t) => (/-realtime$/.test(t) ? 'realtime' : /-standard$/.test(t) ? 'standard' : 'privileged');
   $('#run-log').classList.add('run-index');
   const suiteOf = (r) => ex._suites[runSuite(r)] || {};
   const okOf = (r) => r.success === 1 || r.state === 'success';
@@ -2329,7 +2329,7 @@ async function runIndex(ex, head) {
       <select id="ri-setting" aria-label="Setting"><option value="">All settings</option>${settings.map(([id, n]) => `<option value="${esc(id)}"${id === st.setting ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
       <select id="ri-suite" aria-label="Suite">${order.map((id) => `<option value="${esc(id)}"${id === st.suite ? ' selected' : ''}>${esc(nameOf(id))} (${int(counts[id])})</option>`).join('')}
         <option value="all"${st.suite === 'all' ? ' selected' : ''}>All suites (${int(sum.total ?? order.reduce((n, id) => n + counts[id], 0))})</option></select>
-      <select id="ri-mode" aria-label="Mode"><option value="">Both modes</option><option value="privileged">Privileged</option><option value="standard">Standard</option><option value="standard-realtime">Standard, real time</option></select>
+      <select id="ri-mode" aria-label="Mode"><option value="">Both modes</option><option value="privileged">Privileged</option><option value="standard">Standard</option><option value="realtime">Realtime</option></select>
       <div class="ri-out">${[['', 'All'], ['ok', 'Solved'], ['no', 'Not solved']].map(([v, n]) => `<button type="button" class="chip${v === '' ? ' on' : ''}" data-out="${v}">${n}</button>`).join('')}</div>
       <span class="ri-count" id="ri-count"></span>
       <div class="ri-view" role="group" aria-label="View">${[['list', 'List'], ['grid', 'Cards']].map(([v, n]) => `<button type="button" class="chip${v === view ? ' on' : ''}" data-view="${v}">${n}</button>`).join('')}</div></div>
@@ -2438,8 +2438,8 @@ async function runPage(ex) {
   let file;
   try { ({ r, slug, file } = await loadRun(slug)); } catch (e) { head.innerHTML = `<p class="kicker">Run</p><h1>Run not found</h1><p class="lead">${esc(slug)}</p>`; $('#run-log').innerHTML = `<div class="empty-state">This run could not be loaded. <a href="${exam('run/')}">All runs →</a></div>`; return; }
   const s = ex._suites[BENCH_SUITE[r.bench] || r.bench] || {};
-  const mode = /-standard-realtime$/.test(r.task) ? 'standard-realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
-  const title = (r.task.replace(/-(privileged|standard|standard-realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
+  const mode = /-realtime$/.test(r.task) ? 'realtime' : /-standard$/.test(r.task) ? 'standard' : 'privileged';
+  const title = (r.task.replace(/-(privileged|standard|realtime)$/, '').replace(new RegExp(`^(?:[a-z0-9]+-)?${r.bench}[-_]`), '').replace(/-i\d\d$/, '')
     .replace(/[-_]+/g, ' ')).replace(/\b\w/g, (c) => c.toUpperCase());
   document.title = `${title} · run · Embodied First Exam`;
   const steps = r.steps || [];

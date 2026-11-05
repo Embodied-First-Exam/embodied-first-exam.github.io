@@ -15,8 +15,8 @@ const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const int = (n) => Number(n || 0).toLocaleString('en-US');
 const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
 
-const MODES = { p: 'privileged', s: 'standard', t: 'standard-realtime' };
-const MODE_LABEL = { c: 'Core', p: 'Privileged', s: 'Standard', t: 'Standard-realtime' };
+const MODES = { p: 'privileged', s: 'standard', t: 'realtime' };
+const MODE_LABEL = { c: 'Core', p: 'Privileged', s: 'Standard', t: 'Realtime' };
 const MODE_CLS = { c: '', p: 'm-p', s: 'm-s', t: 'm-r' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const AG = { [TOP[0]]: '--ag-astra', [TOP[1]]: '--ag-opus', [TOP[2]]: '--ag-argon' };                       // their colours
@@ -54,7 +54,7 @@ function compute(ex, tasks, b, atlas) {
   // counts as failed (owners, 2026-10-19)
   const sat = (m) => core.filter((t) => (t.core || '').includes(m)).map((t) => [t, m]);
   const M = { p: sat('p'), s: sat('s'), t: sat('t') };
-  const LB = [...M.s, ...M.t];   // standard and standard-realtime together
+  const LB = [...M.s, ...M.t];   // standard and realtime together
   // the leaderboard's default view, Core: each core task once, in its default mode
   const CORE = core.filter((t) => t.default && (t.core || '').includes(t.default)).map((t) => [t, t.default]);
   const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
@@ -103,7 +103,7 @@ function compute(ex, tasks, b, atlas) {
   const hard = { p: hardRows('p').filter((r) => r.none / r.n >= HARD), s: hardRows('s').filter((r) => r.none / r.n >= HARD) };
   const easy = { p: easyRows('p').filter((r) => r.sum / (3 * r.n) >= EASY_P), s: easyRows('s').filter((r) => r.sum / (3 * r.n) >= EASY_S) };
   const hn = (r) => `${benchName(r.id)} ${Q(r.none, r.n)}`;
-  // standard-realtime by benchmark (too few tests for the figures): the benchmarks with MIN_BENCH tests, hardest first
+  // realtime by benchmark (too few tests for the figures): the benchmarks with MIN_BENCH tests, hardest first
   const tRows = Object.entries(group(M.t, benchOf)).filter(([, L]) => L.length >= MIN_BENCH)
     .map(([id, L]) => ({ id, L, n: L.length, none: none3(L), sum: mean3(L) })).sort((x, y) => y.none / y.n - x.none / x.n || y.n - x.n);
   const em = (r) => `${benchName(r.id)} ${Q(r.sum, 3 * r.n)}`;
@@ -193,7 +193,7 @@ function compute(ex, tasks, b, atlas) {
     budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
     none6_p: `${int(M.p.length - anyOf(M.p))} of ${int(M.p.length)} privileged (${P(M.p.length - anyOf(M.p), M.p.length)})`,
     none6_s: `${int(M.s.length - anyOf(M.s))} of ${int(M.s.length)} standard (${P(M.s.length - anyOf(M.s), M.s.length)})`,
-    none6_t: `${int(M.t.length - anyOf(M.t))} of the ${int(M.t.length)} standard-realtime tests (${P(M.t.length - anyOf(M.t), M.t.length)})`,
+    none6_t: `${int(M.t.length - anyOf(M.t))} of the ${int(M.t.length)} realtime tests (${P(M.t.length - anyOf(M.t), M.t.length)})`,
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s),
     ap_t_code: mix.t ? Q(mix.t.code, mix.t.n) : null, ap_t_closed: kinds.t ? `${int(kinds.t.closed)} of the ${int(mix.t?.code)}` : null,
     h_ap_p: cb.approach?.p ? HQ(...cb.approach.p) : null, h_ap_s: cb.approach?.s ? HQ(...cb.approach.s) : null, h_ap_t: mix.t ? HQ(mix.t.code, mix.t.n) : null,
@@ -221,7 +221,7 @@ function compute(ex, tasks, b, atlas) {
     core_rest_max: Q(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
     // the Introduction: each core task's default setting
     def_s: int(CORE.filter(([, m]) => m === 's').length), def_t: int(CORE.filter(([, m]) => m === 't').length),
-    // Finding 1: the other two strongest agents, standard and standard-realtime; the three together
+    // Finding 1: the other two strongest agents, standard and realtime; the three together
     o_s: Q(solved(M.s, TOP[1]), M.s.length), o_t: Q(solved(M.t, TOP[1]), M.t.length),
     g_s: Q(solved(M.s, TOP[2]), M.s.length), g_t: Q(solved(M.t, TOP[2]), M.t.length),
     m3_s: Q(mean3(M.s), 3 * M.s.length), m3_t: Q(mean3(M.t), 3 * M.t.length),
@@ -237,13 +237,13 @@ function compute(ex, tasks, b, atlas) {
     ...(() => { const L = ps.filter((x) => x.a).map((x) => ({ n: x.name, v: pct(x.a - x.both, x.a) }));
       const lo = Math.min(...L.map((x) => x.v)), hi = Math.max(...L.map((x) => x.v));
       return { ps_lose_lo: `${lo}%`, ps_lose_hi: `${hi}%`, ps_lose_lo_who: list(L.filter((x) => x.v === lo).map((x) => x.n)), ps_lose_hi_who: list(L.filter((x) => x.v === hi).map((x) => x.n)) }; })(),
-    // Finding 4: in privileged mode, the hardest benchmarks past the cut and the two after it; standard-realtime by benchmark
+    // Finding 4: in privileged mode, the hardest benchmarks past the cut and the two after it; realtime by benchmark
     hard_p_more: list(hardRows('p').filter((r) => r.none / r.n < HARD).slice(0, 2).map(hn)),
     hard_p_more_in: hardRows('p').filter((r) => r.none / r.n < HARD).slice(0, 2).every((r) => HARD_GROUPS.some(([, ids]) => ids.includes(r.id))) ? 'also come from these groups' : 'come from other groups',
     hard_t_list: list(tRows.map(hn)), hard_t_n: nw(tRows.length),
-    // Finding 5: the best standard-realtime benchmark by the three's mean success rate
+    // Finding 5: the best realtime benchmark by the three's mean success rate
     easy_t_best: tRows.length ? em([...tRows].sort((x, y) => y.sum / y.n - x.sum / x.n)[0]) : 'none',
-    // Finding 6: closed-loop programs among all sampled standard-realtime attempts; the kinds of privileged program
+    // Finding 6: closed-loop programs among all sampled realtime attempts; the kinds of privileged program
     ap_t_closed_all: kinds.t && mix.t ? Q(kinds.t.closed, mix.t.n) : null,
     ap_p_kinds: kinds.p ? `${int(kinds.p.closed)} closed-loop, ${int(kinds.p.open)} open-loop and ${int(kinds.p.search)} parameter searches` : null,
     types_best: low(tRank[0].k), types_worst: list(tRank.slice(-2).reverse().map((x) => low(x.k))),
@@ -374,7 +374,7 @@ function figOverlap(el, R) {
       <div class="wf-grid" role="img" aria-label="${esc(`${MODE_LABEL[k]}: ${cats.map(([c, l]) => `${l} ${counts[k][c]}`).join(', ')}`)}">${cells(k)}</div></div>`; };
   el.innerHTML = head('In privileged mode, GPT-6 Astra solves almost every test that any of the three solves; in standard mode, the other two each solve some tests that it fails.',
     'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its color shows which of the three solved it, and a cell split in two colors means two of them did.')
-    + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Standard-realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
+    + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
       `<tr><th scope="row"><i class="sw" style="background:${bg(col)}"></i>${esc(l)}</th>${['p', 's', 't'].map((k) => `<td>${int(counts[k][c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
     + `<div class="wfs">${['p', 's', 't'].map(panel).join('')}</div>`;
 }
@@ -475,7 +475,7 @@ function figApproach(el, R) {
       + `<span class="ap-bar">${segs.filter((s) => s.v).map((s) => `<span class="${s.edge ? 'edge' : ''}" style="flex:${s.v} 1 0;background:var(${s.w[4]})" title="${esc(`${MODE_LABEL[k]} · ${s.w[2]}: ${s.v} of ${n}`)}"></span>`).join('')}</span><small class="ap-sum">${sum}</small></span><span class="n">${int(n)}</span></div>`;
   };
   const ks = ['p', 's', 't'].filter((k) => mix[k]);
-  el.innerHTML = head('In privileged mode agents mostly write a program, in standard mode they mostly send commands step by step, and in standard-realtime they mostly write a closed-loop program.',
+  el.innerHTML = head('In privileged mode agents mostly write a program, in standard mode they mostly send commands step by step, and in realtime they mostly write a closed-loop program.',
     'How agents control the robot: the approach taken in the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts that used that approach (each attempt counted once, by the approach that produced its graded answer); labeled by an agent from the run logs, not yet checked by hand.')
     + `<div class="ap-defs"><div><p>Code to control</p><ul>${WAYS.filter((w) => w[1] === 'code').map(def).join('')}</ul></div><div><p>Other approaches</p><ul>${WAYS.filter((w) => w[1] !== 'code').map(def).join('')}</ul></div></div>`
     + `<div class="ap">${ks.map(row).join('')}<div class="ap-row ax"><span></span><span class="sb-ticks"><i style="left:0">0%</i><i style="left:50%">50%</i><i style="left:100%">100%</i></span><span class="n">attempts</span></div></div>`

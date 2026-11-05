@@ -747,7 +747,7 @@ a.sx-cell { transition: box-shadow .15s; } a.sx-cell:hover { box-shadow: inset 0
 .dots i.S.p, .st.S.p { background: var(--priv); } .dots i.S.s, .st.S.s { background: var(--std); }
 .dots i.F, .dots i.E { background: color-mix(in srgb, var(--ink-3) 40%, var(--cell-0)); }
 .dots i.none { background: transparent; border: 1px dashed var(--line); }
-.dots i.S.t, .dots-key i.S.t { background: var(--std-ink); }   /* standard-realtime: standard's colour, darker */
+.dots i.S.t, .dots-key i.S.t { background: var(--std-ink); }   /* realtime: standard's colour, darker */
 /* the line above the cards on reading their squares (owners, 2026-10-19) */
 .dots-key { margin: -6px 0 14px; font-size: 12.5px; line-height: 1.6; color: var(--ink-3); }
 .dots-key .dk-lab { margin-right: 4px; font: 500 10.5px/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
@@ -1221,7 +1221,7 @@ html.ol-lock { overflow: hidden; }
 #lb-suites .sx-bar .seg button .dot.p { box-shadow: inset 0 0 0 2px var(--ink-3); }
 #lb-suites .sx-bar .seg button.on .dot.s { background: var(--bg); }
 /* the leaderboard's settings, one at a time behind a switch (owners, 2026-10-19): Core first, then standard,
-   standard-realtime and privileged; the same rows on the home page and the leaderboard page */
+   realtime and privileged; the same rows on the home page and the leaderboard page */
 .seg.lb-set { flex-wrap: wrap; max-width: 100%; }
 .seg.lb-set button { padding: 9px 16px; font-size: 14px; font-weight: 600; }
 .seg.lb-set button:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 1px; }
@@ -1746,7 +1746,7 @@ button.as-link:hover { color: var(--ink); }
 .sd-name .sd-n { display: block; margin-top: 1px; font: 400 11px/1.2 var(--mono); color: var(--ink-3); }
 .lb-suites-switches { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 16px; }
 .lb-suites-note { margin: 10px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); max-width: 820px; }
-/* standard-realtime: standard's ink, a shade of the realtime colour */
+/* realtime: standard's ink, a shade of the realtime colour */
 .lbh-v.S.t { background: var(--std-ink, var(--ink)); border-color: var(--std-ink, var(--ink)); color: #fff; }
 .sw.t { height: 8px; border-radius: 3px; background: var(--std-ink, var(--ink)); }
 @media (max-width: 640px) {
