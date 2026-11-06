@@ -89,6 +89,10 @@ const GITHUB = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 // the exam's Discord, an icon after GitHub in the bar, in the footer and on Contribute: the permanent invite (owners,
 // 2026-10-19); this is the one place it lives, and an https:// address makes it open in a new tab
 const DISCORD_URL = 'https://discord.gg/AhC6utNyfk';
+// the paper (the arXiv version): the arXiv mark in the bar before GitHub, the footer, the home page's Read the paper and
+// the report all link this one file (owner, 2026-11-06); the mark is Simple Icons' arXiv icon (CC0-1.0)
+const PAPER_URL = 'https://github.com/mll-lab-nu/embodied-first-exam/blob/main/docs/arxiv.pdf';
+const ARXIV = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.8423 0a1.0037 1.0037 0 0 0-.922.6078c-.1536.3687-.0438.6275.2938 1.1113l6.9185 8.3597-1.0223 1.1058a1.0393 1.0393 0 0 0 .003 1.4229l1.2292 1.3135-5.4391 6.4444c-.2803.299-.4538.823-.2971 1.1986a1.0253 1.0253 0 0 0 .9585.635.9133.9133 0 0 0 .6891-.3405l5.783-6.126 7.4902 8.0051a.8527.8527 0 0 0 .6835.2597.9575.9575 0 0 0 .8777-.6138c.1577-.377-.017-.7502-.306-1.1407l-7.0518-8.3418 1.0632-1.13a.9626.9626 0 0 0 .0089-1.3165L4.6336.4639s-.3733-.4535-.768-.463zm0 .272h.0166c.2179.0052.4874.2715.5644.3639l.005.006.0052.0055 10.169 10.9905a.6915.6915 0 0 1-.0072.945l-1.0666 1.133-1.4982-1.7724-8.5994-10.39c-.3286-.472-.352-.6183-.2592-.841a.7307.7307 0 0 1 .6704-.4401Zm14.341 1.5701a.877.877 0 0 0-.6554.2418l-5.6962 6.1584 1.6944 1.8319 5.3089-6.5138c.3251-.4335.479-.6603.3247-1.0292a1.1205 1.1205 0 0 0-.9763-.689zm-7.6557 12.2823 1.3186 1.4135-5.7864 6.1295a.6494.6494 0 0 1-.4959.26.7516.7516 0 0 1-.706-.4669c-.1119-.2682.0359-.6864.2442-.9083l.0051-.0055.0047-.0055z"/></svg>';
 const DISCORD = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.363 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
 // the exam's WeChat group, an icon after Discord: it opens the QR code in the exam repository (owners, 2026-10-19), so
 // replacing docs/assets/wechat.jpg there is all it takes
@@ -106,6 +110,7 @@ function chrome() {
     nav.outerHTML = `<nav class="nav always" aria-label="Sections">
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
       <div class="nav-links">${links.map(([n, p, label]) => (p ? `<a href="${exam(p)}"${active(n) ? ' class="active"' : ''}>${label}</a>` : `<a class="soon" aria-disabled="true" title="Coming soon">${label}</a>`)).join('')}</div>
+      <a class="icon-btn ax-btn" data-paper href="${PAPER_URL}" target="_blank" rel="noopener" aria-label="The paper on arXiv" title="arXiv paper">${ARXIV}</a>
       <a class="icon-btn gh-btn${GITHUB_URL ? '' : ' soon'}"${GITHUB_URL ? ` href="${GITHUB_URL}"` : ' aria-disabled="true"'} aria-label="The exam on GitHub" title="${GITHUB_URL ? 'GitHub' : 'GitHub: coming soon'}">${GITHUB}</a>
       <a class="icon-btn gh-btn dc-btn" data-discord href="${DISCORD_URL}"${DISCORD_ATTRS} aria-label="Discord" title="Discord">${DISCORD}</a>
       <a class="icon-btn gh-btn dc-btn wc-btn" data-wechat href="${WECHAT_URL}" target="_blank" rel="noopener" aria-label="WeChat group" title="WeChat group">${WECHAT}</a>
@@ -144,6 +149,7 @@ function footer(ex) {
       <li><a href="${exam('leaderboard/')}">Leaderboard</a></li><li><a href="${exam('suites/')}">Suites</a></li>
       <li><a href="${exam('tasks/')}">Tasks</a></li><li><a href="${exam('run/')}">Runs</a></li></ul></div>
     <div><h5>About</h5><ul>
+      <li><a data-paper href="${PAPER_URL}" target="_blank" rel="noopener">arXiv paper</a></li>
       <li><a href="${exam('blogs/')}">Blogs</a></li>
       <li><a href="${exam('contribute/')}">Contribute</a></li></ul></div>
     <div><h5>Community</h5><ul>

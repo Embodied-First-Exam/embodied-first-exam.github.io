@@ -1604,6 +1604,12 @@ html.ol-lock { scrollbar-gutter: stable; }
 /* the bar: Discord and WeChat after GitHub */
 .dc-btn svg { width: 20px; height: 20px; }
 .wc-btn svg { width: 19px; height: 19px; }
+/* the bar: the arXiv mark before GitHub, in arXiv red (not on a phone: no room; the footer and the home page's
+   Read the paper have it); and on the home page's Read the paper */
+.ax-btn { color: #b31b1b; } .ax-btn:hover { color: #b31b1b; } .ax-btn svg { width: 18px; height: 18px; }
+[data-theme="dark"] .ax-btn, [data-theme="dark"] .ax-btn:hover { color: #f07070; }
+.btn .ax-mark { width: 15px; height: 15px; color: #b31b1b; } [data-theme="dark"] .btn .ax-mark { color: #f07070; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ax-btn, :root:not([data-theme="light"]) .btn .ax-mark { color: #f07070; } }
 .wc-btn[aria-expanded="true"] { background: var(--bg-3); color: var(--ink); }
 /* a button that reads as a link (the footer's WeChat group, Contribute) */
 button.as-link { padding: 0; border: 0; background: none; font: inherit; color: var(--ink-2); cursor: pointer; text-align: left; }
@@ -1647,6 +1653,7 @@ button.as-link:hover { color: var(--ink); }
   .nav .wordmark .mark { width: 24px; height: 24px; }
   .nav .icon-btn { width: 32px; height: 32px; }
   .nav .gh-btn:not(.dc-btn) { margin-left: auto; }
+  .nav .ax-btn { display: none; }
   .nav .menu-btn { margin-left: 0; }
   .nav .menu-btn + .icon-btn { margin-left: 0; }
 }
