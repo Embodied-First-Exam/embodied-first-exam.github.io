@@ -838,6 +838,7 @@ a.st::after { content: "log ↗"; font-weight: 500; opacity: .75; }
 .run-verdict { font: 600 13px/1 var(--body); padding: 8px 14px; border-radius: 999px; letter-spacing: .02em; }
 .run-verdict.ok { background: color-mix(in srgb, var(--std) 16%, transparent); color: var(--std-ink); }
 .run-verdict.no { background: color-mix(in srgb, var(--priv) 14%, transparent); color: var(--priv-ink); }
+.run-ended { font: 600 13px/1 var(--body); padding: 8px 14px; border-radius: 999px; letter-spacing: .02em; border: 1px dashed var(--line-2); color: var(--ink-2, inherit); }
 .run-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; margin: 28px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .run-stats > div { padding: 14px 16px 14px 0; }
 .run-stats > div + div { padding-left: 16px; border-left: 1px solid var(--line); }

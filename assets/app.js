@@ -2225,6 +2225,10 @@ const RUN_KINDS = {
   shell: { name: 'Shell', verb: 'runs a command', icon: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M7 10l3 2.5L7 15M12.5 15H17"/>' },
   other: { name: 'Tool', verb: 'calls a tool', icon: '<circle cx="12" cy="12" r="7"/>' },
 };
+// a run an API or infrastructure error ended (run.json / index row "ended_by"): shown with its verdict as the
+// leaderboard counts it, and labelled
+const ENDED_BY = { api: 'Ended by an API error', infra: 'Ended by an infrastructure error' };
+const ENDED_TIP = 'An API or infrastructure error ended this attempt. It is counted as it stands, like every other attempt.';
 const KIND_ORDER = ['robot', 'look', 'edit', 'shell'];
 const runIcon = (k) => `<svg class="rk-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(RUN_KINDS[k] || RUN_KINDS.other).icon}</svg>`;
 const clock = (s) => { s = Math.max(0, Math.round(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; };
@@ -2278,6 +2282,7 @@ async function runIndex(ex, head) {
   $('#run-log').classList.add('run-index');
   const suiteOf = (r) => ex._suites[runSuite(r)] || {};
   const okOf = (r) => r.success === 1 || r.state === 'success';
+  const endedOf = (r) => (ENDED_BY[r.ended_by] ? ` · ${ENDED_BY[r.ended_by].replace(/^E/, 'e')}` : '');
   // the suites with runs in the site's order (the team's suites first), then any the site does not list, by id
   const counts = sum.suites || {};
   const order = [...ex.suites.map((s) => s.id).filter((id) => counts[id]), ...Object.keys(counts).filter((id) => counts[id] && !ex._suites[id]).sort()];
@@ -2309,7 +2314,7 @@ async function runIndex(ex, head) {
     const s = suiteOf(r), ok = okOf(r);
     return `<a class="rr" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
       <span class="rr-pic">${r.poster ? `<img loading="lazy" src="${esc(rowPoster(r))}" alt="">` : ''}</span>
-      <span class="rr-task"><b>${esc(titleOf(r))}</b><small>${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</small></span>
+      <span class="rr-task"><b>${esc(titleOf(r))}</b><small>${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}${esc(endedOf(r))}</small></span>
       <span class="rr-model">${esc(settingOf(r))}</span>
       <span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span>
       <span class="rr-n">${clock(r.wall_s)}</span><span class="rr-n">${int(r.steps)}</span>
@@ -2321,7 +2326,7 @@ async function runIndex(ex, head) {
     return `<a class="ri-card" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">
       <div class="ri-pic">${r.poster ? `<img loading="lazy" src="${esc(rowPoster(r))}" alt="">` : ''}<span class="run-verdict ${ok ? 'ok' : 'no'}">${ok ? 'Solved' : 'Not solved'}</span></div>
       <div class="ri-body"><div class="ri-k">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(modeOf(r.task))}</div><h4>${esc(titleOf(r))}</h4>
-        <div class="ri-meta">${esc(settingOf(r))} · ${clock(r.wall_s)} · ${int(r.steps)} steps</div>
+        <div class="ri-meta">${esc(settingOf(r))} · ${clock(r.wall_s)} · ${int(r.steps)} steps${esc(endedOf(r))}</div>
         <div class="ri-bars">${KIND_ORDER.map((k) => `<span class="k-${k}" style="flex:${r.kinds?.[k] || 0}" title="${esc(RUN_KINDS[k].name)}: ${int(r.kinds?.[k] || 0)}"></span>`).join('')}</div></div></a>`;
   };
   $('#run-log').innerHTML = `<div class="ri-tools">
@@ -2462,7 +2467,7 @@ async function runPage(ex) {
   const trajLink = v3 && r.trajectory ? `<a class="btn small" href="${esc(file(r.trajectory.file))}" download="${esc(slug)}.trajectory.jsonl.gz" title="The agent's full trajectory: one JSON event per line, gzipped">Download trajectory <small>${mb(r.trajectory.size)}</small></a>` : '';
   head.innerHTML = `<p class="kicker">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(mode)} · one run</p>
     <h1>${esc(title)}</h1>
-    <div class="run-who"><span class="run-model">${esc(model)}</span><span class="run-verdict ${solved ? 'ok' : 'no'}">${solved ? 'Solved' : 'Not solved'}</span>
+    <div class="run-who"><span class="run-model">${esc(model)}</span><span class="run-verdict ${solved ? 'ok' : 'no'}">${solved ? 'Solved' : 'Not solved'}</span>${ENDED_BY[r.ended_by] ? `<span class="run-ended" title="${esc(ENDED_TIP)}">${esc(ENDED_BY[r.ended_by])}</span>` : ''}
       <span class="run-links" id="run-links"><a class="btn small" href="${exam('run/')}">All runs</a>${trajLink}</span></div>
     <dl class="run-stats">
       <div><dt>Time</dt><dd>${clock(r.wall_s)}</dd></div>
