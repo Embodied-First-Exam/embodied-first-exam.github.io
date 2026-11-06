@@ -6,7 +6,7 @@
 // works at any address.
 
 const BASE = new URL('../', import.meta.url).pathname;
-const MEDIA = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/';
+const MEDIA = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/';
 const PAGE = document.body.dataset.page || 'home';
 const Q = new URLSearchParams(location.search);
 // suites' earlier ids, in links from before 2026-10-19: the Embodied Safety Exam was robosafe; Embodied Olympics - Fun and
@@ -630,10 +630,10 @@ function taskCard(ex, t, runs) {
 // characters of sha1(slug), so a run's folder follows from its slug alone. Paths in run.json and in index rows are
 // relative to the run's folder; the pictures the agent saw are byte ranges of steps.bin.
 const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/';
-// TEMPORARY (the move to embodied-exam-runs, 2026-10): the old flat layout (the runs folder of embodied-exam-media: <slug>.json,
+// TEMPORARY (the move to embodied-exam-runs, 2026-10): the old flat layout (the runs folder of embodied-exam-data: <slug>.json,
 // <slug>/<file>, paths relative to runs/), read while the new dataset has no index or no run.json for a slug. Remove
 // RUNS_OLD and every use marked TEMPORARY once the new index is live and nothing links a run outside it.
-const RUNS_OLD = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/runs/';
+const RUNS_OLD = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/runs/';
 let RUNS_LAYOUT = 3;           // the layout of the index in use: 3, or 2 while the TEMPORARY fallback serves it
 /** sha1 of a string, hex (small and synchronous: the run's folder is needed before anything is fetched). */
 function sha1hex(str) {

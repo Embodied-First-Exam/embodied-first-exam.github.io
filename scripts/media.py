@@ -1,9 +1,9 @@
-"""Where the site's pictures and videos live: the public HF dataset MLL-Lab/embodied-exam-media, under site/.
+"""Where the site's pictures and videos live: the public HF dataset MLL-Lab/embodied-exam-data, under site/.
 
 GitHub Pages serves at most 1 GB per site, so the media are not in this repository. A file the pages call
 media/<suite>/<file> is site/<suite>/<file> in the dataset and is linked as
 
-    https://huggingface.co/datasets/MLL-Lab/embodied-exam-media/resolve/main/site/<suite>/<file>?v=<sha256[:8]>
+    https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/<suite>/<file>?v=<sha256[:8]>
 
 HF answers that address with a redirect (never cached) to its CDN, at an address named by the file's content, so a
 browser always gets the current file; ?v= is the content hash the data was built with, and scripts/check.py checks it
@@ -21,7 +21,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-REPO = "MLL-Lab/embodied-exam-media"
+REPO = "MLL-Lab/embodied-exam-data"
 PREFIX = "site"
 HF = f"https://huggingface.co/datasets/{REPO}/resolve/main/"
 URL = HF + PREFIX + "/"

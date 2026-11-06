@@ -7,7 +7,7 @@ Published at <https://www.embodied-first-exam.ai/> by GitHub Pages, straight fro
 custom domain; <https://embodied-first-exam.ai/> and <https://embodied-first-exam.github.io/> redirect there). There is
 no build step: the pages are static HTML, one stylesheet and one script, and everything they show comes from two data
 files. The pictures and videos are not in this repository (GitHub Pages serves at most 1 GB per site): they are in the
-public HF dataset [MLL-Lab/embodied-exam-media](https://huggingface.co/datasets/MLL-Lab/embodied-exam-media) under
+public HF dataset [MLL-Lab/embodied-exam-data](https://huggingface.co/datasets/MLL-Lab/embodied-exam-data) under
 `site/<suite>/`, and the data names each by its address there with its content hash (`scripts/media.py`).
 
 ```
