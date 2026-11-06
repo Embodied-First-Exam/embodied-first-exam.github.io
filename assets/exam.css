@@ -1604,12 +1604,14 @@ html.ol-lock { scrollbar-gutter: stable; }
 /* the bar: Discord and WeChat after GitHub */
 .dc-btn svg { width: 20px; height: 20px; }
 .wc-btn svg { width: 19px; height: 19px; }
-/* the bar: the arXiv mark before GitHub, in arXiv red (not on a phone: no room; the footer and the home page's
-   Read the paper have it); and on the home page's Read the paper */
-.ax-btn { color: #b31b1b; } .ax-btn:hover { color: #b31b1b; } .ax-btn svg { width: 18px; height: 18px; }
-[data-theme="dark"] .ax-btn, [data-theme="dark"] .ax-btn:hover { color: #f07070; }
-.btn .ax-mark { width: 15px; height: 15px; color: #b31b1b; } [data-theme="dark"] .btn .ax-mark { color: #f07070; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ax-btn, :root:not([data-theme="light"]) .btn .ax-mark { color: #f07070; } }
+/* the paper: the arXiv mark, small and in arXiv red, then the word arXiv, styled like its neighbours (the bar's section
+   links, the footer's links, the home page's buttons) */
+.ax-link { display: inline-flex; align-items: center; gap: 5px; padding: 9px 12px; border-radius: 999px; font: 500 14px/1 var(--body); color: var(--ink-2); white-space: nowrap; transition: background-color .15s, color .15s; }
+.ax-link:hover { background: var(--bg-2); color: var(--ink); }
+.ax-foot .ax-mark { display: inline-block; vertical-align: -1px; margin-right: 5px; }
+.ax-mark { flex: none; width: 13px; height: 13px; color: #b31b1b; } .btn .ax-mark { width: 15px; height: 15px; }
+[data-theme="dark"] .ax-mark { color: #f07070; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ax-mark { color: #f07070; } }
 .wc-btn[aria-expanded="true"] { background: var(--bg-3); color: var(--ink); }
 /* a button that reads as a link (the footer's WeChat group, Contribute) */
 button.as-link { padding: 0; border: 0; background: none; font: inherit; color: var(--ink-2); cursor: pointer; text-align: left; }
@@ -1653,7 +1655,7 @@ button.as-link:hover { color: var(--ink); }
   .nav .wordmark .mark { width: 24px; height: 24px; }
   .nav .icon-btn { width: 32px; height: 32px; }
   .nav .gh-btn:not(.dc-btn) { margin-left: auto; }
-  .nav .ax-btn { display: none; }
+  .nav .ax-link { display: none; }   /* no room beside the wordmark on a phone: the footer and the home page have it */
   .nav .menu-btn { margin-left: 0; }
   .nav .menu-btn + .icon-btn { margin-left: 0; }
 }
