@@ -255,6 +255,8 @@ function scoreGroup(group, tasks, set) {
 }
 const MODE_KEY = { standard: 's', 'realtime': 't', privileged: 'p' };
 
+/** A run's setting from its task dir: -realtime (formerly -standard-realtime), -standard, else privileged. */
+const runMode = (task) => (/-realtime$/.test(task || '') ? 'realtime' : /-standard$/.test(task || '') ? 'standard' : 'privileged');
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 const solvedOf = (v) => (v?.[1] ? `${int(v[0])}/${int(v[1])}` : '–');
 /** The switch between the settings: one button each, the chosen one pressed; arrow keys move along it. */
@@ -807,7 +809,7 @@ function openTask(ex, t, runs) {
     const mine = m.get(key) || [];
     slot.innerHTML = !mine.length ? (m.failed && hasRuns(t) ? '<p class="watch-run wait">The runs could not be loaded just now. Reopen the task to try again.</p>' : '')
       : `<a class="watch-run" href="${exam('run/')}?r=${encodeURIComponent(mine[0].slug)}">${runIcon('robot')}<span><b>${mine[0].success === 1 || mine[0].state === 'success' ? 'Watch an agent solve it, step by step' : 'Watch an agent try it, step by step'}</b><small>${esc(settingOf(mine[0]))}${mine.length > 1 ? ` and ${mine.length - 1} more` : ''} · every command, every picture it looked at, and the replay</small></span><span class="arr">→</span></a>`;
-    if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${/-standard/.test(r.task) ? 'standard' : 'privileged'}) <span class="arr">→</span></a>`).join(''));
+    if (mine.length) $('#drawer-links')?.insertAdjacentHTML('afterbegin', mine.map((r) => `<a class="btn small primary" href="${exam('run/')}?r=${encodeURIComponent(r.slug)}">Watch ${esc(settingOf(r))} (${runMode(r.task)}) <span class="arr">→</span></a>`).join(''));
   });
   // [task search] the Task Atlas part of the drawer (summary, task type and capability, steps, related tasks): search.js
   import('./search.js?v=2e053108').then((m) => m.drawerAtlas?.(t, { tasks: loadTasks, open: (k) => loadTasks().then((all) => {
@@ -2508,7 +2510,7 @@ async function runPage(ex) {
     if (!me?.site || !$('#run-links')) return;
     const others = mine.filter((x) => !isMe(x));
     $('#run-links').insertAdjacentHTML('afterbegin', `<a class="btn small primary" href="${exam('tasks/')}?task=${encodeURIComponent(me.site)}">Open the task <span class="arr">→</span></a>`
-      + others.map((o) => `<a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(o.slug)}">${esc(settingOf(o))} · ${/-standard/.test(o.task) ? 'standard' : 'privileged'}</a>`).join(''));
+      + others.map((o) => `<a class="btn small" href="${exam('run/')}?r=${encodeURIComponent(o.slug)}">${esc(settingOf(o))} · ${runMode(o.task)}</a>`).join(''));
   });
 
   // ---- the strip: one lane per kind of action over the run's clock, the context growing behind, a playhead
