@@ -57,7 +57,6 @@ function compute(ex, tasks, b, atlas) {
   const LB = [...M.s, ...M.t];   // standard and realtime together
   const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
   const anyOf = (L, rs = runs) => L.filter(([t, m]) => rs.some((r) => ok(t, r, m))).length;
-  const has = (L, r) => L.filter(([t, m]) => graded(t, r, m)).length;   // the tests of L with a finished result
   // the leaderboard's order: standard first (its default view), then privileged
   const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(M.p, r), s: solved(M.s, r), t: solved(M.t, r) }))
     .sort((x, y) => y.s - x.s || y.p - x.p);
@@ -219,11 +218,6 @@ function compute(ex, tasks, b, atlas) {
     ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
     s_lead: `${board[0].name} leads at ${P(board[0].s, M.s.length)}, followed by ${list(board.slice(1, 3).map((x) => x.name))}`,
     s_rest_max: P(Math.max(...board.filter((x) => flash.includes(x.id)).map((x) => x.s)), M.s.length),
-    // tests still without a result count as failed: the agents with a result on fewer than 98% of the standard tests
-    coverage_note: (() => { const L = board.map((x) => ({ n: x.name, h: has(M.s, x.id) })).filter((x) => x.h < M.s.length);
-      if (!L.length) return 'Every agent has a result on every test.';
-      const low = L.filter((x) => x.h < 0.98 * M.s.length).sort((a, z) => a.h - z.h);
-      return `Not every test has a result for every agent yet, and a test without one counts as failed${low.length ? `; in standard mode, for example, ${list(low.map((x, i) => (i ? `${x.n} on ${int(x.h)}` : `${x.n} has a result on ${int(x.h)} of the ${int(M.s.length)} tests`)))}` : ''}. The numbers under Figure 6 give every agent’s count.`; })(),
     // Finding 1: the other two strongest agents, standard and realtime; the three together
     o_s: Q(solved(M.s, TOP[1]), M.s.length), o_t: Q(solved(M.t, TOP[1]), M.t.length),
     g_s: Q(solved(M.s, TOP[2]), M.s.length), g_t: Q(solved(M.t, TOP[2]), M.t.length),
@@ -255,7 +249,7 @@ function compute(ex, tasks, b, atlas) {
     views_note: (() => { const d = ['p', 't'].filter((k) => ranked(M[k]).slice(0, 3).join() !== TOP.join());
       return d.length ? `In ${list(d.map((k) => MODES[k]))} mode the order of the three changes, to ${list(ranked(M[d[0]]).slice(0, 3).map(name))}` : 'The three keep this order in all three settings'; })(),
   };
-  return { S, M, LB, has, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
+  return { S, M, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, name, short, ok, solved, flash, ttOf, ttLab: (x) => atlas?.taxonomy?.tt?.[x] || x, suiteName };
 }
 
@@ -309,8 +303,7 @@ function figModes(el, R) {
     'Success rate of each agent on the core set in each setting',
     'each bar is the share of a setting’s core tests that one agent solved (the number on top is the percentage).')
     + legend6(R) + `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Success rate by agent and setting">${svg}</svg></div>`
-    + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => { const n = R.M[k].length, h = R.has(R.M[k], r);
-      return `${pct(R.solved(R.M[k], r), n)}% · ${frac(R.solved(R.M[k], r), n)}${h < n ? ` · ${int(h)} of ${int(n)} have a result` : ''}`; })]));
+    + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
 }
 
 /** Figure 7: a radar of standard mode by task type, one outline per agent. */

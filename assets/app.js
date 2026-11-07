@@ -257,11 +257,6 @@ const MODE_KEY = { standard: 's', 'realtime': 't', privileged: 'p' };
 
 const pctOf = (v) => (v && v[1] ? (100 * v[0]) / v[1] : null);
 const solvedOf = (v) => (v?.[1] ? `${int(v[0])}/${int(v[1])}` : '–');
-/** Where a run has not sat every test of the setting yet (v[2], the tests with a finished result, below v[1]): said
- *  beside its count, as the missing ones count as failed (owner, 2026-11-07). */
-const partialFoot = (vs) => (vs.some(partialOf) ? '<p class="lbh-foot"><sup>*</sup> Not every test of this setting sat yet (hover the count to see how many); the tests not sat count as not solved.</p>' : '');
-const partialOf = (v) => (v?.[1] && v[2] != null && v[2] < v[1] ? `${int(v[2])} of ${int(v[1])} sat so far; the others count as not solved` : '');
-
 /** The switch between the settings: one button each, the chosen one pressed; arrow keys move along it. */
 function settingSwitch(el, current, pick, list = LB_SETTINGS) {
   el.setAttribute('role', 'group');
@@ -301,11 +296,11 @@ function lbRow(r, v, rank, best, set, { part = false, open = false, still = fals
   const k = Math.round(38 + 62 * (q ?? 0) / Math.max(best || 0, 1));
   const tag = still ? 'div' : 'button';
   return `<${still ? 'div' : 'button type="button"'} class="lbh-row lb1${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
-      aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%${partialOf(v) ? `, ${partialOf(v)}` : ''}` : 'not sat'}">
+      aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%` : 'not sat'}">
     <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
     <span class="lbh-name"><span class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></span></span>
     <span class="lbh-track">${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
-    <span class="lbh-val" style="--k:${k}%"${partialOf(v) ? ` title="${esc(partialOf(v))}"` : ''}><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${solvedOf(v)}${partialOf(v) ? '<sup class="lbh-part" aria-hidden="true">*</sup>' : ''}</em></span>
+    <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${solvedOf(v)}</em></span>
   </${tag}>`;
 }
 
@@ -315,7 +310,7 @@ function lbDetail(ex, r, sc, set, href = true) {
   const q = pctOf(sc.v);
   return `<div class="lbh-detail in"><div class="lbh-dh">${makerMark(r.model)}<div class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></div>
       <div class="lbh-pair"><span class="s"><b>${q != null ? Math.round(q) : '–'}%</b>${esc(set.label)}</span>
-        <span class="s"${partialOf(sc.v) ? ` title="${esc(partialOf(sc.v))}"` : ''}><b>${solvedOf(sc.v)}</b>Solved${partialOf(sc.v) ? ` · ${int(sc.v[2])} sat` : ''}</span>
+        <span class="s"><b>${solvedOf(sc.v)}</b>Solved</span>
         ${usd != null ? `<span class="x" title="Model use per test at list price"><b>$${usd.toFixed(usd < 1 ? 2 : 1)}</b>Per test</span>` : ''}
         ${r.agent_n ? `<span class="x"><b>${Math.round(r.agent_s / r.agent_n / 60)} min</b>Per attempt</span>` : ''}</div>
       ${href ? `<a class="btn small" href="${exam('leaderboard/')}?${set.id === LB_SETTINGS[0].id ? '' : `mode=${set.id}&`}open=${encodeURIComponent(r.id)}">On the leaderboard →</a>` : ''}</div>
@@ -350,8 +345,7 @@ function lbBoard(ex, tasks, onDraw) {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
       { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
-      html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('')
-        + partialFoot(main.map((r) => scores[r.id].v));
+      html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
@@ -1852,8 +1846,7 @@ function homeBoard(el, ex) {
     const order = [...sh.runs].sort((a, b) => P(b) - P(a) || (runs[a]?.model || a).localeCompare(runs[b]?.model || b));
     const best = Math.max(0, P(order[0]));
     let rank = 0, prev = null;
-    list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set); }).join('')
-      + partialFoot(order.map((id) => vw.scores?.[id]));
+    list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set); }).join('');
     det.hidden = true;
     el.classList.remove('picked');
     $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0);
@@ -2072,7 +2065,7 @@ async function leaderboardPage(ex) {
 
 /** The same model in other harnesses (owner, 2026-11-07): the generator's leaderboard.harness, one block per model, its
  *  default harness (the board's run) first. Standard and realtime over all the setting's core tests, as the board counts
- *  them (a test without a result counts as failed, and the count says how many have one), then the two harnesses on
+ *  them, then the two harnesses on
  *  the standard tests both have a result for. These runs are in no ranking. */
 function lbHarness(el, ex) {
   const h = ex.leaderboard?.harness;
@@ -2082,8 +2075,7 @@ function lbHarness(el, ex) {
   if (n) n.textContent = h.note || '';
   const val = (v, l) => {
     if (!v?.[1]) return `<span class="hx-v na" data-l="${l}">–</span>`;
-    const part = v[2] != null && v[2] < v[1];
-    return `<span class="hx-v" data-l="${l}"${part ? ` title="${esc(`${int(v[2])} of ${int(v[1])} have a result; the others count as not solved`)}"` : ''}><b>${Math.round(pctOf(v))}<small>%</small></b><em>${int(v[0])}/${int(v[1])}${part ? `<i class="hx-part">${int(v[2])} of ${int(v[1])} have a result</i>` : ''}</em></span>`;
+    return `<span class="hx-v" data-l="${l}"><b>${Math.round(pctOf(v))}<small>%</small></b><em>${int(v[0])}/${int(v[1])}</em></span>`;
   };
   const same = (r) => (r.same ? `<span class="hx-v" data-l="Same tests"><b>${int(r.same[0])}</b><em>vs ${int(r.same[1])} in the default harness, on ${int(r.same[2])} tests</em></span>` : '<span class="hx-v na" data-l="Same tests">–</span>');
   const head = `<div class="hx-row hx-head"><span>Harness</span><span>Standard · ${int(h.tests?.standard)} tests</span><span>Same tests · standard</span><span>Realtime · ${int(h.tests?.realtime)} tests</span></div>`;
