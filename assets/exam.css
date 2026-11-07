@@ -1072,6 +1072,8 @@ a.rr:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
 .lbh-val b { font: 600 15px/1 var(--mono); letter-spacing: -.02em; color: color-mix(in srgb, var(--ink) var(--k, 100%), var(--ink-3)); min-width: 38px; text-align: right; }
 .lbh-val b small { font-size: .7em; margin-left: 1px; }
 .lbh-val em { font: 500 12px/1 var(--mono); font-style: normal; color: var(--ink-3); min-width: 30px; text-align: right; }
+.lbh-val em .lbh-part { font-size: .85em; margin-left: 1px; color: var(--ink-3); }
+.lbh-foot { margin: 6px 0 0; font-size: 12px; color: var(--ink-3); }
 .mk { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--surface); color: var(--ink); }
 .mk svg { width: 56%; height: 56%; fill: currentColor; }
 .mk.txt { font: 700 13px/1 var(--display); }

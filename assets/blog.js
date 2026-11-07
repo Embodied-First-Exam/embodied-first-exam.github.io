@@ -72,7 +72,8 @@ function compute(ex, tasks, b, atlas) {
   const pr = (r) => ps.find((x) => x.id === r), sr = (r) => st.find((x) => x.id === r);
   const none3 = (L) => L.length - anyOf(L, TOP);
   const mean3 = (L) => L.reduce((a, [t, m]) => a + TOP.filter((r) => ok(t, r, m)).length, 0);   // solved by the three, summed
-  const flash = runs.filter((r) => !TOP.includes(r));
+  // the Flash-class models by their names (Qwen3.8 Max and Kimi 3.1 Pro are neither the three strongest nor Flash-class)
+  const flash = runs.filter((r) => !TOP.includes(r) && /\bFlash\b/.test(name(r)));
   const ranked = (L) => [...runs].sort((x, y) => solved(L, y) - solved(L, x));
   const sameOrder = ['p', 's', 't'].every((k) => ranked(M[k]).slice(0, 3).join() === TOP.join());
   const sameOrderCore = sameOrder && ranked(CORE).slice(0, 3).join() === TOP.join();
@@ -218,7 +219,7 @@ function compute(ex, tasks, b, atlas) {
     ps_lose_n: ps.filter((x) => x.a).length === runs.length ? 'every agent' : `each of the ${nw(ps.filter((x) => x.a).length)} agents that solves any`,
     ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
     core_top3: list(board.slice(0, 3).map((x) => `${x.name} at ${Q(x.c, CORE.length)}`)),
-    core_rest_max: Q(Math.max(...board.slice(3).map((x) => x.c)), CORE.length),
+    core_rest_max: Q(Math.max(...board.filter((x) => flash.includes(x.id)).map((x) => x.c)), CORE.length),
     // the Introduction: each core task's default setting
     def_s: int(CORE.filter(([, m]) => m === 's').length), def_t: int(CORE.filter(([, m]) => m === 't').length),
     // Finding 1: the other two strongest agents, standard and realtime; the three together
@@ -275,9 +276,9 @@ const sw = (c, extra = '') => `<i class="sw${extra}" style="background:${c.start
 const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</summary><div class="tscroll"><table class="nt"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead>
   <tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i ? `<td>${c}</td>` : `<th scope="row">${c}</th>`)).join('')}</tr>`).join('')}</tbody></table></div></details>`;
 const frac = (a, n) => `${int(a)}/${int(n)}`;
-const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The three Flash-class models</span></div>`;
+const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The other agents</span></div>`;
 
-/* Overall results: every agent in its own colour, the three Flash-class models in three greys */
+/* Overall results: the three strongest in their own colours, the three Flash-class models in three greys, the others in the darkest */
 const FLASH_O = [1, 0.62, 0.36];
 const colOf = (R, r) => (TOP.includes(r) ? { c: `var(${AG[r]})`, o: 1 } : { c: 'var(--flash)', o: FLASH_O[R.flash.indexOf(r)] ?? 1 });
 const legend6 = (R) => `<div class="legend">${R.order.map((r) => { const k = colOf(R, r);

@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Embodied First Exam · Blogs</title>
-<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how seven agents do on it, and where they fail.">
+<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how eight agents do on it, and where they fail.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../assets/exam.css?v=2ce6527b">
+<link rel="stylesheet" href="../../assets/exam.css?v=272625ee">
 <link rel="stylesheet" href="../../assets/blog.css?v=b3929030">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=f0caad55"></script>
-<script type="module" src="../../assets/blog.js?v=a72bcd24"></script>
+<script type="module" src="../../assets/app.js?v=682d4a9b"></script>
+<script type="module" src="../../assets/blog.js?v=09983d77"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -99,7 +99,7 @@
           <tr><th scope="row">Clock</th><td>plans offline</td><td>waits for each command</td><td>keeps running while the agent thinks</td></tr>
           <tr><th scope="row">Graded</th><td>by a fresh replay</td><td>on the live episode</td><td>on the live episode</td></tr>
         </tbody></table></div>
-      <figcaption><b>Figure 4.</b> The three settings. Most tasks have a privileged and a standard test. Realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which the leaderboard’s Core view counts: standard for <span data-s="def_s"></span> tasks and realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../../how/">how a test is graded</a>.</figcaption>
+      <figcaption><b>Figure 4.</b> The three settings. Most tasks have a privileged and a standard test. Realtime is offered where timing matters, mostly for dynamic tasks with moving objects or opponents; some tasks have only a standard test. Each core task also has a default setting, which this report’s Core view counts: standard for <span data-s="def_s"></span> tasks and realtime for <span data-s="def_t"></span>. Every rule is on the page <a href="../../how/">how a test is graded</a>.</figcaption>
     </figure>
 
     <h3 id="run">How one test runs</h3>
@@ -127,7 +127,7 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in the Antigravity CLI and Qwen3.8 Max in Claude Code, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. Every agent gets one attempt per test under the same limits (typically one hour of agent time, 100M input and 10M output tokens, web search off), and an agent is ranked once it has results in 10 suites; smaller runs are listed below the leaderboard. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> agents on the core set, each a model in a harness at high reasoning effort: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in the Antigravity CLI, Qwen3.8 Max and Kimi 3.1 Pro in Claude Code, together with three Flash-class models, Gemini 3.8 Flash in the Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in the DeepSeek harness. A test counts as solved when the verifier returns 1 on the latest finished attempt of the agent, and a test without a result counts against the agent. Every agent gets one attempt per test under the same limits (typically one hour of agent time, 100M input and 10M output tokens, web search off), and an agent is ranked once it has results in 10 suites; smaller runs are listed below the leaderboard. We report four views: Core, which counts each of the <span data-s="core_tasks"></span> core tasks once in its default setting, and one view for each setting over all of its core tests (<span data-s="np"></span> privileged, <span data-s="ns_only"></span> standard and <span data-s="nt"></span> realtime). The core set is hard by design: easier tasks were filtered out by human judgment and an initial run with GPT-6 Luna.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
       <figcaption class="fig-ext">There is a clear gap between the three strongest agents and the rest. In the Core view, the top three are <span data-s="core_top3"></span>, while the best Flash-class model reaches <span data-s="core_rest_max"></span>. <span data-s="views_note"></span>. Findings 1 and 2 examine what is lost in standard and realtime mode.</figcaption>
