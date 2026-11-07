@@ -16,8 +16,8 @@ const int = (n) => Number(n || 0).toLocaleString('en-US');
 const getJSON = (p) => fetch(BASE + p, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
 
 const MODES = { p: 'privileged', s: 'standard', t: 'realtime' };
-const MODE_LABEL = { c: 'Core', p: 'Privileged', s: 'Standard', t: 'Realtime' };
-const MODE_CLS = { c: '', p: 'm-p', s: 'm-s', t: 'm-r' };
+const MODE_LABEL = { p: 'Privileged', s: 'Standard', t: 'Realtime' };
+const MODE_CLS = { p: 'm-p', s: 'm-s', t: 'm-r' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const AG = { [TOP[0]]: '--ag-astra', [TOP[1]]: '--ag-opus', [TOP[2]]: '--ag-argon' };                       // their colours
 const agc = (r) => AG[r] || '--flash';
@@ -55,12 +55,12 @@ function compute(ex, tasks, b, atlas) {
   const sat = (m) => core.filter((t) => (t.core || '').includes(m)).map((t) => [t, m]);
   const M = { p: sat('p'), s: sat('s'), t: sat('t') };
   const LB = [...M.s, ...M.t];   // standard and realtime together
-  // the leaderboard's default view, Core: each core task once, in its default mode
-  const CORE = core.filter((t) => t.default && (t.core || '').includes(t.default)).map((t) => [t, t.default]);
   const solved = (L, r) => L.filter(([t, m]) => ok(t, r, m)).length;
   const anyOf = (L, rs = runs) => L.filter(([t, m]) => rs.some((r) => ok(t, r, m))).length;
-  const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(M.p, r), s: solved(LB, r), c: solved(CORE, r) }))
-    .sort((x, y) => y.c - x.c || y.p - x.p);
+  const has = (L, r) => L.filter(([t, m]) => graded(t, r, m)).length;   // the tests of L with a finished result
+  // the leaderboard's order: standard first (its default view), then privileged
+  const board = runs.map((r) => ({ id: r, name: name(r), harness: run[r]?.harness || '', p: solved(M.p, r), s: solved(M.s, r), t: solved(M.t, r) }))
+    .sort((x, y) => y.s - x.s || y.p - x.p);
   const order = board.map((x) => x.id);   // every figure lists the agents in the leaderboard's order
   // the same task in two settings, per agent: tasks whose two tests are both in the core set (a missing result is a failure)
   const paired = (a, c) => order.map((r) => {
@@ -76,7 +76,6 @@ function compute(ex, tasks, b, atlas) {
   const flash = runs.filter((r) => !TOP.includes(r) && /\bFlash\b/.test(name(r)));
   const ranked = (L) => [...runs].sort((x, y) => solved(L, y) - solved(L, x));
   const sameOrder = ['p', 's', 't'].every((k) => ranked(M[k]).slice(0, 3).join() === TOP.join());
-  const sameOrderCore = sameOrder && ranked(CORE).slice(0, 3).join() === TOP.join();
   // the best Flash-class result in any setting, with its count
   const flashTop = flash.flatMap((r) => ['p', 's', 't'].map((k) => [solved(M[k], r), M[k].length])).reduce((a, x) => (x[0] / (x[1] || 1) > a[0] / (a[1] || 1) ? x : a), [0, 1]);
   const group = (L, keys) => { const g = {}; for (const x of L) for (const k of keys(x[0])) (g[k] ??= []).push(x); return g; };
@@ -163,17 +162,17 @@ function compute(ex, tasks, b, atlas) {
   const train = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.train || 0), 0), sampled = ['p', 's', 't'].reduce((a, k) => a + (mix[k]?.n || 0), 0);
   const tot = ex.totals;
   const oracle = (k) => tasks.filter((t) => t.oracle === k).length;
-  // Overall results: the Core view by task type (mean of the three strongest) and by suite (who leads)
+  // Overall results: standard mode by task type (mean of the three strongest) and by suite (who leads)
   const ttLab = (x) => (atlas?.taxonomy?.tt?.[x] || x);
   const byT = {};
-  for (const x of CORE) for (const k of ttOf(x[0])) (byT[k] ??= []).push(x);
+  for (const x of M.s) for (const k of ttOf(x[0])) (byT[k] ??= []).push(x);
   const tRank = Object.entries(byT).map(([k, L]) => ({ k, n: L.length, m: mean3(L) / (3 * L.length), a: solved(L, TOP[0]) / L.length,
     o: Math.max(solved(L, TOP[1]), solved(L, TOP[2])) / L.length })).sort((x, y) => y.m - x.m);
   const LOW = { 'deformable-fluid': 'deformable objects and fluids', locomotion: 'locomotion', 'precision-contact': 'precise contact', navigation: 'navigation and search' };
   const low = (k) => LOW[k] || ttLab(k).toLowerCase().replace(/ & /g, ' and ');
   const edge = [...tRank].sort((x, y) => (y.a - y.o) - (x.a - x.o)).slice(0, 2);
   const bySuite = {};
-  for (const x of CORE) (bySuite[x[0].suite] ??= []).push(x);
+  for (const x of M.s) (bySuite[x[0].suite] ??= []).push(x);
   const suiteRows = Object.values(bySuite).filter((L) => L.length >= MIN_BENCH);
   const leads = (r) => suiteRows.filter((L) => runs.every((o) => solved(L, o) <= solved(L, r))).length;
   const S = {
@@ -185,7 +184,7 @@ function compute(ex, tasks, b, atlas) {
     n_runs_lc: ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][runs.length] || int(runs.length),
     n_runs_word: ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'][runs.length] || int(runs.length),
     np: int(M.p.length), ns_only: int(M.s.length), nt: int(M.t.length), ns: int(LB.length),
-    best: board[0].name, best_s: `${int(board[0].s)}/${int(LB.length)}`, best_s_pct: P(board[0].s, LB.length),
+    best: board[0].name, best_s: `${int(board[0].s)}/${int(M.s.length)}`, best_s_pct: P(board[0].s, M.s.length),
     ...per,
     a_p: Q(solved(M.p, TOP[0]), M.p.length), a_s: Q(solved(M.s, TOP[0]), M.s.length), a_t: Q(solved(M.t, TOP[0]), M.t.length),
     h_a_p: HQ(solved(M.p, TOP[0]), M.p.length), h_a_s: HQ(solved(M.s, TOP[0]), M.s.length), h_a_t: HQ(solved(M.t, TOP[0]), M.t.length),
@@ -213,15 +212,18 @@ function compute(ex, tasks, b, atlas) {
     dusty_s_others: (() => { const n = othersSolved('maniguard', 'dusty_transfer_i03', 's', TOP[0]); return n == null ? null : `${nw(n)} other agent${n === 1 ? '' : 's'}`; })(),
     built: (ex.build?.at || '').slice(0, 10),
     // plain words for the headings: the best agent's standard failure share, what every agent loses without privileged
-    // access, and the leaderboard's Core view for the overall results
+    // access, and standard mode (the leaderboard's default view) for the overall results
     a_s_fail_word: about(1 - solved(M.s, TOP[0]) / (M.s.length || 1)),
     ps_lose_all: moreThan(Math.min(...ps.filter((x) => x.a).map((x) => (x.a - x.both) / x.a))),
     ps_lose_n: ps.filter((x) => x.a).length === runs.length ? 'every agent' : `each of the ${nw(ps.filter((x) => x.a).length)} agents that solves any`,
     ps_astra_a: int(pr(TOP[0]).a), ps_astra_both: int(pr(TOP[0]).both),
-    core_top3: list(board.slice(0, 3).map((x) => `${x.name} at ${Q(x.c, CORE.length)}`)),
-    core_rest_max: Q(Math.max(...board.filter((x) => flash.includes(x.id)).map((x) => x.c)), CORE.length),
-    // the Introduction: each core task's default setting
-    def_s: int(CORE.filter(([, m]) => m === 's').length), def_t: int(CORE.filter(([, m]) => m === 't').length),
+    s_lead: `${board[0].name} leads at ${P(board[0].s, M.s.length)}, followed by ${list(board.slice(1, 3).map((x) => x.name))}`,
+    s_rest_max: P(Math.max(...board.filter((x) => flash.includes(x.id)).map((x) => x.s)), M.s.length),
+    // tests still without a result count as failed: the agents with a result on fewer than 98% of the standard tests
+    coverage_note: (() => { const L = board.map((x) => ({ n: x.name, h: has(M.s, x.id) })).filter((x) => x.h < M.s.length);
+      if (!L.length) return 'Every agent has a result on every test.';
+      const low = L.filter((x) => x.h < 0.98 * M.s.length).sort((a, z) => a.h - z.h);
+      return `Not every test has a result for every agent yet, and a test without one counts as failed${low.length ? `; in standard mode, for example, ${list(low.map((x, i) => (i ? `${x.n} on ${int(x.h)}` : `${x.n} has a result on ${int(x.h)} of the ${int(M.s.length)} tests`)))}` : ''}. The numbers under Figure 6 give every agent’s count.`; })(),
     // Finding 1: the other two strongest agents, standard and realtime; the three together
     o_s: Q(solved(M.s, TOP[1]), M.s.length), o_t: Q(solved(M.t, TOP[1]), M.t.length),
     g_s: Q(solved(M.s, TOP[2]), M.s.length), g_t: Q(solved(M.t, TOP[2]), M.t.length),
@@ -250,9 +252,10 @@ function compute(ex, tasks, b, atlas) {
     types_best: low(tRank[0].k), types_worst: list(tRank.slice(-2).reverse().map((x) => low(x.k))),
     types_edge: list(edge.map((x) => `${low(x.k)} (${pct(x.a * x.n, x.n)}% against at most ${pct(x.o * x.n, x.n)}% for the other two)`)),
     suites_n: int(suiteRows.length), suites_astra: int(leads(TOP[0])), suites_opus: int(leads(TOP[1])), suites_argon: int(leads(TOP[2])),
-    views_note: sameOrderCore ? 'The three keep this order in all four views' : 'The order of the three changes between views',
+    views_note: (() => { const d = ['p', 't'].filter((k) => ranked(M[k]).slice(0, 3).join() !== TOP.join());
+      return d.length ? `In ${list(d.map((k) => MODES[k]))} mode the order of the three changes, to ${list(ranked(M[d[0]]).slice(0, 3).map(name))}` : 'The three keep this order in all three settings'; })(),
   };
-  return { S, M: { ...M, c: CORE }, LB, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
+  return { S, M, LB, has, board, order, ps, st, mix, kinds, benchRows, hardRows, easyRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, name, short, ok, solved, flash, ttOf, ttLab: (x) => atlas?.taxonomy?.tt?.[x] || x, suiteName };
 }
 
@@ -284,9 +287,9 @@ const colOf = (R, r) => (TOP.includes(r) ? { c: `var(${AG[r]})`, o: 1 } : { c: '
 const legend6 = (R) => `<div class="legend">${R.order.map((r) => { const k = colOf(R, r);
   return `<span><i class="sw" style="background:${k.c};opacity:${k.o}"></i>${esc(R.name(r))}</span>`; }).join('')}</div>`;
 
-/** Figure 7: grouped bars, one group per view (Core, then each setting), one bar per agent. */
+/** Figure 6: grouped bars, one group per setting (standard, the leaderboard's default view, first), one bar per agent. */
 function figModes(el, R) {
-  const V = ['c', 'p', 's', 't'], lead = R.order[0], N = R.order.length;
+  const V = ['s', 'p', 't'], lead = R.order[0], N = R.order.length;
   const W = 760, H = 300, L = 34, B = 46, T = 16, gw = (W - L - 8) / V.length, bw = Math.min(18, (gw - 22) / N), top = 80;
   const y = (v) => T + (H - T - B) * (1 - v / top);
   let svg = '';
@@ -302,17 +305,18 @@ function figModes(el, R) {
       + `<text x="${L + gi * gw + gw / 2}" y="${H - B + 33}" class="ax" text-anchor="middle">${int(n)} tests</text>`;
   });
   const leads = V.every((k) => R.order.every((r) => R.solved(R.M[k], r) <= R.solved(R.M[k], lead)));
-  el.innerHTML = head(leads ? `${R.name(lead)} leads in the Core view and in every setting, and every agent solves by far its largest share of tests in privileged mode.` : `${R.name(lead)} leads in the Core view.`,
-    'Success rate of each agent on the core set, in the Core view and in each setting',
-    'each bar is the share of a view’s tests that one agent solved (the number on top is the percentage). Core counts each core task once, in its default setting; the other three count every core test of one setting.')
+  el.innerHTML = head(leads ? `${R.name(lead)} leads in every setting, and every agent solves by far its largest share of tests in privileged mode.` : `${R.name(lead)} leads in standard mode.`,
+    'Success rate of each agent on the core set in each setting',
+    'each bar is the share of a setting’s core tests that one agent solved (the number on top is the percentage).')
     + legend6(R) + `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Success rate by agent and setting">${svg}</svg></div>`
-    + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
+    + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => { const n = R.M[k].length, h = R.has(R.M[k], r);
+      return `${pct(R.solved(R.M[k], r), n)}% · ${frac(R.solved(R.M[k], r), n)}${h < n ? ` · ${int(h)} of ${int(n)} have a result` : ''}`; })]));
 }
 
-/** Figure 8: a radar of the Core view by task type, one outline per agent. */
+/** Figure 7: a radar of standard mode by task type, one outline per agent. */
 function figTypes(el, R) {
   const by = {};
-  for (const [t, m] of R.M.c) for (const x of R.ttOf(t)) (by[x] ??= []).push([t, m]);
+  for (const [t, m] of R.M.s) for (const x of R.ttOf(t)) (by[x] ??= []).push([t, m]);
   const axes = Object.entries(by).sort((a, z) => z[1].length - a[1].length).map(([x]) => x);
   const val = (r, x) => (100 * R.solved(by[x], r)) / by[x].length;
   const top = Math.max(10, Math.ceil(Math.max(...R.order.flatMap((r) => axes.map((x) => val(r, x)))) / 10) * 10);
@@ -327,26 +331,26 @@ function figTypes(el, R) {
   [...R.order].reverse().forEach((r) => { const c = colOf(R, r), top3 = TOP.includes(r);
     svg += `<polygon points="${axes.map((x, i) => pt(i, val(r, x)).join(',')).join(' ')}" style="stroke:${c.c};fill:${top3 ? c.c : 'none'};opacity:${c.o}" class="rp${top3 ? '' : ' fl'}"><title>${esc(R.name(r))}</title></polygon>`; });
   el.innerHTML = head(`The three strongest agents do best on ${R.S.types_best} and worst on ${R.S.types_worst}.`,
-    'Success rate in the Core view by task type',
-    'each axis is one task type (with its number of core tasks; a task can have several types), and each outline is one agent. Further from the center is better.')
+    'Success rate in standard mode by task type',
+    'each axis is one task type (with its number of standard tests; a task can have several types), and each outline is one agent. Further from the center is better.')
     + legend6(R) + `<div class="chart radar"><svg viewBox="0 0 ${S} ${S}" role="img" aria-label="Success rate by task type">${svg}</svg></div>`
     + numbers(['Task type', ...R.order.map((r) => esc(R.short(r)))], axes.map((x) => [`${esc(R.ttLab(x))} (${by[x].length})`, ...R.order.map((r) => `${Math.round(val(r, x))}%`)]));
 }
 
 const HEAT_NAME = (n) => n.replace(/^GPT-6 /, '').replace(/^Claude /, '').replace(/^Gemini 4 /, '').replace(/^Gemini 3\.8 Flash$/, 'Gem. Flash').replace(/ V4\.1 Flash$/, '').replace(/ 5\.3 Flash$/, '');
-/** Figure 9: a heatmap of the Core view, one row per suite (suites with fewer than MIN_BENCH core tasks together), one column per agent. */
+/** Figure 8: a heatmap of standard mode, one row per suite (suites with fewer than MIN_BENCH standard tests together), one column per agent. */
 function figSuites(el, R) {
   const g = {};
-  for (const [t, m] of R.M.c) (g[t.suite] ??= []).push([t, m]);
+  for (const [t, m] of R.M.s) (g[t.suite] ??= []).push([t, m]);
   const big = Object.entries(g).filter(([, L]) => L.length >= MIN_BENCH), small = Object.entries(g).filter(([, L]) => L.length < MIN_BENCH);
   const mean = (L) => TOP.reduce((a, r) => a + R.solved(L, r), 0) / (3 * L.length);
   const rows = big.sort((a, z) => mean(z[1]) - mean(a[1]) || z[1].length - a[1].length).map(([id, L]) => [esc(R.suiteName[id] || id), L]);
   if (small.length) rows.push([`Other suites <small>(${small.length})</small>`, small.flatMap(([, L]) => L)]);
   const cell = (L, r) => { const s = R.solved(L, r), v = pct(s, L.length);
     return `<td style="--v:${v}" class="${v >= 50 ? 'hi' : ''}" title="${esc(`${R.name(r)}: ${s} of ${L.length}`)}">${v}</td>`; };
-  el.innerHTML = head(`The leader changes from suite to suite: of the ${R.S.suites_n} suites with at least five core tasks, GPT-6 Astra leads or ties in ${R.S.suites_astra}, Claude Opus 5.5 in ${R.S.suites_opus} and Gemini 4 Argon in ${R.S.suites_argon}.`,
-    'Success rate in the Core view by suite and agent (%)',
-    'each row is a suite with its number of core tasks, sorted by the mean of the three strongest agents; deeper blue is higher. Suites with fewer than five core tasks are grouped as Other.')
+  el.innerHTML = head(`The leader changes from suite to suite: of the ${R.S.suites_n} suites with at least five standard tests, GPT-6 Astra leads or ties in ${R.S.suites_astra}, Claude Opus 5.5 in ${R.S.suites_opus} and Gemini 4 Argon in ${R.S.suites_argon}.`,
+    'Success rate in standard mode by suite and agent (%)',
+    'each row is a suite with its number of standard tests, sorted by the mean of the three strongest agents; deeper blue is higher. Suites with fewer than five standard tests are grouped as Other.')
     + `<div class="tscroll"><table class="heat"><thead><tr><th>Suite</th>${R.order.map((r) => `<th title="${esc(R.name(r))}">${esc(HEAT_NAME(R.name(r)))}</th>`).join('')}</tr></thead>
       <tbody>${rows.map(([nm, L]) => `<tr><th scope="row">${nm} <small>${L.length}</small></th>${R.order.map((r) => cell(L, r)).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
