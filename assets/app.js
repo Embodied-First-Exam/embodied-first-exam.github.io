@@ -1304,13 +1304,13 @@ function flowDiagram(el, ex) {
       <div class="fx-in fx-scene" style="grid-row:4 / 6" title="A simulation scene rebuilt bit for bit and checked against its starting state">
         <span class="fx-ih">${ic('cube')}frozen scene</span>
         <img src="${esc(site('media/ways/scene_start.jpg?v=bcb9718e'))}" alt="The scene at the start: two arms hold two interlocked claw pieces, orange and teal" loading="lazy">
-        <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in both modes</li></ul></div>
+        <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in every setting</li></ul></div>
       <i class="fx-arrow" style="grid-row:5"></i>
       ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
       ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the task is its prompt; web search off')}
       ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
       <div class="fx-iface" style="grid-row:4">
-        <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per mode</small></span>
+        <span class="fx-ln">${ic('layers')}Interface<small>how the code reaches the robot, per setting</small></span>
         <div class="fx-mode s" data-rt="standard" role="button" tabindex="0" title="Standard, the exam. The robot runs in a service the agent cannot open; the eai-standard protocol is the only way in: /spec declares the action types, /observe returns images, depth and proprioception, /submit runs one chunk of actions (a float32 array of shape (T, dim), rows dt apart, at most max_chunk_s), /kinematics answers FK and IK. Never given: object poses, segmentation, contact forces, the success checker.">
           <div class="fx-mh"><span class="fx-lock">${ic('lock')}</span><b>Standard</b><em data-rt="realtime" title="Real-time variant: the clock never stops">${ic('clock')}real-time</em></div>
           <dl><div><dt>reach</dt><dd><span class="fx-pipe" title="The agent’s code reaches the simulator only through the eai-standard API: /spec, /observe, /submit, /kinematics"><i class="b">${ic('code')}</i><i class="ln"></i><i class="api">${ic('lock')}API</i><i class="ln"></i><i class="b">${ic('cube')}</i></span><small>robot API only</small></dd></div>
@@ -1535,7 +1535,7 @@ def pick(xy, z_grasp, yaw=0.0, z_above=0.25):
     ...
     line([x, y, z_grasp], q)
     p["close_gripper"](20)` },
-  c: { tab: 'Train Model to Control', title: 'Train a model to control', def: 'The agent trains a policy that produces the actions.', vid: 'c_hurdle', step: 10,
+  c: { tab: 'Train a Policy to Control', title: 'Train a policy to control', def: 'The agent trains a policy that produces the actions.', vid: 'c_hurdle', step: 10,
     line: 'A neural controller trained from scratch on parallel rollouts with taller and taller hurdles, then refined by rollout search.',
     slug: 'humanoidbench-loco-hurdle-i00-privileged--ev8v9za', who: 'HumanoidBench · Hurdle · privileged · Codex · GPT-6 Astra',
     code: `class Agent(nn.Module):
@@ -1989,13 +1989,13 @@ function suiteDialog(ex, s, opener) {
 /** The three ways an agent can control the robot, one row each, a + opening a sentence on it (owners' meeting,
  *  2026-10-19: readers from language models do not know these terms). Drawn wherever an element #ways exists. */
 const CONTROL_WAYS = [
-  ['Direct control', 'Agent', '⇄', 'Robot', 'The agent is the controller: it sends a command, reads what the robot sensed, and chooses the next command, step by step, inside its own reasoning loop. Most standard-mode attempts work this way.'],
-  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program that turns goals into actions through tools such as inverse kinematics, a motion planner or a feedback controller, and the program drives the robot on its own; between runs the agent reads the outcome and fixes the code. Most privileged and realtime attempts work this way.'],
-  ['Train model to control', 'Model', '→', 'Robot', 'The agent trains a policy, for example with reinforcement learning in simulation, and lets the trained model drive the robot. The model can be any policy, not only a vision-language-action model. This is the rarest of the three.'],
+  ['Direct control', 'Agent', '⇄', 'Robot', 'The agent is the controller: it sends a command, reads what the robot sensed, and chooses the next command, step by step, inside its own reasoning loop. Most attempts in the Standard Setting work this way.'],
+  ['Code to control', 'Code', '→', 'Robot', 'The agent writes a program that turns goals into actions through tools such as inverse kinematics, a motion planner or a feedback controller, and the program drives the robot on its own; between runs the agent reads the outcome and fixes the code. Most attempts in the Privileged and Realtime settings work this way.'],
+  ['Train a policy to control', 'Policy', '→', 'Robot', 'The agent trains a policy, for example with reinforcement learning in simulation, and lets the trained policy drive the robot. The policy can be any network, not only a vision-language-action model. This is the rarest of the three.'],
 ];
 function ways(el) {
   if (!el) return;
-  el.innerHTML = `<p class="cw-lead">An agent can steer the robot itself (direct control), write the code that controls it (code to control), or train a model that controls it (train model to control). The exam does not prescribe which, and agents mix them.</p>
+  el.innerHTML = `<p class="cw-lead">An agent can steer the robot itself (direct control), write the code that controls it (code to control), or train a policy that controls it (train a policy to control). The exam does not prescribe which, and agents mix them.</p>
     <div class="cw-head"><span></span><span>While the robot acts</span><span></span></div>
     ${CONTROL_WAYS.map(([n, a, ar, b, txt], i) => { const w = WAYS[WAY_ORDER[i]]; return `<details class="cw-row"><summary><span class="cw-n">${n}</span><span class="cw-f"><b>${a}</b><i>${ar}</i><b>${b}</b></span><span class="cw-x" aria-hidden="true"></span></summary><p>${txt}${w?.slug ? ` <a href="${exam('run/')}?r=${encodeURIComponent(w.slug)}">See it in a real run →</a>` : ''}</p></details>`; }).join('')}`;
 }
