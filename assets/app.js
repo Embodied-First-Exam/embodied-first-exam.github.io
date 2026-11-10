@@ -196,10 +196,12 @@ function poster(media, cls = '') {
 
 /* --------------------------------------------------------------------------------------------- leaderboard */
 
-/** The leaderboard's settings, shown one at a time behind a switch: standard (the default view), privileged and
- *  realtime, each the core set's tests in that one mode (owner, 2026-11-07: no Core / default-mode view any more).
- *  `key` is the result key of a task's cell (data/tasks.json). */
+/** The leaderboard's settings, shown one at a time behind a switch: Overall (the default view; owner, 2026-11-10), then
+ *  standard, privileged and realtime, each the core set's tests in that one mode (owner, 2026-11-07: no Core /
+ *  default-mode view any more). Overall counts each core task once, solved only if every mode it has in the core set was
+ *  solved. `key` is the result key of a task's cell (data/tasks.json). */
 const LB_SETTINGS = [
+  { id: 'overall', label: 'Overall', key: 'o', overall: true },
   { id: 'standard', label: 'Standard', key: 's' },
   { id: 'privileged', label: 'Privileged', key: 'p' },
   { id: 'realtime', label: 'Realtime', key: 't' },
@@ -218,6 +220,7 @@ function pageSetting(scope, mode) {
 const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (a number’s tooltip gives the count), and these numbers are not comparable between models.';
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
+  overall: (n) => `${int(n)} core tasks. A task counts as solved only if the agent solved every mode it has (standard, and privileged or realtime where the task has them).`,
   standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
   'realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
@@ -236,16 +239,19 @@ function scoreGroup(group, tasks, set) {
     if (t.suite === 'robosuite') continue;
     const k = set.key;
     if (!k) continue;
-    if (set.all ? !(t.modes || []).some((m) => MODE_KEY[m] === k) : !t.core || !t.core.includes(k)) continue;   // the core set only (owners, 2026-10-18)
+    // the result keys that decide the task: the setting's own, or for Overall every mode the task has (in the core set)
+    const ks = set.overall ? (set.all ? (t.modes || []).map((m) => MODE_KEY[m]).filter(Boolean) : [...(t.core || '')].filter((c) => c in RKEY_LABEL))
+      : (set.all ? (t.modes || []).some((m) => MODE_KEY[m] === k) : t.core && t.core.includes(k)) ? [k] : [];   // the core set only (owners, 2026-10-18)
+    if (!ks.length) continue;
     tests += 1;
     for (const r of group) {
-      const st = scored(t.results?.[r.id]?.[k]);
-      if (set.all && st === undefined) continue;
-      const ok = st === 'S';
+      const sts = ks.map((x) => scored(t.results?.[r.id]?.[x]));
+      if (set.all && sts.includes(undefined)) continue;
+      const ok = sts.every((st) => st === 'S');
       const o = scores[r.id];
       o.v[0] += ok;
       o.v[1] += 1;
-      o.v[2] += st === 'S' || st === 'F';
+      o.v[2] += sts.every((st) => st === 'S' || st === 'F');
       const ss = (o.suites[t.suite] ??= [0, 0]);
       ss[0] += ok;
       ss[1] += 1;
@@ -319,7 +325,7 @@ function lbDetail(ex, r, sc, set, href = true) {
     ${suiteBars(ex, sc.suites || {}, set)}</div>`;
 }
 /** The scale over the rows, and the setting's fixed denominator at its end: every agent is counted on all these tests. */
-const lbAxis = (tests) => `<div class="lbh-axis lb1"><span></span><span class="lbh-ticks" aria-hidden="true">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span><span class="lbh-n">${int(tests)} test${tests === 1 ? '' : 's'}</span></div>`;
+const lbAxis = (tests, set) => { const u = set?.overall ? 'task' : 'test'; return `<div class="lbh-axis lb1"><span></span><span class="lbh-ticks" aria-hidden="true">${[0, 25, 50, 75, 100].map((v) => `<i style="left:${v}%">${v}%</i>`).join('')}</span><span class="lbh-n">${int(tests)} ${u}${tests === 1 ? '' : 's'}</span></div>`; };
 
 /** The leaderboard page: the setting switch (remembered in ?mode=), the ranked board, a model's suites on a click. */
 function lbBoard(ex, tasks, onDraw) {
@@ -347,7 +353,7 @@ function lbBoard(ex, tasks, onDraw) {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
       { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
-      html = lbAxis(g.tests) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
+      html = lbAxis(g.tests, set) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
@@ -397,6 +403,7 @@ function lbSuites(el, ex, runs, scores, set) {
   // a note on why some suites have few tests in a setting (readers' question, 2026-10-19)
   const sn = $('#lb-suites-note');
   if (sn) sn.textContent = set.all ? `All counts every task of the exam. ${LB_NOT_COMPARABLE}`
+    : set.overall ? 'Overall counts each core task once, solved only if every mode it has was solved; the number of tasks is under each suite’s name.'
     : set.id === 'realtime' ? 'Realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
     : 'The number of tests each suite has in this setting is under its name.';
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
@@ -422,7 +429,7 @@ function lbSuites(el, ex, runs, scores, set) {
     const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
     // how many tests the suite has in this setting, so a 100% on one test reads as one test (owners' readers, 2026-10-19)
     const n = Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${set.all ? 'up to ' : ''}${n} test${n === 1 ? '' : 's'}</small></span></a>
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${set.all ? 'up to ' : ''}${n} ${set.overall ? 'task' : 'test'}${n === 1 ? '' : 's'}</small></span></a>
       ${runs.map((r, i) => cell(r, s, vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
@@ -1851,7 +1858,7 @@ function homeBoard(el, ex) {
     list.innerHTML = order.map((id, i) => { if (P(id) !== prev) { rank = i + 1; prev = P(id); } return lbRow(runs[id] || { id, model: id }, vw.scores?.[id], rank, best, set); }).join('');
     det.hidden = true;
     el.classList.remove('picked');
-    $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0);
+    $('.lbh-ax', el).innerHTML = lbAxis(vw.tests || 0, set);
     $('#lbh-desc', el).textContent = lbDesc(set.id, vw.tests || 0);
     if (note) note.innerHTML = `<a href="${exam('leaderboard/')}${set.id === LB_SETTINGS[0].id ? '' : `?mode=${set.id}`}">Full leaderboard, per suite →</a>`;
   };
@@ -2117,7 +2124,7 @@ function suiteResults(el, ex, tasks) {
     const best = Math.max(0, P(order[0]));
     let rank = 0, prev = null;
     $('.lbh-rows', el).innerHTML = order.map((r, i) => { if (P(r) !== prev) { rank = i + 1; prev = P(r); } return lbRow(r, g.scores[r.id].v, rank, best, set, { still: true }); }).join('');
-    $('.lbh-ax', el).innerHTML = lbAxis(g.tests);
+    $('.lbh-ax', el).innerHTML = lbAxis(g.tests, set);
   };
   const sw = $('.lb-set', el);
   sw.innerHTML = '';
