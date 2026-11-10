@@ -631,11 +631,6 @@ function taskCard(ex, t, runs) {
 // characters of sha1(slug), so a run's folder follows from its slug alone. Paths in run.json and in index rows are
 // relative to the run's folder; the pictures the agent saw are byte ranges of steps.bin.
 const RUNS_REMOTE = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/';
-// TEMPORARY (the move to embodied-exam-runs, 2026-10): the old flat layout (the runs folder of embodied-exam-data: <slug>.json,
-// <slug>/<file>, paths relative to runs/), read while the new dataset has no index or no run.json for a slug. Remove
-// RUNS_OLD and every use marked TEMPORARY once the new index is live and nothing links a run outside it.
-const RUNS_OLD = 'https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/runs/';
-let RUNS_LAYOUT = 3;           // the layout of the index in use: 3, or 2 while the TEMPORARY fallback serves it
 /** sha1 of a string, hex (small and synchronous: the run's folder is needed before anything is fetched). */
 function sha1hex(str) {
   const b = new TextEncoder().encode(str), n = ((b.length + 8) >> 6) + 1, w = new Uint32Array(n * 16), x = new Uint32Array(80);
@@ -660,10 +655,10 @@ function sha1hex(str) {
 /** A run's folder on the dataset (ends with a slash). */
 const runBase = (slug) => `${RUNS_REMOTE}runs/${sha1hex(slug).slice(0, 2)}/${slug}/`;
 const fetchRunJSON = async (u) => { const r = await fetch(u); if (!r.ok) throw Object.assign(new Error(`${u}: HTTP ${r.status}`), { status: r.status }); return r.json(); };
-/** An index file (index.json, index/<suite>.json) of the layout in use. */
-const runJSON = (p) => fetchRunJSON((RUNS_LAYOUT >= 3 ? RUNS_REMOTE : RUNS_OLD) + p);
+/** An index file (index.json, index/<suite>.json). */
+const runJSON = (p) => fetchRunJSON(RUNS_REMOTE + p);
 /** The poster of an index row, or ''. */
-const rowPoster = (r) => (!r.poster ? '' : RUNS_LAYOUT >= 3 ? runBase(r.slug) + r.poster : RUNS_OLD + r.poster);   // TEMPORARY: the RUNS_OLD branch
+const rowPoster = (r) => (r.poster ? runBase(r.slug) + r.poster : '');
 
 // The runs' index comes in two layouts. v2 (index.json has "v": 2): index.json is a summary (counts by suite and by
 // setting) and index/<suite>.json holds one suite's rows, so a page fetches only the suites it shows. v1 (older
@@ -699,9 +694,7 @@ const runShards = new Map();   // suite id -> promise of its rows
 // is listed with all its runs, every task of the All set, and only kept out of the rankings, UNRANKED_RUNS)
 const HIDDEN_RUNS = new Set();
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
-// TEMPORARY: while the new dataset has no index (an HTTP error), the old one is read, with the old layout
-const runIndexFile = () => runJSON('index.json').catch((e) => { if (!e.status) throw e; RUNS_LAYOUT = 2; return runJSON('index.json'); });
-const runSummary = () => (runSummaryP ??= runIndexFile().then((d) => {
+const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
   if (d.runs) d.runs = shown(d.runs).map(siteNow);
   if (d.v >= 2) return splitSuites(renameSuites(d));
@@ -2420,10 +2413,6 @@ async function loadRun(slug) {
   for (const s of names) {
     try { const r = await fetchRunJSON(runBase(s) + 'run.json'); return { r, slug: s, file: (f) => runBase(s) + f }; } catch (e) { if (!e.status) throw e; }
   }
-  // TEMPORARY: a run the new dataset does not hold yet, from the old flat layout (its paths are relative to runs/)
-  for (const s of names) {
-    try { const r = await fetchRunJSON(`${RUNS_OLD}${s}.json`); return { r, slug: s, file: (f) => RUNS_OLD + f }; } catch (e) { if (!e.status) throw e; }
-  }
   throw new Error(`run ${slug} not found`);
 }
 // The pictures of a run are one file, steps.bin; run.json gives each as [offset, length]. HF answers the dataset's
@@ -2478,15 +2467,13 @@ async function runPage(ex) {
   const est = r.step_times === 'estimated', at = (t) => `${est ? '≈' : ''}${clock(t)}`, estTip = est ? ' title="Estimated: this harness does not record when each step happened"' : '';
   const solved = r.success === 1 || r.state === 'success';
   const model = settingOf(r);
-  // the files of the run: run.json format 3 names them relative to the run's folder; TEMPORARY: the old layout's
-  // replay_last and picture paths (relative to the old runs/)
-  const v3 = r.format >= 3;
-  const poster = v3 ? r.poster : r.replay_last;
-  const pictureOf = v3 && r.steps_bin ? stepPictures(file(r.steps_bin.file || 'steps.bin'), r.steps_bin.mime) : null;
+  // the files of the run: run.json (format 3) names them relative to the run's folder
+  const poster = r.poster;
+  const pictureOf = r.steps_bin ? stepPictures(file(r.steps_bin.file || 'steps.bin'), r.steps_bin.mime) : null;
   const picSrc = (p) => (Array.isArray(p) ? (pictureOf ? pictureOf(p) : Promise.reject(new Error('no steps.bin'))) : Promise.resolve(file(p)));
   const picKey = (p) => (Array.isArray(p) ? `@${p[0]}` : p);
   const mb = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)} MB` : `${Math.max(1, Math.round(n / 1e3))} kB`);
-  const trajLink = v3 && r.trajectory ? `<a class="btn small" href="${esc(file(r.trajectory.file))}" download="${esc(slug)}.trajectory.jsonl.gz" title="The agent's full trajectory: one JSON event per line, gzipped">Download trajectory <small>${mb(r.trajectory.size)}</small></a>` : '';
+  const trajLink = r.trajectory ? `<a class="btn small" href="${esc(file(r.trajectory.file))}" download="${esc(slug)}.trajectory.jsonl.gz" title="The agent's full trajectory: one JSON event per line, gzipped">Download trajectory <small>${mb(r.trajectory.size)}</small></a>` : '';
   head.innerHTML = `<p class="kicker">${s.code ? codeMark(s) : ''} ${esc(s.name || r.bench)} · ${esc(mode)} · one run</p>
     <h1>${esc(title)}</h1>
     <div class="run-who"><span class="run-model">${esc(model)}</span><span class="run-verdict ${solved ? 'ok' : 'no'}">${solved ? 'Solved' : 'Not solved'}</span>${ENDED_BY[r.ended_by] ? `<span class="run-ended" title="${esc(ENDED_TIP)}">${esc(ENDED_BY[r.ended_by])}</span>` : ''}
