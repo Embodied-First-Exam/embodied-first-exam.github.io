@@ -445,6 +445,7 @@ function lbSuites(el, ex, runs, scores, set) {
  *  failure) has no entry in data/tasks.json: it is left out of the denominators, not counted as failed, and counted apart. */
 const LUNA_RUN = 'codex-gpt6_luna-xhigh';
 const LUNA_COLS = [
+  { id: 'overall', label: 'Overall', sub: 'tasks solved', ratio: 'solved / total tasks' },
   { id: 'all', label: 'All modes', sub: 'tests solved', ratio: 'solved / total tests' },
   { id: 's', label: 'Standard', sub: 'tests solved', ratio: 'solved / total tests' },
   { id: 't', label: 'Realtime', sub: 'tests solved', ratio: 'solved / total tests' },
@@ -452,16 +453,17 @@ const LUNA_COLS = [
   { id: 'task', label: 'Any mode', sub: 'tasks solved', ratio: 'solved / all tasks' },
 ];
 function lunaStats(tasks) {
-  const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0] });
+  const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0], overall: [0, 0] });
   const per = {}, total = blank();
   for (const t of tasks) {
     if (t.suite === 'robosuite') continue;
     const r = t.results?.[LUNA_RUN] || {};
     const o = (per[t.suite] ??= blank());
-    let graded = false, solved = false;
+    let graded = false, solved = false, every = (t.modes || []).length > 0;
     for (const m of t.modes || []) {
       const k = MODE_KEY[m] || 's';
       const st = r[k]?.s;
+      every &&= st === 'S';
       for (const x of [o, total]) x.tests += 1;
       if (st !== 'S' && st !== 'F') { o.missing += 1; total.missing += 1; continue; }
       graded = true;
@@ -470,7 +472,9 @@ function lunaStats(tasks) {
     }
     for (const x of [o, total]) {
       x.tasks += 1;
-      if (graded) { x.task[0] += solved; x.task[1] += 1; }
+      // Overall (owner, 2026-11-10): the strict counterpart of Any mode, on the same tasks: solved only if every mode the
+      // task has was solved, a mode without a valid result counting as failed
+      if (graded) { x.task[0] += solved; x.task[1] += 1; x.overall[0] += every; x.overall[1] += 1; }
     }
   }
   return { per, total };
@@ -483,11 +487,11 @@ function lbLuna(el, ex, tasks) {
   const lead = $('#lb-luna-lead');
   if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
   const note = $('#lb-luna-note');
-  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests. A task counts as solved when any of its modes was solved.`;
+  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests. Overall counts a task as solved only when every mode it has was solved, a mode without a valid result counting as not solved; Any mode, when any of them was.`;
   const cell = (name, col, v) => {
     if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
     const q = pctOf(v);
-    const what = col.id === 'task' ? 'tasks solved in at least one mode' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
+    const what = col.id === 'task' ? 'tasks solved in at least one mode' : col.id === 'overall' ? 'tasks solved in every mode they have' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
     return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
   };
   const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small><small class="lu-ratio">${c.ratio}</small></span>`).join('')}</div>`;
