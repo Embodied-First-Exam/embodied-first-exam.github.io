@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="../../assets/exam.css?v=c94f9ada">
 <link rel="stylesheet" href="../../assets/blog.css?v=bff482e0">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=c066caaf"></script>
+<script type="module" src="../../assets/app.js?v=0bd80474"></script>
 <script type="module" src="../../assets/blog.js?v=599cfb60"></script>
 </head>
 <body data-page="blogpost">
@@ -123,7 +123,7 @@
 
     <h3 id="marking">Keeping the grading honest</h3>
     <p>Reference solutions never enter the agent’s container, and we remove the original benchmarks’ solutions from the images. Doing nothing must score 0 on every task, and the reference solution must score 1 wherever one exists (a full reference solution for <span data-s="oracle_full"></span> tasks, a partial one for <span data-s="oracle_partial"></span>). Tasks without one, like most of BEHAVIOR-1K, rely on the original benchmark’s success checker. Before we add a suite, we tell an agent to try to pass without doing the task; if it succeeds anywhere, we hold the suite back until its verifier is fixed.</p>
-    <p>Two observations from this testing affect how the results should be read. First, models remember deleted solutions: Claude Opus 5.5 rewrote a deleted RoboTwin reference solution from memory, with 26 of its 28 lines identical to the original, and both Opus and GPT-6 Astra rebuilt a deleted HumanoidBench reward function with its original constants, so results on tasks built from public benchmarks may partly reflect memorization. Second, one harness offered tools that ran on the provider's servers, outside the container and its network rules, and agents found and used them; these tools are now turned off.</p>
+    <p>Two observations from this testing affect how the results should be read. First, models remember deleted solutions: Claude Opus 5.5 rewrote a deleted RoboTwin reference solution from memory, with 26 of its 28 lines identical to the original, and both Opus and GPT-6 Astra rebuilt a deleted HumanoidBench reward function with its original constants, so results on tasks built from public benchmarks may partly reflect memorization. Second, one harness offers tools that run on the provider's servers, outside the container and its network rules, and agents found and used them; these tools are turned off in the exam.</p>
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>

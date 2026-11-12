@@ -1393,7 +1393,7 @@ function showModal(dlg, opener) {
 /** How a trial runs underneath, per mode, as the protocol (docs/protocol on main) has it: the containers of one trial,
  *  what each holds, what crosses between them, what happens when the time is up, and how the verifier decides. */
 const RT_MON = '<code>rcb_monitor</code> sidecar: samples CPU, memory and GPU, and shows the agent its clock in <code>/run/rcb-limits/usage.json</code> (read-only)';
-const RT_NET = 'Out of the agent’s container: the model’s API (through the usage gateway) and the package registries (PyPI, apt), nothing else. GitHub, Hugging Face and the web do not answer.';
+const RT_NET = 'Out of the agent’s container: the model’s API and the package registries (PyPI, apt), nothing else. GitHub, Hugging Face and the web do not answer.';
 const RUNTIME = {
   standard: {
     tab: 'Standard', proto: 'eai-standard/2.x · robot as a service',

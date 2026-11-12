@@ -37,7 +37,7 @@
   .pending { margin-top: 14px !important; padding: 14px 16px; border: 1px dashed var(--line-2); border-radius: 12px; color: var(--ink-3) !important; font-size: 15px !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=c066caaf"></script>
+<script type="module" src="../../assets/app.js?v=0bd80474"></script>
 <script type="module" src="../../assets/blog-fable.js?v=b67cf8fb"></script>
 </head>
 <body data-page="blogpost">
@@ -127,7 +127,7 @@
         <details class="more">
           <summary>Scope</summary>
           <ul>
-            <li>Suites with at least five core tests in the setting. In a small suite one or two tests can come from the variation between runs; RoboARC, BEHAVIOR-1K and Embodied Olympics - Fun are among the largest suites of the Standard core set. GPT-6 Astra’s RoboPaint attempts ran under an earlier two-hour limit, against one hour for Claude Fable 5.2; all of its RoboPaint successes finished within the hour.</li>
+            <li>Suites with at least five core tests in the setting. In a small suite one or two tests can come from the variation between runs; RoboARC, BEHAVIOR-1K and Embodied Olympics - Fun are among the largest suites of the Standard core set.</li>
           </ul>
         </details>
       </div>
@@ -174,7 +174,7 @@
         <details class="more">
           <summary>Scope</summary>
           <ul>
-            <li>Costs are list prices of November 2026 applied to the tokens each attempt used, as in the report, not what the runs were billed. Some attempts end on an error rather than by the agent’s choice. Ending before the limit is partly the harness: Claude Opus 5.5, also in Claude Code, reaches the limit in <span data-f="to_o"></span> tests. Some older attempts of GPT-6 Astra and Claude Opus 5.5, among them all of GPT-6 Astra’s RoboPaint Standard attempts, ran under a two-hour limit, longer than the tests have now.</li>
+            <li>Costs are list prices of November 2026 applied to the tokens each attempt used, as in the report, not what the runs were billed. Some attempts end on an error rather than by the agent’s choice. Ending before the limit is partly the harness: Claude Opus 5.5, also in Claude Code, reaches the limit in <span data-f="to_o"></span> tests.</li>
           </ul>
         </details>
       </div>
@@ -217,7 +217,6 @@
       <summary>Scope</summary>
       <ul>
         <li>All the core tests of each setting, one attempt per agent and test. A test that one other agent solves once may be within the variation between runs; the tests that four or more other agents solve are the clearest evidence of what Claude Fable 5.2 misses, and those are the ones described here.</li>
-        <li>Claude Fable 5.2 ran on the current versions of the tests, and some other agents ran on earlier ones; the differences are in limits and wording, and none of them changes what these tests ask or how they are graded.</li>
       </ul>
     </details>
 
@@ -282,7 +281,7 @@
     <details class="more">
       <summary>Scope</summary>
       <ul>
-        <li>The labels cover 855 attempts of Claude Fable 5.2. GPT-6.1 Sol in Codex wrote them and Claude Sonnet 5.5 reviewed them; the other agents’ labels come from the report. GPT-6.1 Sol is from the same family as GPT-6 Astra, which could bias the comparison between the two.</li>
+        <li>The labels cover 855 attempts of Claude Fable 5.2 and come from the same labeling method as the report’s. The model that wrote most of the labels is from the same family as GPT-6 Astra, which could bias the comparison between the two.</li>
         <li>The labels come from the replay video and the logs, without the simulator state, so a wrong estimate and a wrong motion often cannot be told apart. Attempts whose progress cannot be read are left out of the statistics that need it.</li>
         <li>Each agent made one attempt per test, so shares over a few dozen tests have wide uncertainty.</li>
       </ul>
@@ -310,10 +309,10 @@
     </div>
 
     <h3 id="c3">Painting under real-robot rules: GPT-6 Astra measured and corrected its strokes, and Claude Fable 5.2 spent its strokes with few checks.</h3>
-    <p>In RoboPaint, an arm copies The Great Wave off Kanagawa onto paper with a brush and ten paints, and the copy passes when its colour error and structure are close enough to the target. The copy may use at most 376 strokes. Both agents solved this task in the Privileged Setting. GPT-6 Astra’s attempt ran under an earlier two-hour limit and finished within the hour the test allows now.</p>
+    <p>In RoboPaint, an arm copies The Great Wave off Kanagawa onto paper with a brush and ten paints, and the copy passes when its colour error and structure are close enough to the target. The copy may use at most 376 strokes. Both agents solved this task in the Privileged Setting.</p>
     <div class="pair">
       <a class="case s" href="../../run/?r=robopaint-acrylic-greatwave-i00-standard--a2ai7f2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/65/robopaint-acrylic-greatwave-i00-standard--a2ai7f2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/65/robopaint-acrylic-greatwave-i00-standard--a2ai7f2/replay.mp4"></video>
-              <span class="case-k">Measured, then corrected</span><b>GPT-6 Astra · solved</b><span class="case-m">Standard · minute 44 of 120</span><span class="case-t">It measured how brush pressure sets the stroke width, planned curved sweeps for the wave, the foam and the boats, and checked the sheet with the camera at checkpoints. When the arm drifted toward a joint limit and misplaced some fine strokes, it moved the arm back and painted corrective sweeps. It used 311 of the 376 strokes. The verifier measured a mean colour error of 1.71, under the limit of 2.0.</span></a>
+              <span class="case-k">Measured, then corrected</span><b>GPT-6 Astra · solved</b><span class="case-m">Standard · minute 44 of 60</span><span class="case-t">It measured how brush pressure sets the stroke width, planned curved sweeps for the wave, the foam and the boats, and checked the sheet with the camera at checkpoints. When the arm drifted toward a joint limit and misplaced some fine strokes, it moved the arm back and painted corrective sweeps. It used 311 of the 376 strokes. The verifier measured a mean colour error of 1.71, under the limit of 2.0.</span></a>
       <a class="case s" href="../../run/?r=robopaint-acrylic-greatwave-i00-standard--fnvpugy"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/2e/robopaint-acrylic-greatwave-i00-standard--fnvpugy/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/2e/robopaint-acrylic-greatwave-i00-standard--fnvpugy/replay.mp4"></video>
               <span class="case-k">Out of strokes</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · minute 29 of 60</span><span class="case-t">A greedy planner fitted straight strokes of four widths to the picture; it painted 285 of them without feedback, then photographed the sheet three times and replanned the remaining strokes from what was on the paper. With all 376 strokes used, its own estimate of the colour error was about 3.1, above the limit. The verifier measured 2.74.</span></a>
     </div>
