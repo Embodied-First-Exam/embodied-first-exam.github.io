@@ -25,6 +25,15 @@
   .dp-v small.net.up { color: var(--ag-fable); } .dp-v small.net.down { color: var(--ag-astra); }
   .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; margin-bottom: 6px; }
   @media (max-width: 560px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  figure.paper .pimg.narrow { max-width: 560px; margin-left: auto; margin-right: auto; }
+  table.fst { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.35; }
+  table.fst th, table.fst td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  table.fst thead th { font: 600 13px/1.3 var(--body); text-align: right; border-bottom: 2px solid currentColor; }
+  table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
+  table.fst tbody th { text-align: left; font-weight: 400; color: var(--ink-2, var(--ink)); }
+  table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
+  table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
+  @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
   .pending { margin-top: 14px !important; padding: 14px 16px; border: 1px dashed var(--line-2); border-radius: 12px; color: var(--ink-3) !important; font-size: 15px !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
@@ -213,7 +222,74 @@
     </details>
 
     <!-- ===================================================================================== 4 -->
-    <h2 id="cases" data-short="Case studies"><span class="num">04</span>Case studies</h2>
+    <h2 id="stages" data-short="Failure stages"><span class="num">04</span>How Claude Fable 5.2 fails</h2>
+    <p>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt, a separate coding agent labels, from the replay video and the logs, the stage at which the attempt went wrong and what visibly went wrong there, such as a lost hold or a fall, and a second agent reviews the labels. We labeled the attempts of Claude Fable 5.2 in the same way as those of the other eight agents in <a href="../first-exam/">the report</a>. Figure 9 compares the three strongest agents, Claude Fable 5.2, GPT-6 Astra and Claude Opus 5.5, and Figure 10 shows all nine.</p>
+    <figure class="fig">
+      <div class="fig-body" data-fig="9"><p class="fig-cap"><span class="fc-t">How the three strongest agents fail.</span> Shares in percent of the failed attempts in the Standard and Realtime settings with each label; a failed attempt can have two phenomena. Zero progress counts the Standard failures on tasks with at least two stages, and the first stage the located Standard failures on such tasks. The last two rows divide by stages instead: among the stages that need contact (or a grasp) that the attempts reached, the share at which the attempt failed without contact (or lost its hold).</p>
+        <div class="tscroll"><table class="fst">
+          <thead><tr><th></th><th class="ag-f">Claude Fable 5.2</th><th class="ag-a">GPT-6 Astra</th><th class="ag-o">Claude Opus 5.5</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Failed attempts analysed (number)</th><td>247</td><td>313</td><td>372</td></tr>
+            <tr><th scope="row">Zero progress: met no stage</th><td>26</td><td>26</td><td>36</td></tr>
+            <tr><th scope="row">Failed at the task’s first stage</th><td>35.8</td><td>34.2</td><td>45.2</td></tr>
+            <tr><th scope="row">Failed to make the required contact</th><td>5.7</td><td>9.9</td><td>7.3</td></tr>
+            <tr><th scope="row">Lost hold</th><td><b>17.8</b></td><td>16.9</td><td>12.6</td></tr>
+            <tr><th scope="row">Inaccurate pose</th><td>18.2</td><td>20.8</td><td>20.4</td></tr>
+            <tr><th scope="row">Obstruction or collision</th><td>11.7</td><td>16.9</td><td>15.1</td></tr>
+            <tr><th scope="row">Constraint violation</th><td>3.6</td><td>6.7</td><td>4.3</td></tr>
+            <tr><th scope="row">Loss of balance</th><td>13.0</td><td>12.8</td><td>17.2</td></tr>
+            <tr class="sep"><th scope="row">No contact, per contact stage reached</th><td>1.0</td><td>2.8</td><td>2.7</td></tr>
+            <tr><th scope="row">Lost hold, per grasp stage reached</th><td>4.2</td><td>5.4</td><td>6.5</td></tr>
+          </tbody></table></div>
+      </div>
+    </figure>
+    <h3 id="s1">Claude Fable 5.2 almost always makes the contact a stage needs.</h3>
+    <p>Only 5.7% of its failed attempts fail to make the required contact, against 9.9% for GPT-6 Astra. Counted per contact stage that it reaches, it fails without contact at 1.0% of these stages, the lowest of the nine agents. The three strongest agents do so at 1.0% to 2.8%, and five of the six weaker agents at 9.0% to 18.5%, with Gemini 4 Argon at 3.7% (Figure 10). A quarter of the failed Standard attempts of Claude Fable 5.2 and of GPT-6 Astra meet no stage of the task, against 36% for Claude Opus 5.5 and up to 64% for the weaker agents.</p>
+    <figure class="fig paper">
+      <div class="fig-body" data-fig="10"><p class="fig-cap"><span class="fc-t">Failure profile of each agent, from the report.</span> Shares of each agent’s failed attempts in the Standard and Realtime settings; zero progress counts Standard failures only. Shading is within each column, and the largest share of a column is in bold.</p>
+        <div class="pimg narrow"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_agents_a.png" alt="A table of the nine agents' failed attempts: the share with zero progress, failing to make contact, a lost hold and a constraint violation" width="2008" height="1623" loading="lazy"></div></div>
+    </figure>
+    <h3 id="s2">A lost hold is its most common failure, yet per grasp it holds best.</h3>
+    <p>A lost hold appears in 17.8% of the failed attempts of Claude Fable 5.2, the highest share of all nine agents, and in 16.9% of GPT-6 Astra’s. A share of failures depends on how far an agent gets: an agent that reaches more stages that need a grasp has more chances to lose one. Per grasp stage reached, Claude Fable 5.2 loses the hold in 4.2% of cases and GPT-6 Astra in 5.4%; only Claude Fable 5.2 and Gemini 4 Argon have a lower rate than GPT-6 Astra. Claude Fable 5.2 also runs into obstructions (11.7% against 16.9%) and breaks a task’s constraints (3.6% against 6.7%) less often than GPT-6 Astra.</p>
+    <h3 id="s3">When both fail, the two get about equally far, and both get further than Claude Opus 5.5.</h3>
+    <p>Of the located Standard failures on tasks with at least two stages, 35.8% of Claude Fable 5.2’s lie at the task’s first stage, 34.2% of GPT-6 Astra’s and 45.2% of Claude Opus 5.5’s; for the other agents the share ranges from 42.3% (Gemini 4 Argon) to 69.3% (Qwen3.8 Max). On the tests with at least three stages that both failed, GPT-6 Astra met more stages than Claude Fable 5.2 on 40 of 72, or 56%, leaving out ties. Claude Fable 5.2 met more stages than Claude Opus 5.5 on 76% of 79 such tests.</p>
+    <h3 id="s4">The hard stage belongs to the test more than to the agent.</h3>
+    <p>For the three strongest agents, two failed attempts on the same Standard test share their failure stage 55% of the time on average, against 30% if failure stages were random. In each of the three tests below, one stage stopped several agents.</p>
+    <h3 id="s5">Preparing a lunch box: three agents packed most of the food and failed in three different ways.</h3>
+    <p>In this BEHAVIOR-1K task a mobile two-armed robot must put two apple halves, a sandwich and a cookie from a cutting board, and a tea bottle from the closed fridge, into a lunch box, and leave the fridge closed. Only Claude Fable 5.2 solved the Standard test (Figure 11). GPT-6 Astra, Claude Opus 5.5 and Gemini 4 Argon each packed three or four foods and then failed in three different ways: GPT-6 Astra’s robot tipped over on the way to the fridge, Claude Opus 5.5 dropped the sandwich behind the box, and Gemini 4 Argon opened a cabinet that it took for the fridge. The Privileged test turned the other way: no agent passed, GPT-6 Astra, Claude Opus 5.5 and Gemini 4 Argon met five or six of the seven stages, and Claude Fable 5.2 two.</p>
+    <figure class="fig paper">
+      <div class="fig-body" data-fig="11"><p class="fig-cap"><span class="fc-t">Preparing a lunch box (BEHAVIOR-1K, Standard), from the report.</span> The task’s stages and how many of them each agent met over the graded episode. Crosses mark the failure stages, and the check mark the attempt that passed.</p>
+        <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_agents_b.png" alt="Progress of the nine agents through the seven stages of preparing a lunch box over the episode; only Claude Fable 5.2 reaches all seven" width="3667" height="1605" loading="lazy"></div></div>
+    </figure>
+    <div class="pair">
+      <a class="case s" href="../../run/?r=behavior-preparing-lunch-box-i00-standard--z5cdebw"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/d8/behavior-preparing-lunch-box-i00-standard--z5cdebw/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/d8/behavior-preparing-lunch-box-i00-standard--z5cdebw/replay.mp4"></video>
+              <span class="case-k">All five foods, fridge closed</span><b>Claude Fable 5.2 · solved</b><span class="case-m">Standard · 462 s of the episode</span><span class="case-t">It packed the apple halves and the sandwich by 124 s and, after the cookie first fell outside the box, the cookie at 283 s. It then put in the tea bottle and closed the fridge at 462 s.</span></a>
+      <a class="case s" href="../../run/?r=behavior-preparing-lunch-box-i00-standard--o3y6cnm"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/6f/behavior-preparing-lunch-box-i00-standard--o3y6cnm/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/6f/behavior-preparing-lunch-box-i00-standard--o3y6cnm/replay.mp4"></video>
+              <span class="case-k">Fell on the way to the fridge</span><b>GPT-6 Astra · failed</b><span class="case-m">Standard · 284 s of the episode</span><span class="case-t">It put both apple halves, the cookie and the sandwich into the box by 250 s. Driving to the fridge with empty hands, the robot tipped over at 284 s, and the episode ended with the fall.</span></a>
+    </div>
+    <h3 id="s6">Catching a ball twice: all nine failed, and Claude Fable 5.2 got to the last stage.</h3>
+    <p>In this RoboDynamicExam task the robot must catch a thrown ball in a cup, pour it into a slot, catch it again after it rolls down and rebounds off a ramp, and pour it into a moving cart. In the Standard test all nine agents failed (Figure 12). Claude Fable 5.2 caught the ball, recaught it at 13.6 s and failed at the last stage, when the ball fell beside the moving cart at 18.2 s (<a href="../../run/?r=pandadyn-s01-cup-route-delivery-i00-standard--zdk97mc">run</a>). Seven of the other eight failed earlier, at the recatch; GPT-6 Astra’s cup hit the ramp (<a href="../../run/?r=pandadyn-s01-cup-route-delivery-i00-standard--ceuuwyj">run</a>). In the Privileged test, Claude Fable 5.2, GPT-6 Astra, Claude Opus 5.5 and Kimi 3.1 Pro completed all three stages, and on the running clock of the Realtime test Claude Fable 5.2 was the only agent to pass (<a href="../../run/?r=pandadyn-s01-cup-route-delivery-i00-realtime--kv5rpmo">run</a>).</p>
+    <figure class="fig paper">
+      <div class="fig-body" data-fig="12"><p class="fig-cap"><span class="fc-t">Catching a ball twice (RoboDynamicExam), from the report.</span> The stages that each agent’s attempt reached and the stage at which it failed, in the Privileged and Standard settings, and Standard replay frames at three failures.</p>
+        <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_where_b.png" alt="The three stages of catching a ball twice, which of them each agent reached in the Privileged and Standard settings, and three replay frames of failures at the recatch" width="3667" height="1079" loading="lazy"></div></div>
+    </figure>
+    <h3 id="s7">Disposing of batteries: three agents binned the first battery and tipped the robot over going for the second.</h3>
+    <p>In this BEHAVIOR-1K task a mobile two-armed robot must put three batteries into the wastebasket of a copy room, one from a cabinet there and two from a desk in an office along the corridor. Only Claude Fable 5.2 passed the Standard test: it dropped the cabinet battery in at 50 s, carried the two office batteries back, one in each hand, and dropped them in at 644 s and 662 s (<a href="../../run/?r=behavior-dispose-of-batteries-i00-standard--nkkepxm">run</a>). GPT-6 Astra, Claude Opus 5.5 and Gemini 4 Argon each binned the first battery and then tipped the robot over while going for the second (Figure 13). GPT-6 Astra’s base caught the office door jamb at 359 s; it righted the robot and picked up a second battery, and still held it when the episode ended (<a href="../../run/?r=behavior-dispose-of-batteries-i00-standard--cxmnuyx">run</a>).</p>
+    <figure class="fig paper">
+      <div class="fig-body" data-fig="13"><p class="fig-cap"><span class="fc-t">Disposing of batteries (BEHAVIOR-1K, Standard), from the report.</span> The task’s stages, where the wastebasket on the floor holds from the start, the stages of each agent, and head-camera frames as the robot tips over.</p>
+        <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_case_batteries.png" alt="The four stages of disposing of batteries, which of them each agent reached in the Standard setting, and head-camera frames of four robots tipping over" width="3667" height="1467" loading="lazy"></div></div>
+    </figure>
+    <details class="more">
+      <summary>Scope</summary>
+      <ul>
+        <li>The labels cover 855 attempts of Claude Fable 5.2. GPT-6.1 Sol in Codex wrote them and Claude Sonnet 5.5 reviewed them; the other agents’ labels come from the report. GPT-6.1 Sol is from the same family as GPT-6 Astra, which could bias the comparison between the two.</li>
+        <li>The labels come from the replay video and the logs, without the simulator state, so a wrong estimate and a wrong motion often cannot be told apart. Attempts whose progress cannot be read are left out of the statistics that need it.</li>
+        <li>Each agent made one attempt per test, so shares over a few dozen tests have wide uncertainty.</li>
+      </ul>
+    </details>
+
+    <!-- ===================================================================================== 5 -->
+    <h2 id="cases" data-short="Case studies"><span class="num">05</span>Case studies</h2>
     <p>Three tests, each with both agents’ runs side by side: two that only Claude Fable 5.2 solved, and one that only GPT-6 Astra solved.</p>
     <h3 id="c1">Catch and shoot on a running clock: both agents modeled the robot, and Claude Fable 5.2 corrected its shot from the real throws.</h3>
     <p>In Embodied Olympics - Fun, the H1-2 humanoid must catch a chest pass between its palms and shoot it through the hoop, in the Realtime Setting: six attempts, of which only the last is graded. No other agent solved this test.</p>
@@ -242,8 +318,8 @@
               <span class="case-k">Out of strokes</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · minute 29 of 60</span><span class="case-t">A greedy planner fitted straight strokes of four widths to the picture; it painted 285 of them without feedback, then photographed the sheet three times and replanned the remaining strokes from what was on the paper. With all 376 strokes used, its own estimate of the colour error was about 3.1, above the limit. The verifier measured 2.74.</span></a>
     </div>
 
-    <!-- ===================================================================================== 5 -->
-    <h2 id="scope" data-short="Scope"><span class="num">05</span>Scope</h2>
+    <!-- ===================================================================================== 6 -->
+    <h2 id="scope" data-short="Scope"><span class="num">06</span>Scope</h2>
     <p>Each agent made one attempt per test, so differences of a few tests, in a small suite or in the Realtime Setting, may come from the variation between runs. Each result belongs to a model in its harness: Claude Fable 5.2 ran in Claude Code and GPT-6 Astra in Codex, and how a harness manages the context and ends a session is part of what we measure. All results are in simulation. Models may remember solutions of the public benchmarks that some suites adapt, as the report describes.</p>
 
   </article>
