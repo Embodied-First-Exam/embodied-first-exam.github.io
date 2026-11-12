@@ -23,6 +23,8 @@ const MODE_CLS = { p: 'm-p', s: 'm-s', t: 'm-r' };
 const TOP = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];   // the three strongest
 const AG = { [TOP[0]]: '--ag-astra', [TOP[1]]: '--ag-opus', [TOP[2]]: '--ag-argon' };                       // their colours
 const agc = (r) => AG[r] || '--flash';
+const PAPER_RUNS = ['codex-gpt6_astra-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high', 'claude_code-kimi_3_1_pro-high',
+  'antigravity_cli-gemini_3_8_flash-high', 'claude_code-qwen3_8_max-high', 'dsh-deepseek_v4_1_flash-high', 'claude_code-glm_5_3_flash-high'];
 const MIN_BENCH = 5;   // a suite counts among the hardest or the easiest from this many tests in the setting
 const HARD = 0.5, EASY = 0.7;
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
@@ -33,7 +35,9 @@ const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs
 
 /** Everything the article says about results, from the site's data. A test is one task in one setting. */
 function compute(ex, tasks, b) {
-  const runs = ex.leaderboard.shared.runs;
+  // the paper's eight agents: a run added to the leaderboard later is not in the article, whose text and figures are
+  // the paper's
+  const runs = ex.leaderboard.shared.runs.filter((r) => PAPER_RUNS.includes(r));
   const run = Object.fromEntries(ex.runs.map((r) => [r.id, r]));
   const name = (id) => run[id]?.model || id;
   const short = (id) => name(id).replace(/^Claude /, '');

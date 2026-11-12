@@ -2315,7 +2315,7 @@ const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playgr
   'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
-const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5',
+const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
   glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', kimi_3_1_pro: 'Kimi 3.1 Pro', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
 // the run viewer with their rule in the setting's name, after the other runs; in no ranking (one suite, under min_suites)
@@ -2333,7 +2333,7 @@ const settingOf = (r) => {
   const model = rest.slice(0, rest.lastIndexOf('-') - (v ? v.length + 1 : 0));
   return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}${v ? ` · ${RUN_VARIANT[v]}` : ''}`;
 };
-const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5',
+const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5', 'claude-fable-5-2': 'Claude Fable 5.2',
   'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'qwen3.8-max': 'Qwen3.8 Max', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
 
 /** A setting's name from its run id alone (the summary has no rows to fall back on); the id itself if it is not one. */
