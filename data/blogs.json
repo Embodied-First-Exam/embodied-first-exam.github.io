@@ -13,5 +13,16 @@
   "featured": true,
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.mp4?v=dce17139",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.jpg?v=eb698885"
+ },
+ {
+  "slug": "fable-5-2",
+  "title": "Claude Fable 5.2",
+  "date": "2026-11-12",
+  "kind": "Analysis",
+  "summary": "Claude Fable 5.2 leads every setting of the exam. Its lead over GPT-6 Astra comes from the Standard Setting, it keeps more of its Privileged successes, and it costs about half as much per attempt; three runs side by side.",
+  "tags": [
+   "analysis",
+   "results"
+  ]
  }
 ]

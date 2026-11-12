@@ -71,10 +71,13 @@ for n, p in mods.items():
 for n in sorted(mods):
     stamp(n)
 stamps = {"exam.css": digest(A / "exam.css"), "app.js": done["app.js"], "blog.css": digest(A / "blog.css"), "blog.js": done["blog.js"]}
+# a post's own script or stylesheet (assets/blog-<post>.js, .css), linked from its page
+stamps.update({p.name: done.get(p.name) or digest(p) for p in [*A.glob("blog-*.js"), *A.glob("blog-*.css")]})
 changed = 0
 for page in sorted([*ROOT.glob("**/index.html"), ROOT / "404.html"]):
     text = page.read_text(encoding="utf-8")
-    new = re.sub(r'(assets/(exam\.css|app\.js|blog\.css|blog\.js))(\?v=[0-9a-f]+)?"', lambda m: f'{m.group(1)}?v={stamps[m.group(2)]}"', text)
+    new = re.sub(r'(assets/(exam\.css|app\.js|blog\.css|blog\.js|blog-[\w-]+\.(?:js|css)))(\?v=[0-9a-f]+)?"',
+                 lambda m: f'{m.group(1)}?v={stamps[m.group(2)]}"' if m.group(2) in stamps else m.group(0), text)
     if new != text:
         page.write_text(new, encoding="utf-8")
         changed += 1
