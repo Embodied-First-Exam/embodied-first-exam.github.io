@@ -14,7 +14,7 @@ public HF dataset [MLL-Lab/embodied-exam-data](https://huggingface.co/datasets/M
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
 assets/exam.css, assets/app.js                                        the look and the drawing of every page
 data/exam.json, data/tasks.json                                       suites, results, the label map; every question
-scripts/                                                              export.py, media.py, upload_media.py, stamp.py, check.py
+scripts/                                                              export.py, media.py, upload_media.py, stamp.py, check.py, intro_video/
 CNAME                                                                 the custom domain, www.embodied-first-exam.ai
 ```
 
@@ -31,6 +31,14 @@ git push                   # GitHub Pages publishes main within a minute or two
 
 `make check` also fails if any page or data file points at the internals of other sites (run logs, review pages,
 private repositories): this site links only to its own pages and to public upstream projects.
+
+## Intro video
+
+The intro video (`site/blog/efe-intro.mp4` on HF, on the home page, the report and its card in `data/blogs.json`) has
+no editable source project; its leaderboard slide (13.6–16.1 s) is re-rendered from HTML and spliced into the mp4.
+To update its numbers, edit `ROWS` in `scripts/intro_video/lb9.py` (the leaderboard's Standard view) and run
+`sh scripts/intro_video/run.sh <workdir>`: only the slide's group of pictures is re-encoded, and the script checks that
+every other frame and the audio are bit-identical. Upload the result and set its `?v=` on those three pages.
 
 ## Task Atlas data
 
