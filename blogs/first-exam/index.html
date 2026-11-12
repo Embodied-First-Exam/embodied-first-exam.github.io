@@ -190,8 +190,8 @@
       <p class="finding-sum">This is usually the first stage of the task, and it also tends to be the same in the Privileged and Standard settings. Stages that change a material or move the robot’s body have the highest failure rates.</p>
       <div class="finding-body" id="f2-body">
         <ul class="claims">
-            <li>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt of the eight agents on 427 core tasks, a separate coding agent labels the stage at which it went wrong.</li>
-            <li>For the three strongest agents, two failed attempts on the same test share their failure stage 56% of the time on average, against 31% if failure stages were random. The most common failure stage of a test is usually the first stage of its task.</li>
+            <li>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt of the eight agents other than Claude Fable 5.2 on 427 core tasks, a separate coding agent labels the stage at which it went wrong.</li>
+            <li>For the three strongest of these labeled agents, GPT-6 Astra, Claude Opus 5.5 and Gemini 4 Argon, two failed attempts on the same test share their failure stage 56% of the time on average, against 31% if failure stages were random. The most common failure stage of a test is usually the first stage of its task.</li>
             <li>Leaving out tasks where it is the first stage in both settings, the most common failure stage is the same in the Privileged and the Standard Setting for more than half of the tasks, against 9% by chance.</li>
             <li>Once reached, material stages such as wiping and body stages such as walking fail most often. Each category occurs mostly in particular suites and with particular robots, so these rates do not show that the category itself causes the failures.</li>
         </ul>
@@ -220,10 +220,10 @@
 
     <div class="finding">
       <h3 id="f3" data-short="Differences between agents"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>Weaker agents fail earlier, and the three strongest solve partly different tests.</button></h3>
-      <p class="finding-sum">The five weaker agents are much more likely to fail before making the required contact. In the Standard Setting, GPT-6 Astra and Claude Opus 5.5 solve dozens of tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.5 percentage points.</p>
+      <p class="finding-sum">Among the labeled agents, the five weaker ones are much more likely to fail before making the required contact. In the Standard Setting, GPT-6 Astra and Claude Opus 5.5 solve dozens of tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.5 percentage points.</p>
       <div class="finding-body" id="f3-body">
         <ul class="claims">
-            <li>Counted per contact stage that they reach, the five weaker agents fail without making the required contact much more often than the three strongest. The weaker agents also add few tests: of the Standard tests that any of them solves, the three strongest agents solve <span data-s="weak_fill"></span>.</li>
+            <li>Counted per contact stage that they reach, the five weaker labeled agents fail without making the required contact much more often than GPT-6 Astra, Claude Opus 5.5 and Gemini 4 Argon. The six agents outside the three strongest also add few tests: of the Standard tests that any of them solves, the three strongest agents solve <span data-s="weak_fill"></span>.</li>
             <li>In the Privileged Setting, Claude Fable 5.2 solves <span data-s="rival_p"></span> of the tests that GPT-6 Astra or Claude Opus 5.5 solves. In the Standard Setting, those two solve <span data-s="rival_s_extra"></span> tests that it fails, and together the three solve <span data-s="u_s_any"></span> of the Standard tests (Figure 9).</li>
             <li>The harness changes the result too. Run in Claude Code instead of its own Codex, GPT-6 Astra solves 7.5 percentage points fewer Standard tests, the largest change among the harnesses we compared.</li>
         </ul>
