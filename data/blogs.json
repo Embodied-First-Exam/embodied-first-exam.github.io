@@ -23,6 +23,8 @@
   "tags": [
    "analysis",
    "results"
-  ]
+  ],
+  "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/replay.mp4",
+  "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/poster.jpg"
  }
 ]

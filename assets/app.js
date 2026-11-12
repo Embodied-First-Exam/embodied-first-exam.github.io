@@ -2021,7 +2021,8 @@ function budgets(el, tasks) {
   el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in Embodied Olympics - Fun and RoboEngineer offer one for training a policy.`;
 }
 
-/** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags});
+/** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags,
+ *  optional badge, featured, video, poster, read}); a post with a video or poster gets the full-width two-column card;
  *  each lives at blogs/<slug>/. */
 async function blogPage() {
   const el = $('#posts');
@@ -2029,10 +2030,11 @@ async function blogPage() {
   let posts = [];
   try { posts = await getJSON('data/blogs.json'); } catch (e) { /* none yet */ }
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card${p.featured ? ' featured' : ''}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}">
+  el.innerHTML = posts.length ? posts.map((p) => `<a class="post-card${p.featured ? ' featured' : ''}${p.video || p.poster ? ' wide' : ''}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}">
       <span class="pc-text">${p.badge ? `<span class="release-badge"><i aria-hidden="true">✦</i>${esc(p.badge)}</span>` : ''}<span class="pc-date">${esc([p.kind, p.date].filter(Boolean).join(' · '))}</span><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
-      ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}${p.featured ? '<span class="pc-read">Read the report →</span>' : ''}</span>
-      ${p.featured && p.video ? `<span class="pc-media"><video src="${esc(p.video)}"${p.poster ? ` poster="${esc(p.poster)}"` : ''} autoplay muted loop playsinline preload="metadata"></video></span>` : ''}</a>`).join('')
+      ${(p.tags || []).length ? `<span class="pc-tags">${p.tags.map((t) => `<i>${esc(t)}</i>`).join('')}</span>` : ''}<span class="pc-read">${esc(p.read || (p.featured ? 'Read the report' : 'Read the post'))} →</span></span>
+      ${p.video ? `<span class="pc-media"><video src="${esc(p.video)}"${p.poster ? ` poster="${esc(p.poster)}"` : ''} autoplay muted loop playsinline preload="metadata"></video></span>`
+        : p.poster ? `<span class="pc-media"><img src="${esc(p.poster)}" alt="" loading="lazy"></span>` : ''}</a>`).join('')
     : '<div class="empty-state">The first posts are on their way.</div>';
 }
 
