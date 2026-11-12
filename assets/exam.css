@@ -1798,6 +1798,14 @@ html { overflow-x: clip; }
 .lu-total .lu-cell b { font-weight: 750; }
 .code-mark.lu-sum { font-size: 12px; }
 #lb-luna-note { max-width: 820px; line-height: 1.5; }
+/* a suite with no core test: every run's results on its tests, listed, not ranked (owner, 2026-11-12); the look of the
+   GPT-6 Luna results block */
+.sr-note { max-width: 820px; margin: 0 0 16px; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); }
+.sr-listed .sx-grid { --c: color-mix(in srgb, var(--ink) 52%, var(--surface)); grid-template-columns: minmax(210px, 260px) repeat(var(--n), minmax(84px, 1fr)); min-width: calc(230px + var(--n) * 92px); }
+.sr-listed .sx-head .sx-col { display: flex; flex-direction: column; justify-content: flex-end; }
+.sr-listed .sx-row .sd-name { height: 58px; }
+.sr-listed .sx-cell { height: 58px; }
+.sr-listed a.sd-name:hover { color: var(--ink); }
 /* at phone width the suite names stay in view while the numbers scroll under them */
 @media (max-width: 640px) {
   #lb-luna .sx-grid { grid-template-columns: 132px repeat(var(--n), minmax(78px, 1fr)); min-width: calc(132px + var(--n) * 86px); gap: 6px; }

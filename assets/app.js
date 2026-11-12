@@ -66,7 +66,8 @@ const pctText = (s, n) => (n ? `${Math.round((100 * s) / n)}%` : '–');
 let examData, taskData;
 const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
 // runs listed but not ranked (exam.json unranked_runs; GPT-6 Luna, owners, 2026-10-19): their per-task results are in
-// tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them
+// tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them, and
+// only the Results list of a suite with no core test (suiteListed, owner 2026-11-12) lists them with the other runs
 const UNRANKED_RUNS = new Set(['codex-gpt6_luna-xhigh']);
 const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
@@ -2111,6 +2112,48 @@ async function suitesPage(ex) {
   suitesGrid($('#suites'), ex, state);
 }
 
+/** A suite with no core test (owner, 2026-11-12): no ranking reads it, so its Results list every run that has results on
+ *  its tests, GPT-6 Luna included: per run the share of tests solved over the modes pooled, per mode, and the share of
+ *  tasks solved in at least one mode, each over the tests (tasks) the run has a valid result for. The runs sat different
+ *  tests, so the rows are listed (most tests first), not ranked. False when no run has a result here. */
+function suiteListed(el, ex, tasks) {
+  const all = [...ex.runs, ...(ex.unranked_runs || [])].filter((r) => !HIDDEN_RUNS.has(r.id));
+  const modes = ['standard', 'realtime', 'privileged'].filter((m) => tasks.some((t) => (t.modes || []).includes(m)));
+  const tests = tasks.reduce((n, t) => n + (t.modes?.length || 0), 0);
+  const rows = all.map((r) => {
+    const o = { r, all: [0, 0], task: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0] };
+    for (const t of tasks) {
+      const res = t.results?.[r.id];
+      if (!res) continue;
+      let graded = false, solved = false;
+      for (const m of t.modes || []) {
+        const k = MODE_KEY[m], st = scored(res[k]);
+        if (st !== 'S' && st !== 'F') continue;
+        graded = true; solved ||= st === 'S';
+        for (const v of [o[k], o.all]) { v[0] += st === 'S'; v[1] += 1; }
+      }
+      if (graded) { o.task[0] += solved; o.task[1] += 1; }
+    }
+    return o;
+  }).filter((o) => o.all[1]).sort((a, b) => b.all[1] - a.all[1] || a.r.model.localeCompare(b.r.model));
+  if (!rows.length) return false;
+  const cols = [{ id: 'all', label: 'All modes', sub: 'tests solved' },
+    ...modes.map((m) => ({ id: MODE_KEY[m], label: { standard: 'Standard', realtime: 'Realtime', privileged: 'Privileged' }[m], sub: 'tests solved' })),
+    { id: 'task', label: 'Any mode', sub: 'tasks solved' }];
+  const cell = (o, c) => {
+    const v = o[c.id];
+    if (!v[1]) return `<span class="sx-cell na" title="${esc(o.r.model)}: no result in this mode">–</span>`;
+    const q = pctOf(v);
+    return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${o.r.model}: ${int(v[0])} of the ${int(v[1])} ${c.id === 'task' ? 'tasks' : 'tests'} it has a result for solved`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
+  };
+  const head = `<div class="sx-row sx-head"><span></span>${cols.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}</div>`;
+  const row = (o) => `<div class="sx-row"><a class="sd-name" href="${exam('run/')}?suite=${encodeURIComponent(tasks[0].suite)}&setting=${encodeURIComponent(o.r.id)}" title="Watch these runs">${makerMark(o.r.model)}<span>${esc(o.r.model)}<small class="sd-n">${esc([o.r.harness, o.r.effort].filter(Boolean).join(' · '))}</small><small class="sd-n">${int(o.all[1])} of ${int(tests)} tests</small></span></a>
+      ${cols.map((c) => cell(o, c)).join('')}</div>`;
+  el.innerHTML = `<p class="sr-note">This suite has no core test, so it counts in no ranking. Every run with results on its tests is listed here, not ranked: each count is over the tests the run has a valid result for, and the runs sat different tests, so the rows are not comparable. A run’s name opens its runs step by step.</p>
+    <div class="sdots sr-listed"><div class="sd-scroll"><div class="sx-grid" style="--n:${cols.length}">${head}${rows.map(row).join('')}</div></div></div>`;
+  return true;
+}
+
 /** A suite's results, as on the leaderboard (owners, 2026-10-19): the ranked agents, one setting at a time behind a
  *  switch (the settings this suite has core tests in, standard first), each on all the suite's core tests of the setting, a
  *  test without a result counted as failed. */
@@ -2119,6 +2162,7 @@ function suiteResults(el, ex, tasks) {
   const runs = runMap(ex);
   const group = (ex.leaderboard?.shared?.runs || []).map((id) => runs[id] || { id, model: id });
   const sets = LB_SETTINGS.map((set) => ({ set, g: scoreGroup(group, tasks, set) })).filter((x) => x.g.tests);
+  if (!sets.length && suiteListed(el, ex, tasks)) return;
   if (!group.length || !sets.length) { el.innerHTML = `<div class="empty-state">${sets.length ? 'No ranked agent yet.' : 'No core test in this suite.'}</div>`; return; }
   el.innerHTML = `<div class="lbh-top"><div class="seg lb-set"></div></div><div class="lbh-chart"><div class="lbh-ax"></div><div class="lbh-rows"></div></div>`;
   const draw = (id) => {
