@@ -74,11 +74,11 @@
     "look_med": 6,
     "tok_out_med": 52542.0,
     "n_cost": 390,
-    "usd_mean": 22.58,
-    "usd_med": 20.08,
-    "usd_total": 8806.5,
-    "usd_med_ok": 15.48,
-    "usd_med_fail": 30.28
+    "usd_mean": 22.92,
+    "usd_med": 20.21,
+    "usd_total": 8940.3,
+    "usd_med_ok": 15.94,
+    "usd_med_fail": 30.71
    },
    "s": {
     "n": 456,
@@ -93,11 +93,11 @@
     "look_med": 35.5,
     "tok_out_med": 55463.0,
     "n_cost": 456,
-    "usd_mean": 26.95,
-    "usd_med": 17.79,
-    "usd_total": 12289.8,
-    "usd_med_ok": 8.46,
-    "usd_med_fail": 25.59
+    "usd_mean": 27.12,
+    "usd_med": 17.87,
+    "usd_total": 12364.6,
+    "usd_med_ok": 9.01,
+    "usd_med_fail": 25.9
    },
    "t": {
     "n": 54,
@@ -112,9 +112,9 @@
     "look_med": 7.0,
     "tok_out_med": 44996.5,
     "n_cost": 54,
-    "usd_mean": 15.44,
+    "usd_mean": 15.55,
     "usd_med": 9.29,
-    "usd_total": 833.7,
+    "usd_total": 839.7,
     "usd_med_ok": 8.39,
     "usd_med_fail": 11.63
    }
@@ -133,11 +133,11 @@
     "look_med": 3.0,
     "tok_out_med": 61824,
     "n_cost": 391,
-    "usd_mean": 4.76,
-    "usd_med": 3.06,
-    "usd_total": 1862.6,
-    "usd_med_ok": 2.75,
-    "usd_med_fail": 3.39
+    "usd_mean": 4.79,
+    "usd_med": 3.17,
+    "usd_total": 1874.1,
+    "usd_med_ok": 2.84,
+    "usd_med_fail": 3.47
    },
    "s": {
     "n": 456,
@@ -152,11 +152,11 @@
     "look_med": 22.0,
     "tok_out_med": 82563.5,
     "n_cost": 456,
-    "usd_mean": 6.43,
+    "usd_mean": 6.45,
     "usd_med": 4.18,
-    "usd_total": 2932.8,
+    "usd_total": 2941.5,
     "usd_med_ok": 2.97,
-    "usd_med_fail": 4.62
+    "usd_med_fail": 4.66
    },
    "t": {
     "n": 54,
@@ -173,7 +173,7 @@
     "n_cost": 54,
     "usd_mean": 4.13,
     "usd_med": 3.47,
-    "usd_total": 223.1,
+    "usd_total": 223.2,
     "usd_med_ok": 2.76,
     "usd_med_fail": 3.54
    }
