@@ -140,7 +140,8 @@ function compute(ex, tasks, bf) {
   }
   const usedPct = (r) => (b(r, 's', 'used_med_fail') != null ? `${Math.round(b(r, 's', 'used_med_fail'))}%` : null);
   Object.assign(S, { used_f_s: usedPct(F), used_a_s: usedPct(A), used_o_s: usedPct(O),
-    left10_f_s: b(F, 's', 'n_fail_used') ? fr(b(F, 's', 'left10_fail'), b(F, 's', 'n_fail_used')) : null });
+    left10_f_s: b(F, 's', 'n_fail_used') ? fr(b(F, 's', 'left10_fail'), b(F, 's', 'n_fail_used')) : null,
+    left10_a_s: b(A, 's', 'n_fail_used') ? fr(b(A, 's', 'left10_fail'), b(A, 's', 'n_fail_used')) : null });
   return { S, M, board, order, h2h, paired, suites, benchName, name, short, solved, b, perSolve, miss, others };
 }
 
@@ -207,7 +208,7 @@ function figPaired(el, R) {
     [r.n - r.a - r.c + r.both, 'In neither', 'var(--wf-none)', true]];
   const keys = [['Solved in both', 'var(--top)'], ['Only in Privileged', 'var(--priv)'], ['Only in Standard', 'var(--std)'], ['In neither', 'var(--wf-none)']];
   const f = R.paired[0];
-  el.innerHTML = head(`${R.name(F)} still solves ${pct(f.both, f.a)}% of the tasks it solves with privileged access when it has only the robot’s sensors and no resets, against ${pct(R.paired[1].both, R.paired[1].a)}% for ${R.name(A)}.`,
+  el.innerHTML = head(`${R.name(F)} still solves ${pct(f.both, f.a)}% of the tasks it solves with privileged access when it has only the robot’s sensors, against ${pct(R.paired[1].both, R.paired[1].a)}% for ${R.name(A)}.`,
     'The same task in two settings: each agent’s outcome on the core tasks that have both a Privileged and a Standard test',
     `each row is one agent on the ${int(f.n)} core tasks with both tests; each segment is the share of tasks with that pair of outcomes.`)
     + `<div class="legend">${keys.map(([l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
@@ -286,7 +287,7 @@ function figEffort(el, R) {
     'each bar is one agent in one setting, over its counted attempts on the core tests; cost is the list price of the tokens the attempt used.')
     + `<div class="legend">${AG.map((r) => `<span>${sw(col(r))}${esc(R.name(r))}</span>`).join('')}</div>`
     + `<div class="efs">${metric.map(small).join('')}</div>`
-    + `<p class="fig-note">Prices are the providers’ list prices of November 2026, as in the report, not what the runs were billed. A step is one turn of the agent with its tool calls. The time limit is the test’s own; an attempt that ends before it was ended by the agent or by an error.</p>`
+    + `<p class="fig-note">Prices are the providers’ list prices of November 2026, as in the report. A step is one turn of the agent with its tool calls. The time limit is the test’s own.</p>`
     + numbers(['Agent', 'Setting', 'Tests', 'Mean cost', 'Cost per solved test', 'Median cost, solved', 'Median cost, failed', 'Median minutes', 'Median minutes, solved', 'Median minutes, failed', 'Median steps', 'Ended by the time limit'],
       AG.flatMap((r) => ['s', 'p', 't'].map((m) => [esc(R.name(r)), MODE_LABEL[m], int(R.M[m].length), usdC(R.b(r, m, 'usd_mean')), usdC(R.perSolve(r, m)), usdC(R.b(r, m, 'usd_med_ok')), usdC(R.b(r, m, 'usd_med_fail')),
         num0(R.b(r, m, 'wall_med')), num0(R.b(r, m, 'wall_med_ok')), num0(R.b(r, m, 'wall_med_fail')), num0(R.b(r, m, 'steps_med')), `${int(R.b(r, m, 'timeout'))}`])));
