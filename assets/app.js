@@ -2018,7 +2018,7 @@ function budgets(el, tasks) {
   const mins = (tasks || []).map((t) => t.budget_min).filter(Boolean);
   const h = (m) => (m % 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? 's' : ''}`);
   const lo = mins.length ? Math.min(...mins) : 30, hi = mins.length ? Math.max(...mins) : 240;
-  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 6 to 40 GB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in Embodied Olympics - Fun and RoboEngineer offer one for training a policy.`;
+  el.innerHTML = `<b>Budgets.</b> Every attempt gets real time and real compute, as an engineer would: from ${h(lo)} to ${h(hi)} of agent time per task, depending on the suite, and a container with 2 to 16 CPU cores and 4 to 39 GiB of memory. Suites built on GPU simulation backends (Isaac Sim, OmniGibson, SAPIEN) give the agent a GPU, and some tasks in Embodied Olympics - Fun and RoboEngineer offer one for training a policy.`;
 }
 
 /** The blog: the report and short analyses, newest first, from data/blogs.json ({slug, title, date, kind, summary, tags,
