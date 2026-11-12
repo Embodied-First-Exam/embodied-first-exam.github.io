@@ -2074,27 +2074,6 @@ async function leaderboardPage(ex) {
   // GPT-6 Luna's results, listed (not ranked): a section of its own, the same in every view (owner, 2026-10-27)
   lbLuna($('#lb-luna'), ex, tasks);
   lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
-  lbHarness($('#lb-harness-cmp'), ex);
-}
-
-/** The same model in other harnesses (owner, 2026-11-07): the generator's leaderboard.harness, one block per model, its
- *  default harness (the board's run) first. Standard and realtime over all the setting's core tests, as the board counts
- *  them, then the two harnesses on
- *  the standard tests both have a result for. These runs are in no ranking. */
-function lbHarness(el, ex) {
-  const h = ex.leaderboard?.harness;
-  if (!el) return;
-  if (!h?.models?.length) { el.closest('section')?.remove(); return; }
-  const n = $('#lb-harness-note');
-  if (n) n.textContent = h.note || '';
-  const val = (v, l) => {
-    if (!v?.[1]) return `<span class="hx-v na" data-l="${l}">–</span>`;
-    return `<span class="hx-v" data-l="${l}"><b>${Math.round(pctOf(v))}<small>%</small></b><em>${int(v[0])}/${int(v[1])}</em></span>`;
-  };
-  const same = (r) => (r.same ? `<span class="hx-v" data-l="Same tests"><b>${int(r.same[0])}</b><em>vs ${int(r.same[1])} in the default harness, on ${int(r.same[2])} tests</em></span>` : '<span class="hx-v na" data-l="Same tests">–</span>');
-  const head = `<div class="hx-row hx-head"><span>Harness</span><span>Standard · ${int(h.tests?.standard)} tests</span><span>Same tests · standard</span><span>Realtime · ${int(h.tests?.realtime)} tests</span></div>`;
-  el.innerHTML = h.models.map((m) => `<div class="hx-model">${makerMark(m.model)}<b>${esc(m.model)}</b></div>${head}${m.rows.map((r) => `<div class="hx-row${r.default ? ' hx-def' : ''}">
-      <span class="hx-h">${esc(r.harness)}${r.default ? ' <small>default, ranked</small>' : ' <small>not ranked</small>'}</span>${val(r.standard, 'Standard')}${same(r)}${val(r.realtime, 'Realtime')}</div>`).join('')}`).join('');
 }
 
 async function suitesPage(ex) {
