@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Embodied First Exam · Blogs</title>
-<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how eight agents do on it, and where they fail.">
+<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how nine agents do on it, and where they fail.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../assets/exam.css?v=a11fcf6b">
-<link rel="stylesheet" href="../../assets/blog.css?v=b3929030">
+<link rel="stylesheet" href="../../assets/exam.css?v=fd685810">
+<link rel="stylesheet" href="../../assets/blog.css?v=bff482e0">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=1ef24946"></script>
-<script type="module" src="../../assets/blog.js?v=ee5feef3"></script>
+<script type="module" src="../../assets/app.js?v=2c6eb855"></script>
+<script type="module" src="../../assets/blog.js?v=599cfb60"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -127,12 +127,12 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p>We evaluate <span data-s="n_runs_lc"></span> coding agents on the core set. An agent is a model in a harness at high reasoning effort, and the harness is part of what we measure: GPT-6 Astra in Codex, Claude Opus 5.5 in Claude Code, Gemini 4 Argon in Antigravity CLI, Kimi 3.1 Pro and Qwen3.8 Max in Claude Code, and three Flash-class models, Gemini 3.8 Flash in Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek Harness. Each agent makes one attempt per test under the same limits, and a test is solved when the verifier passes it. We report each setting on its own, Standard first, as on the leaderboard.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> coding agents on the core set. An agent is a model in a harness at high reasoning effort, and the harness is part of what we measure: Claude Fable 5.2 and Claude Opus 5.5 in Claude Code, GPT-6 Astra in Codex, Gemini 4 Argon in Antigravity CLI, Kimi 3.1 Pro and Qwen3.8 Max in Claude Code, and three Flash-class models, Gemini 3.8 Flash in Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek Harness. Each agent makes one attempt per test under the same limits, and a test is solved when the verifier passes it. We report each setting on its own, Standard first, as on the leaderboard.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
       <figcaption class="fig-ext"><span data-s="s_gap"></span> The Realtime Setting is harder still: on the <span data-s="st_n"></span> tasks with both tests, <span data-s="none_t_pair"></span> of the Realtime tests remain unsolved by any agent, against <span data-s="none_s_pair"></span> of the Standard tests.</figcaption>
     </figure>
-    <p>Together, the three strongest agents solve <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in most suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the three, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
+    <p>Together, the three strongest agents solve <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in <span data-s="hard_s_frac"></span> suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the three, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
     <figure class="fig">
       <div class="fig-body" id="fig-hard" data-fig="7"></div>
     </figure>
@@ -144,10 +144,10 @@
 
     <div class="finding">
       <h3 id="f1" data-short="Privileged versus Standard"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f1-body"><span class="fn">Finding 1</span>Resets close more of the gap to the Privileged Setting than the exact state does.</button></h3>
-      <p class="finding-sum">GPT-6 Astra solves <span data-s="ps_astra_p"></span> of the Privileged tests but only <span data-s="ps_astra_s"></span> of the Standard tests of the same <span data-s="ps_n"></span> tasks. Resets help it more than the exact object state does, and stages that need precision become much harder in the Standard Setting.</p>
+      <p class="finding-sum">The strongest agent, Claude Fable 5.2, solves <span data-s="ps_lead_p"></span> of the Privileged tests but only <span data-s="ps_lead_s"></span> of the Standard tests of the same <span data-s="ps_n"></span> tasks. In controlled runs with GPT-6 Astra, resets help more than the exact object state does. Stages that need precision become much harder in the Standard Setting.</p>
       <div class="finding-body" id="f1-body">
         <ul class="claims">
-            <li>Every agent loses most of its Privileged successes in the Standard Setting (Figure 8). GPT-6 Astra fails <span data-s="ps_astra_lost"></span> of the <span data-s="ps_astra_a"></span> tasks it solves in the Privileged Setting, and its success rate drops in <span data-s="gap_bench"></span> suites with at least five tests in both settings.</li>
+            <li>Every agent loses many of its Privileged successes in the Standard Setting (Figure 8). Even Claude Fable 5.2 fails <span data-s="ps_lead_lost"></span> of the <span data-s="ps_lead_a"></span> tasks it solves in the Privileged Setting, and its success rate drops in <span data-s="gap_bench"></span> suites with at least five tests in both settings.</li>
             <li>In controlled runs, we add the exact state of every object, unlimited resets with saved states, or both to GPT-6 Astra’s Standard interface. In these runs, resets raise its success rate from 28% to 53%, more than the state does, and with both it closes most of the gap to the Privileged Setting.</li>
             <li>Stages that need precision, such as a tight fit, a target pose or contact with a moving object, fail far more often in the Standard Setting than coarse stages do. At these stages resets help GPT-6 Astra, but the exact state alone does not.</li>
         </ul>
@@ -208,7 +208,7 @@
             <a class="case s" href="../../run/?r=humanoidbench-manip-door-i00-standard--cfxzsqf"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/humanoidbench-manip-door-i00-standard--cfxzsqf/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/humanoidbench-manip-door-i00-standard--cfxzsqf/video.mp4"></video>
               <span class="case-k">HumanoidBench: balance and contact</span><b>HumanoidBench · Open a door</b><span class="case-m">Claude Opus 5.5 · Standard · failed</span><span class="case-t">It kept the humanoid standing with ankle feedback and located the handle with stereo cameras. Over more than ten approaches (pressing, hooking, pushing up, both hands) it hooked the handle and pulled back up to 26 cm, but the door never opened; it used 45 resets in 27 minutes.</span></a>
             <a class="case p" href="../../run/?r=roboarc-ikea-stegesund-i00-privileged--ywisczk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/roboarc-ikea-stegesund-i00-privileged--ywisczk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/roboarc-ikea-stegesund-i00-privileged--ywisczk/video.mp4"></video>
-              <span class="case-k">IKEA assembly: one bolt, 40 minutes</span><b>RoboARC · IKEA Stegesund</b><span class="case-m">GPT-6 Astra · Privileged · failed</span><span class="case-t">With the full state, it pressed the halves together, slid in the shelf and drove the first bolt. But its hex key turned only 120° per insertion, so one bolt took 40 minutes, and at the three-hour limit the second bolt was still 3.7 mm short. None of the three strongest agents solved this task.</span></a>
+              <span class="case-k">IKEA assembly: one bolt, 40 minutes</span><b>RoboARC · IKEA Stegesund</b><span class="case-m">GPT-6 Astra · Privileged · failed</span><span class="case-t">With the full state, it pressed the halves together, slid in the shelf and drove the first bolt. But its hex key turned only 120° per insertion, so one bolt took 40 minutes, and at the three-hour limit the second bolt was still 3.7 mm short.</span></a>
           </div>
           <h4>Scope</h4>
           <ul>
@@ -220,11 +220,11 @@
 
     <div class="finding">
       <h3 id="f3" data-short="Differences between agents"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>Weaker agents fail earlier, and the three strongest solve partly different tests.</button></h3>
-      <p class="finding-sum">The five weaker agents are much more likely to fail before making the required contact. In the Standard Setting, Claude Opus 5.5 and Gemini 4 Argon solve dozens of tests that GPT-6 Astra fails, and switching harnesses can change a model’s success rate by up to 12 percentage points.</p>
+      <p class="finding-sum">The five weaker agents are much more likely to fail before making the required contact. In the Standard Setting, GPT-6 Astra and Claude Opus 5.5 solve dozens of tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 12 percentage points.</p>
       <div class="finding-body" id="f3-body">
         <ul class="claims">
-            <li>Counted per contact stage that they reach, the five weaker agents fail without making the required contact much more often than the three strongest. They also add few tests: of the Standard tests that any of them solves, the three strongest agents solve <span data-s="weak_fill"></span>.</li>
-            <li>In the Privileged Setting, GPT-6 Astra solves <span data-s="rival_p"></span> of the tests that Claude Opus 5.5 or Gemini 4 Argon solves. In the Standard Setting, those two solve <span data-s="rival_s_extra"></span> tests that it fails, and together the three solve <span data-s="u_s_any"></span> of the Standard tests (Figure 9).</li>
+            <li>Counted per contact stage that they reach, the five weaker agents fail without making the required contact much more often than the three strongest. The weaker agents also add few tests: of the Standard tests that any of them solves, the three strongest agents solve <span data-s="weak_fill"></span>.</li>
+            <li>In the Privileged Setting, Claude Fable 5.2 solves <span data-s="rival_p"></span> of the tests that GPT-6 Astra or Claude Opus 5.5 solves. In the Standard Setting, those two solve <span data-s="rival_s_extra"></span> tests that it fails, and together the three solve <span data-s="u_s_any"></span> of the Standard tests (Figure 9).</li>
             <li>The harness changes the result too. Run in Claude Code instead of its own Codex, GPT-6 Astra solves 12 percentage points fewer Standard tests, the largest change among the harnesses we compared.</li>
         </ul>
         <figure class="fig">
@@ -232,7 +232,7 @@
         </figure>
           <div class="cases rep">
             <a class="case s" href="../../run/?r=maniguard-jar-transport-i25-standard--kz3tvs9"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9c/maniguard-jar-transport-i25-standard--kz3tvs9/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9c/maniguard-jar-transport-i25-standard--kz3tvs9/replay.mp4"></video>
-              <span class="case-k">Only Claude Opus 5.5</span><b>ManiGuard · Glass jar</b><span class="case-m">Claude Opus 5.5 · Standard · solved · 2× speed</span><span class="case-t">It estimated the shape of the jar’s square body and the position of the lid’s hinge from the depth point cloud, slid its closed fingers under the lid and swung the lid shut about the hinge. It then gripped one edge of the jar, lifted it 1 cm as a test and carried it to the goal without breaking a rule. GPT-6 Astra knocked the jar over while pushing the lid.</span></a>
+              <span class="case-k">Claude Opus 5.5, not GPT-6 Astra</span><b>ManiGuard · Glass jar</b><span class="case-m">Claude Opus 5.5 · Standard · solved · 2× speed</span><span class="case-t">It estimated the shape of the jar’s square body and the position of the lid’s hinge from the depth point cloud, slid its closed fingers under the lid and swung the lid shut about the hinge. It then gripped one edge of the jar, lifted it 1 cm as a test and carried it to the goal without breaking a rule. GPT-6 Astra knocked the jar over while pushing the lid.</span></a>
           </div>
         <details class="more">
           <summary>More cases and scope</summary>
@@ -240,7 +240,7 @@
             <a class="case p" href="../../run/?r=robopaint-acrylic-vision-i00-privileged--tvzr6sk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/robopaint-acrylic-vision-i00-privileged--tvzr6sk/video.mp4"></video>
               <span class="case-k">Only GPT-6 Astra</span><b>RoboPaint · Acrylic copy</b><span class="case-m">GPT-6 Astra · Privileged · solved</span><span class="case-t">After it fitted 380 strokes, its color error plateaued at 2.1–2.8. It switched to optimizing each stroke against the brush’s actual footprint and, after about six full runs, reached 1.98, just under the passing threshold, in 47 minutes.</span></a>
             <a class="case s" href="../../run/?r=robolab-utensils-in-mug-i00-standard--6tth8tk"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/3b/robolab-utensils-in-mug-i00-standard--6tth8tk/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/3b/robolab-utensils-in-mug-i00-standard--6tth8tk/replay.mp4"></video>
-              <span class="case-k">Only Gemini 4 Argon</span><b>RoboLab · Utensils in a mug</b><span class="case-m">Gemini 4 Argon · Standard · solved</span><span class="case-t">It located the spoon, fork and mug with three depth cameras, planned waypoints with inverse kinematics and sent them as six segments, succeeding on the first try. In Claude Opus 5.5’s run, the fork slipped.</span></a>
+              <span class="case-k">Gemini 4 Argon, not Claude Opus 5.5</span><b>RoboLab · Utensils in a mug</b><span class="case-m">Gemini 4 Argon · Standard · solved</span><span class="case-t">It located the spoon, fork and mug with three depth cameras, planned waypoints with inverse kinematics and sent them as six segments, succeeding on the first try. In Claude Opus 5.5’s run, the fork slipped.</span></a>
             <a class="case s" href="../../run/?r=dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/video.mp4"></video>
               <span class="case-k">None of the three</span><b>DexToolBench · Red brush, sweep right</b><span class="case-m">Claude Opus 5.5 · Standard · failed</span><span class="case-t">It pushed the brush until it stuck out over the table edge, grasped it and reached goals 0 to 4. The next goal needed a 90° turn about the brush’s long axis, which its palm-down grasp could not make. It stalled at goal 5 of 38, and the brush flew out of the hand as the arm changed configuration.</span></a>
           </div>

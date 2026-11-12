@@ -9,7 +9,7 @@
   --f-likely: #1f7a48; --f-possible: #7fca9c; --f-unlikely: #d5dbe2;
   --top: #0f141a; --flash: #9aa3ad;
   /* the three strongest agents (validated as a categorical set, apart from the settings' colours); none = an empty cell */
-  --ag-astra: #3a5fc8; --ag-opus: #b83f8c; --ag-argon: #4f8a2a; --wf-none: #dfe5ec;
+  --ag-fable: #7d1d3f; --ag-astra: #3a5fc8; --ag-opus: #b83f8c; --wf-none: #dfe5ec;
   /* Finding 6: the three kinds of program in one blue ramp, the other approaches apart */
   --w-open: #9cc0ea; --w-closed: #3f7fc8; --w-search: #1d4378; --w-direct: #c97b2e; --w-train: #8e5bc0; --w-mixed: #c9b458; --w-none: #c3cad3;
 }
@@ -20,7 +20,7 @@
   --c-claim: #ef6f5a; --c-honest: #4cc27a; --c-silent: #5a626c; --c-other: #3a4048;
   --f-likely: #4cc27a; --f-possible: #2a7a4b; --f-unlikely: #3a4048;
   --top: #eceae6; --flash: #6c747e;
-  --ag-astra: #6f8ee8; --ag-opus: #d9659f; --ag-argon: #6f9f3c; --wf-none: #2c3138;
+  --ag-fable: #c23b4f; --ag-astra: #6f8ee8; --ag-opus: #d9659f; --wf-none: #2c3138;
   --w-open: #a9c8ee; --w-closed: #5a95dc; --w-search: #2f5d9e; --w-direct: #d98f45; --w-train: #a77fd6; --w-mixed: #b8a54d; --w-none: #4a5059;
 }
 
