@@ -18,7 +18,7 @@ const MODE_LABEL = { p: 'Privileged', s: 'Standard', t: 'Realtime', o: 'Overall'
 const MODE_CLS = { p: 'm-p', s: 'm-s', t: 'm-r', o: '' };
 const INK = { p: '--priv-ink', s: '--std-ink', t: '--rt-ink' };
 const F = 'claude_code-fable_5_2-high', A = 'codex-gpt6_astra-high', O = 'claude_code-opus_5_5-high';
-const COL = { [F]: 'var(--ag-fable)', [A]: 'var(--ag-astra)' };
+const COL = { [F]: 'var(--ag-fable)', [A]: 'var(--ag-astra)', [O]: 'var(--ag-opus)' };
 const col = (r) => COL[r] || 'var(--flash)';
 const MIN_BENCH = 5;   // a suite gets a row from this many core tests in the setting
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
@@ -70,6 +70,19 @@ function compute(ex, tasks, bf) {
   const netS = solved('s', F) - solved('s', A);
   const top3 = sS.slice(0, 3), top3net = top3.reduce((a, r) => a + r.f - r.a, 0);
   const astraLead = (m) => suites(m).filter((r) => r.n >= MIN_BENCH && r.a > r.f).sort((x, y) => (y.a - y.f) - (x.a - x.f));
+  // the tests Claude Fable 5.2 fails, by how many of the other agents solve them (the paper's task-agent matrix)
+  const others = runs.filter((r) => r !== F);
+  const miss = Object.fromEntries(['p', 's', 't'].map((m) => {
+    const fail = M[m].filter((t) => !ok(t, F, m));
+    const k = (t) => others.filter((r) => ok(t, r, m)).length;
+    const oth = fail.filter((t) => k(t) > 0);
+    const g = {};
+    for (const t of oth) (g[benchOf(t)] ??= []).push(t);
+    return [m, { n: M[m].length, fail: fail.length, oth: oth.length, k0: fail.length - oth.length,
+      k1: oth.filter((t) => k(t) === 1).length, k23: oth.filter((t) => k(t) >= 2 && k(t) <= 3).length, k4: oth.filter((t) => k(t) >= 4).length,
+      by: Object.fromEntries(others.map((r) => [r, oth.filter((t) => ok(t, r, m)).length])),
+      suites: Object.entries(g).map(([id, L]) => ({ id, n: L.length, k4: L.filter((t) => k(t) >= 4).length })).sort((x, y) => y.n - x.n || x.id.localeCompare(y.id)) }];
+  }));
   const B = bf?.runs || {};
   const b = (r, m, k) => B[r]?.[m]?.[k];
   const Q = (a, n) => `${pct(a, n)}% (${int(a)}/${int(n)})`;
@@ -110,9 +123,13 @@ function compute(ex, tasks, bf) {
     look_f_s: b(F, 's', 'look_med') != null ? int(b(F, 's', 'look_med')) : null, look_a_s: b(A, 's', 'look_med') != null ? int(b(A, 's', 'look_med')) : null,
     out_f_s: b(F, 's', 'tok_out_med') != null ? `${Math.round(b(F, 's', 'tok_out_med') / 1000)}K` : null,
     out_a_s: b(A, 's', 'tok_out_med') != null ? `${Math.round(b(A, 's', 'tok_out_med') / 1000)}K` : null,
+    miss_fail_s: int(miss.s.fail), miss_oth_s: fr(miss.s.oth, miss.s.fail), miss_none_s: int(miss.s.k0),
+    miss_one_s: int(miss.s.k1), miss_astra_s: int(miss.s.by[A]), miss_oth_p: fr(miss.p.oth, miss.p.fail), miss_oth_t: fr(miss.t.oth, miss.t.fail),
+    miss_k4: nw(miss.p.k4 + miss.s.k4 + miss.t.k4),
+    miss_top_s: list(miss.s.suites.slice(0, 3).map((r) => benchName(r.id))),
     snapshot: bf?.snapshot || null,
   };
-  return { S, M, board, order, h2h, paired, suites, benchName, name, short, solved, b, perSolve };
+  return { S, M, board, order, h2h, paired, suites, benchName, name, short, solved, b, perSolve, miss, others };
 }
 
 function fill(S) {
@@ -186,28 +203,43 @@ function figPaired(el, R) {
     + numbers(['Agent', 'Both', 'Only Privileged', 'Only Standard', 'Neither', 'Tasks', 'Privileged successes kept'], R.paired.map((r) => [esc(r.name), r.both, r.a - r.both, r.c - r.both, r.n - r.a - r.c + r.both, r.n, `${pct(r.both, r.a)}% · ${frac(r.both, r.a)}`]));
 }
 
-/** Figure 4: per suite, the two agents' success rates (a dot each, a line between) and the difference in solved tests. */
+/** Figure 4: per suite and setting, how many more tests Claude Fable 5.2 solved than GPT-6 Astra (a diverging bar). */
 function figSuites(el, R) {
+  const rowsOf = (m) => R.suites(m).filter((r) => r.n >= MIN_BENCH);
+  const mx = Math.max(1, ...['s', 'p'].flatMap((m) => rowsOf(m).map((r) => Math.abs(r.f - r.a))));
   const panel = (m) => {
-    const rows = R.suites(m).filter((r) => r.n >= MIN_BENCH);
     const row = (r) => {
-      const xf = (100 * r.f) / r.n, xa = (100 * r.a) / r.n, lo = Math.min(xf, xa), d = r.f - r.a;
-      return `<div class="dp-row"><span class="who"><b>${esc(R.benchName(r.id))}</b><small>${int(r.n)} tests</small></span>`
-        + `<span class="dp-trk"><i class="gl" style="left:0"></i><i class="gl" style="left:25%"></i><i class="gl" style="left:50%"></i><i class="gl" style="left:75%"></i><i class="gl" style="left:100%"></i>`
-        + `<span class="rng" style="left:${lo}%;width:${Math.abs(xf - xa)}%"></span>`
-        + `<i class="dpd" style="left:${xa}%;background:${COL[A]}" title="${esc(`${R.name(A)} · ${R.benchName(r.id)}: ${r.a} of ${r.n} solved`)}"></i>`
-        + `<i class="dpd" style="left:${xf}%;background:${COL[F]}" title="${esc(`${R.name(F)} · ${R.benchName(r.id)}: ${r.f} of ${r.n} solved`)}"></i></span>`
-        + `<span class="dp-v"><small class="net ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d)}</small></span></div>`;
+      const d = r.f - r.a, w = (50 * Math.abs(d)) / mx, c = d > 0 ? COL[F] : COL[A];
+      return `<div class="dp-row"><span class="who"><b>${esc(R.benchName(r.id))}</b><small>${int(r.n)} tests · ${pct(r.f, r.n)}% vs ${pct(r.a, r.n)}%</small></span>`
+        + `<span class="dp-trk dv"><i class="gl" style="left:0"></i><i class="gl" style="left:100%"></i><i class="gl mid" style="left:50%"></i>`
+        + (d ? `<span class="dvb" style="${d > 0 ? 'left:50%' : `left:${50 - w}%`};width:${w}%;background:${c}" title="${esc(`${R.benchName(r.id)}: ${R.name(F)} ${r.f}, ${R.name(A)} ${r.a} of ${r.n}`)}"></span>` : '')
+        + `</span><span class="dp-v"><small class="net ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d)}</small></span></div>`;
     };
-    return `<div class="dp ${m}"><p class="dp-h ${MODE_CLS[m]}">${MODE_LABEL[m]}</p><div class="dp-row dp-head"><span></span><span></span><span class="dp-v"><small>${esc(R.short(F))} − ${esc(R.short(A))}</small></span></div>${rows.map(row).join('')}
-      <div class="dp-row dp-ax"><span></span><span class="dp-trk"><i style="left:0">0</i><i style="left:25%">25</i><i style="left:50%">50</i><i style="left:75%">75</i><i style="left:100%">100%</i></span><span></span></div></div>`;
+    return `<div class="dp ${m}"><p class="dp-h ${MODE_CLS[m]}">${MODE_LABEL[m]}</p><div class="dp-row dp-head"><span></span><span class="dvh"><small>${esc(R.short(A))} more</small><small>${esc(R.short(F))} more</small></span><span class="dp-v"><small>${esc(R.short(F))} − ${esc(R.short(A))}</small></span></div>${rowsOf(m).map(row).join('')}
+      <div class="dp-row dp-ax"><span></span><span class="dp-trk"><i style="left:0">−${mx}</i><i style="left:50%">0</i><i style="left:100%">+${mx}</i></span><span></span></div></div>`;
   };
   el.innerHTML = head(`${R.name(F)}’s Standard gain comes mostly from ${R.S.top3}; ${R.name(A)} solves more Standard tests in ${R.S.astra_lead_s}.`,
-    `Success rate of ${R.name(F)} and ${R.name(A)} by suite (all the core tests of the setting)`,
-    `each dot is one agent’s share of a suite’s tests; the column Fable − Astra is how many more tests ${R.name(F)} solved than ${R.name(A)} in that suite.`)
-    + `<div class="legend"><span><i class="sw dotk" style="background:${COL[F]}"></i>${esc(R.name(F))}</span><span><i class="sw dotk" style="background:${COL[A]}"></i>${esc(R.name(A))}</span></div>`
+    `Difference in solved tests between ${R.name(F)} and ${R.name(A)}, by suite and setting`,
+    `each bar is how many more of a suite’s core tests one agent solved than the other, in that agent’s colour; under each suite are the two success rates.`)
+    + `<div class="legend"><span>${sw(COL[F])}${esc(R.name(F))} solves more</span><span>${sw(COL[A])}${esc(R.name(A))} solves more</span></div>`
     + `<div class="dps">${panel('s')}${panel('p')}</div><p class="fig-note">Suites with at least ${MIN_BENCH} core tests in the setting, by the difference in solved tests. The IKEA assembly tasks of RoboARC count as their own suite.</p>`
     + numbers(['Suite', 'Setting', 'Tests', R.short(F), R.short(A), `Only ${R.short(F)}`, `Only ${R.short(A)}`], ['s', 'p', 't'].flatMap((m) => R.suites(m).map((r) => [esc(R.benchName(r.id)), MODE_LABEL[m], r.n, r.f, r.a, r.fo, r.ao])));
+}
+
+/** The tests Claude Fable 5.2 fails, per setting, by how many of the other eight agents solve each one. */
+function figMiss(el, R) {
+  const K = [['k0', 'No other agent', 'var(--wf-none)', true], ['k1', 'One other agent', 'color-mix(in srgb, var(--ag-astra) 35%, var(--bg))'],
+    ['k23', 'Two or three', 'color-mix(in srgb, var(--ag-astra) 65%, var(--bg))'], ['k4', 'Four or more', 'var(--ag-astra)']];
+  const nO = R.others.length;
+  el.innerHTML = head(`Most of the tests ${R.name(F)} fails are solved by no other agent either; of the rest, most are solved by only one.`,
+    `The core tests that ${R.name(F)} fails, by how many of the other ${nw(nO)} agents solve each one`,
+    'each row is one setting; each segment is the share of the tests it fails, and the number in it is the count.')
+    + `<div class="legend">${K.map(([, l, c]) => `<span>${sw(c)}${esc(l)}</span>`).join('')}</div>`
+    + `<div class="sb">${['s', 'p', 't'].map((m) => sbRow(`<b style="color:var(${INK[m]})">${MODE_LABEL[m]}</b>`, K.map(([k, l, c, dk]) => [R.miss[m][k], l, c, dk]), R.miss[m].fail, 'failed tests')).join('')}${sbAxis('failed')}</div>`
+    + numbers(['Setting', 'Tests', 'Failed', ...K.map(([, l]) => l), ...R.others.map((r) => `Solved by ${esc(R.name(r))}`)],
+      ['s', 'p', 't'].map((m) => { const x = R.miss[m]; return [MODE_LABEL[m], x.n, x.fail, x.k0, x.k1, x.k23, x.k4, ...R.others.map((r) => x.by[r])]; }))
+    + numbers(['Suite', 'Setting', 'Failed but solved by another agent', 'Of these, solved by four or more'],
+      ['s', 'p', 't'].flatMap((m) => R.miss[m].suites.map((r) => [esc(R.benchName(r.id)), MODE_LABEL[m], r.n, r.k4]))).replace('The numbers', 'By suite');
 }
 
 /** Figure 5: how the attempts went, per setting and agent: list-price cost, agent time, steps, attempts ended by the time limit. */
@@ -361,7 +393,7 @@ const settle = findings();
 Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog-fable.json').catch(() => ({}))]).then(([ex, tasks, bf]) => {
   const R = compute(ex, tasks, bf);
   fill(R.S);
-  const figs = { board: figBoard, h2h: figH2H, paired: figPaired, suites: figSuites, effort: figEffort };
+  const figs = { board: figBoard, h2h: figH2H, paired: figPaired, suites: figSuites, effort: figEffort, miss: figMiss };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
   $$('.fig-body[data-fig]').forEach((el) => $('.fig-cap', el)?.insertAdjacentHTML('afterbegin', `<b>Figure ${el.dataset.fig}.</b> `));
 }).catch((e) => {
