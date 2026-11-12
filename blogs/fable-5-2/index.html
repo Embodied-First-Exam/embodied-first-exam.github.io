@@ -38,7 +38,7 @@
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../../assets/app.js?v=0bd80474"></script>
-<script type="module" src="../../assets/blog-fable.js?v=b67cf8fb"></script>
+<script type="module" src="../../assets/blog-fable.js?v=e86b3feb"></script>
 </head>
 <body data-page="blogpost">
 <div id="nav"></div>
@@ -221,7 +221,47 @@
     </details>
 
     <!-- ===================================================================================== 4 -->
-    <h2 id="stages" data-short="Failure stages"><span class="num">04</span>How Claude Fable 5.2 fails</h2>
+    <h2 id="astra-leads" data-short="Where GPT-6 Astra leads"><span class="num">04</span>Where GPT-6 Astra still leads</h2>
+    <p>GPT-6 Astra solves more Standard tests than Claude Fable 5.2 in four suites. The clear gap is RoboPaint, where of <span data-f="n_rp_s"></span> tests Claude Fable 5.2 solves <span data-f="sv_rp_s"></span> for GPT-6 Astra. In HumanoidBench (<span data-f="sv_hb_s"></span>), DexToolBench (<span data-f="sv_dtb_s"></span>) and MuJoCo Playground (<span data-f="sv_mjp_s"></span>) it is one test. We read both agents’ runs in these suites: the failures are the agents’ own, and one pattern runs through them.</p>
+    <h3 id="a1">Claude Fable 5.2 ends its session earlier, when it judges the goal out of reach.</h3>
+    <p>Across the core set, on the Standard tests it fails, Claude Fable 5.2 ends its session after a median <span data-f="used_f_s"></span> of the time limit, and <span data-f="left10_f_s"></span> of these attempts end with ten minutes or more left. GPT-6 Astra uses <span data-f="used_a_s"></span> and usually runs to the limit; Claude Opus 5.5 stops earlier still, at <span data-f="used_o_s"></span>. Claude Fable 5.2’s closing notes usually give the reason: by its own estimate, the threshold is out of reach. Often the time left would not have helped, because it had used every reset, dropped the tool out of reach or spent its strokes in paint that cannot be removed. Where its estimate was wrong, the time left could have mattered, as in the cases below.</p>
+    <h3 id="a2">RoboPaint: GPT-6 Astra looks and corrects far more often, and Claude Fable 5.2 stops when it judges the copy out of reach.</h3>
+    <p>In the Standard Setting the agent sees the sheet only through the cameras, gets no score, and paint cannot be removed. Claude Fable 5.2 works fast: in a median RoboPaint attempt it makes 139 calls to the robot, against 558 for GPT-6 Astra, which goes through many more rounds of looking and correcting. In all 20 RoboPaint Standard tests it failed, Claude Fable 5.2 used nearly every stroke allowed and wrote in its closing note that the copy would miss the threshold. With the score available, in the Privileged Setting, it solves <span data-f="sv_rp_p"></span> for GPT-6 Astra: its weakness here is judging the copy from the camera, not painting.</p>
+    <div class="pair">
+      <a class="case s" href="../../run/?r=robopaint-acrylic-bedroom-i00-standard--wqr5d4c"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/a3/robopaint-acrylic-bedroom-i00-standard--wqr5d4c/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/a3/robopaint-acrylic-bedroom-i00-standard--wqr5d4c/replay.mp4"></video>
+              <span class="case-k">Looked and corrected</span><b>GPT-6 Astra · solved</b><span class="case-m">Standard · minute 48 of 60</span><span class="case-t">On the acrylic copy of van Gogh’s The Bedroom it painted 388 strokes. The verifier measured a mean colour error of 1.69, under the limit of 2.0.</span></a>
+      <a class="case s" href="../../run/?r=robopaint-acrylic-bedroom-i00-standard--c5z5jm8"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9a/robopaint-acrylic-bedroom-i00-standard--c5z5jm8/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9a/robopaint-acrylic-bedroom-i00-standard--c5z5jm8/replay.mp4"></video>
+              <span class="case-k">Judged out of reach</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · stopped at minute 23 of 60</span><span class="case-t">A greedy planner chose strokes at six press depths calibrated on the practice sheet: 220 strokes, then four re-plans from photos of the sheet. It concluded that even the best paint for every pixel would leave a colour error of about 3.1, and stopped after 385 strokes. The verifier measured 2.81.</span></a>
+    </div>
+    <p>The calligraphy tests show the same margin. On a kaishu copy, Claude Fable 5.2 used all 71 strokes, the last three as repairs, and reached an overlap with the target of 0.796 against the 0.80 required, as its own closing note says (<a href="../../run/?r=robopaint-kaishu-linfengguilong-i00-standard--pf67vqf">run</a>); GPT-6 Astra reached 0.90 (<a href="../../run/?r=robopaint-kaishu-linfengguilong-i00-standard--2aowg7m">run</a>).</p>
+    <h3 id="a3">DexToolBench: GPT-6 Astra tracked the tool from the cameras, and Claude Fable 5.2 never got a firm grasp.</h3>
+    <p>A dexterous hand must move a tool along a sequence of goal poses. On the claw hammer’s side swing, one of the two Standard tests GPT-6 Astra solves:</p>
+    <div class="pair">
+      <a class="case s" href="../../run/?r=dextoolbench_hammer_claw_hammer_swing_side-standard--4s5bcvw"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/28/dextoolbench_hammer_claw_hammer_swing_side-standard--4s5bcvw/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/28/dextoolbench_hammer_claw_hammer_swing_side-standard--4s5bcvw/replay.mp4"></video>
+              <span class="case-k">Tracked from the cameras</span><b>GPT-6 Astra · solved</b><span class="case-m">Standard · minute 26 of 60</span><span class="case-t">It estimated the hammer’s pose from the cameras and depth and tracked it in a closed loop, reaching all 40 goals with 2 resets.</span></a>
+      <a class="case s" href="../../run/?r=dextoolbench_hammer_claw_hammer_swing_side-standard--afbitco"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/ee/dextoolbench_hammer_claw_hammer_swing_side-standard--afbitco/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/ee/dextoolbench_hammer_claw_hammer_swing_side-standard--afbitco/replay.mp4"></video>
+              <span class="case-k">No firm grasp</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · stopped at minute 53 of 60</span><span class="case-t">It pushed the hammer so that the handle overhung the table edge and estimated the handle’s axis from depth, but every grasp failed: a pinch on the table slipped, a palm-down wrap dropped the hammer, and a palm-up cradle looked closed from the joint angles while the camera showed an empty fist. It stopped with 3 of 20 resets left, judging that a new attempt would need about 3.5 minutes just to grasp.</span></a>
+    </div>
+    <p>GPT-6 Astra also leads in the Privileged Setting, where of <span data-f="n_dtb_p"></span> tests Claude Fable 5.2 solves <span data-f="sv_dtb_p"></span> for GPT-6 Astra. Part of this gap is stopping early. On a spatula test, Claude Fable 5.2 stopped at minute 40 on goal 15 of 48, 0.0156 m from it against a tolerance of 0.015 m (<a href="../../run/?r=dextoolbench_spatula_spoon_spatula_serve_plate-privileged--4ytpxhk">run</a>); GPT-6 Astra kept going and reached all 48 goals at minute 47 (<a href="../../run/?r=dextoolbench_spatula_spoon_spatula_serve_plate-privileged--zpkxzvw">run</a>). On the long screwdriver’s vertical spin, Claude Fable 5.2 stopped at 21 of 100 goals with about 23 minutes left, and GPT-6 Astra reached all 100. The rest is skill: Claude Fable 5.2 solves none of the four Privileged screwdriver tests, and GPT-6 Astra solves two of the other three besides the vertical spin, while Claude Fable 5.2 solves the red brush’s forward sweep, which GPT-6 Astra misses.</p>
+    <h3 id="a4">HumanoidBench: GPT-6 Astra’s one Standard success came from closing the loop on stereo vision.</h3>
+    <p>Of the eight Standard tests, the three strongest agents solve one between them: GPT-6 Astra’s cube manipulation, where a humanoid must rotate a cube above each palm to a goal orientation without dropping either.</p>
+    <div class="pair">
+      <a class="case s" href="../../run/?r=humanoidbench-manip-cube-i00-standard--5uz2mv2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c3/humanoidbench-manip-cube-i00-standard--5uz2mv2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c3/humanoidbench-manip-cube-i00-standard--5uz2mv2/replay.mp4"></video>
+              <span class="case-k">Closed the loop on vision</span><b>GPT-6 Astra · solved</b><span class="case-m">Standard · minute 40 of 60</span><span class="case-t">It steadied the stance with feedback from the IMU, grasped with tilted palms, brought the right hand into the head cameras’ view and corrected the motion from stereo vision. The test passed at step 477, after 20 resets.</span></a>
+      <a class="case s" href="../../run/?r=humanoidbench-manip-cube-i00-standard--7f56dhz"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c6/humanoidbench-manip-cube-i00-standard--7f56dhz/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c6/humanoidbench-manip-cube-i00-standard--7f56dhz/replay.mp4"></video>
+              <span class="case-k">Lost the cube in the flip</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · stopped at minute 50 of 60</span><span class="case-t">It brought the left cube from 31 to 12 degrees of its target by fitting the cube in the camera frames, but every grasp dropped the right cube during its flip of about 156 degrees, once the palm faced down. It stopped with 4 resets still available and about 11 minutes left: a new episode would replace the graded one, and it had no way to hold the right cube.</span></a>
+    </div>
+    <details class="more">
+      <summary>Scope</summary>
+      <ul>
+        <li>Each agent made one attempt per test, so a difference of one test in a suite may come from the variation between runs; RoboPaint’s is the only clear gap.</li>
+        <li>The share of the time limit used counts the failed Standard attempts of the core set, with each attempt’s agent time against its test’s limit.</li>
+        <li>The closing notes quoted here are the agents’ own last messages in their runs.</li>
+      </ul>
+    </details>
+
+    <!-- ===================================================================================== 5 -->
+    <h2 id="stages" data-short="Failure stages"><span class="num">05</span>How Claude Fable 5.2 fails</h2>
     <p>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt, a separate coding agent labels, from the replay video and the logs, the stage at which the attempt went wrong and what visibly went wrong there, such as a lost hold or a fall, and a second agent reviews the labels. We labeled the attempts of Claude Fable 5.2 in the same way as those of the other eight agents in <a href="../first-exam/">the report</a>. Figure 9 compares the three strongest agents, Claude Fable 5.2, GPT-6 Astra and Claude Opus 5.5, and Figure 10 shows all nine.</p>
     <figure class="fig">
       <div class="fig-body" data-fig="9"><p class="fig-cap"><span class="fc-t">How the three strongest agents fail.</span> Shares in percent of the failed attempts in the Standard and Realtime settings with each label; a failed attempt can have two phenomena. Zero progress counts the Standard failures on tasks with at least two stages, and the first stage the located Standard failures on such tasks. The last two rows divide by stages instead: among the stages that need contact (or a grasp) that the attempts reached, the share at which the attempt failed without contact (or lost its hold).</p>
@@ -287,8 +327,8 @@
       </ul>
     </details>
 
-    <!-- ===================================================================================== 5 -->
-    <h2 id="cases" data-short="Case studies"><span class="num">05</span>Case studies</h2>
+    <!-- ===================================================================================== 6 -->
+    <h2 id="cases" data-short="Case studies"><span class="num">06</span>Case studies</h2>
     <p>Three tests, each with both agents’ runs side by side: two that only Claude Fable 5.2 solved, and one that only GPT-6 Astra solved.</p>
     <h3 id="c1">Catch and shoot on a running clock: both agents modeled the robot, and Claude Fable 5.2 corrected its shot from the real throws.</h3>
     <p>In Embodied Olympics - Fun, the H1-2 humanoid must catch a chest pass between its palms and shoot it through the hoop, in the Realtime Setting: six attempts, of which only the last is graded. No other agent solved this test.</p>
@@ -317,8 +357,8 @@
               <span class="case-k">Out of strokes</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · minute 29 of 60</span><span class="case-t">A greedy planner fitted straight strokes of four widths to the picture; it painted 285 of them without feedback, then photographed the sheet three times and replanned the remaining strokes from what was on the paper. With all 376 strokes used, its own estimate of the colour error was about 3.1, above the limit. The verifier measured 2.74.</span></a>
     </div>
 
-    <!-- ===================================================================================== 6 -->
-    <h2 id="scope" data-short="Scope"><span class="num">06</span>Scope</h2>
+    <!-- ===================================================================================== 7 -->
+    <h2 id="scope" data-short="Scope"><span class="num">07</span>Scope</h2>
     <p>Each agent made one attempt per test, so differences of a few tests, in a small suite or in the Realtime Setting, may come from the variation between runs. Each result belongs to a model in its harness: Claude Fable 5.2 ran in Claude Code and GPT-6 Astra in Codex, and how a harness manages the context and ends a session is part of what we measure. All results are in simulation. Models may remember solutions of the public benchmarks that some suites adapt, as the report describes.</p>
 
   </article>

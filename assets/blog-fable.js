@@ -129,6 +129,18 @@ function compute(ex, tasks, bf) {
     miss_top_s: list(miss.s.suites.slice(0, 3).map((r) => benchName(r.id))),
     snapshot: bf?.snapshot || null,
   };
+  // the suites where GPT-6 Astra still leads: solved tests of each agent per setting, and how much of the time limit failed attempts used
+  const SV = { hb: 'humanoidbench', dtb: 'dextoolbench', rp: 'robopaint', mjp: 'mujoco-playground' };
+  for (const m of ['p', 's', 't']) {
+    const L = suites(m);
+    for (const [k, id] of Object.entries(SV)) {
+      const r = L.find((x) => x.id === id);
+      if (r) { S[`sv_${k}_${m}`] = `${int(r.f)} against ${int(r.a)}`; S[`n_${k}_${m}`] = int(r.n); }
+    }
+  }
+  const usedPct = (r) => (b(r, 's', 'used_med_fail') != null ? `${Math.round(b(r, 's', 'used_med_fail'))}%` : null);
+  Object.assign(S, { used_f_s: usedPct(F), used_a_s: usedPct(A), used_o_s: usedPct(O),
+    left10_f_s: b(F, 's', 'n_fail_used') ? fr(b(F, 's', 'left10_fail'), b(F, 's', 'n_fail_used')) : null });
   return { S, M, board, order, h2h, paired, suites, benchName, name, short, solved, b, perSolve, miss, others };
 }
 

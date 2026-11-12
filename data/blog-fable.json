@@ -19,7 +19,10 @@
     "usd_med": 10.02,
     "usd_total": 4417.3,
     "usd_med_ok": 8.72,
-    "usd_med_fail": 15.67
+    "usd_med_fail": 15.67,
+    "n_fail_used": 78,
+    "used_med_fail": 85.19,
+    "left10_fail": 49
    },
    "s": {
     "n": 456,
@@ -38,7 +41,10 @@
     "usd_med": 11.22,
     "usd_total": 6121.9,
     "usd_med_ok": 8.81,
-    "usd_med_fail": 12.75
+    "usd_med_fail": 12.75,
+    "n_fail_used": 230,
+    "used_med_fail": 67.47,
+    "left10_fail": 180
    },
    "t": {
     "n": 54,
@@ -57,7 +63,10 @@
     "usd_med": 11.26,
     "usd_total": 681.6,
     "usd_med_ok": 10.11,
-    "usd_med_fail": 12.36
+    "usd_med_fail": 12.36,
+    "n_fail_used": 32,
+    "used_med_fail": 49.42,
+    "left10_fail": 29
    }
   },
   "codex-gpt6_astra-high": {
@@ -78,7 +87,10 @@
     "usd_med": 20.21,
     "usd_total": 8940.3,
     "usd_med_ok": 15.94,
-    "usd_med_fail": 30.71
+    "usd_med_fail": 30.71,
+    "n_fail_used": 83,
+    "used_med_fail": 99.75,
+    "left10_fail": 12
    },
    "s": {
     "n": 456,
@@ -97,7 +109,10 @@
     "usd_med": 17.87,
     "usd_total": 12364.6,
     "usd_med_ok": 9.01,
-    "usd_med_fail": 25.9
+    "usd_med_fail": 25.9,
+    "n_fail_used": 299,
+    "used_med_fail": 97.14,
+    "left10_fail": 133
    },
    "t": {
     "n": 54,
@@ -116,7 +131,10 @@
     "usd_med": 9.29,
     "usd_total": 839.7,
     "usd_med_ok": 8.39,
-    "usd_med_fail": 11.63
+    "usd_med_fail": 11.63,
+    "n_fail_used": 37,
+    "used_med_fail": 36.18,
+    "left10_fail": 26
    }
   },
   "claude_code-opus_5_5-high": {
@@ -137,7 +155,10 @@
     "usd_med": 3.17,
     "usd_total": 1874.1,
     "usd_med_ok": 2.84,
-    "usd_med_fail": 3.47
+    "usd_med_fail": 3.47,
+    "n_fail_used": 158,
+    "used_med_fail": 57.65,
+    "left10_fail": 127
    },
    "s": {
     "n": 456,
@@ -156,7 +177,10 @@
     "usd_med": 4.18,
     "usd_total": 2941.5,
     "usd_med_ok": 2.97,
-    "usd_med_fail": 4.66
+    "usd_med_fail": 4.66,
+    "n_fail_used": 342,
+    "used_med_fail": 45.26,
+    "left10_fail": 305
    },
    "t": {
     "n": 54,
@@ -175,7 +199,10 @@
     "usd_med": 3.47,
     "usd_total": 223.2,
     "usd_med_ok": 2.76,
-    "usd_med_fail": 3.54
+    "usd_med_fail": 3.54,
+    "n_fail_used": 50,
+    "used_med_fail": 25.26,
+    "left10_fail": 50
    }
   }
  }

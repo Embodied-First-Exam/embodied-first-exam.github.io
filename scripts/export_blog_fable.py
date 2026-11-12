@@ -3,7 +3,8 @@
 
 The post's results (scores, the head-to-head with GPT-6 Astra, the suites) are computed in the page from data/exam.json and
 data/tasks.json, the files the leaderboard reads. What is left is how the attempts went, for the agents the post compares:
-time, steps, list-price cost, tokens and how many attempts ran into the time limit, per setting and by outcome. Each
+time, steps, list-price cost, tokens, how many attempts ran into the time limit and how much of it the failed ones used,
+per setting and by outcome. Each
 attempt is the one the leaderboard counts for its core test (--leaderboard, one row per core test and agent with the
 counted trial); a test without a counted trial has no row here (it counts as failed in the results).
 
@@ -77,6 +78,12 @@ def main():
     for (ag, suite, task, m), r in cost.items():
         if ag in RUNS and r.get('match') == 'matched' and r.get('usd_list') not in (None, ''):
             usd.setdefault((ag, m), []).append((r['verdict'] == 'S', float(r['usd_list']), float(r['tok_out'] or 0)))
+    # how much of its time limit a failed attempt used (the paper's table: wall time against the test's limit)
+    used = {}
+    for (ag, suite, task, m), r in cost.items():
+        if ag in RUNS and r['verdict'] == 'F' and r.get('wall_s') and r.get('budget_min'):
+            lim = float(r['budget_min']) * 60
+            used.setdefault((ag, m), []).append((float(r['wall_s']) / lim, lim - float(r['wall_s'])))
 
     out = {'snapshot': a.snapshot, 'runs': {}}
     for ag in RUNS:
@@ -99,6 +106,9 @@ def main():
                 'n_cost': len(U), 'usd_mean': mean([u for _, u, _ in U]), 'usd_med': med([u for _, u, _ in U]),
                 'usd_total': round(sum(u for _, u, _ in U), 1),
                 'usd_med_ok': med([u for ok, u, _ in U if ok]), 'usd_med_fail': med([u for ok, u, _ in U if not ok]),
+                'n_fail_used': len(used.get((ag, m), [])),
+                'used_med_fail': med([100 * f for f, _ in used.get((ag, m), [])]),
+                'left10_fail': sum(1 for _, left in used.get((ag, m), []) if left >= 600),
             }
         out['runs'][ag] = per
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf8')
