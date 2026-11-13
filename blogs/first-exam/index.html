@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../../assets/exam.css?v=c94f9ada">
-<link rel="stylesheet" href="../../assets/blog.css?v=bff482e0">
+<link rel="stylesheet" href="../../assets/blog.css?v=6b604741">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../../assets/app.js?v=02c54d59"></script>
 <script type="module" src="../../assets/blog.js?v=599cfb60"></script>
@@ -117,6 +117,17 @@
       <li><b>Episode trajectory.</b> Every episode is recorded step by step as a rollout: the full simulator state <i>s</i>, the robot’s observation <i>o</i> (camera images and joint readings) and the action <i>a</i>. What the agent itself can read depends on the setting: in the Privileged Setting it reads the full state <i>s</i>, while in the Standard and Realtime settings it sees only the observation <i>o</i>, as with a real robot. The verifier always works from the recorded state.</li>
       <li><b>Verifier.</b> The verifier runs in its own sandbox with no network and sees only what was recorded. In the Standard and Realtime settings it grades the live episode; in the Privileged Setting it replays the trajectory. The test scores 1 or 0, and the run’s steps, cost and video are logged.</li>
     </ol>
+    <p>On RoboDojo, how fully the goal states the success check changes the results a great deal. We gave GPT-6 Astra the RoboDojo tasks in the Standard Setting with three versions of the goal text and kept everything else the same (Table 1). RoboDojo’s own one-sentence instructions leave out conditions that its success check tests, above all that both arms end near their start pose, which 47 of the 54 tasks require, so the agent often finishes the visible job and leaves an arm out of place. The text that RoboDojo gave GPT-6 Astra in its own evaluation<sup class="ref"><a href="#ref-32" data-refs="32">32</a></sup> adds a task recipe and a note about the start pose. With that text the agent solves almost as many tasks as with the exam’s goal, which states the success check in full, and most of the remaining differences come from how the manipulation turned out rather than from the wording. The exam’s goals therefore state the conditions they are graded on.</p>
+    <figure class="fig">
+      <div class="tscroll"><table class="itext">
+        <thead><tr><th>Goal text</th><th>Tasks solved</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">RoboDojo’s one-sentence instruction</th><td>12 / 54</td></tr>
+          <tr><th scope="row">The same sentence, plus the task recipe (task description and scoring stages) and the note that both arms must return to their start pose: the text RoboDojo gave GPT-6 Astra in its own evaluation<sup class="ref"><a href="#ref-32" data-refs="32">32</a></sup></th><td>33 / 54</td></tr>
+          <tr><th scope="row">The exam’s goal, which states RoboDojo’s success check in full</th><td>37 / 54</td></tr>
+        </tbody></table></div>
+      <figcaption><b>Table 1.</b> GPT-6 Astra on all 54 RoboDojo tasks in the Standard Setting with three versions of the goal text. Each version had one attempt per task, with the same scenes, step limits and success checks.</figcaption>
+    </figure>
 
     <h3 id="ways-h">Three ways to control the robot</h3>
     <div class="cways" id="ways"></div>
@@ -334,6 +345,7 @@
       <li id="ref-29"><span class="rf-a">Y. Peng, P. Wang, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2608.17386" target="_blank" rel="noopener">MANIGUARD: A Benchmark and Data Suite for Specification-Grounded Safety Evaluation and Improvement of Robotic Manipulation</a> <span class="rf-v">arXiv 2026.</span></li>
       <li id="ref-30"><span class="rf-a">Z. Lan, Y. Jiang, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2505.14030" target="_blank" rel="noopener">AutoBio: A Simulation and Benchmark for Robotic Automation in Digital Biology Laboratory</a> <span class="rf-v">arXiv 2025.</span></li>
       <li id="ref-31"><span class="rf-a">R. Li, Z. Hu, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2505.22634" target="_blank" rel="noopener">LabUtopia: High-Fidelity Simulation and Hierarchical Benchmark for Scientific Embodied Agents</a> <span class="rf-v">arXiv 2025.</span></li>
+      <li id="ref-32"><span class="rf-a">W. Zhang, K. Wang, et al.</span> <a class="rf-t" href="https://arxiv.org/abs/2609.24170" target="_blank" rel="noopener">An Unexpected Robot Policy: Early Evaluations of GPT-6 Astra on RoboDojo and Beyond</a> <span class="rf-v">arXiv 2026.</span></li>
     </ol>
 
     <h3 id="cite">Data and citation</h3>
