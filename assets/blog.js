@@ -21,10 +21,11 @@ const MODES = { p: 'privileged', s: 'standard', t: 'realtime' };
 const MODE_LABEL = { p: 'Privileged', s: 'Standard', t: 'Realtime' };
 const MODE_CLS = { p: 'm-p', s: 'm-s', t: 'm-r' };
 const ASTRA = 'codex-gpt6_astra-high';   // the agent of the controlled runs and of several cases
-const TOP = ['claude_code-fable_5_2-high', ASTRA, 'claude_code-opus_5_5-high'];   // the three strongest
-const AG = { [TOP[0]]: '--ag-fable', [TOP[1]]: '--ag-astra', [TOP[2]]: '--ag-opus' };   // their colours
-// the paper's nine agents: a run added to the leaderboard later is not in the article, whose text and figures are the paper's
-const PAPER_RUNS = [...TOP, 'antigravity_cli-gemini_4_argon-high', 'claude_code-kimi_3_1_pro-high', 'antigravity_cli-gemini_3_8_flash-high',
+// the five strong agents, as the paper names them (the first five of the leaderboard's Standard order); the other five are the weaker agents
+const TOP = ['claude_code-fable_5_2-high', ASTRA, 'codex-gpt6_1_sol-high', 'claude_code-opus_5_5-high', 'antigravity_cli-gemini_4_argon-high'];
+const AG = { [TOP[0]]: '--ag-fable', [TOP[1]]: '--ag-astra', [TOP[2]]: '--ag-sol', [TOP[3]]: '--ag-opus', [TOP[4]]: '--ag-argon' };   // their colours
+// the paper's ten agents: a run added to the leaderboard later is not in the article, whose text and figures are the paper's
+const PAPER_RUNS = [...TOP, 'claude_code-kimi_3_1_pro-high', 'antigravity_cli-gemini_3_8_flash-high',
   'claude_code-qwen3_8_max-high', 'dsh-deepseek_v4_1_flash-high', 'claude_code-glm_5_3_flash-high'];
 const agc = (r) => AG[r] || '--flash';
 const MIN_BENCH = 5;   // a suite counts among the hardest or the easiest from this many tests in the setting
@@ -61,9 +62,9 @@ function compute(ex, tasks, b) {
       both: L.filter((t) => ok(t, r, a) && ok(t, r, c)).length };
   });
   const ps = paired('p', 's');
-  const none3 = (L) => L.length - anyOf(L, TOP);
-  const mean3 = (L) => L.reduce((a, [t, m]) => a + TOP.filter((r) => ok(t, r, m)).length, 0);   // solved by the three, summed
-  // the weaker agents (all but the three strongest), and among them the Flash-class models by their names
+  const none3 = (L) => L.length - anyOf(L, TOP);   // solved by none of the strong agents
+  const mean3 = (L) => L.reduce((a, [t, m]) => a + TOP.filter((r) => ok(t, r, m)).length, 0);   // solved by the strong agents, summed
+  // the weaker agents (all but the strong agents), and among them the Flash-class models by their names
   const weak = runs.filter((r) => !TOP.includes(r));
   const flash = weak.filter((r) => /\bFlash\b/.test(name(r)));
   // suites as the paper counts them in its per-suite results: the IKEA assembly tasks of RoboARC are a suite of their own
@@ -80,18 +81,18 @@ function compute(ex, tasks, b) {
   const QL = (L, f) => Q(f(L || []), (L || []).length);
   const sample = (x) => (x ? Q(x[0], x[1]) : null);
 
-  // the suites from MIN_BENCH tests in a setting: the hardest (half or more solved by none of the three) and the easiest
-  // (the three's mean success rate 70% or more), as the paper reads them
+  // the suites from MIN_BENCH tests in a setting: the hardest (half or more solved by none of the strong agents) and the
+  // easiest (the strong agents' mean success rate 70% or more), as the paper reads them
   const benchRows = (k) => Object.entries(benchH[k]).filter(([, L]) => L.length >= MIN_BENCH)
     .map(([id, L]) => ({ id, L, n: L.length, none: none3(L), sum: mean3(L), per: TOP.map((r) => solved(L, r)) }));
   const hardRows = (k) => benchRows(k).sort((x, y) => y.none / y.n - x.none / x.n || y.n - x.n);
   const hard = { p: hardRows('p').filter((r) => r.none / r.n >= HARD), s: hardRows('s').filter((r) => r.none / r.n >= HARD) };
-  const easyN = (k) => benchRows(k).filter((r) => r.sum / (3 * r.n) >= EASY).length;
+  const easyN = (k) => benchRows(k).filter((r) => r.sum / (TOP.length * r.n) >= EASY).length;
   const inSuites = (n, k) => (n ? `in ${nw(n)} ${MODE_LABEL[k]} suite${n === 1 ? '' : 's'}` : `in no ${MODE_LABEL[k]} suite`);
   // in how many suites (from MIN_BENCH tests in both settings) the strongest agent solves a smaller share in the Standard Setting
   const both = Object.keys(benchH.p).filter((k) => (benchH.p[k] || []).length >= MIN_BENCH && (benchH.s[k] || []).length >= MIN_BENCH);
   const lower = both.filter((k) => solved(benchH.s[k], TOP[0]) / benchH.s[k].length < solved(benchH.p[k], TOP[0]) / benchH.p[k].length);
-  const rivals = (t, m) => ok(t, TOP[1], m) || ok(t, TOP[2], m);
+  const rivals = (t, m) => TOP.slice(1).some((r) => ok(t, r, m));   // solved by one of the other strong agents
   // a case's test: how many of the other agents solved it
   const task = (suite, id) => tasks.find((t) => t.suite === suite && t.id === id);
   const othersSolved = (suite, id, m, r) => { const t = task(suite, id); return t ? runs.filter((o) => o !== r && ok(t, o, m)).length : null; };
@@ -102,7 +103,7 @@ function compute(ex, tasks, b) {
   // the Standard and the Realtime test of the same tasks: the share that no agent solves
   const stL = core.filter((t) => (t.core || '').includes('s') && (t.core || '').includes('t'));
   const noneOf = (m) => stL.filter((t) => !runs.some((r) => ok(t, r, m))).length;
-  // the weaker agents' Standard successes, and how many of those the three strongest also solve
+  // the weaker agents' Standard successes, and how many of those the strong agents also solve
   const weakS = M.s.filter(([t, m]) => weak.some((r) => ok(t, r, m)));
   const ss = (r) => solved(M.s, r), topS = TOP.map(ss), weakMax = Math.max(0, ...weak.map(ss));
   const leadPS = ps.find((x) => x.id === TOP[0]);
@@ -116,10 +117,10 @@ function compute(ex, tasks, b) {
     best: board[0].name,
     budget_lo: dur(Math.min(...budgets)), budget_hi: dur(Math.max(...budgets)),
     built: (ex.build?.at || '').slice(0, 10),
-    // Overall results: the three strongest against the others, or the strongest against the next; Realtime against
+    // Overall results: the strong agents against the weaker ones, or the strongest against the next; Realtime against
     // Standard on the same tasks; suites
     s_gap: Math.min(...topS) > 2 * weakMax
-      ? `${list(TOP.map(name))} each solve more than twice as many ${MODE_LABEL.s} tests as any of the other ${nw(weak.length)} agents.`
+      ? `Each strong agent solves more than twice as many ${MODE_LABEL.s} tests as any weaker agent.`
       : `In the ${MODE_LABEL.s} Setting, ${board[0].name} solves ${P(board[0].s, M.s.length)} of the tests, against ${P(board[1].s, M.s.length)} for ${board[1].name}, the next agent.`,
     none_s_pair: P(noneOf('s'), stL.length), none_t_pair: P(noneOf('t'), stL.length), st_n: int(stL.length),
     u_s_any: QL(M.s, (L) => anyOf(L, TOP)), u_s_any_pct: P(anyOf(M.s, TOP), M.s.length),
@@ -131,14 +132,16 @@ function compute(ex, tasks, b) {
     ps_lead_p: P(leadPS.a, leadPS.n), ps_lead_s: P(leadPS.c, leadPS.n), ps_lead_a: int(leadPS.a), ps_lead_lost: int(leadPS.a - leadPS.both),
     gap_bench: lower.length === both.length ? `each of the ${int(both.length)}` : `${int(lower.length)} of the ${int(both.length)}`,
     dusty_s_others: (() => { const n = othersSolved('maniguard', 'dusty_transfer_i03', 's', ASTRA); return n == null ? null : `${nw(n)} other agent${n === 1 ? '' : 's'}`; })(),
-    // Finding 3: what the strongest agent solves of the tests the other two solve, and what the weaker agents add
-    rival_p: Q(M.p.filter(([t, m]) => ok(t, TOP[0], m) && rivals(t, m)).length, M.p.filter(([t, m]) => rivals(t, m)).length),
+    // Finding 3: what the strongest agent solves of the tests any agent solves, what the other strong agents add, and
+    // what the weaker agents add
+    lead_any_p: Q(solved(M.p, TOP[0]), anyOf(M.p)),
     rival_s_extra: int(M.s.filter(([t, m]) => !ok(t, TOP[0], m) && rivals(t, m)).length),
     weak_fill: `${int(weakS.filter(([t, m]) => TOP.some((r) => ok(t, r, m))).length)} of the ${int(weakS.length)}`,
     // Finding 4: the sampled attempts' approaches
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s), ap_t_code: mix.t ? Q(mix.t.code, mix.t.n) : null,
     ap_train: `${int(train)} of ${int(sampled)}`,
-    cb_sample: cb.sample == null ? null : int(cb.sample), cb_snapshot: (cb.snapshot || '').slice(0, 10) || null,
+    cb_sample: cb.sample == null ? null : int(cb.sample),
+    cb_snapshot: cb.snapshot ? `${cb.snapshot.slice(0, 10)}${cb.snapshot_sol ? `, and ${cb.snapshot_sol} for GPT-6.1 Sol` : ''}` : null,
   };
   return { S, M, board, order, ps, mix, kinds, benchRows, hardRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, name, short, ok, solved, flash, suiteName };
@@ -164,9 +167,8 @@ const sw = (c, extra = '') => `<i class="sw${extra}" style="background:${c.start
 const numbers = (heads, rows) => `<details class="nums"><summary>The numbers</summary><div class="tscroll"><table class="nt"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead>
   <tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i ? `<td>${c}</td>` : `<th scope="row">${c}</th>`)).join('')}</tr>`).join('')}</tbody></table></div></details>`;
 const frac = (a, n) => `${int(a)}/${int(n)}`;
-const agentLegend = (R) => `<div class="legend">${TOP.map((r) => `<span>${sw(AG[r])}${esc(R.name(r))}</span>`).join('')}<span>${sw('--flash')}The other agents</span></div>`;
 
-/* Overall results: the three strongest in their own colours, the three Flash-class models in three greys, the others in the darkest */
+/* Overall results: the strong agents in their own colours, the three Flash-class models in three greys, the others in the darkest */
 const FLASH_O = [1, 0.62, 0.36];
 const colOf = (R, r) => (TOP.includes(r) ? { c: `var(${AG[r]})`, o: 1 } : { c: 'var(--flash)', o: FLASH_O[R.flash.indexOf(r)] ?? 1 });
 const legend6 = (R) => `<div class="legend">${R.order.map((r) => { const k = colOf(R, r);
@@ -197,33 +199,30 @@ function figModes(el, R) {
     + numbers(['Agent', ...V.map((k) => MODE_LABEL[k])], R.order.map((r) => [esc(R.name(r)), ...V.map((k) => `${pct(R.solved(R.M[k], r), R.M[k].length)}% · ${frac(R.solved(R.M[k], r), R.M[k].length)}`)]));
 }
 
-/** Finding 3: a waffle per setting, each cell about 1% of the tests, coloured by which of the
- *  three strongest solved it (a cell split in two colours: those two); above it, each agent's solved count. */
-function figOverlap(el, R) {
-  const [A, O, G] = TOP, nm = (r) => R.name(r).split(' ').filter((w) => !/^[\d.]+$/.test(w)).pop();   // Fable, Astra, Opus, as the analysis names them
-  const cats = [['k', 'All three', 'var(--top)'], ['ao', `${nm(A)} + ${nm(O)}`, [A, O]], ['ag', `${nm(A)} + ${nm(G)}`, [A, G]], ['a', `Only ${nm(A)}`, `var(${AG[A]})`],
-    ['go', `${nm(G)} + ${nm(O)}`, [G, O]], ['o', `Only ${nm(O)}`, `var(${AG[O]})`], ['g', `Only ${nm(G)}`, `var(${AG[G]})`], ['z', 'None of the three', 'var(--wf-none)']];
-  const bg = (c) => (Array.isArray(c) ? `linear-gradient(135deg, var(${AG[c[0]]}) 0 50%, var(${AG[c[1]]}) 50% 100%)` : c);
-  const key = (t, m) => { const s = TOP.map((r) => R.ok(t, r, m)); return s[0] && s[1] && s[2] ? 'k' : s[0] && s[1] ? 'ao' : s[0] && s[2] ? 'ag' : s[0] ? 'a'
-    : s[1] && s[2] ? 'go' : s[1] ? 'o' : s[2] ? 'g' : 'z'; };
-  const counts = {};
-  for (const k of ['p', 's', 't']) { counts[k] = Object.fromEntries(cats.map(([c]) => [c, 0])); for (const [t, m] of R.M[k]) counts[k][key(t, m)] += 1; }
-  // 100 cells by the largest remainder, so each panel has exactly 100
-  const cells = (k) => {
-    const n = R.M[k].length, raw = cats.map(([c]) => (100 * counts[k][c]) / (n || 1)), fl = raw.map(Math.floor);
-    let left = 100 - fl.reduce((a, x) => a + x, 0);
-    raw.map((x, i) => [x - fl[i], i]).sort((a, z) => z[0] - a[0]).forEach(([, i]) => { if (left > 0 && raw[i] > 0) { fl[i] += 1; left -= 1; } });
-    return cats.map(([c, l, col], i) => Array.from({ length: fl[i] }, () => `<i style="background:${bg(col)}" title="${esc(`${l}: ${counts[k][c]} of ${n} tests`)}"></i>`).join('')).join('');
-  };
-  const panel = (k) => { const n = R.M[k].length;
-    return `<div class="wf"><p class="hb-t ${MODE_CLS[k]}">${MODE_LABEL[k]} <small>· ${int(n)} tests</small></p>${TOP.map((r) => { const s = R.solved(R.M[k], r);
-      return `<div class="wf-ag"><span>${esc(R.short(r))}</span><span class="trk"><span style="width:${n ? (100 * s) / n : 0}%;background:var(${AG[r]})"></span></span><b>${int(s)}</b></div>`; }).join('')}
-      <div class="wf-grid" role="img" aria-label="${esc(`${MODE_LABEL[k]}: ${cats.map(([c, l]) => `${l} ${counts[k][c]}`).join(', ')}`)}">${cells(k)}</div></div>`; };
-  el.innerHTML = head(`In the Privileged Setting, ${esc(R.name(A))} solves almost every test that any of the three solves; in the Standard Setting, the other two each solve some tests that it fails.`,
-    'Which of the three strongest agents solved each test (all the core tests of each setting)', 'each cell is about 1% of a setting’s tests; its color shows which of the three solved it, and a cell split in two colors means two of them did.')
-    + `<div class="wf-key"><table><thead><tr><th></th><th class="m-p">Privileged</th><th class="m-s">Standard</th><th class="m-r">Realtime</th></tr></thead><tbody>${cats.map(([c, l, col]) =>
-      `<tr><th scope="row"><i class="sw" style="background:${bg(col)}"></i>${esc(l)}</th>${['p', 's', 't'].map((k) => `<td>${int(counts[k][c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
-    + `<div class="wfs">${['p', 's', 't'].map(panel).join('')}</div>`;
+/** Finding 3 (the paper's solve matrix): for each pair of agents, the share of the row agent's solved Standard tests
+ *  that the column agent also solves; the last column, the share that at least one agent above it on the leaderboard
+ *  also solves. Rows and columns in the leaderboard's order, the strong agents first; a gap after the fifth. */
+function figMatrix(el, R) {
+  const k = 's', L = R.M[k], ord = R.order, cut = TOP.length;
+  const won = Object.fromEntries(ord.map((r) => [r, L.filter(([t, m]) => R.ok(t, r, m)).map(([t]) => t)]));
+  const both = (a, b) => won[a].filter((t) => R.ok(t, b, k)).length;
+  const share = (a, n) => Math.round((100 * a) / n);
+  const td = (a, n, what) => (n ? `<td class="${share(a, n) >= 60 ? 'hi' : ''}" style="--v:${share(a, n)}" title="${esc(`${what}: ${a} of ${n}`)}">${share(a, n)}</td>` : '<td class="dg">–</td>');
+  const gapC = '<td class="gap"></td>';
+  const nameCell = (r) => `<th scope="row">${TOP.includes(r) ? sw(AG[r]) : sw('--flash')}${esc(R.name(r))}</th>`;
+  const rows = ord.map((r, i) => {
+    const n = won[r].length;
+    const cells = ord.map((c, j) => (c === r ? '<td class="dg">–</td>' : td(both(r, c), n, `${R.name(r)}’s solved tests also solved by ${R.name(c)}`)) + (j === cut - 1 ? gapC : ''));
+    const above = ord.slice(0, i), up = won[r].filter((t) => above.some((c) => R.ok(t, c, k))).length;
+    return `${i === cut ? `<tr class="gap"><td colspan="${ord.length + 5}"></td></tr>` : ''}<tr>${nameCell(r)}<td class="sv">${int(n)}</td>${cells.join('')}${gapC}`
+      + `${i ? td(up, n, `${R.name(r)}’s solved tests also solved by an agent above it`) : '<td class="dg">–</td>'}</tr>`;
+  });
+  el.innerHTML = head('No strong agent’s solved tests are a subset of another’s, and almost every test that a weaker agent solves is also solved by a strong agent.',
+    `Tests solved by one agent and by another (all the core ${MODE_LABEL.s} tests)`,
+    'each cell is the share of the row agent’s solved tests that the column agent also solves; the last column is the share that at least one agent above it on the leaderboard solves. The strong agents come first.')
+    + `<div class="tscroll"><table class="heat sm"><thead><tr><th></th><th class="vh"><span>Solved</span></th>${ord.map((c, j) => `<th class="vh"><span>${esc(R.name(c))}</span></th>${j === cut - 1 ? gapC : ''}`).join('')}${gapC}<th class="vh"><span>Any agent above</span></th></tr></thead>`
+    + `<tbody>${rows.join('')}</tbody></table></div>`
+    + `<p class="fig-note">Shares in percent, of the ${int(L.length)} ${MODE_LABEL.s} tests. “Solved” is the number of tests that the row agent solves.</p>`;
 }
 
 /** Finding 1: per agent, the tasks with both a privileged and a standard test, by the outcome
@@ -242,8 +241,8 @@ function figPaired(el, R) {
 }
 
 /** Overall results (the paper's figure of success rates by suite): a dot plot per setting, one row per suite (from
- *  MIN_BENCH tests), a dot per strongest agent at its success rate and a line across their range; on the right a bar with
- *  the share of tests that none of the three solves. Rows past the cut, then the next one under a dashed line. */
+ *  MIN_BENCH tests), a dot per strong agent at its success rate and a line across their range; on the right a bar with
+ *  the share of tests that none of them solves. Rows past the cut, then the next one under a dashed line. */
 function dotPlots(el, R, o) {
   const panel = (k) => {
     const all = o.rows(k), past = all.filter((r) => o.past(k, r)), next = all.find((r) => !o.past(k, r));
@@ -267,12 +266,12 @@ function dotPlots(el, R, o) {
 
 function figHard(el, R) {
   dotPlots(el, R, {
-    rows: (k) => R.hardRows(k), past: (k, r) => r.none / r.n >= HARD, value: (r) => [r.none, r.n], valueName: 'None of the three solves',
+    rows: (k) => R.hardRows(k), past: (k, r) => r.none / r.n >= HARD, value: (r) => [r.none, r.n], valueName: 'None of the strong agents solves',
     valueText: (a, n) => `${a}/${n}`, cutLabel: () => 'below half',
-    say: `In the Privileged Setting, ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'suite has at least half its tests' : 'suites have at least half their tests'} solved by none of the three; in the Standard Setting, ${R.S.hard_s_word}.`,
-    cap: 'Success rate of each of the three strongest agents, by suite (all the core tests of the setting)',
-    how: 'each dot is one agent’s share of a suite’s tests; the gray bar on the right is the share that none of the three solves.',
-    note: `Hardest first. Only suites with at least ${MIN_BENCH} tests in the setting. Each column lists the suites with at least half their tests solved by none of the three, then the next one below the dashed line. The small label under each name is the kind of task. The IKEA assembly tasks of RoboARC count as their own suite.`,
+    say: `In the Privileged Setting, ${R.S.hard_p_word} ${R.S.hard_p_word === 'one' ? 'suite has at least half its tests' : 'suites have at least half their tests'} solved by none of the strong agents; in the Standard Setting, ${R.S.hard_s_word}.`,
+    cap: 'Success rate of each strong agent, by suite (all the core tests of the setting)',
+    how: 'each dot is one agent’s share of a suite’s tests; the gray bar on the right is the share that none of the strong agents solves.',
+    note: `Hardest first. Only suites with at least ${MIN_BENCH} tests in the setting. Each column lists the suites with at least half their tests solved by none of the strong agents, then the next one below the dashed line. The small label under each name is the kind of task. The IKEA assembly tasks of RoboARC count as their own suite.`,
   });
 }
 
@@ -496,7 +495,7 @@ Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('dat
     kinds.textContent = Object.entries(c).sort((a, z) => z[1] - a[1]).map(([k, n]) => `${(ex.bodies?.[k] || k).toLowerCase()} (${int(n)} tasks)`).join(', ');
     const nk = $('#body-kinds'); if (nk) nk.textContent = nw(Object.keys(c).length);
   }
-  const figs = { modes: figModes, hard: figHard, paired: figPaired, overlap: figOverlap, approach: figApproach };
+  const figs = { modes: figModes, hard: figHard, paired: figPaired, matrix: figMatrix, approach: figApproach };
   for (const [k, f] of Object.entries(figs)) { const el = $(`#fig-${k}`); if (el) f(el, R); }
   // each figure's number before its caption
   $$('.fig-body[data-fig]').forEach((el) => $('.fig-cap', el)?.insertAdjacentHTML('afterbegin', `<b>Figure ${el.dataset.fig}.</b> `));

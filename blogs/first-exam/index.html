@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Embodied First Exam · Blogs</title>
-<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how nine agents do on it, and where they fail.">
+<meta name="description" content="What happens when the coding agents that write our software have to program a robot: what the Embodied First Exam is, how ten agents do on it, and where they fail.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../../assets/exam.css?v=c94f9ada">
-<link rel="stylesheet" href="../../assets/blog.css?v=6b604741">
+<link rel="stylesheet" href="../../assets/blog.css?v=874f6bf5">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script type="module" src="../../assets/app.js?v=ba2e0fa0"></script>
-<script type="module" src="../../assets/blog.js?v=599cfb60"></script>
+<script type="module" src="../../assets/blog.js?v=ddcb8457"></script>
 <!-- search-meta:start -->
 <link rel="canonical" href="https://www.embodied-first-exam.ai/blogs/first-exam/">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -143,12 +143,12 @@
 
     <!-- ===================================================================================== 3 -->
     <h2 id="results" data-short="Overall results"><span class="num">03</span>Overall results</h2>
-    <p>We evaluate <span data-s="n_runs_lc"></span> coding agents on the core set. An agent is a model in a harness at high reasoning effort, and the harness is part of what we measure: Claude Fable 5.2 and Claude Opus 5.5 in Claude Code, GPT-6 Astra in Codex, Gemini 4 Argon in Antigravity CLI, Kimi 3.1 Pro and Qwen3.8 Max in Claude Code, and three Flash-class models, Gemini 3.8 Flash in Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek Harness. Each agent makes one attempt per test under the same limits, and a test is solved when the verifier passes it. We report each setting on its own, Standard first, as on the leaderboard.</p>
+    <p>We evaluate <span data-s="n_runs_lc"></span> coding agents on the core set. An agent is a model in a harness at high reasoning effort, and the harness is part of what we measure: Claude Fable 5.2 and Claude Opus 5.5 in Claude Code, GPT-6 Astra and GPT-6.1 Sol in Codex, Gemini 4 Argon in Antigravity CLI, Kimi 3.1 Pro and Qwen3.8 Max in Claude Code, and three Flash-class models, Gemini 3.8 Flash in Antigravity CLI, GLM 5.3 Flash in Claude Code and DeepSeek V4.1 Flash in DeepSeek Harness. Each agent makes one attempt per test under the same limits, and a test is solved when the verifier passes it. We report each setting on its own, Standard first, as on the leaderboard.</p>
     <figure class="fig fig-wide">
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
-      <figcaption class="fig-ext"><span data-s="s_gap"></span> The Realtime Setting is harder still: on the <span data-s="st_n"></span> tasks with both tests, <span data-s="none_t_pair"></span> of the Realtime tests remain unsolved by any agent, against <span data-s="none_s_pair"></span> of the Standard tests.</figcaption>
+      <figcaption class="fig-ext">Claude Fable 5.2 solves the most tests in every setting. GPT-6 Astra and GPT-6.1 Sol follow it in every setting, and Claude Opus 5.5 and Gemini 4 Argon come next in the Standard Setting. We call these five the strong agents and the other five the weaker agents. <span data-s="s_gap"></span> The Realtime Setting is harder still: on the <span data-s="st_n"></span> tasks with both tests, <span data-s="none_t_pair"></span> of the Realtime tests remain unsolved by any agent, against <span data-s="none_s_pair"></span> of the Standard tests.</figcaption>
     </figure>
-    <p>Together, the three strongest agents solve <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in <span data-s="hard_s_frac"></span> suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the three, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
+    <p>Together, the strong agents solve <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in <span data-s="hard_s_frac"></span> suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the strong agents, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
     <figure class="fig">
       <div class="fig-body" id="fig-hard" data-fig="7"></div>
     </figure>
@@ -206,10 +206,10 @@
       <p class="finding-sum">This is usually the first stage of the task, and it also tends to be the same in the Privileged and Standard settings. Stages that change a material or move the robot’s body have the highest failure rates.</p>
       <div class="finding-body" id="f2-body">
         <ul class="claims">
-            <li>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt of the nine agents on 427 core tasks, a separate coding agent labels the stage at which it went wrong.</li>
-            <li>For the three strongest agents, two failed attempts on the same test share their failure stage 55% of the time on average, against 30% if failure stages were random. The most common failure stage of a test is usually the first stage of its task.</li>
-            <li>Leaving out tasks where it is the first stage in both settings, the most common failure stage is the same in the Privileged and the Standard Setting for more than half of the tasks, against 10% by chance.</li>
-            <li>Once reached, material stages such as wiping and body stages such as walking fail most often. Each category occurs mostly in particular suites and with particular robots, so these rates do not show that the category itself causes the failures.</li>
+            <li>We divide each task into stages, each a change in the world that the task requires: putting a tomato into a closed fridge has three, the fridge open, the tomato inside and the fridge closed again. For each failed attempt of the ten agents on 427 core tasks, a separate coding agent labels the stage at which it went wrong.</li>
+            <li>For the strong agents, two failed attempts on the same test share their failure stage 55% of the time on average, against 30% if failure stages were random. The most common failure stage of a test is usually the first stage of its task.</li>
+            <li>Leaving out tasks where it is the first stage in both settings, the most common failure stage is the same in the Privileged and the Standard Setting for 59% of the 88 tasks, against 9% by chance.</li>
+            <li>Once reached, material stages such as wiping fail most often, at 56%, and body stages such as walking next, at 39%. Each category occurs mostly in particular suites and with particular robots, so these rates do not show that the category itself causes the failures.</li>
         </ul>
           <div class="cases rep">
             <a class="case s" href="../../run/?r=pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/pandadyn-s09-toss-recatch-delivery-i00-standard--ifeciju/video.mp4"></video>
@@ -228,23 +228,23 @@
           </div>
           <h4>Scope</h4>
           <ul>
-            <li>A failed attempt has at most one failure stage: the stage of an irreversible event, such as a fall, or else of the earliest mistake that the agent did not correct. The labels come from coding agents, and the model that wrote most of them belongs to the same family as GPT-6 Astra, which could bias comparisons between agents.</li>
+            <li>A failed attempt has at most one failure stage: the stage of an irreversible event, such as a fall, or else of the earliest mistake that the agent did not correct. The labels come from coding agents. GPT-6.1 Sol wrote most of them, including those of its own attempts, and it is from the same family as GPT-6 Astra; Claude Sonnet 5.5 wrote the rest and reviewed every label file. This could bias comparisons between agents.</li>
           </ul>
         </details>
       </div>
     </div>
 
     <div class="finding">
-      <h3 id="f3" data-short="Differences between agents"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>Most weaker agents fail earlier, and the three strongest solve partly different tests.</button></h3>
-      <p class="finding-sum">Five of the six weaker agents are much more likely than the three strongest agents to fail before making the required contact. In the Standard Setting, GPT-6 Astra and Claude Opus 5.5 solve dozens of tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.5 percentage points.</p>
+      <h3 id="f3" data-short="Differences between agents"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>The weaker agents fail earlier, and the strong agents solve partly different tests.</button></h3>
+      <p class="finding-sum">The weaker agents are much more likely than the strong agents to fail before making the required contact. In the Standard Setting, the other four strong agents solve <span data-s="rival_s_extra"></span> tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.5 percentage points.</p>
       <div class="finding-body" id="f3-body">
         <ul class="claims">
-            <li>Counted per contact stage that they reach, five of the six weaker agents fail without making the required contact at 9.0% to 18.5% of these stages, against 1.0% to 2.8% for the three strongest agents. The six weaker agents also add few tests: of the Standard tests that any of them solves, the three strongest agents solve <span data-s="weak_fill"></span>.</li>
-            <li>In the Privileged Setting, Claude Fable 5.2 solves <span data-s="rival_p"></span> of the tests that GPT-6 Astra or Claude Opus 5.5 solves. In the Standard Setting, those two solve <span data-s="rival_s_extra"></span> tests that it fails, and together the three solve <span data-s="u_s_any"></span> of the Standard tests (Figure 9).</li>
+            <li>Counted per contact stage that they reach, the weaker agents fail without making the required contact at 9.0% to 18.5% of these stages, against 1.0% to 3.7% for the strong agents. The weaker agents also add few tests: of the Standard tests that any of them solves, the strong agents solve <span data-s="weak_fill"></span>.</li>
+            <li>In the Privileged Setting, Claude Fable 5.2 by itself solves <span data-s="lead_any_p"></span> of the tests that any agent solves. In the Standard Setting, no strong agent’s solved tests are a subset of another’s (Figure 9). The other four strong agents solve <span data-s="rival_s_extra"></span> tests that Claude Fable 5.2 fails, and together the five solve <span data-s="u_s_any"></span> of the Standard tests.</li>
             <li>The harness changes the result too. Run in Claude Code instead of its own Codex, GPT-6 Astra solves 7.5 percentage points fewer Standard tests, the largest change among the harnesses we compared.</li>
         </ul>
         <figure class="fig">
-          <div class="fig-body" id="fig-overlap" data-fig="9"></div>
+          <div class="fig-body" id="fig-matrix" data-fig="9"></div>
         </figure>
           <div class="cases rep">
             <a class="case s" href="../../run/?r=maniguard-jar-transport-i25-standard--kz3tvs9"><video data-auto data-rate="2" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9c/maniguard-jar-transport-i25-standard--kz3tvs9/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/9c/maniguard-jar-transport-i25-standard--kz3tvs9/replay.mp4"></video>
@@ -258,11 +258,11 @@
             <a class="case s" href="../../run/?r=roboarc-blanket-fold-01-i01-standard--yf2uasy"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/27/roboarc-blanket-fold-01-i01-standard--yf2uasy/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/27/roboarc-blanket-fold-01-i01-standard--yf2uasy/replay.mp4"></video>
               <span class="case-k">Gemini 3.8 Flash, not Claude Opus 5.5</span><b>RoboARC · Blanket fold</b><span class="case-m">Gemini 3.8 Flash · Standard · solved</span><span class="case-t">It located the blanket from the cameras’ images and depth, grasped the two far corners with both grippers and folded the blanket in half. Four short programs then shifted and straightened the fold onto the target, and the test passed at minute 35. In Claude Opus 5.5’s run, the grippers repeatedly missed or snagged the cloth, and the blanket ended crumpled.</span></a>
             <a class="case s" href="../../run/?r=dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/blog/dextoolbench_brush_red_brush_sweep_right-standard--kxfadcg/video.mp4"></video>
-              <span class="case-k">None of the three</span><b>DexToolBench · Red brush, sweep right</b><span class="case-m">Claude Opus 5.5 · Standard · failed</span><span class="case-t">It pushed the brush until it stuck out over the table edge, grasped it and reached goals 0 to 4. The next goal needed a 90° turn about the brush’s long axis, which its palm-down grasp could not make. It stalled at goal 5 of 38, and the brush flew out of the hand as the arm changed configuration.</span></a>
+              <span class="case-k">No agent</span><b>DexToolBench · Red brush, sweep right</b><span class="case-m">Claude Opus 5.5 · Standard · failed</span><span class="case-t">It pushed the brush until it stuck out over the table edge, grasped it and reached goals 0 to 4. The next goal needed a 90° turn about the brush’s long axis, which its palm-down grasp could not make. It stalled at goal 5 of 38, and the brush flew out of the hand as the arm changed configuration.</span></a>
           </div>
           <h4>Scope</h4>
           <ul>
-            <li>Each agent made one attempt per test, so part of these differences may come from the variation between runs.</li>
+            <li>Each agent made one attempt per test, so part of these differences may come from the variation between runs. Of the Standard tests that one run of GPT-6.1 Sol solves, another run of the same agent solves only 57% to 70%.</li>
             <li>Cross-provider runs of the harness comparison go through an adapter; the paper gives every model and harness pair.</li>
           </ul>
         </details>
@@ -302,7 +302,7 @@
           </div>
           <h4>Scope</h4>
           <ul>
-            <li>The approach counts are from a random sample of about a third of the attempts (<span data-s="cb_sample"></span> analyzed, snapshot of <span data-s="cb_snapshot"></span>), labeled by a coding agent from the run logs. The soccer counts include the runs of the harness comparison, so some models appear more than once.</li>
+            <li>The approach counts are from a random sample of <span data-s="cb_sample"></span> attempts, none by Claude Fable 5.2 or Kimi 3.1 Pro (snapshot of <span data-s="cb_snapshot"></span>), labeled by a coding agent from the run logs. The soccer counts include the runs of the harness comparison, so some models appear more than once.</li>
           </ul>
         </details>
       </div>

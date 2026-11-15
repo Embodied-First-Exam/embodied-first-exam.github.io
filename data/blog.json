@@ -2,57 +2,57 @@
  "crossbench": {
   "approach_mix": {
    "p": {
-    "n": 672,
-    "code": 549,
-    "direct": 61,
+    "n": 786,
+    "code": 624,
+    "direct": 93,
     "train": 0,
-    "mixed": 13,
-    "none": 49
+    "mixed": 18,
+    "none": 51
    },
    "s": {
-    "n": 719,
-    "code": 223,
-    "direct": 438,
-    "train": 4,
-    "mixed": 43,
+    "n": 859,
+    "code": 255,
+    "direct": 537,
+    "train": 5,
+    "mixed": 51,
     "none": 11
    },
    "t": {
-    "n": 98,
-    "code": 95,
+    "n": 115,
+    "code": 111,
     "direct": 0,
     "train": 2,
-    "mixed": 1,
+    "mixed": 2,
     "none": 0
    }
   },
   "approach_kinds": {
    "p": {
-    "n": 672,
-    "open": 135,
-    "closed": 300,
-    "search": 114,
-    "direct": 61,
-    "mixed": 13,
-    "none": 49
+    "n": 786,
+    "open": 149,
+    "closed": 339,
+    "search": 136,
+    "direct": 93,
+    "mixed": 18,
+    "none": 51
    },
    "s": {
-    "n": 719,
-    "open": 68,
-    "closed": 95,
-    "search": 60,
-    "direct": 438,
-    "train": 4,
-    "mixed": 43,
+    "n": 859,
+    "open": 72,
+    "closed": 114,
+    "search": 69,
+    "direct": 537,
+    "train": 5,
+    "mixed": 51,
     "none": 11
    },
    "t": {
-    "n": 98,
-    "open": 13,
-    "closed": 80,
-    "search": 2,
+    "n": 115,
+    "open": 15,
+    "closed": 93,
+    "search": 3,
     "train": 2,
-    "mixed": 1
+    "mixed": 2
    }
   },
   "bench_tags": {
@@ -74,21 +74,22 @@
    "embodied-olympics-fun": "humanoid sports"
   },
   "snapshot": "2026-10-18 18:30",
-  "sample": 1489,
+  "sample": 1760,
   "interim": true,
   "approach": {
    "p": [
-    549,
-    672
+    624,
+    786
    ],
    "s": [
-    438,
-    719
+    537,
+    859
    ],
    "t": [
-    80,
-    98
+    93,
+    115
    ]
-  }
+  },
+  "snapshot_sol": "2026-11-15"
  }
 }

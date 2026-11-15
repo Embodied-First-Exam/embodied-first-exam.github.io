@@ -20,7 +20,7 @@ Each task can be run in up to three settings. The Standard Setting mimics the re
 
 ## How well do current coding agents do on agentic robotics tasks?
 
-On the 456 core tasks, the strongest of eight agents evaluated in the paper, GPT-6 Astra in Codex, reaches a 34% success rate in the Standard Setting. This leaves much room for improvement.
+On the 456 core tasks, the strongest of ten agents evaluated in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting. This leaves much room for improvement.
 
 ## What kinds of tasks does the Embodied First Exam cover?
 
@@ -47,4 +47,4 @@ The code is at https://github.com/mll-lab-nu/embodied-first-exam (it runs on Har
 - 1,156 tasks, 35 suites, 47 robots, 456 core tasks, 9 new suites
 - 3 evaluation settings: Standard, Realtime (a variant of Standard), Privileged
 - 3 control approaches: direct control, code to control, train a policy to control
-- Best Standard Setting success rate on core tasks: 34% (GPT-6 Astra in Codex, strongest of eight agents)
+- Best Standard Setting success rate on core tasks: 50% (Claude Fable 5.2 in Claude Code, strongest of ten agents)

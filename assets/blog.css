@@ -8,8 +8,8 @@
   --c-claim: #c2412b; --c-honest: #2a8a57; --c-silent: #b9c1ca; --c-other: #dde2e8;
   --f-likely: #1f7a48; --f-possible: #7fca9c; --f-unlikely: #d5dbe2;
   --top: #0f141a; --flash: #9aa3ad;
-  /* the three strongest agents (validated as a categorical set, apart from the settings' colours); none = an empty cell */
-  --ag-fable: #7d1d3f; --ag-astra: #3a5fc8; --ag-opus: #b83f8c; --wf-none: #dfe5ec;
+  /* the strong agents (Sol and Argon in the paper's colours); none = an empty cell */
+  --ag-fable: #7d1d3f; --ag-astra: #3a5fc8; --ag-sol: #1a3a78; --ag-opus: #b83f8c; --ag-argon: #6a4a8f; --wf-none: #dfe5ec;
   /* Finding 6: the three kinds of program in one blue ramp, the other approaches apart */
   --w-open: #9cc0ea; --w-closed: #3f7fc8; --w-search: #1d4378; --w-direct: #c97b2e; --w-train: #8e5bc0; --w-mixed: #c9b458; --w-none: #c3cad3;
 }
@@ -20,7 +20,7 @@
   --c-claim: #ef6f5a; --c-honest: #4cc27a; --c-silent: #5a626c; --c-other: #3a4048;
   --f-likely: #4cc27a; --f-possible: #2a7a4b; --f-unlikely: #3a4048;
   --top: #eceae6; --flash: #6c747e;
-  --ag-fable: #c23b4f; --ag-astra: #6f8ee8; --ag-opus: #d9659f; --wf-none: #2c3138;
+  --ag-fable: #c23b4f; --ag-astra: #6f8ee8; --ag-sol: #b4c6f4; --ag-opus: #d9659f; --ag-argon: #a98bd6; --wf-none: #2c3138;
   --w-open: #a9c8ee; --w-closed: #5a95dc; --w-search: #2f5d9e; --w-direct: #d98f45; --w-train: #a77fd6; --w-mixed: #b8a54d; --w-none: #4a5059;
 }
 
@@ -393,7 +393,7 @@ details.more .cases { margin: 10px 16px 14px; }
 .fig .fig-cap { margin: 4px 0 0 !important; font: 500 13px/1.45 var(--body) !important; color: var(--ink-2) !important; }
 .fig .fig-how { margin: 4px 0 16px !important; font: 400 12.5px/1.5 var(--body) !important; color: var(--ink-3) !important; }
 .fig .fig-how b { margin-right: 6px; font: 600 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
-.legend .sw, .wf-key .sw, .ap-defs .sw { display: inline-block; flex: none; width: 11px; height: 11px; border-radius: 3px; }
+.legend .sw, table.heat .sw, .ap-defs .sw { display: inline-block; flex: none; width: 11px; height: 11px; border-radius: 3px; }
 .legend .sw.dotk { border-radius: 50%; }
 .legend .sw.barkey { width: 18px; height: 6px; border-radius: 3px; background: var(--ink-3); }
 .finding h3 small.cnt { font: 500 .62em var(--mono); letter-spacing: 0; color: var(--ink-3); white-space: nowrap; }
@@ -411,21 +411,6 @@ details.more .cases { margin: 10px 16px 14px; }
 .hb-row .val { font: 400 11.5px var(--mono); color: var(--ink-3); text-align: right; white-space: nowrap; }
 .hb-row .val b { margin-right: 4px; font-weight: 600; color: var(--ink); }
 
-/* Finding 2: the waffles, their counts in the key */
-.wf-key { overflow-x: auto; margin: 0 0 16px; }
-.wf-key table { border-collapse: collapse; font-size: 13px; }
-.wf-key th, .wf-key td { padding: 3px 10px; text-align: right; white-space: nowrap; }
-.wf-key thead th { font: 600 10.5px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--line-2); }
-.wf-key tbody th { font: 500 13px var(--body); text-align: left; padding-left: 0; }
-.wf-key tbody th .sw { margin-right: 8px; vertical-align: -1px; }
-.wf-key td { font: 500 12.5px var(--mono); color: var(--ink-2); border-bottom: 1px solid var(--line); }
-.wfs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
-.wf-ag { display: grid; grid-template-columns: 96px minmax(0, 1fr) 30px; align-items: center; gap: 8px; margin: 3px 0; font-size: 12.5px; }
-.wf-ag b { font: 600 12px var(--mono); text-align: right; }
-.wf-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; max-width: 250px; margin-top: 14px; }
-.wf-grid i { aspect-ratio: 1; border-radius: 4px; }
-@media (max-width: 700px) { .wfs { grid-template-columns: minmax(0, 1fr); max-width: 320px; } }
-
 /* Finding 3 and the safety figure: stacked bars with a gap between segments */
 .sb { display: grid; gap: 8px; }
 .sb-row { display: grid; grid-template-columns: minmax(96px, 170px) minmax(0, 1fr) 40px; align-items: center; gap: 12px; }
@@ -436,7 +421,6 @@ details.more .cases { margin: 10px 16px 14px; }
 .sb-trk > span { display: flex; align-items: center; justify-content: center; min-width: 2px; border-radius: 4px; overflow: hidden; }
 .sb-trk em { font: 600 11px var(--mono); font-style: normal; color: #fff; }
 .sb-trk em.dk { color: var(--ink); }
-@media (max-width: 640px) { .wf-key th, .wf-key td { padding: 3px 6px; font-size: 12px; } }
 [data-theme="dark"] .sb-trk > span[style*="--top"] em { color: var(--bg); }
 .sb-row.ax { margin-top: -2px; }
 .sb-ticks { position: relative; height: 14px; font: 400 10.5px var(--mono); color: var(--ink-3); }
@@ -554,6 +538,17 @@ table.heat th small { font: 400 10.5px var(--mono); color: var(--ink-3); margin-
 table.heat td { text-align: center; padding: 6px 4px; border-radius: 4px; color: var(--ink);
   background: color-mix(in srgb, var(--ag-astra) calc(var(--v) * 1%), var(--bg-2)); }
 table.heat td.hi { color: #fff; }
+/* Finding 3's matrix: the setting's colour, names on their side, a gap between the strong and the weaker agents */
+table.heat.sm { min-width: 600px; }
+table.heat.sm th[scope="row"] { width: 168px; font-weight: 500; }
+table.heat.sm th[scope="row"] .sw { margin-right: 7px; vertical-align: -1px; }
+table.heat.sm td { background: color-mix(in srgb, var(--std) calc(var(--v) * .9%), var(--bg-2)); }
+table.heat.sm td.sv, table.heat.sm td.dg, table.heat.sm td.gap { background: none; color: var(--ink-3); }
+table.heat.sm td.sv { color: var(--ink-2, var(--ink)); }
+table.heat.sm td.gap { width: 4px; padding: 0; }
+table.heat.sm tr.gap td { height: 4px; padding: 0; background: none; }
+table.heat.sm thead th.vh { height: 132px; padding: 0 0 6px; vertical-align: bottom; text-align: center; }
+table.heat.sm thead th.vh span { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font: 500 11.5px var(--body); }
 @media (max-width: 640px) { table.heat { font-size: 10.5px; border-spacing: 2px; } table.heat th { padding: 3px 4px; } .chart .rl { font-size: 13px; } }
 
 /* each finding: its one-sentence summary, shown even when the finding is folded */
@@ -580,6 +575,9 @@ ol.refs li:target { background: color-mix(in srgb, var(--accent, var(--std)) 10%
 /* figures stay as wide as the text; the framework figure keeps its landscape layout, drawn at 1240 px and scaled to the
    column; "Enlarge" opens any figure at full size */
 .fig-zoom-host { position: relative; }
+/* a legend at the top of a figure keeps clear of the Enlarge button */
+.fig-zoom-host > .legend { padding-right: 96px; }
+.zoom-ov .fig-zoom-host > .legend, .zoom-in > .legend { padding-right: 0; }
 .flow-box { position: relative; overflow: hidden; }
 .flow-box > .flowfig { width: 1240px; transform-origin: 0 0; }
 @media (max-width: 860px) { .flow-box > .flowfig { width: auto; transform: none !important; } .flow-box { height: auto !important; } }

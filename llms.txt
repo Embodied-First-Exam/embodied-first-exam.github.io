@@ -9,7 +9,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models), with 456 core tasks.
 - 9 new suites go beyond pick-and-place to spatial puzzles, dexterous manipulation, multi-robot interaction, dynamic whole-body control, and sim-to-sim engineering.
 - Evaluation settings: the Standard Setting mimics the real world (sensor observations only, no environment resets by default); its Realtime variant keeps the environment running while the agent reasons; the Privileged Setting gives full simulator state and unlimited resets, and its success rates serve as an approximate upper bound.
-- Headline result: on the 456 core tasks, the strongest of eight agents in the paper, GPT-6 Astra in Codex, reaches a 34% success rate in the Standard Setting, leaving much room for improvement.
+- Headline result: on the 456 core tasks, the strongest of ten agents in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting, leaving much room for improvement.
 - Failure analysis: failed attempts are labeled by the stage at which they go wrong and compared across agents, settings, and stage categories. Every run is published with its full trace and a replay.
 - Unlike robotics benchmarks built around visuomotor policy learning, EFE treats the coding agent as the system under test and lets it choose its own control approach.
 
