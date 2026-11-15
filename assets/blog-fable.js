@@ -29,8 +29,13 @@ const mins = (x) => (x == null ? null : `${Math.round(x)} minutes`);
 
 /* ---------------------------------------------------------------------------------------------- numbers */
 
+// the nine agents the post was written about (2026-11-12; its text says "the other eight agents"): a run ranked later
+// (GPT-6.1 Sol, 2026-11-15) is on the leaderboard, not in the post, whose numbers and figures stay as published
+const POST_RUNS = [F, A, O, 'antigravity_cli-gemini_4_argon-high', 'claude_code-kimi_3_1_pro-high', 'antigravity_cli-gemini_3_8_flash-high',
+  'claude_code-qwen3_8_max-high', 'dsh-deepseek_v4_1_flash-high', 'claude_code-glm_5_3_flash-high'];
+
 function compute(ex, tasks, bf) {
-  const runs = ex.leaderboard.shared.runs;
+  const runs = ex.leaderboard.shared.runs.filter((r) => POST_RUNS.includes(r));
   const run = Object.fromEntries(ex.runs.map((r) => [r.id, r]));
   const name = (id) => run[id]?.model || id;
   const short = (id) => name(id).replace(/^(Claude|GPT-6|Gemini \d|Gemini) /, '').replace(/ \d.*$/, '');
