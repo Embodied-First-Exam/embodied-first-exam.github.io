@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.embodied-first-exam.ai/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/blogs/first-exam/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/suites/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/tasks/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/leaderboard/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/contribute/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/blogs/</loc></url>
-  <url><loc>https://www.embodied-first-exam.ai/run/</loc></url>
+  <url><loc>https://www.embodied-first-exam.ai/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/blogs/first-exam/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/suites/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/tasks/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/leaderboard/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/contribute/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/blogs/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/run/</loc><lastmod>2026-11-14</lastmod></url>
   <url><loc>https://www.embodied-first-exam.ai/suite/?id=behavior-1k</loc></url>
   <url><loc>https://www.embodied-first-exam.ai/suite/?id=robolab</loc></url>
   <url><loc>https://www.embodied-first-exam.ai/suite/?id=robocasa</loc></url>

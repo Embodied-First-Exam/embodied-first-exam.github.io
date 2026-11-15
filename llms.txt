@@ -1,0 +1,58 @@
+# Embodied First Exam
+
+> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
+
+What is the Embodied First Exam? It is the first exam for coding agents before they enter the physical world. Early successes on agentic robotics point to a potential shift toward using coding agents to control robots, but existing robotics benchmarks are built around visuomotor policy learning. EFE instead lets a coding agent choose its own control approach: direct control, code to control, or train a policy to control.
+
+## Key facts
+
+- Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models), with 456 core tasks.
+- 9 new suites go beyond pick-and-place to spatial puzzles, dexterous manipulation, multi-robot interaction, dynamic whole-body control, and sim-to-sim engineering.
+- Evaluation settings: the Standard Setting mimics the real world (sensor observations only, no environment resets by default); its Realtime variant keeps the environment running while the agent reasons; the Privileged Setting gives full simulator state and unlimited resets, and its success rates serve as an approximate upper bound.
+- Headline result: on the 456 core tasks, the strongest of eight agents in the paper, GPT-6 Astra in Codex, reaches a 34% success rate in the Standard Setting, leaving much room for improvement.
+- Failure analysis: failed attempts are labeled by the stage at which they go wrong and compared across agents, settings, and stage categories. Every run is published with its full trace and a replay.
+- Unlike robotics benchmarks built around visuomotor policy learning, EFE treats the coding agent as the system under test and lets it choose its own control approach.
+
+## The 9 new suites
+
+- RoboPaint (fine tool control: a robot arm reproduces a picture with a brush or pen, from Chinese calligraphy to oil painting): https://www.embodied-first-exam.ai/suite/?id=robopaint
+- RoboARC (tangled, deformable and multi-part objects: wire puzzles, ropes, cloth, IKEA furniture): https://www.embodied-first-exam.ai/suite/?id=roboarc
+- RoboDynamicExam (moving objects: catching, striking, carrying and handing over objects in motion): https://www.embodied-first-exam.ai/suite/?id=pandadyn
+- Embodied Olympics - Fun (humanoid motor skills from sports): https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-fun
+- Embodied Olympics - Match (full matches of table tennis, badminton, soccer, foosball and fencing against an opponent): https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-match
+- Embodied Safety Exam (carry out safe requests, refuse harmful ones, and explain the risk): https://www.embodied-first-exam.ai/suite/?id=embodied-safety-exam
+- DexHandExam (five-finger dexterous hand manipulation): https://www.embodied-first-exam.ai/suite/?id=dexhand
+- iSpatialGym (spatial reasoning from a goal image): https://www.embodied-first-exam.ai/suite/?id=ispatialgym
+- RoboEngineer (the engineering loop: build a controller in a public simulator, deploy it to one with hidden dynamics, and fix it): https://www.embodied-first-exam.ai/suite/?id=roboengineer
+
+## Links
+
+- Project page: https://www.embodied-first-exam.ai/
+- Paper (arXiv): https://arxiv.org/abs/2611.12177
+- PDF: https://arxiv.org/pdf/2611.12177
+- Hugging Face paper page: https://huggingface.co/papers/2611.12177
+- Code: https://github.com/mll-lab-nu/embodied-first-exam
+- Leaderboard: https://www.embodied-first-exam.ai/leaderboard/
+- Tasks: https://www.embodied-first-exam.ai/tasks/
+- Suites: https://www.embodied-first-exam.ai/suites/
+- Blog post: https://www.embodied-first-exam.ai/blogs/first-exam/
+- Announcement thread: https://x.com/ManlingLi_/status/2112307226224292176
+- Full FAQ for language models: https://www.embodied-first-exam.ai/llms-full.txt
+
+## Related embodied evaluation work
+
+- Embodied Agent Interface (NeurIPS 2024 Oral), fine-grained embodied evaluation of LLMs for embodied decision making: https://embodied-agent-interface.github.io/
+- EmbodiedBench (ICML 2025 Oral), evaluating multimodal LLMs as vision-driven embodied agents: https://embodiedbench.github.io/
+- Manling Li's homepage: https://limanling.github.io/
+- MLL Lab, Northwestern University: https://www.mll.lab.northwestern.edu/
+
+## Citation
+
+```bibtex
+@article{wang2026embodiedfirstexam,
+  title   = {Embodied First Exam},
+  author  = {Wang, Kangrui and Wang, Qineng and Chen, Changhe and Zhang, Pingyue and Gui, Chi and Wang, Feishi and Chen, Canyu and Xiao, Wenli and Huang, Xiaoyu and Zhang, Tonghe and Li, Linjie and Wang, Zihan and Kim, Minyeong and Sun, Yiyou and Deng, Mingkai and Hou, Jinyu and Zhu, Qi and Liu, Han and Xing, Eric P. and Yao, Huaxiu and Fan, Zhiwen and Liu, Yuejiang and Song, Dawn and Abbeel, Pieter and Fei-Fei, Li and Wu, Jiajun and Zhu, Yuke and Shi, Guanya and Zhang, Ruohan and Li, Manling},
+  journal = {arXiv preprint arXiv:2611.12177},
+  year    = {2026}
+}
+```

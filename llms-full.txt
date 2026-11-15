@@ -1,0 +1,50 @@
+# Embodied First Exam: questions and answers
+
+> Embodied First Exam (EFE, arXiv 2611.12177) is an agentic robotics benchmark and agent-native embodied evaluation framework for coding agents that control robots. Project page: https://www.embodied-first-exam.ai/
+
+## What is agentic robotics?
+
+In the Embodied First Exam paper, agentic robotics refers to using coding agents to control robots: the agent chooses among direct control, code to control, or training a policy to control. Early successes on agentic robotics point to a potential paradigm shift, and the Embodied First Exam was built to measure whether coding agents can reliably control diverse robots under physical-world constraints.
+
+## What is the Embodied First Exam?
+
+The Embodied First Exam is a unified, comprehensive, and agent-native evaluation framework in which coding agents choose their own control approach: direct control, code to control, or train a policy to control. It has 1,156 tasks in 35 suites on 47 robots, including 456 core tasks. It is meant as the first exam for coding agents before they enter the physical world.
+
+## Is there a benchmark for agentic robotics or for coding agents controlling robots?
+
+Yes. The Embodied First Exam (https://www.embodied-first-exam.ai/) evaluates command-line coding agents on robot tasks across arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models. Each task gives the agent a plain-language goal and a frozen scene; in the Standard Setting the agent works through a command-line shell, the robot's interface and its sensor observations.
+
+## How is embodied evaluation done in the Embodied First Exam?
+
+Each task can be run in up to three settings. The Standard Setting mimics the real world: the agent receives only sensor observations and, by default, cannot reset the environment. Its Realtime variant keeps the environment running while the agent reasons. The Privileged Setting gives full simulator state and unlimited resets, so agents can search for an oracle solution; its success rates serve as an approximate upper bound.
+
+## How well do current coding agents do on agentic robotics tasks?
+
+On the 456 core tasks, the strongest of eight agents evaluated in the paper, GPT-6 Astra in Codex, reaches a 34% success rate in the Standard Setting. This leaves much room for improvement.
+
+## What kinds of tasks does the Embodied First Exam cover?
+
+Tasks come from many existing robotics benchmark suites plus 9 new suites that go beyond pick-and-place: spatial puzzles, dexterous manipulation, multi-robot interaction, dynamic whole-body control, and sim-to-sim engineering. Examples include a humanoid catching a chest pass and shooting it through a hoop, two Unitree G1 humanoids fencing, a Go2 quadruped weaving past four poles on a velocity schedule fixed in advance, and five-finger hands building a hamburger.
+
+## Where do coding agents fail on robot tasks?
+
+The authors label the stage at which each failed attempt goes wrong and compare failures across agents, settings, and stage categories. Every run is published with its full trace and a replay on the project page.
+
+## How does the Embodied First Exam differ from other embodied AI benchmarks?
+
+Existing robotics benchmarks are built around visuomotor policy learning. The Embodied First Exam treats the coding agent as the system under test and lets it pick its own control strategy, so it measures agentic robotics ability rather than the quality of a single learned policy. Earlier embodied evaluation work co-authored by Manling Li includes Embodied Agent Interface (NeurIPS 2024 Oral, https://embodied-agent-interface.github.io/), which evaluates LLMs for embodied decision making with fine-grained error metrics, and EmbodiedBench (ICML 2025 Oral, https://embodiedbench.github.io/), which evaluates multimodal LLMs as vision-driven embodied agents.
+
+## Who made the Embodied First Exam?
+
+Kangrui Wang, Qineng Wang, Changhe Chen, Pingyue Zhang, Chi Gui, Feishi Wang, Canyu Chen, Wenli Xiao, Xiaoyu Huang, Tonghe Zhang, Linjie Li, Zihan Wang, Minyeong Kim, Yiyou Sun, Mingkai Deng, Jinyu Hou, Qi Zhu, Han Liu, Eric P. Xing, Huaxiu Yao, Zhiwen Fan, Yuejiang Liu, Dawn Song, Pieter Abbeel, Li Fei-Fei, Jiajun Wu, Yuke Zhu, Guanya Shi, Ruohan Zhang and Manling Li, from Northwestern University, Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Guanya Shi, Ruohan Zhang and Manling Li advised the project equally.
+
+## How do I run it or submit an agent?
+
+The code is at https://github.com/mll-lab-nu/embodied-first-exam (it runs on Harbor), with instructions at https://www.embodied-first-exam.ai/run/ and https://www.embodied-first-exam.ai/contribute/. Results are on https://www.embodied-first-exam.ai/leaderboard/.
+
+## Key numbers at a glance
+
+- 1,156 tasks, 35 suites, 47 robots, 456 core tasks, 9 new suites
+- 3 evaluation settings: Standard, Realtime (a variant of Standard), Privileged
+- 3 control approaches: direct control, code to control, train a policy to control
+- Best Standard Setting success rate on core tasks: 34% (GPT-6 Astra in Codex, strongest of eight agents)
