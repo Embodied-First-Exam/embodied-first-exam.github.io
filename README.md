@@ -10,6 +10,15 @@ files. The pictures and videos are not in this repository (GitHub Pages serves a
 public HF dataset [MLL-Lab/embodied-exam-data](https://huggingface.co/datasets/MLL-Lab/embodied-exam-data) under
 `site/<suite>/`, and the data names each by its address there with its content hash (`scripts/media.py`).
 
+Where the data lives, one role per place:
+
+- [MLL-Lab/embodied-exam-data](https://huggingface.co/datasets/MLL-Lab/embodied-exam-data): site media only
+  (`site/` that the pages load, `masters/`, `web/` and `blog/` that the blog posts link, `leaderboard/` downloads);
+- [MLL-Lab/embodied-exam-runs](https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs): every agent run the run
+  viewer shows (`/run/`, the tasks' "Watch an agent" links, the blog's case links), read by `assets/app.js`
+  (`RUNS_REMOTE`); nothing reads runs from anywhere else;
+- `MLL-Lab/efe-raw-trials`: the encrypted archive of the raw trials the runs are built from (not read by the site).
+
 ```
 index.html, leaderboard/, suites/, suite/, tasks/, how/, contribute/   the pages
 assets/exam.css, assets/app.js                                        the look and the drawing of every page

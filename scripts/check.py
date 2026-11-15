@@ -22,8 +22,8 @@ FORBIDDEN = ["embodied-agent-interface", "runs/overview", "/runs/", "benchmarks/
              "robot_coding_bench", "internal preview", "log.json", "RoboPaint-strict", "robopaint-strict"]
 SKIP = ("http://", "https://", "mailto:", "#", "data:", "javascript:")
 # public addresses that contain a forbidden fragment by coincidence: removed from the text before the scan
-ALLOWED = ["huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/runs/", "huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/",
-           "blog.json"]  # the public runs datasets; blog.json: the blog's own data file, not a log
+ALLOWED = ["huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/",
+           "blog.json"]  # the public runs dataset; blog.json: the blog's own data file, not a log
 
 
 def exists(base: Path, ref: str) -> bool:
