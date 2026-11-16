@@ -173,13 +173,13 @@
 <meta property="og:title" content="Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics">
 <meta property="og:description" content="Where today’s coding agents succeed and fail in robotics: ten agents on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
 <meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/failure-analysis/">
-<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=bd2e8d93">
+<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics">
 <meta name="twitter:description" content="Where today’s coding agents succeed and fail in robotics: ten agents on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
-<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=bd2e8d93">
+<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -194,7 +194,7 @@
       "inLanguage": "en",
       "url": "https://www.embodied-first-exam.ai/blogs/failure-analysis/",
       "mainEntityOfPage": "https://www.embodied-first-exam.ai/blogs/failure-analysis/",
-      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=bd2e8d93",
+      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30",
       "author": {
         "@type": "Organization",
         "name": "Embodied First Exam",
@@ -475,8 +475,8 @@
 <p>The reverse direction is larger. Fable solves 108 Standard tests that Astra fails, against the 39 Astra solves that Fable fails; both solve 118 and neither solves 191. Against Sol the split is 108 and 29, and against Opus 134 and 22. Still, each of those 39, 29 and 22 tests is one where the agent with fewer successes did something the other did not.</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="9">
-    <p class="fig-cap"><span class="fc-t">Whichever agent the tests are sorted by, other agents still solve tests it fails.</span> Official Figure 9, Standard panel, with a second panel made from the same data. (a) Ten agents, tests ordered by Claude Fable 5.2. (b) Nine agents without Fable, tests ordered by GPT-6 Astra.</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=bd2e8d93" alt="Two Standard task-agent matrices. (a) Ten agents ordered by Claude Fable 5.2: Astra solves 39, Sol 29 and Opus 22 tests that Fable fails. (b) Nine agents without Fable, ordered by GPT-6 Astra: Sol solves 49, Opus 46 and Argon 34 tests that Astra fails." width="1920" height="1080"></div>
+    <p class="fig-cap"><span class="fc-t">Even the strongest agent cannot solve every test that other agents solve.</span> Official Figure 9, Standard panel, with a second panel made from the same data. (a) Ten agents, tests ordered by Claude Fable 5.2. (b) Tests ordered by GPT-6 Astra.</p>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30" alt="Two Standard task-agent matrices. (a) Ten agents ordered by Claude Fable 5.2: Astra solves 39, Sol 29 and Opus 22 tests that Fable fails. (b) Ordered by GPT-6 Astra: Sol solves 49, Opus 46 and Argon 34 tests that Astra fails." width="1920" height="1080"></div>
   </div>
 </figure>
 <p>Panel (b) removes Fable and sorts the tests by Astra, and the pattern repeats one level down. Of the Standard tests Astra fails, Sol solves 49, Opus 46, Argon 34 and Kimi 13. For several pairs the two directions are close: Sol solves 49 tests Astra fails and Astra 59 that Sol fails, and Argon solves 47 that Opus fails against Opus’s 51 that Argon fails. Opus and Astra are further apart, 46 against 89. The table gives every pair.</p>
@@ -506,7 +506,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="8">
     <p class="fig-cap"><span class="fc-t">Every agent fails most Standard tests, and together they still leave about a third unsolved.</span> Official Figure 8. Success rate of each of the ten agents on the paper’s core set, with solved tests or tasks in parentheses. Column order: Overall, then Standard, Realtime, Privileged. In Overall, each core task counts once and is solved only if every core test of the task is solved. The same tasks are solved much more often with full simulator access.</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=a112f20c" alt="Official paper Figure 8: success rates of ten agents in Overall, Standard, Realtime and Privileged. No agent solves half of the 456 Standard tests; on the 391 tasks with both settings, success is far higher in Privileged than in Standard, and Realtime leaves 46% of tests unsolved against 35% of the matching Standard tests." width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=49c0dfc9" alt="Official paper Figure 8: success rates of ten agents in Overall, Standard, Realtime and Privileged. No agent solves half of the 456 Standard tests; on the 391 tasks with both settings, success is far higher in Privileged than in Standard, and Realtime leaves 46% of tests unsolved against 35% of the matching Standard tests." width="1920" height="1080"></div>
   </div>
 </figure>
 <p>In Standard, the five strong agents solve 226, 157, 147, 114 and 110 of 456 tests, and the five weaker agents 46, 29, 17, 14 and 11. Few tests are solved by many agents: 33 by all five strong agents, and only one, a button-press test, by all ten. At the other end, 77 tests are solved by exactly one agent.</p>
