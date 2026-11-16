@@ -26,7 +26,9 @@ function toc() {
     return `<li class="fold"><div class="fold-head"><a href="#${h.id}">${label(h)}</a><button type="button" aria-expanded="false" aria-label="Show subsections">${s.length}</button></div>`
       + `<div class="fold-body"><ol>${s.map((x, i) => `<li><a href="#${x.id}"><span class="k">${i + 1}</span>${esc(x.dataset.short || textOf(x))}</a></li>`).join('')}</ol></div></li>`;
   }).join('');
-  document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${items}</ol></nav>`);
+  const lang = (document.documentElement.lang || 'en').slice(0, 2);
+  const word = { zh: '目录', ja: '目次', ko: '목차', es: 'Contenido', fr: 'Sommaire', de: 'Inhalt' }[lang] || 'Contents';
+  document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="${word}"><p>${word}</p><ol>${items}</ol></nav>`);
   const rail = $('.toc-rail');
   const marks = [...heads, ...$$('.post h3[id]')];
   const links = marks.flatMap((h) => $$(`a[href="#${h.id}"]`)).filter(Boolean);
