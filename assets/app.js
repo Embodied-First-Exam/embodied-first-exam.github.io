@@ -488,7 +488,7 @@ function lbLuna(el, ex, tasks) {
   const lead = $('#lb-luna-lead');
   if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
   const note = $('#lb-luna-note');
-  if (note) note.textContent = `Each test counts the run’s latest finished attempt. A test with no valid result (not run, or ended by an infrastructure failure) is left out of the counts rather than counted as failed: ${int(total.missing)} of ${int(total.tests)} tests. Overall counts a task as solved only when every mode it has was solved, a mode without a valid result counting as not solved; Any mode, when any of them was.`;
+  if (note) note.textContent = `Each share counts the run’s latest graded attempt of each test. Overall counts a task as solved only when every mode it has was solved; Any mode, when any of them was.`;
   const cell = (name, col, v) => {
     if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
     const q = pctOf(v);

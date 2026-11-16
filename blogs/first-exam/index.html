@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="../../assets/exam.css?v=c94f9ada">
 <link rel="stylesheet" href="../../assets/blog.css?v=874f6bf5">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=cbb609b6"></script>
+<script type="module" src="../../assets/app.js?v=2b4ebfc7"></script>
 <script type="module" src="../../assets/blog.js?v=ddcb8457"></script>
 <!-- search-meta:start -->
 <link rel="canonical" href="https://www.embodied-first-exam.ai/blogs/first-exam/">
@@ -148,7 +148,7 @@
       <div class="fig-body" id="fig-modes" data-fig="6"></div>
       <figcaption class="fig-ext">Claude Fable 5.2 solves the most tests in every setting. GPT-6 Astra and GPT-6.1 Sol follow it in every setting, and Claude Opus 5.5 and Gemini 4 Argon come next in the Standard Setting. We call these five the strong agents and the other five the weaker agents. <span data-s="s_gap"></span> The Realtime Setting is harder still: on the <span data-s="st_n"></span> tasks with both tests, <span data-s="none_t_pair"></span> of the Realtime tests remain unsolved by any agent, against <span data-s="none_s_pair"></span> of the Standard tests.</figcaption>
     </figure>
-    <p>Together, the strong agents solve <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in <span data-s="hard_s_frac"></span> suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the strong agents, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
+    <p>At least one strong agent solves <span data-s="u_s_any_pct"></span> of the Standard tests. Yet in <span data-s="hard_s_frac"></span> suites, at least half of the Standard tests are solved by none of them, while in the Privileged Setting this holds <span data-s="hard_p_names"></span> (Figure 7). Averaged over the strong agents, the success rate is at least 70% in <span data-s="easy_p"></span> Privileged suites and <span data-s="easy_s_in"></span>.</p>
     <figure class="fig">
       <div class="fig-body" id="fig-hard" data-fig="7"></div>
     </figure>
@@ -236,12 +236,12 @@
 
     <div class="finding">
       <h3 id="f3" data-short="Differences between agents"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f3-body"><span class="fn">Finding 3</span>The weaker agents fail earlier, and the strong agents solve partly different tests.</button></h3>
-      <p class="finding-sum">The weaker agents are much more likely than the strong agents to fail before making the required contact. In the Standard Setting, the other four strong agents solve <span data-s="rival_s_extra"></span> tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.4 percentage points.</p>
+      <p class="finding-sum">The weaker agents are much more likely than the strong agents to fail before making the required contact. In the Standard Setting, the other four strong agents solve <span data-s="rival_s_extra"></span> tests that Claude Fable 5.2 fails, and switching harnesses can change a model’s success rate by up to 7.5 percentage points.</p>
       <div class="finding-body" id="f3-body">
         <ul class="claims">
             <li>Counted per contact stage that they reach, the weaker agents fail without making the required contact at 9.0% to 18.5% of these stages, against 1.0% to 3.7% for the strong agents. The weaker agents also add few tests: of the Standard tests that any of them solves, the strong agents solve <span data-s="weak_fill"></span>.</li>
             <li>In the Privileged Setting, Claude Fable 5.2 by itself solves <span data-s="lead_any_p"></span> of the tests that any agent solves. In the Standard Setting, no strong agent’s solved tests are a subset of another’s (Figure 9). The other four strong agents solve <span data-s="rival_s_extra"></span> tests that Claude Fable 5.2 fails, and together the five solve <span data-s="u_s_any"></span> of the Standard tests.</li>
-            <li>The harness changes the result too. Run in Claude Code instead of its own Codex, GPT-6 Astra solves 7.4 percentage points fewer Standard tests, the largest change among the harnesses we compared.</li>
+            <li>The harness changes the result too. Run in Claude Code instead of its own Codex, GPT-6 Astra solves 7.5 percentage points fewer Standard tests, the largest change among the harnesses we compared.</li>
         </ul>
         <figure class="fig">
           <div class="fig-body" id="fig-matrix" data-fig="9"></div>
@@ -262,7 +262,7 @@
           </div>
           <h4>Scope</h4>
           <ul>
-            <li>Each agent made one attempt per test, so part of these differences may come from the variation between runs. Of the Standard tests that one run of GPT-6.1 Sol solves, another run of the same agent solves only 57% to 70%.</li>
+            <li>Each agent made one attempt per test, so part of these differences may come from the variation between runs. Of the Standard tests that one run of GPT-6.1 Sol solves, another run of the same agent solves only 56% to 70%.</li>
             <li>Cross-provider runs of the harness comparison go through an adapter; the paper gives every model and harness pair.</li>
           </ul>
         </details>
@@ -315,7 +315,7 @@
     <p>Anyone can take part. A single command, <code>harbor run -d embodied-first-exam -a &lt;harness&gt; -m &lt;model&gt;</code>, evaluates a new model or harness on the core set; the code is in the <a href="https://github.com/mll-lab-nu/embodied-first-exam">exam repository</a>. New tasks and whole suites are welcome (see <a href="../../contribute/">how to contribute</a>), every run can be replayed step by step on the <a href="../../run/">runs page</a>, and labs with real robots can reach us on <a data-discord href="https://discord.gg/AhC6utNyfk" target="_blank" rel="noopener">Discord</a>.</p>
 
     <h3 id="limits">Limitations</h3>
-    <p>Each agent makes a single attempt per test, the stage-level and control-approach labels come from coding agents, and all results are in simulation. Each result belongs to a model in a particular harness, so the way the harness exposes tools, manages the context and ends a session is part of what we measure. The core set leaves out tasks that we judged easy and tasks that the screening agent solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite.</p>
+    <p>Each agent makes a single attempt per test, the stage-level and control-approach labels come from coding agents, and all results except the buzz-wire demonstration are in simulation. Each result belongs to a model in a particular harness, so the way the harness exposes tools, manages the context and ends a session is part of what we measure. The core set leaves out tasks that we judged easy and tasks that the screening agent solved, so its success rates are lower than those of the full exam, by an amount that differs from suite to suite.</p>
 
     <h3 id="references">References</h3>
     <ol class="refs">
