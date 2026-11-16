@@ -1,4 +1,4 @@
-/* A static blog post (blogs/fable-5-2/): the contents rail built from the article's h2 and h3 heads, the replay clips that
+/* A static blog post (blogs/failure-analysis/ and its language versions): the contents rail built from the article's h2 and h3 heads, the replay clips that
    play while on screen, and an Enlarge button on every figure. The nav, footer and theme come from app.js. */
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
