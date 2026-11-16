@@ -754,8 +754,8 @@ const watchable = (suite) => {
   if (!watchP.has(suite)) watchP.set(suite, runShard(suite).then((rows) => {
     const m = new Map();
     for (const r of rows) { if (!r.site) continue; if (!m.has(r.site)) m.set(r.site, []); m.get(r.site).push(r); }
-    // unranked runs, then the ablations, last
-    const late = (r) => (runVariant(r.run) ? 2 : UNRANKED_RUNS.has(r.run) ? 1 : 0);
+    // unranked runs, then the ablations and the study runs, last
+    const late = (r) => (runVariant(r.run) || RUN_STUDY[r.run] ? 2 : UNRANKED_RUNS.has(r.run) ? 1 : 0);
     for (const v of m.values()) v.sort((a, b) => late(a) - late(b));
     return m;
   }).catch((e) => { console.warn('runs', suite, e); watchP.delete(suite); return Object.assign(new Map(), { failed: true }); }));
@@ -2294,6 +2294,10 @@ const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
 // the run viewer with their rule in the setting's name, after the other runs; in no ranking (one suite, under min_suites)
 const RUN_VARIANT = {};
+// runs added to the viewer by hand that keep the exam's rules but are not the agent's ranked run (owner, 2026-11-15: GPT-6.1
+// Sol's reasoning-effort comparison, the pool's check runs codex-gpt6_1_sol-medium and -max): by run id, named like the
+// variants, listed after the other runs, in no ranking (no results in data/exam.json)
+const RUN_STUDY = { 'codex-gpt6_1_sol-medium': 'effort comparison', 'codex-gpt6_1_sol-max': 'effort comparison' };
 const runVariant = (id) => Object.keys(RUN_VARIANT).find((v) => (id || '').endsWith(`_${v}-${(id || '').split('-').pop()}`));
 const settingOf = (r) => {
   const id = r.run || '';
@@ -2305,7 +2309,7 @@ const settingOf = (r) => {
   }
   const rest = id.slice(h.length + 1), effort = rest.slice(rest.lastIndexOf('-') + 1), v = runVariant(id);
   const model = rest.slice(0, rest.lastIndexOf('-') - (v ? v.length + 1 : 0));
-  return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}${v ? ` · ${RUN_VARIANT[v]}` : ''}`;
+  return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}${v ? ` · ${RUN_VARIANT[v]}` : ''}${RUN_STUDY[id] ? ` · ${RUN_STUDY[id]}` : ''}`;
 };
 const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5', 'claude-fable-5-2': 'Claude Fable 5.2',
   'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'qwen3.8-max': 'Qwen3.8 Max', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
