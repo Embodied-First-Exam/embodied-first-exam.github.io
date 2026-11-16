@@ -8,8 +8,13 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 function toc() {
   const heads = $$('.post h2[id]');
   if (!heads.length) return;
+  const subs0 = (h) => { const out = []; for (let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) if (el.tagName === 'H3' && el.id) out.push(el); return out; };
   const textOf = (el) => [...el.childNodes].filter((n) => !n.classList?.contains('num')).map((n) => n.textContent).join('').trim();
-  const label = (h) => `<span class="k">${esc((h.querySelector('.num')?.textContent || '').trim())}</span>${esc(h.dataset.short || textOf(h))}`;
+  // parts are numbered in order (a part without subsections, such as a summary, gets no number); subsections by position
+  let partNo = 0;
+  const nums = new Map(heads.map((h) => [h, (h.querySelector('.num')?.textContent || '').trim()]));
+  heads.forEach((h) => { if (!nums.get(h) && subs0(h).length) nums.set(h, String(++partNo)); });
+  const label = (h) => `<span class="k">${esc(nums.get(h) || '')}</span>${esc(h.dataset.short || textOf(h))}`;
   const subs = (h) => {
     const out = [];
     for (let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) if (el.tagName === 'H3' && el.id) out.push(el);
@@ -19,7 +24,7 @@ function toc() {
     const s = subs(h);
     if (!s.length) return `<li><a href="#${h.id}">${label(h)}</a></li>`;
     return `<li class="fold"><div class="fold-head"><a href="#${h.id}">${label(h)}</a><button type="button" aria-expanded="false" aria-label="Show subsections">${s.length}</button></div>`
-      + `<div class="fold-body"><ol>${s.map((x) => `<li><a href="#${x.id}">${esc(x.dataset.short || textOf(x))}</a></li>`).join('')}</ol></div></li>`;
+      + `<div class="fold-body"><ol>${s.map((x, i) => `<li><a href="#${x.id}"><span class="k">${i + 1}</span>${esc(x.dataset.short || textOf(x))}</a></li>`).join('')}</ol></div></li>`;
   }).join('');
   document.body.insertAdjacentHTML('beforeend', `<nav class="toc-rail" aria-label="Contents"><p>Contents</p><ol>${items}</ol></nav>`);
   const rail = $('.toc-rail');

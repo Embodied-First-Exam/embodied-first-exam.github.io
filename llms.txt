@@ -17,8 +17,8 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 - Under real-robot rules (Standard Setting), 169 of the 456 core tests (37%) are solved by none of the ten agents.
 - Being able to retry helps more than knowing the exact state: in controlled runs of GPT-6 Astra, exact object state raises success from 29% to 45%, unlimited resets with saved states to 53%, both to 68%, against 79% in Privileged.
-- Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol agree on only 57% to 70% of their solved tests.
-- The harness changes results by up to 7.4 percentage points for the same model (GPT-6 Astra: 34.4% in Codex, 27.0% in Claude Code).
+- Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol agree on only 56% to 70% of their solved tests.
+- The harness changes results by up to 7.5 percentage points for the same model (GPT-6 Astra: 34.4% in Codex, 27.0% in Claude Code).
 - Spending more does not buy success: for every agent the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.0%, 32.2% and 29.8% at medium, high and maximum reasoning effort.
 - Stating the success check in full in the task instruction raises GPT-6 Astra from 12 to 37 of 54 RoboDojo tasks.
 
