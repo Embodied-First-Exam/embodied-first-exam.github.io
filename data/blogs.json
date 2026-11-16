@@ -16,13 +16,13 @@
  },
  {
   "slug": "fable-5-2",
-  "title": "Claude Fable 5.2",
-  "date": "2026-11-12",
+  "title": "Fable 5.2 on EFE: Where Agentic Robots Succeed and Fail",
+  "date": "2026-11-16",
   "kind": "Analysis",
-  "summary": "Claude Fable 5.2 leads every setting of the exam, most of all the Standard Setting. Its results, where and why it fails, how it solves tasks, and six of its runs in full.",
+  "summary": "What robotic tasks can coding agents solve, under what physical-world constraints, and where do they fail? Which tasks each of ten agents fails and why, what information matters in Privileged versus Standard, where in a task agents fail, how they act, and how the harness, spending and the task instruction change the result.",
   "tags": [
    "analysis",
-   "results"
+   "failure modes"
   ],
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/replay.mp4",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/poster.jpg"
