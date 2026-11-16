@@ -46,7 +46,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Suites: https://www.embodied-first-exam.ai/suites/
 - Blog post: https://www.embodied-first-exam.ai/blogs/first-exam/
 - Blog post (GPT-6.1 Sol, the tenth agent: its results against GPT-6 Astra, where and why it fails, how it works, its runs, repeated runs and reasoning effort): https://www.embodied-first-exam.ai/blogs/gpt-6-1-sol/
-- Language versions of the failure analysis post: 中文: https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/
+- Language versions of the failure analysis post: 中文: https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/, Español: https://www.embodied-first-exam.ai/blogs/failure-analysis/es/
 - Blog post, "Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics" (which robot tasks each of ten coding agents fails and why; what information matters, Privileged versus Standard; where in a task agents fail; control approaches; harness, spending and task instructions): https://www.embodied-first-exam.ai/blogs/failure-analysis/
 - Announcement thread: https://x.com/ManlingLi_/status/2112307226224292176
 - Full FAQ for language models: https://www.embodied-first-exam.ai/llms-full.txt
