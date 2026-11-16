@@ -154,6 +154,13 @@
   .wwf ul { margin: 0 0 8px; padding-left: 1.2em; }
   .wwf li { margin: 0 0 6px; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
   .toc-rail .fold-head > a { padding-right: 42px; }
+  .toc-top details > summary { cursor: pointer; list-style: none; }
+  .toc-top details > summary::-webkit-details-marker { display: none; }
+  .toc-top details > summary::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 10px; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: translateY(-3px) rotate(45deg); transition: transform .2s; }
+  .toc-top details[open] > summary::after { transform: translateY(0) rotate(-135deg); }
+  .toc-top details > ol { margin: 6px 0 4px; }
+  .toc-top a:hover, .toc-top a:focus-visible, .wwf a:hover { color: var(--priv-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .toc-rail a:hover { color: var(--priv-ink); border-left-color: var(--priv); }
   .lang-switch { margin: 10px 0 0; font: 500 13px/1.7 var(--mono); color: var(--ink-3); }
   .lang-switch a { color: var(--ink-2); border: 0; }
   .lang-switch span[aria-current] { color: var(--ink); font-weight: 650; }
@@ -391,10 +398,10 @@
   </div>
 </div>
 
-    <nav class="toc-top" aria-label="Contents">
-      <p class="label">Contents</p>
+    <nav class="toc-top" aria-label="Outline">
+      <p class="label">Outline</p>
       <ol>
-        <li><a href="#fail-why">Which tasks does each agent fail, and why?</a><ol>
+        <li><details><summary><a href="#fail-why">Which tasks does each agent fail, and why?</a></summary><ol>
           <li><a href="#cross-solve">Each strong agent solves tests the others cannot, in both directions</a></li>
           <li><a href="#shared-boundary">Even with ten agents pooled, more than a third of the Standard tests stay unsolved</a></li>
           <li><a href="#where-each-leads">The lead changes hands from suite to suite, and a newer agent can do worse on specific suites</a></li>
@@ -404,16 +411,16 @@
           <li><a href="#eight-tests">Fable’s misses on widely solved tests come from an unwanted contact, a skipped check, or no margin left</a></li>
           <li><a href="#run-variance">The same agent run three times solves a different set of tests, so single-test differences between agents are weak evidence</a></li>
           <li><a href="#realtime">When the simulation keeps running, the boundary moves further in, though not on every task</a></li>
-        </ol></li>
-        <li><a href="#information">What information matters to the agent? Privileged versus Standard</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#information">What information matters to the agent? Privileged versus Standard</a></summary><ol>
           <li><a href="#settings-explained">The three settings differ only in what the agent can see and do</a></li>
           <li><a href="#transfer">Full simulator access hides much of what makes a task hard</a></li>
           <li><a href="#state-vs-resets">Being able to retry helps more than knowing where everything is</a></li>
           <li><a href="#precise-stages">The drop concentrates at stages that need a tight fit, a target pose or a moving contact</a></li>
           <li><a href="#precise-resets">At precise stages, seeing the exact pose barely helps on its own; retrying the action does</a></li>
           <li><a href="#no-signal">GPT-6 Astra barely depends on being told that the task has succeeded</a></li>
-        </ol></li>
-        <li><a href="#where">Where in a task do agents fail?</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#where">Where in a task do agents fail?</a></summary><ol>
           <li><a href="#same-stage">When several agents fail a task, they tend to fail at the same stage, so the hard step belongs to the task more than to the agent</a></li>
           <li><a href="#same-across-settings">Full simulator access changes what happens at and after the hard stage, not where the hard stage is</a></li>
           <li><a href="#stage-kinds">Changing a material or moving the robot’s body fails most often, but which kinds of stage are hardest does not carry over from one suite to another</a></li>
@@ -423,27 +430,27 @@
           <li><a href="#fable-profile">Fable rarely fails before touching the object; when it fails, it is usually after contact, with a misjudged pose or a lost grip</a></li>
           <li><a href="#lunch-batteries">On long household tasks, many agents complete the first items and then lose the robot’s balance on the way to the next</a></li>
           <li><a href="#cereal">Fetching cereal and a bowl: the strong agents fail with the bowl in reach, the weaker ones before getting hold of what their stage needs</a></li>
-        </ol></li>
-        <li><a href="#act">Which control approach do agents use?</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#act">Which control approach do agents use?</a></summary><ol>
           <li><a href="#control-by-setting">The setting decides how agents act: the model drives the robot in Standard, and programs drive it in Realtime and Privileged</a></li>
           <li><a href="#soccer-gpu">Given a GPU and a training library, agents switch from hand-written gaits to trained policies, and in Standard and Realtime almost every win comes from a policy they trained</a></li>
-        </ol></li>
-        <li><a href="#trajectories">What successful trajectories look like</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#trajectories">What successful trajectories look like</a></summary><ol>
           <li><a href="#success-methods">Solved runs measure before they move: they model the scene and the robot, rehearse offline, and treat a failed episode as data</a></li>
-        </ol></li>
-        <li><a href="#spend">Does spending more help?</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#spend">Does spending more help?</a></summary><ol>
           <li><a href="#spend-cost">Spending more is not what buys success: failed attempts cost more than solved ones, and an agent at less than a sixth of the price comes within about two points</a></li>
           <li><a href="#spend-how">The agents spend an attempt in different ways: Fable writes more and acts less, Astra acts more and runs to the time limit, Opus stops earliest</a></li>
           <li><a href="#spend-effort">Thinking harder changes how GPT-6.1 Sol works but hardly changes how often it succeeds</a></li>
-        </ol></li>
-        <li><a href="#harness">How the harness affects results</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#harness">How the harness affects results</a></summary><ol>
           <li><a href="#harness-gap">An agent’s score belongs to the model and its harness together: the same model moves by up to 7.5 points when the harness changes</a></li>
           <li><a href="#harness-design">How a harness ends a session and summarizes a long one can decide whether a physical task gets finished</a></li>
-        </ol></li>
-        <li><a href="#instruction">Does the task instruction change the result?</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#instruction">Does the task instruction change the result?</a></summary><ol>
           <li><a href="#robodojo">A case from RoboDojo: stating the success check in full triples the score</a></li>
-        </ol></li>
-        <li><a href="#next">What’s next</a><ol>
+        </ol></details></li>
+        <li><details><summary><a href="#next">What’s next</a></summary><ol>
           <li><a href="#closing-limits">One run, agent-written labels and simulation only: what these results cannot yet tell us</a></li>
           <li><a href="#next-hidden">A hidden set of tasks, so that results measure ability rather than memory</a></li>
           <li><a href="#next-real">Evaluation on real robots, starting from the same Standard interface</a></li>
@@ -451,7 +458,7 @@
           <li><a href="#closing-olympics">A separate board, with its own rules: the Embodied Olympics Episodic Learning matches</a></li>
           <li><a href="#closing-notes">Where each number comes from</a></li>
           <li><a href="#cite">Data and citation</a></li>
-        </ol></li>
+        </ol></details></li>
       </ol>
     </nav>
 
