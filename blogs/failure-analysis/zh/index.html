@@ -467,7 +467,7 @@
     <ul>
       <li>在 Fable 失败的 230 个 Standard 测试中，Astra 完成 39 个，Sol 完成 29 个，Opus 完成 22 个，Argon 完成 14 个；四者合计完成 60 个。Fable 则完成了 108 个 Astra 失败的 Standard 测试。</li>
       <li>不考虑 Fable 时，在 Astra 失败的 Standard 测试中，Sol 完成 49 个，Opus 完成 46 个，Argon 完成 34 个。Opus 完成了全部 7 个 ManiGuard 测试，其他智能体均未做到。</li>
-      <li>在 Privileged 设定下，两个方向基本持平：在 391 个测试中，仅 Fable 完成的有 28 个，仅 Astra 完成的有 25 个。</li>
+      <li>在 Privileged 设定下，两个方向基本持平：在 391 个测试中，仅 Fable 完成的有 28 个，仅 Astra 完成的有 24 个。</li>
       <li>在 Fable 失败的 230 个 Standard 测试中，有 169 个没有任何智能体能够完成。</li>
     </ul>
   </div>
@@ -500,7 +500,7 @@
 </figure>
 <p>只有一个强智能体解决的测试也分散在不同智能体之间。在至少被一个强智能体解决的 286 个 Standard 测试中，有 79 个恰好只有一个强智能体解决：Fable 48 个，Astra 18 个，Sol 8 个，Opus 4 个，Argon 1 个。它们分布在不同的套件中：Fable 的 48 个中有 25 个属于 BEHAVIOR-1K 或 RoboARC，而 Astra 的 18 个中有 4 个、Sol 的 8 个中有 2 个是 RoboPaint 测试。</p>
 <p>成功次数最多的智能体失败，并不意味着该测试就难。Fable 失败的测试中有 8 个被其余九个智能体中的至少四个解决，其中一个 Embodied Safety Exam 倾倒测试被六个智能体解决，包括 Kimi、Gemini 3.8 Flash、Qwen 和 DeepSeek（这 8 个测试全部列在 <a href="#eight-tests">Fable 在普遍被解决的测试上的失误</a>中）。</p>
-<p>在拥有完整模拟器访问权限时，Fable 与 Astra 之间的划分几乎持平：在 Privileged 下，只有 Fable 解决的测试有 28 个，只有 Astra 解决的有 25 个，两者都解决的有 283 个，都未解决的有 55 个（共 391 个测试）。在 Privileged 测试中，Astra 是 13 个测试的唯一强解决者，Fable 是 9 个，Sol 是 5 个，Argon 是 2 个，Opus 是 1 个。Realtime 下的划分见 <a href="#realtime">Realtime 一节</a>。</p>
+<p>在拥有完整模拟器访问权限时，Fable 与 Astra 之间的划分几乎持平：在 Privileged 下，只有 Fable 解决的测试有 28 个，只有 Astra 解决的有 24 个，两者都解决的有 284 个，都未解决的有 55 个（共 391 个测试）。在 Privileged 测试中，Astra 是 12 个测试的唯一强解决者，Fable 是 9 个，Sol 是 5 个，Argon 是 2 个，Opus 是 1 个。Realtime 下的划分见 <a href="#realtime">Realtime 一节</a>。</p>
 <p>本节的所有数字都来自每个智能体在每个测试上的单次运行，而同一智能体的两次运行之间，成功结果只有 56% 到 70% 相互一致（<a href="#run-variance">见下文</a>）。因此论文指出，各智能体所解决测试集合之间的差异，很大一部分可能来自运行间的波动：其他智能体解决而 Fable 失败的 60 个测试确实是真实的成功，但其中任何一个都未必能够复现。</p>
 
     <h3 id="shared-boundary" data-short="所有智能体均未解决">即使汇总全部十个智能体，仍有超过三分之一的 Standard 测试无人解决</h3>
@@ -521,8 +521,8 @@
 <p>按套件拆分来看，成功次数最多的智能体多次易位。这些计数来自论文核心集的网站数据，采用论文的套件划分，其中 RoboARC 的 IKEA 组装任务单独计为一个套件。</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="suite-diff">
-        <p class="fig-cap"><span class="fc-t">两个智能体中哪一个解出的测试更多，取决于具体的测试套件；在拥有完整模拟器访问权限时，两者几乎持平。</span> 图中数值为 Claude Fable 5.2 解出的测试数减去 GPT-6 Astra 解出的测试数，涵盖该设置下所有核心测试不少于五个的套件（RoboARC 中的 IKEA assembly 任务单独计为一个套件；括号内为各套件的核心测试数），数据来自排行榜。在 Standard 设置下，Fable 在 17 个套件中解出更多，Astra 在 4 个套件中解出更多：RoboPaint（7 对 2），以及 DexToolBench、HumanoidBench 和 MuJoCo Playground（各多一个测试）。在 Privileged 设置下，两者在 20 个套件中的 14 个持平；Fable 在 RoboARC 中多解出 5 个（+5），并在另外三个套件中各多一个测试，Astra 则在 DexToolBench（+3）和 RoboPaint（+2）中领先。</p>
-        <div class="pimg"><img class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/suite_diff_fable_astra.png?v=19d2aa5a" alt="按套件展示 Claude Fable 5.2 解出的测试数减去 GPT-6 Astra 解出的测试数的发散条形图。Standard：Fable 在 17 个套件中解出更多，差距最大的是 RoboARC（+18）和 BEHAVIOR-1K（+12）；Astra 在 RoboPaint（多 5 个）以及 DexToolBench、HumanoidBench 和 MuJoCo Playground（各多 1 个）中解出更多。Privileged：20 个套件中有 14 个持平；Fable 在 RoboARC 中 +5，Astra 在 DexToolBench 中 +3、在 RoboPaint 中 +2。" width="2400" height="1440"></div>
+        <p class="fig-cap"><span class="fc-t">两个智能体中哪一个解出的测试更多，取决于具体的测试套件；在拥有完整模拟器访问权限时，两者几乎持平。</span> 图中数值为 Claude Fable 5.2 解出的测试数减去 GPT-6 Astra 解出的测试数，涵盖该设置下所有核心测试不少于五个的套件（RoboARC 中的 IKEA assembly 任务单独计为一个套件；括号内为各套件的核心测试数），数据来自排行榜。在 Standard 设置下，Fable 在 17 个套件中解出更多，Astra 在 4 个套件中解出更多：RoboPaint（7 对 2），以及 DexToolBench、HumanoidBench 和 MuJoCo Playground（各多一个测试）。在 Privileged 设置下，两者在 20 个套件中的 13 个持平；Fable 在 RoboARC 中多解出 5 个（+5），并在另外四个套件中各多一个测试，Astra 则在 DexToolBench（+3）和 RoboPaint（+2）中领先。</p>
+        <div class="pimg"><img class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/suite_diff_fable_astra.png?v=19d2aa5a" alt="按套件展示 Claude Fable 5.2 解出的测试数减去 GPT-6 Astra 解出的测试数的发散条形图。Standard：Fable 在 17 个套件中解出更多，差距最大的是 RoboARC（+18）和 BEHAVIOR-1K（+12）；Astra 在 RoboPaint（多 5 个）以及 DexToolBench、HumanoidBench 和 MuJoCo Playground（各多 1 个）中解出更多。Privileged：20 个套件中有 13 个持平；Fable 在 RoboARC 中 +5，Astra 在 DexToolBench 中 +3、在 RoboPaint 中 +2。" width="2400" height="1440"></div>
       </div>
     </figure>
 
@@ -732,11 +732,11 @@
     <p>这些任务还被设计为在真实机器人规则下依然困难，因此 Privileged 成功率高而 Standard 成功率低正是预期结果。二者之间的差距衡量的是智能体在必须像真实机器人一样工作时所损失的能力。下面各节分别考察 Privileged 中的成功有多少能保留到 Standard，以及这一差距究竟来自精确状态还是重试机会。</p>
 
     <h3 id="transfer" data-short="Privileged 到 Standard">完整的仿真器权限掩盖了任务的大部分难点</h3>
-<p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 311 个中失败 136 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 281 个中 174 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
+<p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 281 个中 174 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
 <p>反过来的情况很少。在 Standard 中解出但在 Privileged 中未解出的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 8 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有智能体中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=d0a5ac89" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 311 个 Privileged 任务中有 136 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 281 个中 174 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、8 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=d0a5ac89" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 281 个中 174 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、8 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
 <p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的套件中，Fable 的成功率除一个套件外全部下降；根据网站数据，该套件为 iSpatialGym，Fable 在两种设置下均解出 8 个任务中的 7 个。Astra 在所有这些套件中都出现下降。Sol 除 RoboWits 外全部下降（Standard 中 6 个解出 3 个，Privileged 中一个未解出）。Opus 在 ManiGuard（两种设置下均为 7 个解出 7 个）和 DexToolBench（两种设置下均未解出）中没有下降。Argon 在 MyoSuite（Standard 中 13 个解出 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个解出 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个解出 1 个）。</p>
-<p><b>在 Privileged 中看似相当的智能体，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 解出的有 28 个，仅 Astra 解出的有 25 个，二者都解出的有 283 个，二者都未解出的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
+<p><b>在 Privileged 中看似相当的智能体，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 解出的有 28 个，仅 Astra 解出的有 24 个，二者都解出的有 284 个，二者都未解出的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
     <h3 id="state-vs-resets" data-short="重试与状态">能够重试比知道一切物体的位置更有帮助</h3>
 <p>当论文把 Privileged 的功能逐一加入 Standard 接口时，无限重置比精确物体状态弥合了更多差距。这表明（只是一种推断，而非已证实的结论）：对智能体而言，更难的部分是把动作做对，而不是知道物体在哪里。</p>

@@ -26,18 +26,5 @@
   ],
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/0b/roboarc-interlocked-claws-12-i01-standard--vkgu3fv/replay.mp4",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/0b/roboarc-interlocked-claws-12-i01-standard--vkgu3fv/poster.jpg"
- },
- {
-  "slug": "gpt-6-1-sol",
-  "title": "GPT-6.1 Sol",
-  "date": "2026-11-16",
-  "kind": "Analysis",
-  "summary": "GPT-6.1 Sol is third in every setting of the exam, close to GPT-6 Astra at less than a sixth of its cost per attempt. Its results, where and why it fails, how it works, its runs, and repeated runs and reasoning effort.",
-  "tags": [
-   "analysis",
-   "results"
-  ],
-  "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/be/behavior-preparing-lunch-box-i00-standard--wfkzrcj/replay.mp4",
-  "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/be/behavior-preparing-lunch-box-i00-standard--wfkzrcj/poster.jpg"
  }
 ]
