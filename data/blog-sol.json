@@ -1,0 +1,181 @@
+{
+ "snapshot": "the report's cost table, November 2026",
+ "source": "paper cost table (app_cost_vs_success/attempts.csv)",
+ "runs": {
+  "codex-gpt6_1_sol-high": {
+   "p": {
+    "n_cost": 386,
+    "usd_mean": 3.98,
+    "usd_total": 1535.3,
+    "usd_med_ok": 2.25,
+    "usd_med_fail": 6.28,
+    "wall_med": 59.89,
+    "wall_med_ok": 57.23,
+    "wall_med_fail": 118.13,
+    "tok_out_med": 74703.0
+   },
+   "s": {
+    "n_cost": 456,
+    "usd_mean": 4.1,
+    "usd_total": 1869.5,
+    "usd_med_ok": 1.05,
+    "usd_med_fail": 3.14,
+    "wall_med": 57.83,
+    "wall_med_ok": 25.1,
+    "wall_med_fail": 60.05,
+    "tok_out_med": 65344.5
+   },
+   "t": {
+    "n_cost": 54,
+    "usd_mean": 2.6,
+    "usd_total": 140.6,
+    "usd_med_ok": 1.51,
+    "usd_med_fail": 2.13,
+    "wall_med": 48.15,
+    "wall_med_ok": 42.42,
+    "wall_med_fail": 56.53,
+    "tok_out_med": 69849.5
+   }
+  },
+  "codex-gpt6_astra-high": {
+   "p": {
+    "n_cost": 390,
+    "usd_mean": 22.92,
+    "usd_total": 8940.3,
+    "usd_med_ok": 15.94,
+    "usd_med_fail": 30.71,
+    "wall_med": 58.88,
+    "wall_med_ok": 50.72,
+    "wall_med_fail": 118.2,
+    "tok_out_med": 52542.0
+   },
+   "s": {
+    "n_cost": 456,
+    "usd_mean": 27.12,
+    "usd_total": 12364.6,
+    "usd_med_ok": 9.01,
+    "usd_med_fail": 25.9,
+    "wall_med": 55.34,
+    "wall_med_ok": 24.1,
+    "wall_med_fail": 60.05,
+    "tok_out_med": 55463.0
+   },
+   "t": {
+    "n_cost": 54,
+    "usd_mean": 15.55,
+    "usd_total": 839.7,
+    "usd_med_ok": 8.39,
+    "usd_med_fail": 11.63,
+    "wall_med": 28.73,
+    "wall_med_ok": 21.97,
+    "wall_med_fail": 39.25,
+    "tok_out_med": 44996.5
+   }
+  },
+  "claude_code-fable_5_2-high": {
+   "p": {
+    "n_cost": 389,
+    "usd_mean": 11.36,
+    "usd_total": 4417.3,
+    "usd_med_ok": 8.72,
+    "usd_med_fail": 15.67,
+    "wall_med": 51.72,
+    "wall_med_ok": 45.75,
+    "wall_med_fail": 96.43,
+    "tok_out_med": 124064.0
+   },
+   "s": {
+    "n_cost": 456,
+    "usd_mean": 13.43,
+    "usd_total": 6121.9,
+    "usd_med_ok": 8.81,
+    "usd_med_fail": 12.75,
+    "wall_med": 44.33,
+    "wall_med_ok": 33.3,
+    "wall_med_fail": 50.92,
+    "tok_out_med": 146447.5
+   },
+   "t": {
+    "n_cost": 54,
+    "usd_mean": 12.62,
+    "usd_total": 681.6,
+    "usd_med_ok": 10.11,
+    "usd_med_fail": 12.36,
+    "wall_med": 36.47,
+    "wall_med_ok": 36.47,
+    "wall_med_fail": 37.95,
+    "tok_out_med": 145389.0
+   }
+  },
+  "claude_code-opus_5_5-high": {
+   "p": {
+    "n_cost": 391,
+    "usd_mean": 4.79,
+    "usd_total": 1874.1,
+    "usd_med_ok": 2.84,
+    "usd_med_fail": 3.47,
+    "wall_med": 38.8,
+    "wall_med_ok": 34.95,
+    "wall_med_fail": 44.76,
+    "tok_out_med": 61824.0
+   },
+   "s": {
+    "n_cost": 456,
+    "usd_mean": 6.45,
+    "usd_total": 2941.5,
+    "usd_med_ok": 2.97,
+    "usd_med_fail": 4.66,
+    "wall_med": 32.29,
+    "wall_med_ok": 24.07,
+    "wall_med_fail": 36.85,
+    "tok_out_med": 82563.5
+   },
+   "t": {
+    "n_cost": 54,
+    "usd_mean": 4.13,
+    "usd_total": 223.2,
+    "usd_med_ok": 2.76,
+    "usd_med_fail": 3.54,
+    "wall_med": 22.73,
+    "wall_med_ok": 17.07,
+    "wall_med_fail": 23.07,
+    "tok_out_med": 77423.0
+   }
+  },
+  "antigravity_cli-gemini_4_argon-high": {
+   "p": {
+    "n_cost": 391,
+    "usd_mean": 4.21,
+    "usd_total": 1647.7,
+    "usd_med_ok": 3.39,
+    "usd_med_fail": 4.18,
+    "wall_med": 59.95,
+    "wall_med_ok": 46.63,
+    "wall_med_fail": 60.05,
+    "tok_out_med": 132888.0
+   },
+   "s": {
+    "n_cost": 456,
+    "usd_mean": 6.27,
+    "usd_total": 2860.9,
+    "usd_med_ok": 2.85,
+    "usd_med_fail": 5.95,
+    "wall_med": 60.05,
+    "wall_med_ok": 37.57,
+    "wall_med_fail": 65.29,
+    "tok_out_med": 217144.5
+   },
+   "t": {
+    "n_cost": 54,
+    "usd_mean": 4.94,
+    "usd_total": 266.7,
+    "usd_med_ok": 2.0,
+    "usd_med_fail": 4.69,
+    "wall_med": 57.51,
+    "wall_med_ok": 27.73,
+    "wall_med_fail": 60.03,
+    "tok_out_med": 187837.0
+   }
+  }
+ }
+}
