@@ -139,6 +139,7 @@
   .hl li:last-child { margin-bottom: 0; }
   .hl li a { border: 0; color: var(--ink); }
   .hl li a b { font-weight: 650; }
+  .wwf-label { margin: 0 auto 10px; max-width: var(--col); font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
   .toc-top { margin: 18px auto 30px; padding: 18px 24px; border: 1px solid var(--line); border-radius: 16px; max-width: var(--col); box-sizing: border-box; }
   .toc-top > ol { margin: 0; padding-left: 1.3em; }
   .toc-top > ol > li { margin: 0 0 10px; font-weight: 600; font-size: 15px; }
@@ -370,34 +371,6 @@
     <p>The <a href="../first-exam/">first report</a> describes the exam; this post asks what its results say about coding agents. What sets the exam apart is that it controls exactly what an agent can see and do. Each task runs in three settings with the same scene, success rule and time limit: in the <b>Standard</b> Setting the agent sees only the robot’s sensors and cannot reset, as with a real robot; the <b>Realtime</b> Setting is the same, but the world keeps running while the agent thinks; the <b>Privileged</b> Setting gives the full simulator state and unlimited resets. Comparing them shows which information and abilities an agent depends on. Ten agents each made one attempt per test on the 456 hard core tasks.</p>
 
     <h2 id="found" data-short="What we found">What we found</h2>
-    <div class="wwf">
-  <div class="wwf-b">
-    <h4>Where Fable leads</h4>
-    <ul>
-      <li>BEHAVIOR-1K, Standard: 26 of 71 long household activities, against 14 for Astra, 13 for Sol, 5 for Opus and 4 for Argon.</li>
-      <li>RoboARC, Standard: 32 of 50 puzzles, against at most 15 for any other agent.</li>
-      <li>iSpatialGym (7 of 8) and Embodied Olympics - Match (10 of 13), where the next agents solve 5 and 6.</li>
-    </ul>
-  </div>
-  <div class="wwf-b">
-    <h4>Where Astra and Sol lead</h4>
-    <ul>
-      <li>RoboPaint, Standard: GPT-6 Astra solves 7 of 22 tests and GPT-6.1 Sol 6, against 2 each for Claude Fable 5.2, Claude Opus 5.5 and Gemini 4 Argon.</li>
-      <li>Astra is ahead in Standard DexToolBench (2 of 20), HumanoidBench (1 of 8, the only success by any agent in the suite) and MuJoCo Playground (4 of 7), and in Privileged DexToolBench (13 of 20, against 10 for Fable and Sol).</li>
-      <li>In Privileged, Sol solves the most MyoSuite tests (7 of 13) and BEHAVIOR-1K tests (38 of 71).</li>
-    </ul>
-  </div>
-  <div class="wwf-b">
-    <h4>What others solve that Fable cannot, and the reverse</h4>
-    <ul>
-      <li>Of the 230 Standard tests Fable fails, Astra solves 39, Sol 29, Opus 22 and Argon 14; together the four solve 60. Fable solves 108 Standard tests that Astra fails.</li>
-      <li>Without Fable, Sol solves 49 Standard tests that Astra fails, Opus 46 and Argon 34. Opus solves all 7 ManiGuard tests, which no other agent does.</li>
-      <li>In Privileged the two directions are nearly even: 28 tests only Fable solves and 25 only Astra solves, out of 391.</li>
-      <li>169 of the 230 Standard tests Fable fails are solved by no agent at all.</li>
-    </ul>
-  </div>
-</div>
-
     <nav class="toc-top" aria-label="Outline">
       <p class="label">Outline</p>
       <ol>
@@ -461,6 +434,36 @@
         </ol></details></li>
       </ol>
     </nav>
+
+    <p class="wwf-label">Overall results</p>
+    <div class="wwf">
+  <div class="wwf-b">
+    <h4>Where Fable leads</h4>
+    <ul>
+      <li>BEHAVIOR-1K, Standard: 26 of 71 long household activities, against 14 for Astra, 13 for Sol, 5 for Opus and 4 for Argon.</li>
+      <li>RoboARC, Standard: 32 of 50 puzzles, against at most 15 for any other agent.</li>
+      <li>iSpatialGym (7 of 8) and Embodied Olympics - Match (10 of 13), where the next agents solve 5 and 6.</li>
+    </ul>
+  </div>
+  <div class="wwf-b">
+    <h4>Where Astra and Sol lead</h4>
+    <ul>
+      <li>RoboPaint, Standard: GPT-6 Astra solves 7 of 22 tests and GPT-6.1 Sol 6, against 2 each for Claude Fable 5.2, Claude Opus 5.5 and Gemini 4 Argon.</li>
+      <li>Astra is ahead in Standard DexToolBench (2 of 20), HumanoidBench (1 of 8, the only success by any agent in the suite) and MuJoCo Playground (4 of 7), and in Privileged DexToolBench (13 of 20, against 10 for Fable and Sol).</li>
+      <li>In Privileged, Sol solves the most MyoSuite tests (7 of 13) and BEHAVIOR-1K tests (38 of 71).</li>
+    </ul>
+  </div>
+  <div class="wwf-b">
+    <h4>What others solve that Fable cannot, and the reverse</h4>
+    <ul>
+      <li>Of the 230 Standard tests Fable fails, Astra solves 39, Sol 29, Opus 22 and Argon 14; together the four solve 60. Fable solves 108 Standard tests that Astra fails.</li>
+      <li>Without Fable, Sol solves 49 Standard tests that Astra fails, Opus 46 and Argon 34. Opus solves all 7 ManiGuard tests, which no other agent does.</li>
+      <li>In Privileged the two directions are nearly even: 28 tests only Fable solves and 25 only Astra solves, out of 391.</li>
+      <li>169 of the 230 Standard tests Fable fails are solved by no agent at all.</li>
+    </ul>
+  </div>
+</div>
+
 
     <h2 id="fail-why" data-short="Which tasks fail">Which tasks does each agent fail, and why?</h2>
     <h3 id="cross-solve" data-short="Who solves what">Each strong agent solves tests the others cannot, in both directions</h3>
