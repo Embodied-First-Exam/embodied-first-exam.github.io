@@ -918,6 +918,13 @@
 <p><b>多数较弱智能体在完成其阶段所需的接触之前就已失败。</b> Kimi 3.1 Pro 打开了柜子，但始终没有抓住麦片盒。Gemini 3.8 Flash 在 2 s 时在碗的位置闭合夹爪，却抓了个空。GLM 5.3 Flash 始终没有抓住柜门把手，DeepSeek V4.1 Flash 打开了一扇柜门，但始终没有够到麦片盒。Qwen3.8 Max 从未打开柜子。</p>
 <p>在拥有精确状态时，碗是可以处理的：在 Privileged 设置下，Fable、Astra、Sol 和 Opus 都解决了该测试。在 Standard 设置下，Fable 的通过与 Astra 或 Opus 的失败之间的差别，只在于几秒钟内碗是否滑落；因此，在每个智能体只有一次尝试的情况下，这个案例更多地展示了各智能体如何失败，而非哪个智能体更擅长该任务。</p><h2 id="act" data-short="控制方式">智能体采用哪种控制方式？</h2>
     <h3 id="control-by-setting" data-short="按设定区分的控制方式">设定决定智能体的行动方式：Standard 中由模型直接驱动机器人，Realtime 与 Privileged 中由程序驱动</h3>
+    <p>智能体控制机器人有三种方式，也可以混合使用。<b>直接控制</b>时，模型本身就是控制器：它发出一个动作，查看相机图像或传感器读数，再决定下一个动作。<b>用代码控制</b>时，它编写规划器、控制器或其他程序，由程序产生机器人的动作。<b>训练策略</b>时，它在仿真中训练一个策略，再让策略控制机器人。下图给出每种方式的一次尝试，并附上智能体所写内容的节选。</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="approaches">
+        <p class="fig-cap"><span class="fc-t">三种控制方式，以及它们的混合使用。</span> 论文官方图 4。每个面板上方是智能体命令或代码的节选，下方是该回合的一帧画面；深色标签表示所用的方式（<i>model</i> 即直接控制）。从左到右依次为：RoboTwin 2.0 上的直接控制，RoboLab 上的用代码控制，HumanoidBench 上训练出的策略，以及 Embodied Olympics - Fun 上代码与策略的混合，其中带框的一行就是策略。</p>
+        <div class="pimg"><img class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_approaches.png?v=2de92f5d" alt="论文官方图 4，共四个面板。RoboTwin 2.0 上的直接控制：模型发出 move、grip 和 look 命令，并记下可乐瓶倒了。RoboLab 上的用代码控制：函数 line 和 pick 通过逆运动学移动关节。HumanoidBench 上的训练策略：一个训练了五轮的小型神经网络 actor，画面中人形机器人在奔跑。Embodied Olympics - Fun 上的混合：代码做最小二乘拟合和参数搜索，其中一行调用策略。" width="2400" height="899"></div>
+      </div>
+    </figure>
     <p>在随机抽取的尝试中，智能体在 63% 的 Standard 尝试中直接控制机器人，而在 97% 的 Realtime 尝试和 79% 的 Privileged 尝试中编写程序来控制机器人。原因在于时钟。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，智能体掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="18">
