@@ -311,7 +311,7 @@
           "name": "不同的编码智能体解决的是同一批机器人任务吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "不是。GPT-6 Astra 解决了 39 个 Claude Fable 5.2 未能解决的 Standard 测试，而 Fable 解决了 108 个 Astra 未能解决的测试。在没有 Fable 的情况下，GPT-6.1 Sol 解决了 49 个 Astra 未能解决的测试，Claude Opus 5.5 为 46 个，Gemini 4 Argon 为 34 个。"
+            "text": "不是。GPT-6 Astra 解决了 39 个 Claude Fable 5.2 未能解决的 Standard 测试，而 Fable 解决了 108 个 Astra 未能解决的测试。GPT-6.1 Sol 解决了 49 个 Astra 未能解决的测试，Claude Opus 5.5 为 46 个，Gemini 4 Argon 为 34 个。"
           }
         },
         {
@@ -466,7 +466,7 @@
     <h4>其他智能体能完成而 Fable 不能完成的任务，以及反过来的情况</h4>
     <ul>
       <li>在 Fable 失败的 230 个 Standard 测试中，Astra 完成 39 个，Sol 完成 29 个，Opus 完成 22 个，Argon 完成 14 个；四者合计完成 60 个。Fable 则完成了 108 个 Astra 失败的 Standard 测试。</li>
-      <li>不考虑 Fable 时，在 Astra 失败的 Standard 测试中，Sol 完成 49 个，Opus 完成 46 个，Argon 完成 34 个。Opus 完成了全部 7 个 ManiGuard 测试，其他智能体均未做到。</li>
+      <li>在 Astra 失败的 Standard 测试中，Sol 完成 49 个，Opus 完成 46 个，Argon 完成 34 个。Opus 完成了全部 7 个 ManiGuard 测试，其他智能体均未做到。</li>
       <li>在 Privileged 设定下，两个方向基本持平：在 391 个测试中，仅 Fable 完成的有 28 个，仅 Astra 完成的有 24 个。</li>
       <li>在 Fable 失败的 230 个 Standard 测试中，有 169 个没有任何智能体能够完成。</li>
     </ul>
@@ -482,7 +482,7 @@
     <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9" alt="两个 Standard 任务-智能体矩阵。(a) 十个智能体，按 Claude Fable 5.2 排序：在 Fable 失败的测试中，Astra 解决 39 个，Sol 解决 29 个，Opus 解决 22 个。(b) 按 GPT-6 Astra 排序：在 Astra 失败的测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个。" width="1920" height="1080"></div>
   </div>
 </figure>
-<p>面板 (b) 去掉了 Fable，并按 Astra 对测试排序，同样的模式在下一层级再次出现。在 Astra 失败的 Standard 测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个，Kimi 解决 13 个。对若干组智能体而言，两个方向的数量相近：Sol 解决了 49 个 Astra 失败的测试，Astra 解决了 59 个 Sol 失败的测试；Argon 解决了 47 个 Opus 失败的测试，而 Opus 解决了 51 个 Argon 失败的测试。Opus 与 Astra 之间差距较大，为 46 对 89。下表列出了每一组的结果。</p>
+<p>在 Astra 失败的 Standard 测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个，Kimi 解决 13 个。对若干组智能体而言，两个方向的数量相近：Sol 解决了 49 个 Astra 失败的测试，Astra 解决了 59 个 Sol 失败的测试；Argon 解决了 47 个 Opus 失败的测试，而 Opus 解决了 51 个 Argon 失败的测试。Opus 与 Astra 之间差距较大，为 46 对 89。下表列出了每一组的结果。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="cross-s">
     <p class="fig-cap"><span class="fc-t">每个强智能体都有其他每个强智能体失败而它解决的测试。</span> 行智能体解决而列智能体失败的 Standard 测试数（共 456 个），数据来自论文核心集的网站数据。</p>
@@ -532,7 +532,7 @@
 <p><b>较新的智能体可能在特定套件上下降。</b> GPT-6.1 Sol 与 GPT-6 Astra 运行在同一个 harness（Codex）中，Sol 是更新的模型。Sol 解决了 147 个 Standard 测试，比 Astra 的 157 个少 10 个，且下降集中在少数套件：在 BiGym 2.0 中，Astra 解决 10 个 Standard 测试中的 4 个，Sol 为 0；在 RoboDojo 中，12 个中为 3 对 0；在 DexHandExam 中，23 个中为 13 对 9。反过来，Sol 在 ManiGuard（7 个中 5 对 3）、RoboLab（6 个中 2 对 0）、iSpatialGym（8 个中 5 对 4）和 RoboDynamicExam（10 个中 4 对 3）上领先于 Astra。在 Privileged 下，Sol 在 BEHAVIOR-1K 和 MyoSuite 上领先 Astra，但在 DexToolBench（20 个中 10 对 13）和 RoboDojo（12 个中 6 对 10）上落后。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="suite-leads">
-    <p class="fig-cap"><span class="fc-t">每个强智能体都有自己表现最好的套件。</span> 在领先者发生变化的套件中，每个强智能体解决的测试数。与论文的套件图一致，RoboARC 的 8 个 IKEA 组装测试单独计算。</p>
+    <p class="fig-cap"><span class="fc-t">每个强智能体都有自己表现最好的套件。</span> 在领先者发生变化的套件中，每个强智能体解决的测试数。</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>套件（设置，测试数）</th><th>Fable</th><th>Astra</th><th>Sol</th><th>Opus</th><th>Argon</th></tr></thead>
       <tbody>

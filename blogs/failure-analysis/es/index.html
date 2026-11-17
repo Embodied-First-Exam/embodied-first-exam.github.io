@@ -311,7 +311,7 @@
           "name": "¿Resuelven los distintos agentes de programación las mismas tareas robóticas?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. GPT-6 Astra resuelve 39 pruebas Standard que Claude Fable 5.2 falla, y Fable resuelve 108 que Astra falla. Sin Fable, GPT-6.1 Sol resuelve 49 pruebas que Astra falla, Claude Opus 5.5 46 y Gemini 4 Argon 34."
+            "text": "No. GPT-6 Astra resuelve 39 pruebas Standard que Claude Fable 5.2 falla, y Fable resuelve 108 que Astra falla. GPT-6.1 Sol resuelve 49 pruebas que Astra falla, Claude Opus 5.5 46 y Gemini 4 Argon 34."
           }
         },
         {
@@ -466,7 +466,7 @@
     <h4>Lo que otros resuelven y Fable no, y viceversa</h4>
     <ul>
       <li>De las 230 pruebas Standard en las que falla Fable, Astra resuelve 39, Sol 29, Opus 22 y Argon 14; entre los cuatro resuelven 60. Fable resuelve 108 pruebas Standard en las que falla Astra.</li>
-      <li>Sin Fable, Sol resuelve 49 pruebas Standard en las que falla Astra, Opus 46 y Argon 34. Opus resuelve las 7 pruebas de ManiGuard, algo que ningún otro agente logra.</li>
+      <li>Sol resuelve 49 pruebas Standard en las que falla Astra, Opus 46 y Argon 34. Opus resuelve las 7 pruebas de ManiGuard, algo que ningún otro agente logra.</li>
       <li>En Privileged, ambas direcciones están casi igualadas: 28 pruebas que solo resuelve Fable y 24 que solo resuelve Astra, de un total de 391.</li>
       <li>169 de las 230 pruebas Standard en las que falla Fable no las resuelve ningún agente.</li>
     </ul>
@@ -482,7 +482,7 @@
     <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9" alt="Dos matrices tarea-agente en Standard. (a) Diez agentes ordenados según Claude Fable 5.2: Astra resuelve 39, Sol 29 y Opus 22 pruebas que Fable falla. (b) Ordenados según GPT-6 Astra: Sol resuelve 49, Opus 46 y Argon 34 pruebas que Astra falla." width="1920" height="1080"></div>
   </div>
 </figure>
-<p>El panel (b) elimina a Fable y ordena las pruebas según Astra, y el patrón se repite un nivel más abajo. De las pruebas Standard que Astra falla, Sol resuelve 49, Opus 46, Argon 34 y Kimi 13. Para varios pares las dos direcciones están próximas: Sol resuelve 49 pruebas que Astra falla y Astra 59 que Sol falla, y Argon resuelve 47 que Opus falla frente a las 51 de Opus que Argon falla. Opus y Astra están más alejados, 46 frente a 89. La tabla recoge todos los pares.</p>
+<p>De las pruebas Standard que Astra falla, Sol resuelve 49, Opus 46, Argon 34 y Kimi 13. Para varios pares las dos direcciones están próximas: Sol resuelve 49 pruebas que Astra falla y Astra 59 que Sol falla, y Argon resuelve 47 que Opus falla frente a las 51 de Opus que Argon falla. Opus y Astra están más alejados, 46 frente a 89. La tabla recoge todos los pares.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="cross-s">
     <p class="fig-cap"><span class="fc-t">Cada agente fuerte tiene pruebas que cada uno de los demás agentes fuertes falla.</span> Pruebas Standard que el agente de la fila resuelve y el agente de la columna falla, de un total de 456, según los datos del sitio para el conjunto principal del artículo.</p>
@@ -532,7 +532,7 @@
 <p><b>Un agente más nuevo puede retroceder en suites concretas.</b> GPT-6.1 Sol y GPT-6 Astra se ejecutan en el mismo harness, Codex, y Sol es el modelo más nuevo. Sol resuelve 147 pruebas Standard, 10 menos que las 157 de Astra, y la caída está concentrada: en BiGym 2.0 Astra resuelve 4 de 10 pruebas Standard y Sol ninguna, en RoboDojo 3 de 12 frente a ninguna, y en DexHandExam 13 frente a 9 de 23. En la otra dirección, Sol supera a Astra en ManiGuard (5 frente a 3 de 7), RoboLab (2 frente a 0 de 6), iSpatialGym (5 frente a 4 de 8) y RoboDynamicExam (4 frente a 3 de 10). En Privileged, Sol supera a Astra en BEHAVIOR-1K y MyoSuite, pero queda por detrás en DexToolBench (10 frente a 13 de 20) y RoboDojo (6 frente a 10 de 12).</p>
 <figure class="fig">
   <div class="fig-body" data-fig="suite-leads">
-    <p class="fig-cap"><span class="fc-t">Cada agente fuerte tiene suites en las que rinde mejor.</span> Pruebas resueltas por cada agente fuerte en las suites donde cambia el liderazgo. Las 8 pruebas de ensamblaje IKEA de RoboARC se cuentan aparte, como en la figura de suites del artículo.</p>
+    <p class="fig-cap"><span class="fc-t">Cada agente fuerte tiene suites en las que rinde mejor.</span> Pruebas resueltas por cada agente fuerte en las suites donde cambia el liderazgo.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>Suite (setting, pruebas)</th><th>Fable</th><th>Astra</th><th>Sol</th><th>Opus</th><th>Argon</th></tr></thead>
       <tbody>

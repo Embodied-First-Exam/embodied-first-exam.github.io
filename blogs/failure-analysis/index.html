@@ -308,7 +308,7 @@
           "name": "Do different coding agents solve the same robot tasks?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. Without Fable, GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34."
+            "text": "No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34."
           }
         },
         {
@@ -461,7 +461,7 @@
     <h4>What others solve that Fable cannot, and the reverse</h4>
     <ul>
       <li>Of the 230 Standard tests Fable fails, Astra solves 39, Sol 29, Opus 22 and Argon 14; together the four solve 60. Fable solves 108 Standard tests that Astra fails.</li>
-      <li>Without Fable, Sol solves 49 Standard tests that Astra fails, Opus 46 and Argon 34. Opus solves all 7 ManiGuard tests, which no other agent does.</li>
+      <li>Sol solves 49 Standard tests that Astra fails, Opus 46 and Argon 34. Opus solves all 7 ManiGuard tests, which no other agent does.</li>
       <li>In Privileged the two directions are nearly even: 28 tests only Fable solves and 24 only Astra solves, out of 391.</li>
       <li>169 of the 230 Standard tests Fable fails are solved by no agent at all.</li>
     </ul>
@@ -480,7 +480,7 @@
     <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9" alt="Two Standard task-agent matrices. (a) Ten agents ordered by Claude Fable 5.2: Astra solves 39, Sol 29 and Opus 22 tests that Fable fails. (b) Ordered by GPT-6 Astra: Sol solves 49, Opus 46 and Argon 34 tests that Astra fails." width="1920" height="1080"></div>
   </div>
 </figure>
-<p>Panel (b) removes Fable and sorts the tests by Astra, and the pattern repeats one level down. Of the Standard tests Astra fails, Sol solves 49, Opus 46, Argon 34 and Kimi 13. For several pairs the two directions are close: Sol solves 49 tests Astra fails and Astra 59 that Sol fails, and Argon solves 47 that Opus fails against Opus’s 51 that Argon fails. Opus and Astra are further apart, 46 against 89. The table gives every pair.</p>
+<p>Of the Standard tests Astra fails, Sol solves 49, Opus 46, Argon 34 and Kimi 13. For several pairs the two directions are close: Sol solves 49 tests Astra fails and Astra 59 that Sol fails, and Argon solves 47 that Opus fails against Opus’s 51 that Argon fails. Opus and Astra are further apart, 46 against 89. The table gives every pair.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="cross-s">
     <p class="fig-cap"><span class="fc-t">Every strong agent has tests that each other strong agent fails.</span> Standard tests that the row agent solves and the column agent fails, out of 456, from the site data of the paper’s core set.</p>
@@ -530,7 +530,7 @@
 <p><b>A newer agent can drop on specific suites.</b> GPT-6.1 Sol and GPT-6 Astra run in the same harness, Codex, and Sol is the newer model. Sol solves 147 Standard tests, 10 fewer than Astra’s 157, and the drop is concentrated: in BiGym 2.0 Astra solves 4 of 10 Standard tests and Sol none, in RoboDojo 3 of 12 against none, and in DexHandExam 13 against 9 of 23. In the other direction, Sol is ahead of Astra in ManiGuard (5 against 3 of 7), RoboLab (2 against 0 of 6), iSpatialGym (5 against 4 of 8) and RoboDynamicExam (4 against 3 of 10). In Privileged, Sol leads Astra in BEHAVIOR-1K and MyoSuite but trails it in DexToolBench (10 against 13 of 20) and RoboDojo (6 against 10 of 12).</p>
 <figure class="fig">
   <div class="fig-body" data-fig="suite-leads">
-    <p class="fig-cap"><span class="fc-t">Each strong agent has suites where it does best.</span> Solved tests of each strong agent in the suites where the lead changes. The 8 IKEA assembly tests of RoboARC are counted separately, as in the paper’s suite figure.</p>
+    <p class="fig-cap"><span class="fc-t">Each strong agent has suites where it does best.</span> Solved tests of each strong agent in the suites where the lead changes.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>Suite (setting, tests)</th><th>Fable</th><th>Astra</th><th>Sol</th><th>Opus</th><th>Argon</th></tr></thead>
       <tbody>
