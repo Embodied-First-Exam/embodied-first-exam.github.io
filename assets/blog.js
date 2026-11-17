@@ -302,7 +302,7 @@ function figApproach(el, R) {
   };
   const ks = ['p', 's', 't'].filter((k) => mix[k]);
   el.innerHTML = head('Agents mostly write a program in the Privileged and Realtime settings and mostly control the robot directly in the Standard Setting.',
-    'How agents control the robot: the approach of the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts that used that approach (each attempt counted once, by the approach that produced its graded answer), as labeled by a coding agent from the run logs.')
+    'How agents control the robot: the approach of the sampled attempts, by setting', 'each segment is the share of a setting’s sampled attempts that used that approach (each attempt counted once, by the approach that produced its graded answer), as drafted by a coding agent from the run logs and checked and finalized by the authors.')
     + `<div class="ap-defs"><div><p>Code to control</p><ul>${WAYS.filter((w) => w[1] === 'code').map(def).join('')}</ul></div><div><p>Other approaches</p><ul>${WAYS.filter((w) => w[1] !== 'code').map(def).join('')}</ul></div></div>`
     + `<div class="ap">${ks.map(row).join('')}<div class="ap-row ax"><span></span><span class="sb-ticks"><i style="left:0">0%</i><i style="left:50%">50%</i><i style="left:100%">100%</i></span><span class="n">attempts</span></div></div>`
     + `<p class="fig-note">A dark mark separates the approaches; the three shades of blue are the three kinds of program. Sampled attempts: ${R.S.cb_sample} analyzed in all (snapshot of ${R.S.cb_snapshot}).</p>`

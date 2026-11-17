@@ -44,15 +44,15 @@ The code is at https://github.com/mll-lab-nu/embodied-first-exam (it runs on Har
 
 ## Where do today’s coding agents fail on robot tasks?
 
-On the 456 core tests of the Embodied First Exam in the Standard Setting, where the agent sees only the robot’s sensors and cannot reset, 169 tests (37%) are solved by none of ten coding agents. Failures on a task tend to happen at the same stage for different agents, and stages that change a material or move the robot’s body fail most often once reached (56% and 39%). Using tools is the hardest kind of task and carrying objects the easiest. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+On the 456 core tests of the Embodied First Exam in the Standard Setting, where the agent sees only the robot’s sensors and cannot reset by default, 169 tests (37%) are solved by none of ten coding agents. Failures on a task tend to happen at the same stage for different agents, and stages that change a material or move the robot’s body fail most often once reached (56% and 39%). Using tools is the hardest kind of task and carrying objects the easiest. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## What information matters to a coding agent controlling a robot?
 
-The exam compares a Standard Setting (sensors only, no resets) with a Privileged Setting (full simulator state and unlimited resets). In controlled runs of GPT-6 Astra, adding the exact state of every object raises success from 29% to 45%, while unlimited resets with saved states raise it to 53%; with both it reaches 68%, against 79% in Privileged. At stages that need precise actions, resets recover 36% of failures and exact state 21%, close to a plain second try (19%). Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+The exam compares a Standard Setting (sensors only, no resets by default) with a Privileged Setting (full simulator state and unlimited resets). In controlled runs of GPT-6 Astra, adding the exact state of every object raises success from 29% to 45%, while unlimited resets with saved states raise it to 53%; with both it reaches 68%, against 79% in Privileged. At stages that need precise actions, resets recover 36% of failures and exact state 21%, close to a plain second try (19%). Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Do different coding agents solve the same robot tasks?
 
-No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. Without Fable, GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34. Three runs of the same agent agree on only 56% to 70% of the tests they solve, so a difference of a few tests between two agents is weak evidence. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34. Three runs of GPT-6.1 Sol differ by at most five points in success rate, so a difference of a few tests between two agents is weak evidence. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Does the harness change how well a coding agent controls robots?
 
@@ -60,7 +60,7 @@ Yes, by up to 7.5 percentage points for the same model: GPT-6 Astra solves 34.4%
 
 ## Does spending more help coding agents on robot tasks?
 
-Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol at medium, high and maximum reasoning effort solves 30.0%, 32.2% and 29.8% of the Standard tests, within run-to-run variation. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol at medium, high and maximum reasoning effort solves 30.7%, 32.2% and 30.9% of the Standard tests, within run-to-run variation. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## How do coding agents control robots?
 

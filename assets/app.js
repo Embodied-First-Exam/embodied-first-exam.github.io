@@ -1329,10 +1329,10 @@ const RUNTIME = {
   },
   realtime: {
     tab: 'Standard · real-time', proto: 'eai-standard/2.3 · a clock that does not stop',
-    lead: 'Standard mode in real time. Once the episode starts the robot keeps moving whatever the agent is doing, so the agent’s controller has to run as a program in its own container, not as a chat.',
+    lead: 'Standard mode in real time. Once the episode starts the robot keeps moving whatever the agent is doing, so most agents run the controller as a program in their own container.',
     agent: ['the harness calling its model', 'the agent’s controller: a program in this container that streams action chunks and reads observations', 'the shipped client, <code>rcb_client.py</code>', 'no simulator, no scene, no simulation code'],
     link: ['/spec', '/observe', '/submit', '/kinematics'],
-    sim: ['the simulator, the frozen scene, the seed and the success checker', 'runs at 1/<i>S</i> of real speed from the first action, whatever the agent does', 'holds the last targets while the agent thinks', 'resets within the budget (10 by default); a journal of every call'],
+    sim: ['the simulator, the frozen scene, the seed and the success checker', 'runs at 1/<i>S</i> of real speed from the first action, whatever the agent does', 'holds the last targets while the agent thinks', 'no resets unless the task grants a budget; a journal of every call'],
     stop: ['every process the agent left running is killed (<code>kill -9 -1</code>)', 'the monitor seals its record', 'the sidecar refuses any more physics and finalizes the episode: <code>final.json</code>, the journal, the trajectory'],
     verify: ['receives only the sidecar’s evidence', 'transcribes its verdict on the live episode: <code>graded_by_live = 1</code>, no replay', 'writes <code>reward.txt</code> (1 or 0) and <code>reward.json</code>', 'renders the video after the verdict, never from it'],
   },

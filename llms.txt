@@ -1,6 +1,6 @@
 # Embodied First Exam
 
-> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
+> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam: A Comprehensive Benchmark for Coding Agents in Robotics" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
 
 What is the Embodied First Exam? It is the first exam for coding agents before they enter the physical world. Early successes on agentic robotics point to a potential shift toward using coding agents to control robots, but existing robotics benchmarks are built around visuomotor policy learning. EFE instead lets a coding agent choose its own control approach: direct control, code to control, or train a policy to control.
 
@@ -17,9 +17,9 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 - Under real-robot rules (Standard Setting), 169 of the 456 core tests (37%) are solved by none of the ten agents.
 - Being able to retry helps more than knowing the exact state: in controlled runs of GPT-6 Astra, exact object state raises success from 29% to 45%, unlimited resets with saved states to 53%, both to 68%, against 79% in Privileged.
-- Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol agree on only 56% to 70% of their solved tests.
+- Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol differ by at most five points in success rate (30.8% ± 2.5).
 - The harness changes results by up to 7.5 percentage points for the same model (GPT-6 Astra: 34.4% in Codex, 27.0% in Claude Code).
-- Spending more does not buy success: for every agent the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.0%, 32.2% and 29.8% at medium, high and maximum reasoning effort.
+- Spending more does not buy success: for every agent the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.7%, 32.2% and 30.9% at medium, high and maximum reasoning effort.
 - Stating the success check in full in the task instruction raises GPT-6 Astra from 12 to 37 of 54 RoboDojo tasks.
 
 ## The 9 new suites
@@ -61,7 +61,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ```bibtex
 @article{wang2026embodiedfirstexam,
-  title   = {Embodied First Exam},
+  title   = {Embodied First Exam: A Comprehensive Benchmark for Coding Agents in Robotics},
   author  = {Wang, Kangrui and Wang, Qineng and Chen, Changhe and Zhang, Pingyue and Gui, Chi and Wang, Feishi and Chen, Canyu and Xiao, Wenli and Huang, Xiaoyu and Zhang, Tonghe and Li, Linjie and Wang, Zihan and Kim, Minyeong and Sun, Yiyou and Deng, Mingkai and Hou, Jinyu and Zhu, Qi and Liu, Han and Xing, Eric P. and Yao, Huaxiu and Fan, Zhiwen and Liu, Yuejiang and Song, Dawn and Abbeel, Pieter and Fei-Fei, Li and Wu, Jiajun and Zhu, Yuke and Shi, Guanya and Zhang, Ruohan and Li, Manling},
   journal = {arXiv preprint arXiv:2611.12177},
   year    = {2026}
