@@ -1,6 +1,6 @@
 # Embodied First Exam
 
-> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam: A Comprehensive Benchmark for Coding Agents in Robotics" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
+> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
 
 What is the Embodied First Exam? It is the first exam for coding agents before they enter the physical world. Early successes on agentic robotics point to a potential shift toward using coding agents to control robots, but existing robotics benchmarks are built around visuomotor policy learning. EFE instead lets a coding agent choose its own control approach: direct control, code to control, or train a policy to control.
 
@@ -61,7 +61,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ```bibtex
 @article{wang2026embodiedfirstexam,
-  title   = {Embodied First Exam: A Comprehensive Benchmark for Coding Agents in Robotics},
+  title   = {Embodied First Exam},
   author  = {Wang, Kangrui and Wang, Qineng and Chen, Changhe and Zhang, Pingyue and Gui, Chi and Wang, Feishi and Chen, Canyu and Xiao, Wenli and Huang, Xiaoyu and Zhang, Tonghe and Li, Linjie and Wang, Zihan and Kim, Minyeong and Sun, Yiyou and Deng, Mingkai and Hou, Jinyu and Zhu, Qi and Liu, Han and Xing, Eric P. and Yao, Huaxiu and Fan, Zhiwen and Liu, Yuejiang and Song, Dawn and Abbeel, Pieter and Fei-Fei, Li and Wu, Jiajun and Zhu, Yuke and Shi, Guanya and Zhang, Ruohan and Li, Manling},
   journal = {arXiv preprint arXiv:2611.12177},
   year    = {2026}

@@ -2099,7 +2099,6 @@ async function suitePage(ex) {
     ['Origin', isOurs(s) ? 'built by the exam’s team, released with the exam' : s.origin === 'ours' ? 'built by the lab' : `adapted from the upstream benchmark${s.edition ? ` (${esc(s.edition)})` : ''}`],
     ['Simulator', esc(s.simulator || '')], ['Robot', robots],
     ['Tasks', tasksTests(s.instances, s.task_dirs)],   // tasks, then tests; no count per mode (owners, 2026-10-18/19)
-    ['Reference solution', `full ${s.oracle?.full || 0} · partial ${s.oracle?.partial || 0} · none ${s.oracle?.none || 0}`],
     ['Agent time', (s.budgets_min || []).map((b) => `${b} min`).join(', ')],
   ].filter(([, v]) => v);
   $('#suite-head').innerHTML = `
