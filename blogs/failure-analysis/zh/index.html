@@ -173,13 +173,13 @@
 <meta property="og:title" content="Fable 5.2 on EFE：当今智能体在机器人任务中的失败与成功模式">
 <meta property="og:description" content="当今编码智能体在机器人任务中的失败与成功模式：十个智能体在 Embodied First Exam 上的表现。每个智能体在哪些机器人任务上失败及其原因，哪些信息是关键（Privileged 与 Standard 对比），智能体在任务的哪个阶段失败，它们如何控制机器人，以及 harness、花费和任务指令如何改变结果。">
 <meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/failure-analysis/">
-<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9">
+<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fable 5.2 on EFE：当今智能体在机器人任务中的失败与成功模式">
 <meta name="twitter:description" content="当今编码智能体在机器人任务中的失败与成功模式：十个智能体在 Embodied First Exam 上的表现。每个智能体在哪些机器人任务上失败及其原因，哪些信息是关键（Privileged 与 Standard 对比），智能体在任务的哪个阶段失败，它们如何控制机器人，以及 harness、花费和任务指令如何改变结果。">
-<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9">
+<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -194,7 +194,7 @@
       "inLanguage": "zh-Hans",
       "url": "https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/",
       "mainEntityOfPage": "https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/",
-      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9",
+      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b",
       "author": {
         "@type": "Organization",
         "name": "Embodied First Exam",
@@ -478,7 +478,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="9">
     <p class="fig-cap"><span class="fc-t">即使是最强的智能体，也无法解出其他智能体能解出的所有测试。</span> 论文官方图 9 的 Standard 面板，另附一个由同一数据绘制的面板。(a) 十个智能体，测试按 Claude Fable 5.2 排序。(b) 测试按 GPT-6 Astra 排序。</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9" alt="两个 Standard 任务-智能体矩阵。(a) 十个智能体，按 Claude Fable 5.2 排序：在 Fable 失败的测试中，Astra 解决 39 个，Sol 解决 29 个，Opus 解决 22 个。(b) 按 GPT-6 Astra 排序：在 Astra 失败的测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个。" width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b" alt="两个 Standard 任务-智能体矩阵。(a) 十个智能体，按 Claude Fable 5.2 排序：在 Fable 失败的测试中，Astra 解决 39 个，Sol 解决 29 个，Opus 解决 22 个。(b) 按 GPT-6 Astra 排序：在 Astra 失败的测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>在 Astra 失败的 Standard 测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个，Kimi 解决 13 个。对若干组智能体而言，两个方向的数量相近：Sol 解决了 49 个 Astra 失败的测试，Astra 解决了 59 个 Sol 失败的测试；Argon 解决了 47 个 Opus 失败的测试，而 Opus 解决了 51 个 Argon 失败的测试。Opus 与 Astra 之间差距较大，为 46 对 89。下表列出了每一组的结果。</p>
