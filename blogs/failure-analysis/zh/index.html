@@ -507,7 +507,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="8">
     <p class="fig-cap"><span class="fc-t">每个智能体都在大多数 Standard 测试上失败，即使合在一起，仍有约三分之一无人解决。</span> 论文官方图 8。十个智能体在论文核心集上的成功率，括号中为解决的测试或任务数。列的顺序为：Overall，然后是 Standard、Realtime、Privileged。在 Overall 中，每个核心任务计一次，只有当该任务的所有核心测试都被解决时才算解决。在拥有完整模拟器访问权限时，同样的任务被解决的频率要高得多。</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=f3135b43" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=ea3e3d7b" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>在 Standard 下，五个强智能体分别解决了 456 个测试中的 226、157、147、114 和 110 个，五个较弱的智能体分别解决了 46、29、17、14 和 11 个。被许多智能体共同解决的测试很少：33 个被全部五个强智能体解决，只有一个按钮按压测试被全部十个智能体解决。另一端，有 77 个测试恰好只被一个智能体解决。</p>
@@ -559,7 +559,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="10">
     <p class="fig-cap"><span class="fc-t">在真实机器人规则下，七个套件至少一半无人解决；在完整模拟器访问权限下，只剩一个。</span> 论文官方图 10。按套件统计的成功率，仅包括在该设置下至少有五个核心测试的套件。圆点表示每个强智能体的成功率；柱形表示没有任何强智能体解决的测试比例。RoboARC 的 IKEA 组装任务单独计为一个套件。</p>
-    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=edb1c136" alt="论文官方图 10：五个强智能体在各套件上的 Standard 与 Privileged 成功率。在 22 个 Standard 套件中，有 7 个至少一半的测试无一被它们解决：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
+    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="论文官方图 10：五个强智能体在各套件上的 Standard 与 Privileged 成功率。在 22 个 Standard 套件中，有 7 个至少一半的测试无一被它们解决：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>这七个 Standard 套件及其中没有任何强智能体解决的测试数分别为：HumanoidBench（8 个中 7 个）、IKEA 组装任务（8 个中 7 个）、DexToolBench（20 个中 17 个）、MyoSuite（13 个中 8 个）、BEHAVIOR-1K（71 个中 36 个）、RoboPaint（22 个中 11 个）和 RoboDojo（12 个中 6 个）。它们涵盖了不同类型的难度：人形机器人全身控制、灵巧手的家具组装与工具使用、肌肉驱动的手臂与手、长程家务活动、只能通过相机检查效果的绘画，以及成功判定以不同方式编写的目标。在最难的两个套件中，没有强智能体解决超过两个测试：DexToolBench 中最多的是 Astra 的 2 个，而在 IKEA 组装任务中只有 Fable 和 Astra 各解决一个。</p>
@@ -727,7 +727,7 @@
     <h3 id="transfer" data-short="Privileged 到 Standard">完整的仿真器权限掩盖了任务的大部分难点</h3>
 <p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 286 个中 176 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
 <p>反过来的情况很少。在 Standard 中解出但在 Privileged 中未解出的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 5 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有智能体中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=e1c50c5b" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=2b8ac182" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
 <p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的套件中，Fable 的成功率除一个套件外全部下降；根据网站数据，该套件为 iSpatialGym，Fable 在两种设置下均解出 8 个任务中的 7 个。Astra 和 Sol 在所有这些套件中都出现下降。Opus 在 ManiGuard（两种设置下均为 7 个解出 7 个）和 DexToolBench（两种设置下均未解出）中没有下降。Argon 在 MyoSuite（Standard 中 13 个解出 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个解出 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个解出 1 个）。</p>
 <p><b>在 Privileged 中看似相当的智能体，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 解出的有 28 个，仅 Astra 解出的有 24 个，二者都解出的有 284 个，二者都未解出的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
@@ -923,7 +923,7 @@
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="18">
         <p class="fig-cap"><span class="fc-t">各设定下的控制方式（a），以及有无 GPU 时的足球比赛结果（b）。</span>论文原图 18。（a）从十个智能体的运行中随机抽取的 2,622 次尝试（1,263 次 Standard、177 次 Realtime、1,182 次 Privileged）。“混合”尝试指中途切换了方式，或两种方式使用程度相当。（b）Standard 和 Realtime 下的足球测试中，训练了策略、取得进球或赢得比赛的数量，分为配备 GPU 和强化学习库、以及仅有 CPU 两种情况。</p>
-        <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig18_approaches.png?v=68f827be" alt="论文原图 18。(a) 部分：Standard 中 60% 为直接控制，33% 为代码；Realtime 中 94% 为代码，以闭环程序为主（74%）；Privileged 中 82% 为代码，其中开环 18%、闭环 45%、参数搜索 20%。(b) 部分：配备 GPU 时，28 场足球测试中有 25 场训练了策略，17 场进球，8 场获胜；仅有 CPU 时，28 场中分别为 1、5 和 1 场。" width="1920" height="1080"></div>
+        <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig18_approaches.png?v=8e4b115c" alt="论文原图 18。(a) 部分：Standard 中 60% 为直接控制，33% 为代码；Realtime 中 94% 为代码，以闭环程序为主（74%）；Privileged 中 82% 为代码，其中开环 18%、闭环 45%、参数搜索 20%。(b) 部分：配备 GPU 时，28 场足球测试中有 25 场训练了策略，17 场进球，8 场获胜；仅有 CPU 时，28 场中分别为 1、5 和 1 场。" width="1920" height="1080"></div>
       </div>
     </figure>
     <p><b>样本覆盖范围。</b>另一个编程智能体阅读了这 2,622 次尝试的日志，并为每次尝试标注其最终评分答案所采用的方式。这些尝试随机抽自十个智能体的运行。作者随后检查并确定了全部标签。</p>
