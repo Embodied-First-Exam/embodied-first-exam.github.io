@@ -311,7 +311,7 @@
           "name": "不同的编码智能体解决的是同一批机器人任务吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "不是。GPT-6 Astra 解决了 39 个 Claude Fable 5.2 未能解决的 Standard 测试，而 Fable 解决了 108 个 Astra 未能解决的测试。在不计 Fable 的情况下，GPT-6.1 Sol 解决了 49 个 Astra 未能解决的测试，Claude Opus 5.5 为 46 个，Gemini 4 Argon 为 34 个。同一智能体的三次运行在各自解决的测试上仅有 56% 到 70% 一致，因此两个智能体之间相差几个测试只是很弱的证据。"
+            "text": "不是。GPT-6 Astra 解决了 39 个 Claude Fable 5.2 未能解决的 Standard 测试，而 Fable 解决了 108 个 Astra 未能解决的测试。在不计 Fable 的情况下，GPT-6.1 Sol 解决了 49 个 Astra 未能解决的测试，Claude Opus 5.5 为 46 个，Gemini 4 Argon 为 34 个。同一智能体的三次运行在各自解决的测试上仅有 59% 到 70% 一致，因此两个智能体之间相差几个测试只是很弱的证据。"
           }
         },
         {
@@ -327,7 +327,7 @@
           "name": "花费更多能帮助编码智能体完成机器人任务吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "单靠花费并不能。对每个智能体而言，失败尝试的花费中位数都高于成功尝试的花费中位数；GPT-6.1 Sol 在中、高和最高推理强度下分别解决了 30.0%、32.2% 和 29.8% 的 Standard 测试，差异在多次运行之间的波动范围之内。"
+            "text": "单靠花费并不能。对每个智能体而言，失败尝试的花费中位数都高于成功尝试的花费中位数；GPT-6.1 Sol 在中、高和最高推理强度下分别解决了 30.7%、32.2% 和 30.9% 的 Standard 测试，差异在多次运行之间的波动范围之内。"
           }
         },
         {
@@ -501,7 +501,7 @@
 <p>只有一个强智能体解决的测试也分散在不同智能体之间。在至少被一个强智能体解决的 286 个 Standard 测试中，有 79 个恰好只有一个强智能体解决：Fable 48 个，Astra 18 个，Sol 8 个，Opus 4 个，Argon 1 个。它们分布在不同的套件中：Fable 的 48 个中有 25 个属于 BEHAVIOR-1K 或 RoboARC，而 Astra 的 18 个中有 4 个、Sol 的 8 个中有 2 个是 RoboPaint 测试。</p>
 <p>成功次数最多的智能体失败，并不意味着该测试就难。Fable 失败的测试中有 8 个被其余九个智能体中的至少四个解决，其中一个 Embodied Safety Exam 倾倒测试被六个智能体解决，包括 Kimi、Gemini 3.8 Flash、Qwen 和 DeepSeek（这 8 个测试全部列在 <a href="#eight-tests">Fable 在普遍被解决的测试上的失误</a>中）。</p>
 <p>在拥有完整模拟器访问权限时，Fable 与 Astra 之间的划分几乎持平：在 Privileged 下，只有 Fable 解决的测试有 28 个，只有 Astra 解决的有 24 个，两者都解决的有 284 个，都未解决的有 55 个（共 391 个测试）。在 Privileged 测试中，Astra 是 12 个测试的唯一强解决者，Fable 是 9 个，Sol 是 5 个，Argon 是 2 个，Opus 是 1 个。Realtime 下的划分见 <a href="#realtime">Realtime 一节</a>。</p>
-<p>本节的所有数字都来自每个智能体在每个测试上的单次运行，而同一智能体的两次运行之间，成功结果只有 56% 到 70% 相互一致（<a href="#run-variance">见下文</a>）。因此论文指出，各智能体所解决测试集合之间的差异，很大一部分可能来自运行间的波动：其他智能体解决而 Fable 失败的 60 个测试确实是真实的成功，但其中任何一个都未必能够复现。</p>
+<p>本节的所有数字都来自每个智能体在每个测试上的单次运行，而同一智能体的两次运行之间，成功结果只有 59% 到 70% 相互一致（<a href="#run-variance">见下文</a>）。因此论文指出，各智能体所解决测试集合之间的差异，很大一部分可能来自运行间的波动：其他智能体解决而 Fable 失败的 60 个测试确实是真实的成功，但其中任何一个都未必能够复现。</p>
 
     <h3 id="shared-boundary" data-short="所有智能体均未解决">即使汇总全部十个智能体，仍有超过三分之一的 Standard 测试无人解决</h3>
 <p>汇总全部十个智能体，456 个 Standard 测试中有 287 个至少被一个智能体解决，169 个（37%）无人解决。五个强智能体合计解决 286 个（63%），五个较弱的智能体只额外增加了一个测试。这一共同边界是本考试中对“当前编程智能体在真实机器人规则下尚无法做到什么”最清晰的度量，而且它不取决于我们关注哪个智能体。</p>
@@ -530,7 +530,7 @@
 <p>根据我们对运行过程的解读，RoboPaint 在 Standard 下的差距来自智能体如何通过相机判断自己的临摹结果，而不是来自绘画本身；<a href="#check-vs-stop">检查与停止</a>一节展示了相关运行。</p>
 <p><b>Claude Fable 5.2 领先的套件。</b> 它最大的领先优势出现在长程、多步骤的套件中。在包含长程家务活动的 BEHAVIOR-1K 中，它解决了 71 个 Standard 测试中的 26 个，而 Astra 为 14 个，Sol 为 13 个。在包含精细操作谜题的 RoboARC 中，它解决了 50 个中的 32 个，而其他每个强智能体各解决 11 到 15 个。它在 iSpatialGym（8 个中 7 个）和 Embodied Olympics - Match（13 个中 10 个）上也领先。其他智能体同样有能力完成这些套件：在拥有完整模拟器访问权限时，Astra 和 Sol 解决的 BEHAVIOR-1K 测试数量与 Fable 大致相当（71 个中分别为 36 和 38 个，Fable 为 36 个），因此 Fable 在该套件 Standard 下的领先似乎与在真实机器人规则下工作有关。</p>
 <p><b>Claude Opus 5.5 领先的套件。</b> Opus 在 Standard 下解决了全部 7 个 ManiGuard 测试，是十个智能体中唯一做到这一点的。ManiGuard 在指令中写明了安全规则，也是五个强智能体平均成功率至少达到 70% 的唯一一个 Standard 套件。Opus 在 RoboWits 上也拥有最多的 Standard 成功（6 个中 4 个）。Opus 总共解决 114 个 Standard 测试，少于 Fable、Astra 或 Sol，这表明较低的总分也可以与某个完整套件上的最佳结果并存。</p>
-<p><b>较新的智能体可能在特定套件上下降。</b> GPT-6.1 Sol 与 GPT-6 Astra 运行在同一个 harness（Codex）中，Sol 是更新的模型。Sol 解决了 147 个 Standard 测试，比 Astra 的 157 个少 10 个，且下降集中在少数套件：在 BiGym 2.0 中，Astra 解决 10 个 Standard 测试中的 4 个，Sol 为 0；在 RoboDojo 中，12 个中为 3 对 0；在 DexHandExam 中，23 个中为 13 对 9。反过来，Sol 在 ManiGuard（7 个中 5 对 3）、RoboLab（6 个中 2 对 0）、iSpatialGym（8 个中 5 对 4）和 RoboDynamicExam（10 个中 4 对 3）上领先于 Astra。在 Privileged 下，Sol 在 BEHAVIOR-1K 和 MyoSuite 上领先 Astra，但在 DexToolBench（20 个中 10 对 13）和 RoboDojo（12 个中 6 对 10）上落后。图 10 中 Sol 在 Privileged RoboWits 上 6 个中 0 个的成绩并不是下降：其中五个 Sol 测试没有结果，按失败计。</p>
+<p><b>较新的智能体可能在特定套件上下降。</b> GPT-6.1 Sol 与 GPT-6 Astra 运行在同一个 harness（Codex）中，Sol 是更新的模型。Sol 解决了 147 个 Standard 测试，比 Astra 的 157 个少 10 个，且下降集中在少数套件：在 BiGym 2.0 中，Astra 解决 10 个 Standard 测试中的 4 个，Sol 为 0；在 RoboDojo 中，12 个中为 3 对 0；在 DexHandExam 中，23 个中为 13 对 9。反过来，Sol 在 ManiGuard（7 个中 5 对 3）、RoboLab（6 个中 2 对 0）、iSpatialGym（8 个中 5 对 4）和 RoboDynamicExam（10 个中 4 对 3）上领先于 Astra。在 Privileged 下，Sol 在 BEHAVIOR-1K 和 MyoSuite 上领先 Astra，但在 DexToolBench（20 个中 10 对 13）和 RoboDojo（12 个中 6 对 10）上落后。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="suite-leads">
     <p class="fig-cap"><span class="fc-t">每个强智能体都有自己表现最好的套件。</span> 在领先者发生变化的套件中，每个强智能体解决的测试数。与论文的套件图一致，RoboARC 不含 8 个 IKEA 组装测试。</p>
@@ -687,7 +687,7 @@
           <span class="case-k">规划中缺失的一步</span><b>Claude Fable 5.2 · 失败</b><span class="case-m">Standard · 于第 136 分钟停止（共 180 分钟）</span><span class="case-t">它根据深度图像建立部件模型，并在一类受限的运动中离线规划分离过程。第一段执行成功；在第二段让爪件穿过缝隙时，部件在 47 个路径点中的第 33 个处卡住。规划中的下一步没有无碰撞路径，因此它在部件仍然互锁的状态下停止。</span></a>
 </div>
 <p><b>它没有留下余量。</b> 在一个无人机控制测试中，它的控制器通过了 10 次隐藏飞行中的 9 次，而测试要求全部 10 次通过（<a href="../../../run/?r=roboengineer-neuralfly-general-skydio-i01-standard--2lmjgra">运行记录</a>）。</p>
-<p><b>同一模式下的一个 Privileged 案例。</b> 这个案例不在上述 8 个 Standard 测试之内。Fable 在 Standard Setting 下解出了 RoboWits 的灯泡竖立测试，却在 Privileged Setting 下失败，而其余九个智能体中有五个解出了它。在拥有特权信息的情况下，它花了一个小时试图让灯泡以倾斜姿态自行立住，重置仿真约 700 次，直到时间限制到来时仍未保存任何轨迹（<a href="../../../run/?r=robowits-stand-bulb-i00-privileged--hbmnxvr">运行记录</a>）。GPT-6 Astra 把灯泡立在场景提供的圆环中，并在第 10 分钟保存了一条经过检查的轨迹（<a href="../../../run/?r=robowits-stand-bulb-i00-privileged--7yfezvr">运行记录</a>）。在 Standard Setting 下情况正好相反：Fable 和 Opus 解出了该测试，Astra 没有。</p>
+<p><b>同一模式下的一个 Privileged 案例。</b> 这个案例不在上述 8 个 Standard 测试之内。Fable 在 Standard Setting 下解出了 RoboWits 的灯泡竖立测试，却在 Privileged Setting 下失败，而其余九个智能体中有六个解出了它。在拥有特权信息的情况下，它花了一个小时试图让灯泡以倾斜姿态自行立住，重置仿真约 700 次，直到时间限制到来时仍未保存任何轨迹（<a href="../../../run/?r=robowits-stand-bulb-i00-privileged--hbmnxvr">运行记录</a>）。GPT-6 Astra 把灯泡立在场景提供的圆环中，并在第 10 分钟保存了一条经过检查的轨迹（<a href="../../../run/?r=robowits-stand-bulb-i00-privileged--7yfezvr">运行记录</a>）。在 Standard Setting 下情况正好相反：Fable 和 Opus 解出了该测试，Astra 没有。</p>
 
     <h3 id="run-variance" data-short="运行间差异">同一智能体运行三次，解出的测试集合各不相同，因此智能体间的单测试差异只是弱证据</h3>
 <p>智能体的成功率在不同运行之间相当稳定，但它解出的测试集合并不稳定。排行榜对每个智能体和每个测试只统计一次尝试。为了衡量这意味着什么，论文让 Codex 中的 GPT-6.1 Sol 以高推理强度在全部 456 个核心 Standard 测试上额外运行了两次，其余条件均与排行榜运行相同。</p>
@@ -699,19 +699,19 @@
       <tbody>
         <tr><th>第 1 次运行</th><td>147</td><td>32.2%</td></tr>
         <tr><th>第 2 次运行</th><td>147</td><td>32.2%</td></tr>
-        <tr><th>第 3 次运行</th><td>124</td><td>27.2%</td></tr>
+        <tr><th>第 3 次运行</th><td>127</td><td>27.9%</td></tr>
         <tr><th>均值（pass@1）</th><td></td><td>30.6%（标准差 2.9）</td></tr>
-        <tr><th>三次运行均解出</th><td>69</td><td>15.1%</td></tr>
-        <tr><th>pass@2</th><td></td><td>41.2%</td></tr>
+        <tr><th>三次运行均解出</th><td>71</td><td>15.6%</td></tr>
+        <tr><th>pass@2</th><td></td><td>41.3%</td></tr>
         <tr><th>pass@3（至少一次运行解出）</th><td>215</td><td>47.1%</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p>三次运行的总数相差不超过五个百分点，但三次都解出的测试只有 69 个，约为至少一次运行解出的 215 个测试的三分之一。对于某一次运行解出的测试，另一次运行只能解出其中的 56% 到 70%；第 1 次和第 2 次运行的总数完全相同，但彼此的成功测试只有 69% 重合。任意两次运行在 77% 到 80% 的测试上结果一致，三次运行之间的 Fleiss kappa 系数为 0.50。</p>
-<p>这为前文的跨智能体比较提供了一个参照尺度。在 Sol 排行榜运行解出的 147 个测试中，GPT-6 Astra 解出了 98 个，即 67%，落在 Sol 自身运行之间 56% 到 70% 的范围之内。正如论文的结论所言，一个强智能体解出而另一个失败的测试，既可能反映两者之间的真实差异，也同样可能只是运行间的波动。Astra 的 157 个与 Sol 的 147 个 Standard 成功之间相差 10 个测试，小于 Sol 两次运行之间相差的 23 个测试；Opus 的 114 个与 Argon 的 110 个之间相差 4 个测试，差距更小。相差许多个测试，或在整个测试集上呈现相同模式，都比任何单个测试更有说服力。</p>
-<p>增加运行次数能迅速提高成功率。如果任意一次运行解出就算作解出，Sol 在三次运行下达到 Standard 测试的 47.1%，接近 Claude Fable 5.2 在单次排行榜运行中达到的 49.6%；两次运行已经达到 41.2%。因此，在单次运行的排行榜上，智能体之间的部分差距来自个别测试上的运气。</p>
-<p>推理强度对结果的影响小于重复运行：Sol 在中、高和最高推理强度下分别解出 Standard 测试的 30.0%、32.2% 和 29.8%，差距为 2.4 个百分点（<a href="#spend-effort">详情</a>）。</p>
+<p>三次运行的总数相差不超过五个百分点，但三次都解出的测试只有 71 个，约为至少一次运行解出的 215 个测试的三分之一。对于某一次运行解出的测试，另一次运行只能解出其中的 59% 到 70%；第 1 次和第 2 次运行的总数完全相同，但彼此的成功测试只有 69% 重合。任意两次运行在 78% 到 80% 的测试上结果一致，三次运行之间的 Fleiss kappa 系数为 0.51。</p>
+<p>这为前文的跨智能体比较提供了一个参照尺度。在 Sol 排行榜运行解出的 147 个测试中，GPT-6 Astra 解出了 98 个，即 67%，落在 Sol 自身运行之间 59% 到 70% 的范围之内。正如论文的结论所言，一个强智能体解出而另一个失败的测试，既可能反映两者之间的真实差异，也同样可能只是运行间的波动。Astra 的 157 个与 Sol 的 147 个 Standard 成功之间相差 10 个测试，小于 Sol 两次运行之间相差的 20 个测试；Opus 的 114 个与 Argon 的 110 个之间相差 4 个测试，差距更小。相差许多个测试，或在整个测试集上呈现相同模式，都比任何单个测试更有说服力。</p>
+<p>增加运行次数能迅速提高成功率。如果任意一次运行解出就算作解出，Sol 在三次运行下达到 Standard 测试的 47.1%，接近 Claude Fable 5.2 在单次排行榜运行中达到的 49.6%；两次运行已经达到 41.3%。因此，在单次运行的排行榜上，智能体之间的部分差距来自个别测试上的运气。</p>
+<p>推理强度对结果的影响小于重复运行：Sol 在中、高和最高推理强度下分别解出 Standard 测试的 30.7%、32.2% 和 30.9%，差距为 1.5 个百分点（<a href="#spend-effort">详情</a>）。</p>
 
     <h3 id="realtime" data-short="Realtime">当仿真持续运行时，能力边界进一步内缩，但并非所有任务都如此</h3>
 <p>对每个强智能体而言，Realtime 都比 Standard 更难。仿真不会在智能体思考时暂停，因此决策迟缓就会耗费机器人上的时间。在同时具有 Standard 测试和 Realtime 测试的 54 个核心任务上，54 个 Realtime 测试中有 25 个（46%）没有任何智能体解出，而 54 个 Standard 测试中这一数字为 19 个（35%）。</p>
@@ -732,10 +732,10 @@
     <p>这些任务还被设计为在真实机器人规则下依然困难，因此 Privileged 成功率高而 Standard 成功率低正是预期结果。二者之间的差距衡量的是智能体在必须像真实机器人一样工作时所损失的能力。下面各节分别考察 Privileged 中的成功有多少能保留到 Standard，以及这一差距究竟来自精确状态还是重试机会。</p>
 
     <h3 id="transfer" data-short="Privileged 到 Standard">完整的仿真器权限掩盖了任务的大部分难点</h3>
-<p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 281 个中 174 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
-<p>反过来的情况很少。在 Standard 中解出但在 Privileged 中未解出的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 8 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有智能体中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=d0a5ac89" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 281 个中 174 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、8 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
-<p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的套件中，Fable 的成功率除一个套件外全部下降；根据网站数据，该套件为 iSpatialGym，Fable 在两种设置下均解出 8 个任务中的 7 个。Astra 在所有这些套件中都出现下降。Sol 除 RoboWits 外全部下降（Standard 中 6 个解出 3 个，Privileged 中一个未解出）。Opus 在 ManiGuard（两种设置下均为 7 个解出 7 个）和 DexToolBench（两种设置下均未解出）中没有下降。Argon 在 MyoSuite（Standard 中 13 个解出 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个解出 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个解出 1 个）。</p>
+<p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 286 个中 176 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
+<p>反过来的情况很少。在 Standard 中解出但在 Privileged 中未解出的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 5 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有智能体中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=d0a5ac89" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
+<p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的套件中，Fable 的成功率除一个套件外全部下降；根据网站数据，该套件为 iSpatialGym，Fable 在两种设置下均解出 8 个任务中的 7 个。Astra 和 Sol 在所有这些套件中都出现下降。Opus 在 ManiGuard（两种设置下均为 7 个解出 7 个）和 DexToolBench（两种设置下均未解出）中没有下降。Argon 在 MyoSuite（Standard 中 13 个解出 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个解出 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个解出 1 个）。</p>
 <p><b>在 Privileged 中看似相当的智能体，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 解出的有 28 个，仅 Astra 解出的有 24 个，二者都解出的有 284 个，二者都未解出的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
     <h3 id="state-vs-resets" data-short="重试与状态">能够重试比知道一切物体的位置更有帮助</h3>
@@ -1001,7 +1001,7 @@
               <span class="case-k">唯一的 Realtime 解决</span><b>RoboDynamicExam · 抛起、再接、递送</b><span class="case-m">Claude Fable 5.2 · Realtime · 成功</span><span class="case-t">它根据前两个回合拟合了球的飞行轨迹和小车的运动，并在自己构建的机械臂伺服模型中搜索抛球动作。随后它发送一份预先计算好的关节规划：杯子接住球，将其抛起再接住，跟随移动的小车，并把球倒入其中。第三个回合在第 24 分钟（共 60 分钟）时通过。没有其他智能体解决这个 Realtime 测试。它与连续两次接球的任务（图 15）不同，后者在 Standard 中十个智能体全部失败。</span></a>
     </div>
     <p><b>相邻的绳索测试结果相反。</b>论文附录中的绳索案例（图 31a）是 rope threading 06，需按顺序穿过五个通道：墙上的索环、圆环、第二个索环、第二个圆环和第三个索环。在 Standard Setting 下，Claude Opus 5.5 通过了该测试，是十个智能体中唯一通过的。Claude Fable 5.2 在约 91 s 时穿过了前三个通道，但在为第二个圆环重新抓取绳头时，绳子在 99 s 和 125 s 两次从夹爪中滑脱，回合在到达第二个圆环前结束。GPT-6 Astra 也在 100 s 时穿过了三个通道，随后手指卡在第二个圆环的边缘，绳子滑脱。在失败的智能体中，GPT-6.1 Sol 走得最远，约 84 s 时穿过四个通道，随后其夹爪在 86.5 s 闭合时未能抓住绳子。Gemini 4 Argon 约 55 s 时穿过三个通道，但绳子始终没有穿过第二个圆环。五个较弱的智能体中有四个未能让绳子穿过第一个索环；Kimi 3.1 Pro 在 395 s 时穿过了第一个索环和第一个圆环。</p>
-    <p>这两个绳索测试说明了为什么单次运行只是弱证据。在 rope threading 07 上，Claude Fable 5.2 和 GPT-6.1 Sol 通过，Claude Opus 5.5 失败；在 rope threading 06 这条同样有五个通道的类似赛道上，Claude Opus 5.5 通过，另外两者都失败了，且都是在重新抓取绳头时绳子滑脱或未抓住。每个智能体在每个测试上只有一次尝试，这样的分化既可能反映运行间的随机波动，也可能反映智能体之间的差异：在 <a href="#run-variance">GPT-6.1 Sol 的三次重复 Standard 运行</a>中，成功率最多相差五个百分点，但只有 69 个测试（约占至少一次运行解决的测试的三分之一）在三次中都被解决。上述方法描述的是成功运行的做法；至于某次运行能否顺利完成一次精细的重新抓取，仍会因尝试而异。</p>
+    <p>这两个绳索测试说明了为什么单次运行只是弱证据。在 rope threading 07 上，Claude Fable 5.2 和 GPT-6.1 Sol 通过，Claude Opus 5.5 失败；在 rope threading 06 这条同样有五个通道的类似赛道上，Claude Opus 5.5 通过，另外两者都失败了，且都是在重新抓取绳头时绳子滑脱或未抓住。每个智能体在每个测试上只有一次尝试，这样的分化既可能反映运行间的随机波动，也可能反映智能体之间的差异：在 <a href="#run-variance">GPT-6.1 Sol 的三次重复 Standard 运行</a>中，成功率最多相差五个百分点，但只有 71 个测试（约占至少一次运行解决的测试的三分之一）在三次中都被解决。上述方法描述的是成功运行的做法；至于某次运行能否顺利完成一次精细的重新抓取，仍会因尝试而异。</p>
 
     <h2 id="spend" data-short="投入更多">投入更多有用吗？</h2>
     <h3 id="spend-cost" data-short="投入有用吗？">成功并非靠投入更多换来：失败的尝试比成功的更贵，而价格不到六分之一的智能体与之相差仅约两个百分点</h3>
@@ -1065,17 +1065,17 @@
     <div class="tscroll"><table class="fst">
       <thead><tr><th>推理强度</th><th>成功率</th><th>每次尝试成本</th><th>输出 tokens</th><th>请求数</th><th>时间</th></tr></thead>
       <tbody>
-        <tr><th scope="row">中等</th><td>30.0%</td><td>$4.07</td><td>83k</td><td>201</td><td>69 min</td></tr>
+        <tr><th scope="row">中等</th><td>30.7%</td><td>$4.05</td><td>82k</td><td>201</td><td>69 min</td></tr>
         <tr><th scope="row">高（排行榜）</th><td>32.2%</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
-        <tr><th scope="row">最高</th><td>29.8%</td><td>$3.94</td><td>112k</td><td>157</td><td>80 min</td></tr>
+        <tr><th scope="row">最高</th><td>30.9%</td><td>$3.91</td><td>111k</td><td>157</td><td>79 min</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等、高和最高推理强度分别解决 30.0%、32.2% 和 29.8%，相差 2.4 个百分点。这小于 Sol 在相同测试上三次高推理强度运行之间的差异（分别解决 147、147 和 124 个；均值 30.6%，标准差 2.9 个百分点；见<a href="#run-variance">运行方差</a>）。没有迹象表明其他推理强度的得分会与排行榜所用的高推理强度有实质差异。</p>
+<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等、高和最高推理强度分别解决 30.7%、32.2% 和 30.9%，相差 1.5 个百分点。这小于 Sol 在相同测试上三次高推理强度运行之间的差异（分别解决 147、147 和 127 个；均值 30.8%，标准差 2.5 个百分点；见<a href="#run-variance">运行方差</a>）。没有迹象表明其他推理强度的得分会与排行榜所用的高推理强度有实质差异。</p>
 <p><b>改变的是智能体的工作方式。</b>推理强度更高时，Sol 输出更多 tokens、发送更少请求、运行更久：它在每一步之前思考更多，步数更少、每步更慢。两种风格在这些物理任务上解决的比例大致相同。</p>
-<p><b>成本基本不变，</b>每次尝试 $3.94 到 $4.10，可能是因为请求减少抵消了额外的输出 tokens。论文没有进一步拆分成本，因此这只是我们的解读，而非测得的结果。</p>
-<p><b>重复一次尝试，比在一次尝试中思考更久更重要。</b>在三次高推理强度运行中，被解决的测试集合的变动远大于成功率的变动：只有 69 个测试在三次中都被解决，而 456 个中有 215 个（47.1%）至少被解决一次；对于某次运行解决的测试，另一次运行只解决其中的 56% 到 70%。把任一运行解决即算作解决，并不是排行榜的规则，但这表明，额外一次独立尝试会改变许多单个结果，而在一次尝试内部多思考则让成功率维持原样。</p>
+<p><b>成本基本不变，</b>每次尝试 $3.91 到 $4.10，可能是因为请求减少抵消了额外的输出 tokens。论文没有进一步拆分成本，因此这只是我们的解读，而非测得的结果。</p>
+<p><b>重复一次尝试，比在一次尝试中思考更久更重要。</b>在三次高推理强度运行中，被解决的测试集合的变动远大于成功率的变动：只有 71 个测试在三次中都被解决，而 456 个中有 215 个（47.1%）至少被解决一次；对于某次运行解决的测试，另一次运行只解决其中的 59% 到 70%。把任一运行解决即算作解决，并不是排行榜的规则，但这表明，额外一次独立尝试会改变许多单个结果，而在一次尝试内部多思考则让成功率维持原样。</p>
 <h2 id="harness" data-short="Harness">Harness 如何影响结果</h2>
     <h3 id="harness-gap" data-short="同一模型，换个 harness">Agent 的得分同时取决于模型及其 harness：同一模型更换 harness 后，得分变化最多可达 7.5 个百分点</h3>
 <p>本次考试中的每个 agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及三个较弱的模型（Kimi 3.1 Pro、Qwen3.8 Max 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行同样的 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
