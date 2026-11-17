@@ -1642,7 +1642,7 @@ button.as-link:hover { color: var(--ink); }
   .lbh-row { grid-template-columns: 22px 26px 300px minmax(0, 1fr) 84px; }
   .lbh-axis { grid-template-columns: calc(22px + 26px + 20px + 300px + 6px) minmax(0, 1fr) 94px; }
 }
-@media (max-width: 760px) { .lbh-nl { flex-wrap: wrap; column-gap: 6px; } .lbh-set { flex-basis: 100%; font-size: 13.5px; } }
+@media (max-width: 760px) { .lbh-nl { flex-wrap: wrap; column-gap: 6px; } .lbh-set { flex-basis: 100%; font-size: 13.5px; white-space: normal; } }
 .lbh-pair { font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
 .lbh-pair .x b { color: var(--ink-2); font-weight: 650; }
 .lbh-dh .lbh-nl b { font: 600 16px/1.25 var(--body); }

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../../../assets/exam.css?v=c94f9ada">
+<link rel="stylesheet" href="../../../assets/exam.css?v=0fe173d5">
 <link rel="stylesheet" href="../../../assets/blog.css?v=874f6bf5">
 <style>
   .efs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; }
@@ -166,7 +166,7 @@
   .lang-switch a { color: var(--ink-2); }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../../assets/app.js?v=2b4ebfc7"></script>
+<script type="module" src="../../../assets/app.js?v=76dd8870"></script>
 <script type="module" src="../../../assets/blog-post.js?v=4a7fbd4d"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
@@ -509,7 +509,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="8">
     <p class="fig-cap"><span class="fc-t">每个智能体都在大多数 Standard 测试上失败，即使合在一起，仍有约三分之一无人解决。</span> 论文官方图 8。十个智能体在论文核心集上的成功率，括号中为解决的测试或任务数。列的顺序为：Overall，然后是 Standard、Realtime、Privileged。在 Overall 中，每个核心任务计一次，只有当该任务的所有核心测试都被解决时才算解决。在拥有完整模拟器访问权限时，同样的任务被解决的频率要高得多。</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=e7c7cfab" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=f3135b43" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>在 Standard 下，五个强智能体分别解决了 456 个测试中的 226、157、147、114 和 110 个，五个较弱的智能体分别解决了 46、29、17、14 和 11 个。被许多智能体共同解决的测试很少：33 个被全部五个强智能体解决，只有一个按钮按压测试被全部十个智能体解决。另一端，有 77 个测试恰好只被一个智能体解决。</p>

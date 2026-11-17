@@ -2288,7 +2288,7 @@ const kTok = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` :
 const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playground', robotwin_2_0: 'robotwin-2', cell: 'embodied-safety-exam', rsb: 'embodied-safety-exam', ese: 'embodied-safety-exam', ikea: 'roboarc',
   'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
-const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DSH' };
+const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DeepSeek Harness' };
 const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
   glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', kimi_3_1_pro: 'Kimi 3.1 Pro', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
@@ -2303,7 +2303,7 @@ const settingOf = (r) => {
   const id = r.run || '';
   const h = Object.keys(HARNESS_NAME).find((k) => id.startsWith(k + '-'));
   if (!h) {   // no run id (older builds): the harness, model and effort fields
-    const hn = /^codex/.test(r.agent || '') ? 'Codex' : /claude/.test(r.agent || '') ? 'Claude Code' : /antigravity/i.test(r.agent || '') ? 'Antigravity CLI' : /dsh/i.test(r.agent || '') ? 'DSH' : r.agent;
+    const hn = /^codex/.test(r.agent || '') ? 'Codex' : /claude/.test(r.agent || '') ? 'Claude Code' : /antigravity/i.test(r.agent || '') ? 'Antigravity CLI' : /dsh/i.test(r.agent || '') ? 'DeepSeek Harness' : r.agent;
     const mn = MODEL_NAME[(r.model || '').replace(/-\d$/, '')] || r.model;
     return [hn, mn, r.effort].filter(Boolean).join(' · ');
   }
