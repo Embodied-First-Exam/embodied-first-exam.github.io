@@ -65,10 +65,10 @@ const pctText = (s, n) => (n ? `${Math.round((100 * s) / n)}%` : '–');
 
 let examData, taskData;
 const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`); return r.json(); });
-// runs listed but not ranked (exam.json unranked_runs; GPT-6 Luna, owners, 2026-10-19): their per-task results are in
+// runs listed but not ranked (exam.json unranked_runs; none since 2026-11-17): their per-task results would be in
 // tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them, and
 // only the Results list of a suite with no core test (suiteListed, owner 2026-11-12) lists them with the other runs
-const UNRANKED_RUNS = new Set(['codex-gpt6_luna-xhigh']);
+const UNRANKED_RUNS = new Set();
 const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
@@ -438,76 +438,6 @@ function lbSuites(el, ex, runs, scores, set) {
   el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
 }
 
-/** GPT-6 Luna's results, suite by suite, on every test (owner, 2026-10-27): shown in every view and drawn once from all
- *  the tasks, so a view or filter does not change them. The run is listed but not ranked: it
- *  stays out of the board, the suite-by-suite table and every score (UNRANKED_RUNS); this block only lists its results.
- *  Per suite: the share of tests solved over all modes pooled, per mode, and the share of tasks (a task = one scene with
- *  all its modes) solved in at least one mode. A test without a valid result (not run, or ended by an infrastructure
- *  failure) has no entry in data/tasks.json: it is left out of the denominators, not counted as failed, and counted apart. */
-const LUNA_RUN = 'codex-gpt6_luna-xhigh';
-const LUNA_COLS = [
-  { id: 'overall', label: 'Overall', sub: 'tasks solved', ratio: 'solved / total tasks' },
-  { id: 'all', label: 'All modes', sub: 'tests solved', ratio: 'solved / total tests' },
-  { id: 's', label: 'Standard', sub: 'tests solved', ratio: 'solved / total tests' },
-  { id: 't', label: 'Realtime', sub: 'tests solved', ratio: 'solved / total tests' },
-  { id: 'p', label: 'Privileged', sub: 'tests solved', ratio: 'solved / total tests' },
-  { id: 'task', label: 'Any mode', sub: 'tasks solved', ratio: 'solved / all tasks' },
-];
-function lunaStats(tasks) {
-  const blank = () => ({ tasks: 0, tests: 0, missing: 0, all: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0], task: [0, 0], overall: [0, 0] });
-  const per = {}, total = blank();
-  for (const t of tasks) {
-    if (t.suite === 'robosuite') continue;
-    const r = t.results?.[LUNA_RUN] || {};
-    const o = (per[t.suite] ??= blank());
-    let graded = false, solved = false, every = (t.modes || []).length > 0;
-    for (const m of t.modes || []) {
-      const k = MODE_KEY[m] || 's';
-      const st = r[k]?.s;
-      every &&= st === 'S';
-      for (const x of [o, total]) x.tests += 1;
-      if (st !== 'S' && st !== 'F') { o.missing += 1; total.missing += 1; continue; }
-      graded = true;
-      solved ||= st === 'S';
-      for (const x of [o, total]) { x[k][0] += st === 'S'; x[k][1] += 1; x.all[0] += st === 'S'; x.all[1] += 1; }
-    }
-    for (const x of [o, total]) {
-      x.tasks += 1;
-      // Overall (owner, 2026-11-10): the strict counterpart of Any mode, on the same tasks: solved only if every mode the
-      // task has was solved, a mode without a valid result counting as failed
-      if (graded) { x.task[0] += solved; x.task[1] += 1; x.overall[0] += every; x.overall[1] += 1; }
-    }
-  }
-  return { per, total };
-}
-function lbLuna(el, ex, tasks) {
-  if (!el) return;
-  const who = (ex.unranked_runs || []).find((r) => r.id === LUNA_RUN);
-  const { per, total } = lunaStats(tasks);
-  if (!who || !total.all[1]) { el.closest('section')?.remove(); return; }
-  const lead = $('#lb-luna-lead');
-  if (lead) lead.textContent = `${who.model} (${[who.harness, who.effort].filter(Boolean).join(', ')}) on every test, used to help us filter the tasks; not ranked.`;
-  const note = $('#lb-luna-note');
-  if (note) note.textContent = `Each share counts the run’s latest graded attempt of each test. Overall counts a task as solved only when every mode it has was solved; Any mode, when any of them was.`;
-  const cell = (name, col, v) => {
-    if (!v?.[1]) return `<span class="sx-cell na" title="${esc(name)}: no test in this mode">–</span>`;
-    const q = pctOf(v);
-    const what = col.id === 'task' ? 'tasks solved in at least one mode' : col.id === 'overall' ? 'tasks solved in every mode they have' : `${col.id === 'all' ? '' : `${col.label.toLowerCase()} `}tests solved`;
-    return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${name}: ${int(v[0])} of ${int(v[1])} ${what}`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
-  };
-  const head = `<div class="sx-row sx-head"><span></span>${LUNA_COLS.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small><small class="lu-ratio">${c.ratio}</small></span>`).join('')}</div>`;
-  const row = (s) => {
-    const o = per[s.id];
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${int(o.tasks)} task${o.tasks === 1 ? '' : 's'} · ${int(o.tests)} test${o.tests === 1 ? '' : 's'}</small></span></a>
-      ${LUNA_COLS.map((c) => cell(s.name, c, o[c.id])).join('')}</div>`;
-  };
-  const suites = ranked(ex).filter((s) => per[s.id]);
-  const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp"><span>${title}</span></div>${list.map(row).join('')}`).join('');
-  const tot = `<div class="sx-row lu-total"><span class="sd-name"><span class="code-mark lu-sum" aria-hidden="true">Σ</span><span>Total<small class="sd-n">${int(total.tasks)} tasks · ${int(total.tests)} tests</small></span></span>
-      ${LUNA_COLS.map((c) => cell('Total', c, total[c.id])).join('')}</div>`;
-  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid" style="--n:${LUNA_COLS.length}">${head}${rows}<div class="lu-rule" aria-hidden="true"></div>${tot}</div></div>`;
-}
-
 /* ---------------------------------------------------------------------------------------------- suites */
 
 function suiteCard(ex, s) {
@@ -702,9 +632,9 @@ function renameSuites(sum) {
 let runSummaryP;
 const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
-// runs the owners took off the site: not listed, not counted as a setting, not watched (none since 2026-10-19: GPT-6 Luna
-// is listed with all its runs, every task of the All set, and only kept out of the rankings, UNRANKED_RUNS)
-const HIDDEN_RUNS = new Set();
+// runs the owners took off the site: not listed, not counted as a setting, not watched (owner, 2026-11-17: the site
+// matches the paper, D64)
+const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
@@ -2066,8 +1996,6 @@ async function leaderboardPage(ex) {
   const lb = ex.leaderboard || {};
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
   const tasks = await loadTasks();
-  // GPT-6 Luna's results, listed (not ranked): a section of its own, the same in every view (owner, 2026-10-27)
-  lbLuna($('#lb-luna'), ex, tasks);
   lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
 }
 
@@ -2087,7 +2015,7 @@ async function suitesPage(ex) {
 }
 
 /** A suite with no core test (owner, 2026-11-12): no ranking reads it, so its Results list every run that has results on
- *  its tests, GPT-6 Luna included: per run the share of tests solved over the modes pooled, per mode, and the share of
+ *  its tests: per run the share of tests solved over the modes pooled, per mode, and the share of
  *  tasks solved in at least one mode, each over the tests (tasks) the run has a valid result for. The runs sat different
  *  tests, so the rows are listed (most tests first), not ranked. False when no run has a result here. */
 function suiteListed(el, ex, tasks) {
@@ -2289,7 +2217,7 @@ const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playgr
   'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DeepSeek Harness' };
-const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
+const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
   glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', kimi_3_1_pro: 'Kimi 3.1 Pro', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
 // the run viewer with their rule in the setting's name, after the other runs; in no ranking (one suite, under min_suites)
@@ -2311,7 +2239,7 @@ const settingOf = (r) => {
   const model = rest.slice(0, rest.lastIndexOf('-') - (v ? v.length + 1 : 0));
   return `${HARNESS_NAME[h]} · ${RUN_MODEL_NAME[model] || model} · ${effort}${v ? ` · ${RUN_VARIANT[v]}` : ''}${RUN_STUDY[id] ? ` · ${RUN_STUDY[id]}` : ''}`;
 };
-const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-luna': 'GPT-6 Luna', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5', 'claude-fable-5-2': 'Claude Fable 5.2',
+const MODEL_NAME = { 'gpt-6-astra': 'GPT-6 Astra', 'gpt-6-sol': 'GPT-6 Sol', 'gpt-6.1-sol': 'GPT-6.1 Sol', 'claude-opus-5-5': 'Claude Opus 5.5', 'claude-fable-5-2': 'Claude Fable 5.2',
   'glm-5.3-flash': 'GLM-5.3 Flash', 'qwen3.8-27b': 'Qwen3.8 27B', 'qwen3.8-max': 'Qwen3.8 Max', 'gemini-3.8-flash': 'Gemini 3.8 Flash', 'gemini-4-argon': 'Gemini 4 Argon', 'deepseek-v4.1-flash': 'DeepSeek V4.1 Flash' };
 
 /** A setting's name from its run id alone (the summary has no rows to fall back on); the id itself if it is not one. */
