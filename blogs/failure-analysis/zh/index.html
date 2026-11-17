@@ -173,13 +173,13 @@
 <meta property="og:title" content="Fable 5.2 on EFE：当今智能体在机器人任务中的失败与成功模式">
 <meta property="og:description" content="当今编码智能体在机器人任务中的失败与成功模式：十个智能体在 Embodied First Exam 上的表现。每个智能体在哪些机器人任务上失败及其原因，哪些信息是关键（Privileged 与 Standard 对比），智能体在任务的哪个阶段失败，它们如何控制机器人，以及 harness、花费和任务指令如何改变结果。">
 <meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/failure-analysis/">
-<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30">
+<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fable 5.2 on EFE：当今智能体在机器人任务中的失败与成功模式">
 <meta name="twitter:description" content="当今编码智能体在机器人任务中的失败与成功模式：十个智能体在 Embodied First Exam 上的表现。每个智能体在哪些机器人任务上失败及其原因，哪些信息是关键（Privileged 与 Standard 对比），智能体在任务的哪个阶段失败，它们如何控制机器人，以及 harness、花费和任务指令如何改变结果。">
-<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30">
+<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -194,7 +194,7 @@
       "inLanguage": "zh-Hans",
       "url": "https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/",
       "mainEntityOfPage": "https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/",
-      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30",
+      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9",
       "author": {
         "@type": "Organization",
         "name": "Embodied First Exam",
@@ -479,7 +479,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="9">
     <p class="fig-cap"><span class="fc-t">即使是最强的智能体，也无法解出其他智能体能解出的所有测试。</span> 论文官方图 9 的 Standard 面板，另附一个由同一数据绘制的面板。(a) 十个智能体，测试按 Claude Fable 5.2 排序。(b) 测试按 GPT-6 Astra 排序。</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=8f2f1e30" alt="两个 Standard 任务-智能体矩阵。(a) 十个智能体，按 Claude Fable 5.2 排序：在 Fable 失败的测试中，Astra 解决 39 个，Sol 解决 29 个，Opus 解决 22 个。(b) 按 GPT-6 Astra 排序：在 Astra 失败的测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个。" width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=441e84a9" alt="两个 Standard 任务-智能体矩阵。(a) 十个智能体，按 Claude Fable 5.2 排序：在 Fable 失败的测试中，Astra 解决 39 个，Sol 解决 29 个，Opus 解决 22 个。(b) 按 GPT-6 Astra 排序：在 Astra 失败的测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>面板 (b) 去掉了 Fable，并按 Astra 对测试排序，同样的模式在下一层级再次出现。在 Astra 失败的 Standard 测试中，Sol 解决 49 个，Opus 解决 46 个，Argon 解决 34 个，Kimi 解决 13 个。对若干组智能体而言，两个方向的数量相近：Sol 解决了 49 个 Astra 失败的测试，Astra 解决了 59 个 Sol 失败的测试；Argon 解决了 47 个 Opus 失败的测试，而 Opus 解决了 51 个 Argon 失败的测试。Opus 与 Astra 之间差距较大，为 46 对 89。下表列出了每一组的结果。</p>
@@ -509,7 +509,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="8">
     <p class="fig-cap"><span class="fc-t">每个智能体都在大多数 Standard 测试上失败，即使合在一起，仍有约三分之一无人解决。</span> 论文官方图 8。十个智能体在论文核心集上的成功率，括号中为解决的测试或任务数。列的顺序为：Overall，然后是 Standard、Realtime、Privileged。在 Overall 中，每个核心任务计一次，只有当该任务的所有核心测试都被解决时才算解决。在拥有完整模拟器访问权限时，同样的任务被解决的频率要高得多。</p>
-    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=49c0dfc9" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
+    <div class="pimg"><img src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig08_leaderboard.png?v=e7c7cfab" alt="论文官方图 8：十个智能体在 Overall、Standard、Realtime 和 Privileged 下的成功率。没有智能体能解决 456 个 Standard 测试中的一半；在同时具有两种设置的 391 个任务上，Privileged 下的成功率远高于 Standard；Realtime 有 46% 的测试无人解决，而对应的 Standard 测试为 35%。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>在 Standard 下，五个强智能体分别解决了 456 个测试中的 226、157、147、114 和 110 个，五个较弱的智能体分别解决了 46、29、17、14 和 11 个。被许多智能体共同解决的测试很少：33 个被全部五个强智能体解决，只有一个按钮按压测试被全部十个智能体解决。另一端，有 77 个测试恰好只被一个智能体解决。</p>
@@ -561,7 +561,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="10">
     <p class="fig-cap"><span class="fc-t">在真实机器人规则下，七个套件至少一半无人解决；在完整模拟器访问权限下，只剩一个。</span> 论文官方图 10。按套件统计的成功率，仅包括在该设置下至少有五个核心测试的套件。圆点表示每个强智能体的成功率；柱形表示没有任何强智能体解决的测试比例。RoboARC 的 IKEA 组装任务单独计为一个套件。</p>
-    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=63ac77fc" alt="论文官方图 10：五个强智能体在各套件上的 Standard 与 Privileged 成功率。在 22 个 Standard 套件中，有 7 个至少一半的测试无一被它们解决：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
+    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=edb1c136" alt="论文官方图 10：五个强智能体在各套件上的 Standard 与 Privileged 成功率。在 22 个 Standard 套件中，有 7 个至少一半的测试无一被它们解决：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
   </div>
 </figure>
 <p>这七个 Standard 套件及其中没有任何强智能体解决的测试数分别为：HumanoidBench（8 个中 7 个）、IKEA 组装任务（8 个中 7 个）、DexToolBench（20 个中 17 个）、MyoSuite（13 个中 8 个）、BEHAVIOR-1K（71 个中 36 个）、RoboPaint（22 个中 11 个）和 RoboDojo（12 个中 6 个）。它们涵盖了不同类型的难度：人形机器人全身控制、灵巧手的家具组装与工具使用、肌肉驱动的手臂与手、长程家务活动、只能通过相机检查效果的绘画，以及成功判定以不同方式编写的目标。在最难的两个套件中，没有强智能体解决超过两个测试：DexToolBench 中最多的是 Astra 的 2 个，而在 IKEA 组装任务中只有 Fable 和 Astra 各解决一个。</p>
@@ -734,7 +734,7 @@
     <h3 id="transfer" data-short="Privileged 到 Standard">完整的仿真器权限掩盖了任务的大部分难点</h3>
 <p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个智能体在 Privileged 中解出的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 286 个中 176 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的智能体这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明智能体原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
 <p>反过来的情况很少。在 Standard 中解出但在 Privileged 中未解出的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 5 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有智能体中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=d0a5ac89" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">智能体在完整仿真器权限下解出的任务，很多在真实机器人规则下失败。</span>官方图 11。各智能体在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其解出任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=e1c50c5b" alt="论文官方图 11：十个智能体在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
 <p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的套件中，Fable 的成功率除一个套件外全部下降；根据网站数据，该套件为 iSpatialGym，Fable 在两种设置下均解出 8 个任务中的 7 个。Astra 和 Sol 在所有这些套件中都出现下降。Opus 在 ManiGuard（两种设置下均为 7 个解出 7 个）和 DexToolBench（两种设置下均未解出）中没有下降。Argon 在 MyoSuite（Standard 中 13 个解出 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个解出 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个解出 1 个）。</p>
 <p><b>在 Privileged 中看似相当的智能体，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 解出的有 28 个，仅 Astra 解出的有 24 个，二者都解出的有 284 个，二者都未解出的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
@@ -1010,7 +1010,7 @@
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="cost">
     <p class="fig-cap"><span class="fc-t">成本与成功只有松散关联：价格差异很大的智能体达到相近的成功率。</span>论文原图 21（附录）。各智能体的成功率与单次尝试平均标价成本（对数坐标）的关系，分别为 Standard Setting（实心圆，456 个测试）和 Privileged Setting（空心圆，391 个测试）。连线连接同一智能体的两个设定。</p>
-    <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig_cost_vs_success.png?v=2e6a3852" alt="论文原图 21：十个智能体在 Standard 和 Privileged 设定下的成功率与单次尝试平均标价成本。GPT-6 Astra 每次 Standard 尝试约 $27，Claude Fable 5.2 约 $13；GPT-6.1 Sol 约 $4，其 Standard 成功率接近 Astra。对大多数智能体而言，Privileged 点位于 Standard 点的左上方。" width="3334" height="1250"></div>
+    <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig_cost_vs_success.png?v=342853ba" alt="论文原图 21：十个智能体在 Standard 和 Privileged 设定下的成功率与单次尝试平均标价成本。GPT-6 Astra 每次 Standard 尝试约 $27，Claude Fable 5.2 约 $13；GPT-6.1 Sol 约 $4，其 Standard 成功率接近 Astra。对大多数智能体而言，Privileged 点位于 Standard 点的左上方。" width="3334" height="1250"></div>
   </div>
 </figure>
 <p><b>价格只是成功的粗略参考。</b>在 Standard Setting 下，GPT-6 Astra 每次尝试平均花费 $27.12，约为 Claude Fable 5.2（$13.43）的两倍，约为 Claude Opus 5.5（$6.45）或 Gemini 4 Argon（$6.27）的四倍。GPT-6.1 Sol 是五个强智能体中成本最低的，为 $4.10，不到 Astra 价格的六分之一，在 456 个 Standard 测试中解决 147 个（32.2%），Astra 为 157 个（34.4%），且多于 Opus（114）和 Argon（110）。反过来，Kimi 3.1 Pro（$8.05）和 Gemini 3.8 Flash（$7.09）每次尝试的花费高于 Opus 或 Argon，解决的 Standard 测试却不到它们的一半，分别为 46 和 29 个。在全部三个设定下，Astra 每次尝试的平均成本为 $24.61，Fable 为 $12.48。</p>
