@@ -141,7 +141,7 @@ function compute(ex, tasks, b) {
     ap_p: sample(cb.approach?.p), ap_s: sample(cb.approach?.s), ap_t_code: mix.t ? Q(mix.t.code, mix.t.n) : null,
     ap_train: `${int(train)} of ${int(sampled)}`,
     cb_sample: cb.sample == null ? null : int(cb.sample),
-    cb_snapshot: cb.snapshot ? `${cb.snapshot.slice(0, 10)}${cb.snapshot_sol ? `, and ${cb.snapshot_sol} for GPT-6.1 Sol` : ''}` : null,
+    cb_snapshot: cb.snapshot_text || (cb.snapshot ? `${cb.snapshot.slice(0, 10)}${cb.snapshot_sol ? `, and ${cb.snapshot_sol} for GPT-6.1 Sol` : ''}` : null),
   };
   return { S, M, board, order, ps, mix, kinds, benchRows, hardRows, benchName, tags: cb.bench_tags || {},
     none3, mean3, name, short, ok, solved, flash, suiteName };

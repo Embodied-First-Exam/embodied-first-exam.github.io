@@ -64,7 +64,7 @@ Not by itself. For every agent, the median failed attempt costs more than the me
 
 ## How do coding agents control robots?
 
-In a sample of 1,760 attempts, agents control the robot directly in 63% of Standard attempts but write programs in 97% of Realtime and 79% of Privileged attempts. Given a GPU and a reinforcement-learning library, 25 of 28 soccer tests in the Standard and Realtime settings trained a policy. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+In a sample of 2,622 attempts, agents control the robot directly in 60% of Standard attempts but write programs in 94% of Realtime and 82% of Privileged attempts. Given a GPU and a reinforcement-learning library, 25 of 28 soccer tests in the Standard and Realtime settings trained a policy. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Does the wording of a robot task instruction change the result?
 

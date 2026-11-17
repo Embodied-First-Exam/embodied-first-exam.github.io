@@ -2,57 +2,60 @@
  "crossbench": {
   "approach_mix": {
    "p": {
-    "n": 786,
-    "code": 624,
-    "direct": 93,
-    "train": 0,
-    "mixed": 18,
-    "none": 51
+    "n": 1182,
+    "code": 973,
+    "direct": 114,
+    "train": 2,
+    "mixed": 21,
+    "none": 72
    },
    "s": {
-    "n": 859,
-    "code": 255,
-    "direct": 537,
-    "train": 5,
-    "mixed": 51,
-    "none": 11
+    "n": 1263,
+    "code": 419,
+    "direct": 755,
+    "train": 9,
+    "mixed": 68,
+    "none": 12
    },
    "t": {
-    "n": 115,
-    "code": 111,
-    "direct": 0,
-    "train": 2,
-    "mixed": 2,
-    "none": 0
+    "n": 177,
+    "code": 167,
+    "direct": 1,
+    "train": 4,
+    "mixed": 4,
+    "none": 1
    }
   },
   "approach_kinds": {
    "p": {
-    "n": 786,
-    "open": 149,
-    "closed": 339,
-    "search": 136,
-    "direct": 93,
-    "mixed": 18,
-    "none": 51
+    "n": 1182,
+    "open": 209,
+    "closed": 531,
+    "search": 233,
+    "direct": 114,
+    "train": 2,
+    "mixed": 21,
+    "none": 72
    },
    "s": {
-    "n": 859,
-    "open": 72,
-    "closed": 114,
-    "search": 69,
-    "direct": 537,
-    "train": 5,
-    "mixed": 51,
-    "none": 11
+    "n": 1263,
+    "open": 113,
+    "closed": 203,
+    "search": 103,
+    "direct": 755,
+    "train": 9,
+    "mixed": 68,
+    "none": 12
    },
    "t": {
-    "n": 115,
-    "open": 15,
-    "closed": 93,
-    "search": 3,
-    "train": 2,
-    "mixed": 2
+    "n": 177,
+    "open": 29,
+    "closed": 131,
+    "search": 7,
+    "direct": 1,
+    "train": 4,
+    "mixed": 4,
+    "none": 1
    }
   },
   "bench_tags": {
@@ -74,22 +77,23 @@
    "embodied-olympics-fun": "humanoid sports"
   },
   "snapshot": "2026-10-18 18:30",
-  "sample": 1760,
+  "sample": 2622,
   "interim": true,
   "approach": {
    "p": [
-    624,
-    786
+    973,
+    1182
    ],
    "s": [
-    537,
-    859
+    755,
+    1263
    ],
    "t": [
-    93,
-    115
+    131,
+    177
    ]
   },
-  "snapshot_sol": "2026-11-15"
+  "snapshot_sol": "2026-11-15",
+  "snapshot_text": "2026-10-18 to 2026-11-17, all ten agents"
  }
 }

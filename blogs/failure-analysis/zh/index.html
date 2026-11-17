@@ -335,7 +335,7 @@
           "name": "编码智能体如何控制机器人？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "在 1,760 次尝试的样本中，智能体在 63% 的 Standard 尝试中直接控制机器人，而在 97% 的 Realtime 尝试和 79% 的 Privileged 尝试中编写程序。在提供 GPU 和强化学习库的情况下，Standard 与 Realtime 设置下的 28 个足球测试中有 25 个训练了策略。"
+            "text": "在 2,622 次尝试的样本中，智能体在 60% 的 Standard 尝试中直接控制机器人，而在 94% 的 Realtime 尝试和 82% 的 Privileged 尝试中编写程序。在提供 GPU 和强化学习库的情况下，Standard 与 Realtime 设置下的 28 个足球测试中有 25 个训练了策略。"
           }
         },
         {
@@ -710,7 +710,7 @@
     <h3 id="realtime" data-short="Realtime">当仿真持续运行时，能力边界进一步内缩，但并非所有任务都如此</h3>
 <p>对每个强智能体而言，Realtime 都比 Standard 更难。仿真不会在智能体思考时暂停，因此决策迟缓就会耗费机器人上的时间。在同时具有 Standard 测试和 Realtime 测试的 54 个核心任务上，54 个 Realtime 测试中有 25 个（46%）没有任何智能体解出，而 54 个 Standard 测试中这一数字为 19 个（35%）。</p>
 <p>在这 54 个任务上，Claude Fable 5.2 解出 27 个 Standard 测试和 22 个 Realtime 测试，GPT-6 Astra 分别为 23 和 17 个，GPT-6.1 Sol 为 17 和 13 个，Claude Opus 5.5 为 10 和 4 个，Gemini 4 Argon 为 15 和 5 个。Opus 和 Argon 下降最多，Realtime 也是 Argon 唯一一个解出数多于 Opus 的设置，多出一个测试。Kimi 3.1 Pro 解出 4 个 Realtime 测试，与 Opus 相同；Gemini 3.8 Flash、Qwen3.8 Max 和 DeepSeek V4.1 Flash 各解出 1 个，GLM 5.3 Flash 一个也没有解出。</p>
-<p>下降并不均匀，有些任务在 Realtime 下表现反而更好。在 54 个任务中，有 12 个在 Standard 下有智能体解出而在 Realtime 下无人解出，反过来的情况有 6 个。除 Argon 之外，每个强智能体都解出了一些它在 Standard 下失败的 Realtime 测试：Fable 9 个，Astra 3 个，Sol 3 个，Opus 2 个。各测试集情况不同。在 BiGym 2.0 中，10 个 Realtime 测试中有 8 个无人解出，Standard 下为 10 个中的 3 个；在 Embodied Olympics - Match 中分别为 12 个中的 5 个和 12 个中的 2 个。在 RoboDynamicExam 中方向相反：8 个 Realtime 测试中只有 1 个无人解出，Standard 下为 8 个中的 3 个，且 Fable 在这里解出 6 个 Realtime 测试，Standard 测试只有 3 个。在 Realtime 下，97% 的抽样尝试通过程序控制机器人，其中大多数是运行控制回路的程序（<a href="#control-by-setting">控制方式</a>），因此奖励快速闭环的任务可以从这一设置中获益。</p>
+<p>下降并不均匀，有些任务在 Realtime 下表现反而更好。在 54 个任务中，有 12 个在 Standard 下有智能体解出而在 Realtime 下无人解出，反过来的情况有 6 个。除 Argon 之外，每个强智能体都解出了一些它在 Standard 下失败的 Realtime 测试：Fable 9 个，Astra 3 个，Sol 3 个，Opus 2 个。各测试集情况不同。在 BiGym 2.0 中，10 个 Realtime 测试中有 8 个无人解出，Standard 下为 10 个中的 3 个；在 Embodied Olympics - Match 中分别为 12 个中的 5 个和 12 个中的 2 个。在 RoboDynamicExam 中方向相反：8 个 Realtime 测试中只有 1 个无人解出，Standard 下为 8 个中的 3 个，且 Fable 在这里解出 6 个 Realtime 测试，Standard 测试只有 3 个。在 Realtime 下，94% 的抽样尝试通过程序控制机器人，其中大多数是运行控制回路的程序（<a href="#control-by-setting">控制方式</a>），因此奖励快速闭环的任务可以从这一设置中获益。</p>
 <p>智能体之间的两两比较也随之变化。在 Realtime 下，有 9 个测试只有 Fable 解出，4 个只有 Astra 解出，13 个两者都解出，28 个两者都未解出。Sol 解出了 5 个 Fable 失败的 Realtime 测试，比 Astra 多一个；而 Astra 解出了 7 个 Sol 失败的测试，Sol 解出了 3 个 Astra 失败的测试。由于只有 54 个测试，这些差异中的每一项都只建立在少数几次尝试之上。</p>
 <h2 id="information" data-short="哪些信息重要">哪些信息对智能体真正重要？Privileged 与 Standard 对比</h2>
     <h3 id="settings-explained" data-short="三种设置">三种设置的唯一区别在于智能体能看到什么、能做什么</h3>
@@ -920,19 +920,19 @@
         <div class="pimg"><img class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_approaches.png?v=2de92f5d" alt="论文官方图 4，共四个面板。RoboTwin 2.0 上的直接控制：模型发出 move、grip 和 look 命令，并记下可乐瓶倒了。RoboLab 上的用代码控制：函数 line 和 pick 通过逆运动学移动关节。HumanoidBench 上的训练策略：一个训练了五轮的小型神经网络 actor，画面中人形机器人在奔跑。Embodied Olympics - Fun 上的混合：代码做最小二乘拟合和参数搜索，其中一行调用策略。" width="2400" height="899"></div>
       </div>
     </figure>
-    <p>在随机抽取的尝试中，智能体在 63% 的 Standard 尝试中直接控制机器人，而在 97% 的 Realtime 尝试和 79% 的 Privileged 尝试中编写程序来控制机器人。原因在于时钟。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，智能体掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
+    <p>在随机抽取的尝试中，智能体在 60% 的 Standard 尝试中直接控制机器人，而在 94% 的 Realtime 尝试和 82% 的 Privileged 尝试中编写程序来控制机器人。原因在于时钟。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，智能体掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="18">
-        <p class="fig-cap"><span class="fc-t">各设定下的控制方式（a），以及有无 GPU 时的足球比赛结果（b）。</span>论文原图 18。（a）随机抽取的 1,760 次尝试（859 次 Standard、115 次 Realtime、786 次 Privileged）。“混合”尝试指中途切换了方式，或两种方式使用程度相当。（b）Standard 和 Realtime 下的足球测试中，训练了策略、取得进球或赢得比赛的数量，分为配备 GPU 和强化学习库、以及仅有 CPU 两种情况。</p>
-        <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig18_approaches.png?v=41ce807e" alt="论文原图 18。(a) 部分：Standard 中 63% 为直接控制，30% 为代码；Realtime 中 97% 为代码，以闭环程序为主（81%）；Privileged 中 79% 为代码，其中开环 19%、闭环 43%、参数搜索 17%。(b) 部分：配备 GPU 时，28 场足球测试中有 25 场训练了策略，17 场进球，8 场获胜；仅有 CPU 时，28 场中分别为 1、5 和 1 场。" width="1920" height="1080"></div>
+        <p class="fig-cap"><span class="fc-t">各设定下的控制方式（a），以及有无 GPU 时的足球比赛结果（b）。</span>论文原图 18。（a）从十个智能体的运行中随机抽取的 2,622 次尝试（1,263 次 Standard、177 次 Realtime、1,182 次 Privileged）。“混合”尝试指中途切换了方式，或两种方式使用程度相当。（b）Standard 和 Realtime 下的足球测试中，训练了策略、取得进球或赢得比赛的数量，分为配备 GPU 和强化学习库、以及仅有 CPU 两种情况。</p>
+        <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig18_approaches.png?v=68f827be" alt="论文原图 18。(a) 部分：Standard 中 60% 为直接控制，33% 为代码；Realtime 中 94% 为代码，以闭环程序为主（74%）；Privileged 中 82% 为代码，其中开环 18%、闭环 45%、参数搜索 20%。(b) 部分：配备 GPU 时，28 场足球测试中有 25 场训练了策略，17 场进球，8 场获胜；仅有 CPU 时，28 场中分别为 1、5 和 1 场。" width="1920" height="1080"></div>
       </div>
     </figure>
-    <p><b>样本覆盖范围。</b>另一个编程智能体阅读了这 1,760 次尝试的日志，并为每次尝试标注其最终评分答案所采用的方式。这些尝试随机抽自 2026 年 10 月 18 日的运行，GPT-6.1 Sol 则抽自其 2026 年 11 月 15 日的运行（289 次尝试）。标注是智能体对日志的解读，而非人工标注，因此比例之间的细小差异不具有意义。</p>
-    <p><b>Standard：模型就是控制器。</b>在 859 次 Standard 尝试中，63% 采用直接控制：模型发送一段动作，查看相机图像或传感器读数，然后在机器人等待期间选择下一段动作。只有 30% 编写了程序来控制机器人（开环 8%、闭环 13%、参数搜索 8%）。另有 6% 混合使用多种方式，1% 没有控制方案。</p>
-    <p><b>Realtime：由程序执行控制回路。</b>在 115 次 Realtime 尝试中，97% 使用了程序，没有一次采用直接控制。大多数程序是闭环的，运行时读取机器人状态或相机画面：闭环程序占全部 Realtime 尝试的 81%，开环程序占 13%，参数搜索占 3%。在论文中来自 Embodied Olympics - Match 的羽毛球示例里，GPT-6 Astra 编写的程序在后台运行，用两台相机定位羽毛球，为其飞行轨迹拟合阻力模型并挥拍击球。每当比赛暂停，智能体就读取程序日志并加以修改，最终以 11 比 4 战胜了一个用学习策略选择击球的对手。</p>
-    <p><b>Privileged：先计算或搜索，再提交。</b>在 786 次 Privileged 尝试中，79% 使用了程序：开环 19%、闭环 43%、参数搜索 17%。参数搜索占 624 个程序中的 136 个，它们在仿真器中尝试大量回合，直到某段动作通过。直接控制降至 12%，另有 6% 的尝试没有控制方案。</p>
+    <p><b>样本覆盖范围。</b>另一个编程智能体阅读了这 2,622 次尝试的日志，并为每次尝试标注其最终评分答案所采用的方式。这些尝试随机抽自十个智能体的运行。标注是智能体对日志的解读，而非人工标注，因此比例之间的细小差异不具有意义。</p>
+    <p><b>Standard：模型就是控制器。</b>在 1,263 次 Standard 尝试中，60% 采用直接控制：模型发送一段动作，查看相机图像或传感器读数，然后在机器人等待期间选择下一段动作。只有 33% 编写了程序来控制机器人（开环 9%、闭环 16%、参数搜索 8%）。另有 5% 混合使用多种方式，1% 没有控制方案。</p>
+    <p><b>Realtime：由程序执行控制回路。</b>在 177 次 Realtime 尝试中，94% 使用了程序，只有一次采用直接控制。大多数程序是闭环的，运行时读取机器人状态或相机画面：闭环程序占全部 Realtime 尝试的 74%，开环程序占 16%，参数搜索占 4%。在论文中来自 Embodied Olympics - Match 的羽毛球示例里，GPT-6 Astra 编写的程序在后台运行，用两台相机定位羽毛球，为其飞行轨迹拟合阻力模型并挥拍击球。每当比赛暂停，智能体就读取程序日志并加以修改，最终以 11 比 4 战胜了一个用学习策略选择击球的对手。</p>
+    <p><b>Privileged：先计算或搜索，再提交。</b>在 1,182 次 Privileged 尝试中，82% 使用了程序：开环 18%、闭环 45%、参数搜索 20%。参数搜索占 973 个程序中的 233 个，它们在仿真器中尝试大量回合，直到某段动作通过。直接控制降至 10%，另有 6% 的尝试没有控制方案。</p>
     <p><b>同一智能体会随设定改变方式。</b>在一个要求把三个瓶子放进垃圾桶的 RoboTwin 2.0 任务中，GPT-6 Astra 在 Standard Setting 下逐条发送末端执行器指令，每条之后检查相机图像。它碰倒了一个瓶子，用另一只手臂把它重新拾起，在时限前约 30 秒完成任务。在 Privileged Setting 下，它阅读了任务源代码，用仿真器的运动原语编写抓取脚本，在空中将瓶子从一只手臂交接到另一只手臂，五分钟后提交。</p>
-    <p><b>除非测试提供工具，否则很少训练策略。</b>在抽取的 1,760 次尝试中，只有 7 次训练了策略：占 Standard 样本的 0.6%、Realtime 样本的 2%，Privileged 样本中则没有。许多 Privileged 测试为智能体提供 GPU 来运行仿真器，但其说明中并未指明任何训练库。除此之外，只有八个测试为智能体提供 GPU：每个设定下足球比赛和乒乓球比赛的 GPU 版本，以及两个要求智能体训练行走策略的 RoboEngineer 测试。当测试确实提供 GPU 和训练库时，智能体就会进行训练，下面的足球比赛即为例证。</p>
+    <p><b>除非测试提供工具，否则很少训练策略。</b>在抽取的 2,622 次尝试中，只有 15 次训练了策略：占 Standard 样本的 0.7%、Realtime 样本的 2%、Privileged 样本的 0.2%。许多 Privileged 测试为智能体提供 GPU 来运行仿真器，但其说明中并未指明任何训练库。除此之外，只有八个测试为智能体提供 GPU：每个设定下足球比赛和乒乓球比赛的 GPU 版本，以及两个要求智能体训练行走策略的 RoboEngineer 测试。当测试确实提供 GPU 和训练库时，智能体就会进行训练，下面的足球比赛即为例证。</p>
 
     <h3 id="soccer-gpu" data-short="配备 GPU 的足球比赛">有了 GPU 和训练库，智能体从手写步态转向训练策略；在 Standard 和 Realtime 中，几乎每场胜利都来自它们自己训练的策略</h3>
     <p>在人形机器人足球比赛的 Standard 和 Realtime 设定中，智能体在获得 GPU 和训练库时会训练策略，9 场胜利中有 8 场使用了训练得到的策略。没有 GPU 时，智能体手写行走步态，仅赢下一场。在 Privileged Setting 下，9 场胜利中有 7 场转而复用了对手的行走网络。</p>
