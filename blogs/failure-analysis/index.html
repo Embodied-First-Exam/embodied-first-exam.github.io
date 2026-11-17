@@ -166,7 +166,7 @@
   .lang-switch a { color: var(--ink-2); }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=76dd8870"></script>
+<script type="module" src="../../assets/app.js?v=36667c3e"></script>
 <script type="module" src="../../assets/blog-post.js?v=4a7fbd4d"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
@@ -308,7 +308,7 @@
           "name": "Do different coding agents solve the same robot tasks?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. Without Fable, GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34. Three runs of the same agent agree on only 59% to 70% of the tests they solve, so a difference of a few tests between two agents is weak evidence."
+            "text": "No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable solves 108 that Astra fails. Without Fable, GPT-6.1 Sol solves 49 tests that Astra fails, Claude Opus 5.5 46 and Gemini 4 Argon 34."
           }
         },
         {
@@ -386,7 +386,7 @@
           <li><a href="#task-types">Every agent finds carrying objects easiest and using tools hardest, while the middle types change order</a></li>
           <li><a href="#check-vs-stop">Astra keeps checking and correcting until time runs out; Fable plans ahead and stops once it expects to miss</a></li>
           <li><a href="#eight-tests">Fable’s misses on widely solved tests come from an unwanted contact, a skipped check, or no margin left</a></li>
-          <li><a href="#run-variance">The same agent run three times solves a different set of tests, so single-test differences between agents are weak evidence</a></li>
+          <li><a href="#run-variance">Three runs of the same agent give success rates within five points of each other</a></li>
           <li><a href="#realtime">When the simulation keeps running, the boundary moves further in, though not on every task</a></li>
         </ol></details></li>
         <li><details><summary><a href="#information">What information matters to the agent? Privileged versus Standard</a></summary><ol>
@@ -499,7 +499,6 @@
 <p>Tests that only one strong agent solves are spread across agents too. Of the 286 Standard tests that any strong agent solves, 79 have exactly one strong solver: 48 Fable, 18 Astra, 8 Sol, 4 Opus and 1 Argon. They fall in different suites: 25 of Fable’s 48 are in BEHAVIOR-1K or RoboARC, while 4 of Astra’s 18 and 2 of Sol’s 8 are RoboPaint tests.</p>
 <p>A failure by the agent with the most successes does not mark a test as hard. Eight tests Fable fails are solved by at least four of the other nine agents, and one, an Embodied Safety Exam pour, by six, including Kimi, Gemini 3.8 Flash, Qwen and DeepSeek (all eight are listed in <a href="#eight-tests">Fable’s misses on widely solved tests</a>).</p>
 <p>With full simulator access the split between Fable and Astra is nearly even: in Privileged, 28 tests only Fable solves and 24 only Astra solves, with 284 solved by both and 55 by neither (391 tests). Astra is the only strong solver of 12 Privileged tests, Fable of 9, Sol of 5, Argon of 2 and Opus of 1. The Realtime split is in <a href="#realtime">the Realtime section</a>.</p>
-<p>Every number in this section comes from one run per agent and test, and two runs of the same agent agree on only 59% to 70% of each other’s successes (<a href="#run-variance">see below</a>). The paper therefore says much of the difference between agents’ solved sets may be run-to-run variation: the 60 tests the others solve and Fable fails are real successes, but any single one may not repeat.</p>
 
     <h3 id="shared-boundary" data-short="Unsolved by all">Even with ten agents pooled, more than a third of the Standard tests stay unsolved</h3>
 <p>Pooling all ten agents, 287 of the 456 Standard tests are solved by at least one and 169 (37%) by none. The five strong agents together solve 286 (63%), and the five weaker agents add one test. This shared boundary is the clearest measure in the exam of what current coding agents cannot yet do under real-robot rules, and it does not depend on which agent we look at.</p>
@@ -552,7 +551,7 @@
     </table></div>
   </div>
 </figure>
-<p>Many of these suites are small, and several leads are one test. Given the <a href="#run-variance">run-to-run variation</a>, the single-test margins in DexToolBench, HumanoidBench and MuJoCo Playground are weak evidence by themselves. The larger gaps (RoboPaint, BEHAVIOR-1K Standard, RoboARC, ManiGuard) are more likely to reflect a real difference in how the agents work.</p>
+<p>Many of these suites are small, and several leads are one test, so the single-test margins in DexToolBench, HumanoidBench and MuJoCo Playground are weak evidence by themselves. The larger gaps (RoboPaint, BEHAVIOR-1K Standard, RoboARC, ManiGuard) are more likely to reflect a real difference in how the agents work.</p>
 
     <h3 id="suites-out-of-reach" data-short="Suites out of reach">Some suites are mostly out of reach for every agent under real-robot rules, but almost none with full simulator access</h3>
 <p>Of the 22 suites with at least five Standard tests, 7 have at least half their tests solved by none of the five strong agents. With full simulator access, only one, HumanoidBench, is still that far out of reach.</p>
@@ -688,28 +687,23 @@
 <p><b>It had no margin left.</b> On a drone-control test its controller passed 9 of the 10 hidden flights, and the test needs all 10 (<a href="../../run/?r=roboengineer-neuralfly-general-skydio-i01-standard--2lmjgra">run</a>).</p>
 <p><b>A Privileged case of the same pattern.</b> This case lies outside the 8 Standard tests. Fable solved RoboWits’ stand-the-bulb test in the Standard Setting but failed it in the Privileged Setting, which six of the other nine agents solved. With privileged access, it spent the hour trying to make the bulb stand by itself in a leaning pose, resetting the simulation about 700 times, and the time limit came before it had saved a trajectory (<a href="../../run/?r=robowits-stand-bulb-i00-privileged--hbmnxvr">run</a>). GPT-6 Astra stood the bulb in the ring that the scene provides and saved a checked trajectory at minute 10 (<a href="../../run/?r=robowits-stand-bulb-i00-privileged--7yfezvr">run</a>). In the Standard Setting the order reverses: Fable and Opus solve this test, and Astra does not.</p>
 
-    <h3 id="run-variance" data-short="Run to run">The same agent run three times solves a different set of tests, so single-test differences between agents are weak evidence</h3>
-<p>An agent’s success rate is fairly stable from run to run, but the set of tests it solves is not. The leaderboard counts one attempt per agent and test. To measure what that means, the paper ran GPT-6.1 Sol in Codex on all 456 core Standard tests two more times at high effort, with everything else as in the leaderboard run.</p>
+    <h3 id="run-variance" data-short="Run to run">Three runs of the same agent give success rates within five points of each other</h3>
+<p>The leaderboard counts one attempt per agent and test. To measure how much the success rate changes from one run to the next, the paper ran GPT-6.1 Sol in Codex on all 456 core Standard tests two more times at high effort, with everything else as in the leaderboard run.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-runs">
-    <p class="fig-cap"><span class="fc-t">Three runs of the same agent give similar totals but only partly overlapping solved sets.</span> GPT-6.1 Sol in Codex at high effort on the 456 core Standard tests, from the paper’s appendix on repeated runs. Run 1 is the leaderboard run. pass@k is the expected share of tests that at least one of k runs, drawn from the three, solves.</p>
+    <p class="fig-cap"><span class="fc-t">Three runs of the same agent give similar success rates.</span> GPT-6.1 Sol in Codex at high effort on the 456 core Standard tests, from the paper’s appendix on repeated runs. Run 1 is the leaderboard run.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th></th><th>Tests solved</th><th>Success rate</th></tr></thead>
       <tbody>
         <tr><th>Run 1</th><td>147</td><td>32.2%</td></tr>
         <tr><th>Run 2</th><td>147</td><td>32.2%</td></tr>
         <tr><th>Run 3</th><td>127</td><td>27.9%</td></tr>
-        <tr><th>Mean (pass@1)</th><td></td><td>30.8% (s.d. 2.5)</td></tr>
-        <tr><th>Solved in all three runs</th><td>71</td><td>15.6%</td></tr>
-        <tr><th>pass@2</th><td></td><td>41.3%</td></tr>
-        <tr><th>pass@3 (solved in at least one run)</th><td>215</td><td>47.1%</td></tr>
+        <tr><th>Mean ± s.d.</th><td></td><td>30.8% ± 2.5</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p>The three runs’ totals are within five percentage points of each other, yet only 71 tests are solved in all three, about a third of the 215 that at least one run solves. Of the tests one run solves, another run solves only 59% to 70%; runs 1 and 2, with identical totals, agree on 69% of each other’s successes. Any two runs give the same outcome on 78% to 80% of the tests, and Fleiss’ kappa over the three runs is 0.51.</p>
-<p>This sets a scale for the cross-agent comparisons above. GPT-6 Astra solves 98 of the 147 tests that Sol solves in its leaderboard run, or 67%, inside the 59% to 70% range of Sol against itself. As the paper concludes, a test that one strong agent solves and another fails can reflect run-to-run variation as much as a real difference between the two agents. The 10-test gap between Astra’s 157 and Sol’s 147 Standard successes is smaller than the 20-test gap between two runs of Sol, and the 4-test gap between Opus’s 114 and Argon’s 110 is smaller still. Differences of many tests, or the same pattern across a whole suite, are better evidence than any single test.</p>
-<p>More runs raise the success rate quickly. Counting a test as solved when any of three runs solves it, Sol reaches 47.1% of the Standard tests, close to the 49.6% that Claude Fable 5.2 reaches in its single leaderboard run; two runs already give 41.3%. So part of what separates agents on a one-run leaderboard is luck on individual tests.</p>
+<p>The three runs’ success rates are within five percentage points of each other, with a mean of 30.8% and a standard deviation of 2.5 points, and each run by itself would rank third in the Standard column of the leaderboard.</p>
 <p>Reasoning effort moves the result less than repeating the run: Sol at medium, high and maximum effort solves 30.7%, 32.2% and 30.9% of the Standard tests, a spread of 1.5 points (<a href="#spend-effort">details</a>).</p>
 
     <h3 id="realtime" data-short="Realtime">When the simulation keeps running, the boundary moves further in, though not on every task</h3>
@@ -1006,7 +1000,7 @@
               <span class="case-k">The only Realtime solve</span><b>RoboDynamicExam · Toss, recatch, deliver</b><span class="case-m">Claude Fable 5.2 · Realtime · solved</span><span class="case-t">From its first two episodes it fitted the ball’s flight and the cart’s motion, and it searched for a toss in its own model of the arm’s servos. It then sent one precomputed joint plan: the cup catches the ball, tosses and recatches it, follows the moving cart and tips the ball in. Its third episode passed at minute 24 of 60. No other agent solved this Realtime test. It is a different task from catching a ball twice (Figure 15), where all ten agents fail in Standard.</span></a>
     </div>
     <p><b>A neighboring rope test runs the other way.</b> The rope case in the paper’s appendix (Figure 31a) is rope threading 06, with five passages in order: a grommet in a wall, a ring, a second grommet, a second ring and a third grommet. In the Standard Setting, Claude Opus 5.5 passed it, the only one of the ten agents to do so. Claude Fable 5.2 threaded the first three passages by about 91 s, but as it regripped the rope end for the second ring, the rope slipped out of the gripper at 99 s and again at 125 s, and the episode ended before the second ring. GPT-6 Astra also threaded three passages, by 100 s, before the fingers caught on the rim of the second ring and the rope slipped out. GPT-6.1 Sol got furthest among the agents that failed, four passages by about 84 s, before its gripper closed without catching the rope at 86.5 s. Gemini 4 Argon threaded three passages by about 55 s, but the rope never went through the second ring. Four of the five weaker agents did not get the rope through the first grommet; Kimi 3.1 Pro threaded the first grommet and the first ring by 395 s.</p>
-    <p>The two rope tests show why single runs are weak evidence. On rope threading 07, Claude Fable 5.2 and GPT-6.1 Sol passed and Claude Opus 5.5 failed; on rope threading 06, a similar course of five passages, Claude Opus 5.5 passed and both of the others failed, each when the rope slipped or was missed at a regrip of its end. With one attempt per agent and test, such a split can reflect run-to-run variation as much as a difference between agents: in <a href="#run-variance">three repeated Standard runs of GPT-6.1 Sol</a>, success rates differ by at most five percentage points, yet only 71 tests, about a third of those some run solves, are solved in all three. The methods above describe what solved runs do; whether a given run gets through a delicate regrip still varies from attempt to attempt.</p>
+    <p>The two rope tests split the agents differently. On rope threading 07, Claude Fable 5.2 and GPT-6.1 Sol passed and Claude Opus 5.5 failed; on rope threading 06, a similar course of five passages, Claude Opus 5.5 passed and both of the others failed, each when the rope slipped or was missed at a regrip of its end.</p>
 
     <h2 id="spend" data-short="Spending more">Does spending more help?</h2>
     <h3 id="spend-cost" data-short="Does spending help?">Spending more is not what buys success: failed attempts cost more than solved ones, and an agent at less than a sixth of the price comes within about two points</h3>
@@ -1080,7 +1074,6 @@
 <p><b>The three efforts are within run noise of each other.</b> Medium, high and maximum effort solve 30.7%, 32.2% and 30.9%, a spread of 1.5 points. That is smaller than the spread between three high-effort runs of Sol on the same tests (147, 147 and 127 solved; mean 30.8%, standard deviation 2.5 points; see <a href="#run-variance">run variance</a>). Nothing suggests that another effort would have scored meaningfully differently from the leaderboard’s high effort.</p>
 <p><b>What changes is the way the agent works.</b> With more effort, Sol writes more output tokens, sends fewer requests and runs longer: it thinks more before each step and takes fewer, slower steps. Both styles solve about the same share of these physical tasks.</p>
 <p><b>The cost stays about the same,</b> $3.91 to $4.10 per attempt, probably because fewer requests offset the extra output tokens. The paper does not break the cost down further, so this is our reading, not a measured result.</p>
-<p><b>Repeating an attempt matters more than thinking longer within one.</b> Across the three high-effort runs, the solved set moves much more than the rate: only 71 tests are solved in all three, while 215 of 456 (47.1%) are solved in at least one, and of the tests one run solves, another solves only 59% to 70%. Counting a test as solved when any run solves it is not the leaderboard’s rule, but it shows that an extra independent try changes many single outcomes, while extra thinking inside one try leaves the rate where it was.</p>
 
     <h2 id="harness" data-short="Harness">How the harness affects results</h2>
     <h3 id="harness-gap" data-short="Same model, other harness">An agent’s score belongs to the model and its harness together: the same model moves by up to 7.5 points when the harness changes</h3>
@@ -1150,7 +1143,7 @@
 
     <h2 id="next" data-short="What’s next">What’s next</h2>
     <h3 id="closing-limits" data-short="Limitations">Limitations</h3>
-    <p>Every comparison here comes from one attempt per agent and test, and repeated runs of the same agent solve different sets of tests (see <a href="#run-variance">Run to run</a>), so a gap of a few tests between two agents is weak evidence. The stage and control-approach labels behind Parts 3 and 4 were written by agents (GPT-6.1 Sol and Claude Sonnet 5.5), not by people. All results except one real-robot demonstration are in simulation. The paper discusses these and further limits, including possible memorization of public benchmarks and how the core set was screened (<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">paper, Limitations</a>).</p>
+    <p>Every comparison here comes from one attempt per agent and test; three runs of GPT-6.1 Sol in the Standard Setting give a success rate of 30.8% ± 2.5 (see <a href="#run-variance">Run to run</a>). The stage and control-approach labels behind Parts 3 and 4 were written by agents (GPT-6.1 Sol and Claude Sonnet 5.5), not by people. All results except one real-robot demonstration are in simulation. The paper discusses these and further limits, including possible memorization of public benchmarks and how the core set was screened (<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">paper, Limitations</a>).</p>
 
     <h3 id="next-hidden" data-short="Hidden set">A hidden set of tasks, so that results measure ability rather than memory</h3>
     <p>Because results on tasks adapted from public benchmarks may partly reflect what a model has seen before, we are building a hidden set of held-out tasks that will not be released. Agents will be evaluated on it under the same settings and the same external verifier, so a result there shows how an agent handles a task it could not have seen.</p>
@@ -1175,7 +1168,7 @@
 <p>The paper keeps the demonstration out of every success rate. It covers one task, one robot and two agents with one sequence of eight trials each, no program grades the trials, and Claude Fable 5.2 was not tested. It shows that a coding agent can control a physical robot arm in this game, not how well simulation results predict hardware results.</p>
 
         <h3 id="next-runs" data-short="Runs and Realtime">More runs per test, and more tasks where the clock keeps running</h3>
-    <p>Running every agent several times will separate failures an agent repeats from failures of a single run, and will give confidence intervals for the comparisons between agents and between settings in this post; three runs of GPT-6.1 Sol already solve quite different sets of tests (<a href="#run-variance">Run to run</a>). The paper also plans more Realtime tasks, since the Realtime Setting has the largest share of tests that no agent solves.</p>
+    <p>Running every agent several times, as the paper did for GPT-6.1 Sol (<a href="#run-variance">Run to run</a>), will separate failures an agent repeats from failures of a single run, and will give confidence intervals for the comparisons between agents and between settings in this post. The paper also plans more Realtime tasks, since the Realtime Setting has the largest share of tests that no agent solves.</p>
 
     <h3 id="closing-olympics" data-short="Olympics board">A separate board, with its own rules: the Embodied Olympics Episodic Learning matches</h3>
 <p>This section is not from the paper’s core tests. On the separate <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> Episodic Learning board, agents play matches against each other under different agents, rules and scoring, so its results should not be combined with the paper’s numbers. Claude Fable 5.2 joined on 10 November 2026 and played one fresh match against each of the other six agents in 15 sports; it did not enter Humanoid Soccer · Team, drone racing or full-size racing. It holds 10 gold and 3 silver medals, with a 44-5 record (90%) in 10 duel and team-duel sports. Two details affect that record. The start reminder that Gemini had in earlier Episodic matches was off, and Gemini did not start 5 of its 11 matches against Fable, each counted as a Fable win. Beach volleyball and tennis are exhibitions and count in neither the medal table nor the win rate.</p>

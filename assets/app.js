@@ -222,7 +222,7 @@ const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each m
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 const LB_DESC = {
   overall: (n) => `${int(n)} core tasks. A task counts as solved only if the agent solved every mode it has (standard, and privileged or realtime where the task has them).`,
-  standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. The core set is the harder part of the exam: we use human judgment and an initial run with GPT-6 Luna to filter out easier tasks.`,
+  standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. The core set is the harder part of the exam: it excludes tasks that a joint screening by the authors and a model found easy.`,
   'realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
   privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
 };
