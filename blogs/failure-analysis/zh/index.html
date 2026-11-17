@@ -319,7 +319,7 @@
           "name": "harness 会影响编码智能体控制机器人的效果吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "会，对于同一模型，差距最多可达 7.5 个百分点：GPT-6 Astra 在 Codex 中解决了 34.4% 的 Standard 测试，在 Claude Code 中为 27.0%；Gemini 4 Argon 在 Codex 中解决了 132 个测试，在 Antigravity CLI 中为 114 个。harness 如何结束会话、如何压缩长上下文，会影响物理任务能否完成。"
+            "text": "会，对于同一模型，差距最多可达 7.5 个百分点：GPT-6 Astra 在 Codex 中解决了 34.4% 的 Standard 测试，在 Claude Code 中为 27.0%；Gemini 4 Argon 在 Codex 中解决了 132 个测试，在 Antigravity CLI 中为 110 个。"
           }
         },
         {
@@ -426,7 +426,6 @@
         </ol></details></li>
         <li><details><summary><a href="#harness">Harness 如何影响结果</a></summary><ol>
           <li><a href="#harness-gap">Agent 的得分同时取决于模型及其 harness：同一模型更换 harness 后，得分变化最多可达 7.5 个百分点</a></li>
-          <li><a href="#harness-design">Harness 如何结束会话、如何压缩长会话，可能决定一个物理任务能否完成</a></li>
         </ol></details></li>
         <li><details><summary><a href="#instruction">任务指令会改变结果吗？</a></summary><ol>
           <li><a href="#robodojo">RoboDojo 的案例：完整写明成功判定条件后，得分提高到约三倍</a></li>
@@ -1074,11 +1073,11 @@
 <p>本次考试中的每个 agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及三个较弱的模型（Kimi 3.1 Pro、Qwen3.8 Max 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行同样的 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
 <p><b>GPT-6 Astra 离开 Codex 后下降 7.5 个百分点。</b>在其自带的 harness Codex 中，它解决了 456 个测试中的 157 个（34.4%），在 Claude Code 中解决了 123 个（27.0%）。单个测试的变化是双向的：75 个仅在 Codex 中解决，41 个仅在 Claude Code 中解决。论文认为这一差异显著（配对精确检验，p = 0.002，未做多重比较校正）。差异的大部分在第一个 episode、任何重置之前就已出现：Codex 中成功 119 次，Claude Code 中为 95 次（p = 0.015，未校正）。因此，这一差距并不只来自各 harness 处理多次重试的长会话的方式。</p>
 <p><b>Claude Opus 5.5 在两个 harness 中表现相近。</b>它在 Codex 中解决了 456 个中的 119 个，在其自带的 Claude Code 中解决了 114 个；第一个 episode 中分别为 97 和 96。细看之下，35 个测试仅在 Codex 中解决，30 个仅在 Claude Code 中解决。两项计数的差异均不显著。</p>
-<p><b>Gemini 4 Argon 在其他 harness 中表现最好。</b>它在 Codex 中解决了 456 个中的 132 个，在 Claude Code 中解决了 116 个，在其自带的 Antigravity CLI 中解决了 114 个。与其自带 harness 相比，Codex 多赢 46 个测试、少赢 28 个，净多 18 个（p = 0.047，未校正，因此仅为名义上显著），其中 BEHAVIOR-1K 贡献了 18 个中的 6 个，是所有套件中最多的。Claude Code 与 Antigravity CLI 相差不大（p = 0.92）。第一个 episode 的排序相同，分别为 114、109 和 100，但 Codex 在这里的优势并不显著（p = 0.11）。</p>
+<p><b>Gemini 4 Argon 在其他 harness 中表现最好。</b>它在 Codex 中解决了 456 个中的 132 个，在 Claude Code 中解决了 116 个，在其自带的 Antigravity CLI 中解决了 110 个。与其自带 harness 相比，Codex 多赢 47 个测试、少赢 25 个，净多 22 个（p = 0.013，未校正），其中 BEHAVIOR-1K 贡献了 22 个中的 10 个，是所有套件中最多的。Claude Code 与 Antigravity CLI 相差不大（p = 0.61）。第一个 episode 的排序相同，分别为 114、109 和 96，Codex 在这里同样领先（p = 0.036，未校正）。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="16c">
-    <p class="fig-cap"><span class="fc-t">456 个核心 Standard 测试上按模型和 harness 划分的成功率。</span>论文官方图 16c。带斜线的柱表示非模型自带的 harness。Gemini 4 Argon 的 BEHAVIOR-1K 测试在三个 harness 中使用相同的任务指令，因此其 Antigravity CLI 柱（114 个测试）与图 8（110 个）不同。</p>
-    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig16c_harness.png?v=563172a7" alt="论文官方图 16c：456 个 Standard 测试上按模型和 harness 划分的成功率。GPT-6 Astra 在 Codex 中为 34%，在 Claude Code 中为 27%；Claude Opus 5.5 在 Codex 中为 26%，在 Claude Code 中为 25%；Gemini 4 Argon 在 Codex 中为 29%，在 Claude Code 中为 25%，在 Antigravity CLI 中为 25%。" width="1920" height="1080"></div>
+    <p class="fig-cap"><span class="fc-t">456 个核心 Standard 测试上按模型和 harness 划分的成功率。</span>论文官方图 16c。带斜线的柱表示非模型自带的 harness。</p>
+    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig16c_harness.png?v=4decd66b" alt="论文官方图 16c：456 个 Standard 测试上按模型和 harness 划分的成功率。GPT-6 Astra 在 Codex 中为 34%，在 Claude Code 中为 27%；Claude Opus 5.5 在 Codex 中为 26%，在 Claude Code 中为 25%；Gemini 4 Argon 在 Codex 中为 29%，在 Claude Code 中为 25%，在 Antigravity CLI 中为 24%。" width="1920" height="1080"></div>
   </div>
 </figure>
 <figure class="fig">
@@ -1089,28 +1088,13 @@
       <tbody>
         <tr><th scope="row">GPT-6 Astra</th><td>157 / 119*</td><td>123 / 95</td><td>未运行</td></tr>
         <tr><th scope="row">Claude Opus 5.5</th><td>119 / 97</td><td>114 / 96*</td><td>未运行</td></tr>
-        <tr><th scope="row">Gemini 4 Argon</th><td>132 / 114</td><td>116 / 109</td><td>114 / 100*</td></tr>
+        <tr><th scope="row">Gemini 4 Argon</th><td>132 / 114</td><td>116 / 109</td><td>110 / 96*</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p><b>两点说明。</b>第一，Codex 和 Claude Code 只支持各自提供商的 API 格式。在跨提供商的运行中，一个适配器将每个请求转发给另一家提供商，再把回复翻译回来，并调整系统提示词和模型元数据。论文指出这些运行只是近似原生设置，因此模型在非自带 harness 中的下降，可能有一部分来自这层转换，而非 harness 设计本身。第二，Argon 的 BEHAVIOR-1K 测试在三个 harness 中使用同一任务指令，这就是它在该 harness 中的柱为 114 而非排行榜中 110 的原因（图 8）；它在 Antigravity CLI 中的其他结果来自排行榜运行。harness 对比运行单独报告，不改变排行榜。</p>
+<p><b>一点说明。</b>Codex 和 Claude Code 只支持各自提供商的 API 格式。在跨提供商的运行中，一个适配器将每个请求转发给另一家提供商，再把回复翻译回来，并调整系统提示词和模型元数据。论文指出这些运行只是近似原生设置，因此模型在非自带 harness 中的下降，可能有一部分来自这层转换，而非 harness 设计本身。harness 对比运行单独报告，不改变排行榜。</p>
 <p>因此，当一个 agent 解决了另一个 agent 失败的测试时，差异有一部分可能来自 harness。论文因此把每个结果都报告为某个模型在特定 harness 中的结果：harness 如何暴露工具、管理上下文以及结束会话，本身就是这次考试所衡量内容的一部分。</p>
-
-    <h3 id="harness-design" data-short="Harness 设计">Harness 如何结束会话、如何压缩长会话，可能决定一个物理任务能否完成</h3>
-<p>本次考试的时间限制从 30 分钟到四小时不等，失败的 agent 往往会一直工作到时间耗尽。在短小的编程任务中很少起作用的两个 harness 设计选择，在这里变得重要：模型提供商拒绝回复时 harness 怎么做，以及对话超出模型上下文时 harness 保留什么。数据显示各 harness 在这两点上存在明显差异，但无法说明每一点各自解释了多少得分差距。</p>
-<p><b>在回复被拦截时结束会话，会把一个可恢复的小问题变成一次失败的尝试。</b>在整个考试中，有 162 次尝试因提供商的内容过滤器而中止，尝试要么结束，要么没有提交任何内容：其中 153 次来自 Gemini 4 Argon，7 次来自 Gemini 3.8 Flash，Claude Fable 5.2 和 Qwen3.8 Max 各 1 次。这种情况几乎全部落在 Gemini 模型上，一个可能的原因是它们的 harness Antigravity CLI 会在回复被拦截后结束会话，而 Codex 会重新发送请求，Claude Code 会让模型继续。论文没有测量这能解释多少该现象，因为过滤器对不同模型的拦截比例本身也可能不同。Argon 的中止在每种设置中都有出现：Standard 中 36 次，Realtime 中 9 次，Privileged 中 108 次。在要求 agent 提交录制轨迹的 Privileged 中，Argon 有 134 次尝试从未提交轨迹，其中 79 次是过滤器中止。</p>
-<p>这些尝试在排行榜上计为失败。论文仅在失败阶段统计中剔除了它们，因为过滤器中止几乎无法反映物理层面出了什么问题。数据无法判断 Argon 在重试后能否解决这些测试，论文也没有统计 Argon 在 harness 对比中的失败有多少以回复被拦截告终，因此我们并不认为这些中止解释了它与 Codex 之间的差距。</p>
-<p><b>各 harness 压缩长对话的方式不同。</b>当上下文填满时，harness 会用一份摘要替换对话。Antigravity CLI 在约 260k token 时压缩，并保留任务指令的大约前 10k 个字符；Codex 在约 240k token 时压缩，并保留完整指令；Claude Code 保留一份摘要和最近的消息。用 Gemini 4 Argon 运行 456 个核心 Standard 测试时，Antigravity CLI 和 Codex 都进行了压缩的测试有 287 个，只有其中一个压缩的有 63 个，两者都未压缩的有 106 个。</p>
-<p><b>Argon 在两个 harness 之间的差距集中在经过压缩的长测试中。</b>在两者都未压缩的测试中，Antigravity CLI 略微领先，64 比 60。在只有一方压缩的测试中，两者持平，18 比 19。在两者都压缩的测试中，Codex 解决 53 个，Antigravity CLI 解决 32 个，且 Codex 的 53 个中有 33 个是 Antigravity CLI 失败的测试（反方向为 12 个）。这些测试中的失败往往耗尽了时间：Antigravity CLI 的 255 次失败尝试中有 209 次、Codex 的 234 次中有 174 次一直运行到时间限制。</p>
-<p><b>压缩之后，Antigravity CLI 的命令失败率约翻倍。</b>在发生过压缩的尝试中，以错误退出的 shell 命令占比在 Antigravity CLI 中从首次压缩前的 7.7% 升至压缩后的 16.2%，在 Codex 中从 8.3% 升至 11.9%。论文检验了 agent 是否遗忘了摘要中丢掉的指令细节，发现这似乎不能解释该差距。在 BEHAVIOR-1K 之外（其所有尝试丢失的指令都不到 30%），在 Antigravity CLI 丢掉不到 30% 指令的 117 个测试中，它解决 14 个，Codex 解决 27 个；在它丢掉 30% 或以上指令的 133 个测试中，它解决 20 个，Codex 解决 23 个。丢掉的越多，差距反而越小，这与遗忘假说的预测相反。而且在两个 harness 中，压缩后查找错误里缺失的名称只有大约四分之一（Antigravity CLI 中为 23.5%，Codex 中为 23.1%）出现在指令中。论文将这些都视为相关性，而非因果关系。</p>
-<p><b>Harness 开发者可以检查的方面。</b>以下是值得检查的事项，而非已经证实的修复方案：</p>
-<ul>
-  <li><b>不要因为一次被拒绝的回复就结束长会话。</b>在还剩一小时或更长时间时结束会话，会浪费剩余时间；重试（Codex）或让模型继续（Claude Code）可以让尝试延续下去。在这里，这一选择使一个 agent 的 153 次尝试未进入物理失败分析。</li>
-  <li><b>把压缩当作 agent 可能失去方向的节点来测量。</b>一个简单的信号是每次压缩前后命令的失败占比；在 Argon 的运行中，上升幅度更大的 harness 解决的长测试更少。摘要中究竟哪一部分起作用尚无定论：仅仅保留完整指令似乎并不是关键。</li>
-  <li><b>在长任务上测试 harness。</b>在测试触及上下文上限、并且往往也触及时间限制之前，两个 harness 的表现大致相当。</li>
-  <li><b>在报告模型时一并报告 harness。</b>它可以使模型得分变化数个百分点。</li>
-</ul>
 
     <h2 id="instruction" data-short="任务指令">任务指令会改变结果吗？</h2>
     <h3 id="robodojo" data-short="RoboDojo 目标">RoboDojo 的案例：完整写明成功判定条件后，得分提高到约三倍</h3>

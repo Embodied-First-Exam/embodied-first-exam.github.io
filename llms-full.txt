@@ -56,7 +56,7 @@ No. GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 
 
 ## Does the harness change how well a coding agent controls robots?
 
-Yes, by up to 7.5 percentage points for the same model: GPT-6 Astra solves 34.4% of the Standard tests in Codex and 27.0% in Claude Code, and Gemini 4 Argon solves 132 tests in Codex against 114 in Antigravity CLI. How a harness ends a session and compacts a long context affects whether a physical task gets finished. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+Yes, by up to 7.5 percentage points for the same model: GPT-6 Astra solves 34.4% of the Standard tests in Codex and 27.0% in Claude Code, and Gemini 4 Argon solves 132 tests in Codex against 110 in Antigravity CLI. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Does spending more help coding agents on robot tasks?
 
