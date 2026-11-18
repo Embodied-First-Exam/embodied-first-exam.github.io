@@ -1971,6 +1971,31 @@ function bodyLabel(ex, s) {
   return `${low.slice(0, -1).join(', ')} and ${low[low.length - 1]}`;
 }
 
+/** What's new: one small line by the hero's search (owner and Canyu Chen, 2026-11-18): the blog's latest posts from
+ *  data/blogs.json, newest first, one at a time, and a link to all posts. With more than one post it turns every few
+ *  seconds, holds while hovered or focused, and stays on the newest post for a viewer who prefers less motion. */
+async function homeNews(el) {
+  if (!el) return;
+  let posts = [];
+  try { posts = await getJSON('data/blogs.json'); } catch (e) { return; }
+  posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 3);
+  if (!posts.length) return;
+  const day = (iso) => { const d = new Date(`${iso}T00:00:00Z`); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); };
+  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts">${posts.map((p, i) => `<a class="hn-post${i ? '' : ' on'}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"><span class="hn-title">${esc(p.title)}</span>${p.date ? `<span class="hn-date">${esc(day(p.date))}</span>` : ''}</a>`).join('')}</span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
+  const items = $$('.hn-post', el);
+  if (items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let at = 0, hold = false;
+  const on = () => { hold = true; }, off = () => { hold = el.matches(':hover, :focus-within'); };
+  el.addEventListener('mouseenter', on); el.addEventListener('focusin', on);
+  el.addEventListener('mouseleave', off); el.addEventListener('focusout', () => setTimeout(off));
+  setInterval(() => {
+    if (hold || document.hidden) return;
+    items[at].classList.remove('on');
+    at = (at + 1) % items.length;
+    items[at].classList.add('on');
+  }, 5000);
+}
+
 async function home(ex) {
   const t = ex.totals || {};
   $('#hero-lead').textContent = ex.hero?.lead || ex.summary || '';
@@ -1979,6 +2004,7 @@ async function home(ex) {
   flowDiagram($('#flowfig'), ex);
   homeBoard($('#lbh'), ex);
   heroRun($('#hero-run'), ex);
+  homeNews($('#home-news'));
   oneLine($('.ol-open'), ex);
   gallery($('#gallery'), ex);
   // the intro video plays (muted) while it is on screen, unless the viewer prefers less motion
