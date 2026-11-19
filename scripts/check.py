@@ -74,13 +74,16 @@ def main() -> int:
             if bad in text:
                 problems.append(f"{f.relative_to(ROOT)}: contains '{bad}'")
     # a post's date is the day it was published, never the day it was last edited: the card date in
-    # data/blogs.json must equal the page's datePublished (dateModified is free to follow later edits)
+    # data/blogs.json must equal the page's datePublished (pages carry no modified date)
     for post in json.loads((ROOT / "data/blogs.json").read_text(encoding="utf-8")):
         page = ROOT / "blogs" / post["slug"] / "index.html"
         if page.is_file():
             pub = re.findall(r'"datePublished": "([^"]+)"', page.read_text(encoding="utf-8"))
             if pub and post.get("date") != pub[0]:
                 problems.append(f"data/blogs.json: {post['slug']} date {post.get('date')} is not its publication date {pub[0]}")
+        for f in (ROOT / "blogs" / post["slug"]).glob("**/index.html"):
+            if '"dateModified"' in f.read_text(encoding="utf-8"):
+                problems.append(f"{f.relative_to(ROOT)}: a post carries only its publication date (remove dateModified)")
     print(f"checked {len(pages)} pages, {len(refs)} media files on HF ({media.PREFIX}/) and "
           f"{sum(len(x) for x in others.values())} links to its other folders")
     for p in problems:
