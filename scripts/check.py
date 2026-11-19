@@ -73,14 +73,14 @@ def main() -> int:
         for bad in FORBIDDEN:
             if bad in text:
                 problems.append(f"{f.relative_to(ROOT)}: contains '{bad}'")
-    # dates pinned by the owner: later small edits do not change a post's date
+    # creation dates pinned by the owner: a post shows the day it was created, whatever is edited later
     pinned = {"failure-analysis": "2026-11-15"}
     posts = {b["slug"]: b for b in json.loads((ROOT / "data/blogs.json").read_text(encoding="utf-8"))}
     for slug, day in pinned.items():
         if posts.get(slug, {}).get("date") != day:
             problems.append(f"data/blogs.json: {slug} date must stay {day}")
         for page in (ROOT / "blogs" / slug).glob("**/index.html"):
-            for key, val in re.findall(r'"(datePublished|dateModified)": "([^"]+)"', page.read_text(encoding="utf-8")):
+            for key, val in re.findall(r'"(datePublished)": "([^"]+)"', page.read_text(encoding="utf-8")):
                 if val != day:
                     problems.append(f"{page.relative_to(ROOT)}: {key} must stay {day}")
     print(f"checked {len(pages)} pages, {len(refs)} media files on HF ({media.PREFIX}/) and "

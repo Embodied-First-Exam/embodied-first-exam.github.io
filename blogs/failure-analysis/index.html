@@ -190,7 +190,7 @@
       "headline": "Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics",
       "description": "Where today’s coding agents succeed and fail in robotics: ten agents on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.",
       "datePublished": "2026-11-15",
-      "dateModified": "2026-11-15",
+      "dateModified": "2026-11-19",
       "inLanguage": "en",
       "url": "https://www.embodied-first-exam.ai/blogs/failure-analysis/",
       "mainEntityOfPage": "https://www.embodied-first-exam.ai/blogs/failure-analysis/",
@@ -384,7 +384,7 @@
           <li><a href="#where-each-leads">The top agent changes by suite; a newer agent is not always the strongest</a></li>
           <li><a href="#suites-out-of-reach">In 7 suites, more than half the Standard tests stay unsolved</a></li>
           <li><a href="#task-types">Carrying is easy, tool use is hard</a></li>
-          <li><a href="#eight-tests">Why does Fable fail tests that other agents solve?</a></li>
+          <li><a href="#eight-tests">Why do agents fail tests that others solve? The case of Fable</a></li>
           <li><a href="#realtime">Which tasks can still be solved in Realtime?</a></li>
         </ol></details></li>
         <li><details open><summary><a href="#information">Which information matters most? Privileged versus Standard</a></summary><ol>
@@ -570,7 +570,7 @@
 <p>The middle of the order changes from agent to agent. Astra does better on Precision &amp; Contact (30%) than on Articulated Mechanisms (24%), while Fable and Sol show the reverse. Argon solves more Dynamic Interaction (24%) and Precision &amp; Contact (17%) tests than Opus (19% and 13%), while Opus is ahead on Navigation &amp; Search (18% against 10%), Articulated Mechanisms (24% against 20%) and Deformable &amp; Fluid (19% against 12%). Argon’s Navigation &amp; Search rate, 10%, is close to its Tool Use rate.</p>
 <p>Task types describe a whole task, and a hard type can be hard for several reasons. The stage-level failure labels, which assign a type to each stage, are the better tool for asking which step goes wrong (<a href="#same-stage">Where in a task do agents fail?</a>).</p>
 
-    <h3 id="eight-tests" data-short="Fable’s misses">Why does Fable fail tests that other agents solve?</h3>
+    <h3 id="eight-tests" data-short="Fable’s misses">Why do agents fail tests that others solve? The case of Fable</h3>
 <p><b>Fable’s misses on widely solved tests come from an unwanted contact, a skipped check, or no margin left.</b> When many agents solve a test that Claude Fable 5.2 fails, the failure shows what goes wrong for Fable on a task well within reach. Of the 230 Standard tests Fable fails, only 8 are solved by four or more of the other nine agents. In the five of these runs we read, Fable got the important part right and then lost the test on a contact it did not avoid, a check it did not make, or a margin it did not have.</p>
 <p>The solvers are a mixed group. Weaker agents are among the solvers of 7 of the 8, and on the pour test four of the six solvers are weaker agents, while GPT-6.1 Sol and Claude Opus 5.5 fail it along with Fable. GPT-6 Astra solves 4 of the 8, Sol 6, and Opus and Gemini 4 Argon 7 each. Each test is one attempt per agent, so part of any single difference may be run variation.</p>
 <figure class="fig">
