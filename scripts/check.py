@@ -81,9 +81,14 @@ def main() -> int:
             pub = re.findall(r'"datePublished": "([^"]+)"', page.read_text(encoding="utf-8"))
             if pub and post.get("date") != pub[0]:
                 problems.append(f"data/blogs.json: {post['slug']} date {post.get('date')} is not its publication date {pub[0]}")
+        # every language version (zh/, es/, ...) carries the same publication date as the post
         for f in (ROOT / "blogs" / post["slug"]).glob("**/index.html"):
-            if '"dateModified"' in f.read_text(encoding="utf-8"):
+            text = f.read_text(encoding="utf-8")
+            if '"dateModified"' in text:
                 problems.append(f"{f.relative_to(ROOT)}: a post carries only its publication date (remove dateModified)")
+            for d in re.findall(r'"datePublished": "([^"]+)"', text):
+                if d != post.get("date"):
+                    problems.append(f"{f.relative_to(ROOT)}: datePublished {d} differs from the post's date {post.get('date')}")
     print(f"checked {len(pages)} pages, {len(refs)} media files on HF ({media.PREFIX}/) and "
           f"{sum(len(x) for x in others.values())} links to its other folders")
     for p in problems:
