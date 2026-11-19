@@ -498,7 +498,7 @@
 <p>在拥有完整模拟器访问权限时，Fable 与 Astra 之间的划分几乎持平：在 Privileged 下，只有 Fable 完成的测试有 28 个，只有 Astra 完成的有 24 个，两者都完成的有 284 个，都未完成的有 55 个（共 391 个测试）。在 Privileged 测试中，Astra 是 12 个测试的唯一强完成者，Fable 是 9 个，Sol 是 5 个，Argon 是 2 个，Opus 是 1 个。Realtime 下的划分见 <a href="#realtime">Realtime 一节</a>。</p>
 
  <h3 id="shared-boundary" data-short="无人完成">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</h3>
-<p>汇总全部十个 Agent，456 个 Standard 测试中有 287 个至少被一个 Agent 完成，169 个（37%）无人完成。五个强 Agent 合计完成 286 个（63%），五个较弱的 Agent 只额外增加了一个测试。这一共同边界是本考试中对“当前编程 Agent 在真实机器人规则下尚无法做到什么”最清晰的度量，而且它不取决于我们关注哪个 Agent。</p>
+<p>汇总全部十个 Agent，456 个 Standard 测试中有 287 个至少被一个 Agent 完成，169 个（37%）无人完成。五个强 Agent 合计完成 286 个（63%），五个较弱的 Agent 只额外增加了一个测试。这一共同边界是本考试中对“当前编程 Agent 在真实机器人约束下尚无法做到什么”最清晰的度量，而且它不取决于我们关注哪个 Agent。</p>
 <p>一个 Agent 失败的测试，大多数是所有 Agent 都失败的。在 Claude Fable 5.2 失败的 230 个 Standard 测试中，有 169 个属于这些无人完成的测试；只有约四分之一（61 个）是被其他 Agent 完成的。</p>
 <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="8">
@@ -508,7 +508,7 @@
 </figure>
 <p>在 Standard 下，五个强 Agent 分别完成了 456 个测试中的 226、157、147、114 和 110 个，五个较弱的 Agent 分别完成了 46、29、17、14 和 11 个。被许多 Agent 共同完成的测试很少：33 个被全部五个强 Agent 完成，只有一个按钮按压测试被全部十个 Agent 完成。另一端，有 77 个测试恰好只被一个 Agent 完成。</p>
 <p>无人完成的 Suite 中在少数几个 Suite 中：在这 169 个测试中，BEHAVIOR-1K 占 36 个，Embodied Olympics - Fun 占 26 个，DexToolBench 占 17 个，RoboARC 占 14 个（另有 7 个 IKEA 组装测试），RoboPaint 占 11 个，MyoSuite 占 8 个，HumanoidBench 占 7 个（<a href="#suites-out-of-reach">难以企及的 Suite</a>一节专门分析这些 Suite）。</p>
-<p>这一差距正是本考试设计所要呈现的：任务的 Privileged 测试可以通过搜索完成，但在真实机器人规则下依然困难。在无人完成的 169 个 Standard 测试中，有 160 个所属任务也有 Privileged 测试，而这些 Privileged 测试中有 122 个被某个 Agent 完成。只有 38 个在两种设置下都无人完成；另外 9 个没有 Privileged 测试。在整个 Privileged Setting 中，391 个测试中只有 43 个（11%）无人完成，其中 19 个属于 BEHAVIOR-1K。强 Agent 合计完成 348 个 Privileged 测试（89%），较弱的 Agent 没有额外贡献。</p>
+<p>这一差距正是本考试设计所要呈现的：任务的 Privileged 测试可以通过搜索完成，但在真实机器人约束下依然困难。在无人完成的 169 个 Standard 测试中，有 160 个所属任务也有 Privileged 测试，而这些 Privileged 测试中有 122 个被某个 Agent 完成。只有 38 个在两种设置下都无人完成；另外 9 个没有 Privileged 测试。在整个 Privileged Setting 中，391 个测试中只有 43 个（11%）无人完成，其中 19 个属于 BEHAVIOR-1K。强 Agent 合计完成 348 个 Privileged 测试（89%），较弱的 Agent 没有额外贡献。</p>
 <p>这些计数并不能说明一个测试为何无人完成。论文中阶段级的失败标签（一个阶段是任务所要求的一次世界状态变化，例如冰箱被打开；由编程 Agent 根据回放和日志为每次失败的尝试打标签，我们在开发提示词期间对标签做了人工抽查）指出了一次尝试在哪个阶段失败、在那里出了什么问题，但它们无法区分感知错误与控制错误，其根因层面也只能支持很少的确定结论。</p>
 
  <h3 id="where-each-leads" data-short="逐 Suite 对比">不同 Suite 的第一名不同，新 Agent 也可能退步</h3>
@@ -522,7 +522,7 @@
 
 <p><b>GPT-6 Astra 与 GPT-6.1 Sol 领先的 Suite。</b> RoboPaint 是最明显的例子：在 Standard 下，22 个绘画与书法测试中 Astra 完成 7 个，Sol 完成 6 个，而 Claude Fable 5.2、Claude Opus 5.5 和 Gemini 4 Argon 各完成 2 个。Astra 在 DexToolBench（20 个中 2 个）、HumanoidBench（8 个中 1 个，也是该 Suite 中所有强 Agent 唯一的成功）和 MuJoCo Playground（7 个中 4 个）上也拥有最多的 Standard 成功。HumanoidBench 中唯一的成功是方块操作任务，即人形机器人在每只手掌上方旋转一个方块；Fable 在 Standard 下失败，但在 Realtime 和 Privileged 下都完成了同一任务。在拥有完整模拟器访问权限时，Astra 仍在 DexToolBench（20 个中 13 个，Fable 和 Sol 各 10 个）和 RoboPaint（22 个中 22 个，Fable 和 Sol 各 20 个）上领先，而 Sol 在 MyoSuite（13 个中 7 个，Fable 和 Astra 各 6 个）和 BEHAVIOR-1K（71 个中 38 个，Fable 和 Astra 各 36 个）上领先。</p>
 <p>根据我们对运行过程的解读，RoboPaint 在 Standard 下的差距来自 Agent 如何通过相机判断自己的临摹结果，而不是来自绘画本身；<a href="#check-vs-stop">检查与停止</a>一节展示了相关运行。</p>
-<p><b>Claude Fable 5.2 领先的 Suite。</b> 它最大的领先优势出现在长程、多步骤的 Suite 中。在包含长程家务活动的 BEHAVIOR-1K 中，它完成了 71 个 Standard 测试中的 26 个，而 Astra 为 14 个，Sol 为 13 个。在包含精细操作谜题的 RoboARC 中，它完成了 50 个中的 32 个，而其他每个强 Agent 各完成 11 到 15 个。它在 iSpatialGym（8 个中 7 个）和 Embodied Olympics - Match（13 个中 10 个）上也领先。其他 Agent 同样有能力完成这些 Suite：在拥有完整模拟器访问权限时，Astra 和 Sol 完成的 BEHAVIOR-1K 测试数量与 Fable 大致相当（71 个中分别为 36 和 38 个，Fable 为 36 个），因此 Fable 在该 Suite Standard 下的领先似乎与在真实机器人规则下工作有关。</p>
+<p><b>Claude Fable 5.2 领先的 Suite。</b> 它最大的领先优势出现在长程、多步骤的 Suite 中。在包含长程家务活动的 BEHAVIOR-1K 中，它完成了 71 个 Standard 测试中的 26 个，而 Astra 为 14 个，Sol 为 13 个。在包含精细操作谜题的 RoboARC 中，它完成了 50 个中的 32 个，而其他每个强 Agent 各完成 11 到 15 个。它在 iSpatialGym（8 个中 7 个）和 Embodied Olympics - Match（13 个中 10 个）上也领先。其他 Agent 同样有能力完成这些 Suite：在拥有完整模拟器访问权限时，Astra 和 Sol 完成的 BEHAVIOR-1K 测试数量与 Fable 大致相当（71 个中分别为 36 和 38 个，Fable 为 36 个），因此 Fable 在该 Suite Standard 下的领先似乎与在真实机器人约束下工作有关。</p>
 <p><b>Claude Opus 5.5 领先的 Suite。</b> Opus 在 Standard 下完成了全部 7 个 ManiGuard 测试，是十个 Agent 中唯一做到这一点的。ManiGuard 在指令中写明了安全规则，也是五个强 Agent 平均成功率至少达到 70% 的唯一一个 Standard Suite。Opus 在 RoboWits 上也拥有最多的 Standard 成功（6 个中 4 个）。Opus 总共完成 114 个 Standard 测试，少于 Fable、Astra 或 Sol，这表明较低的总分也可以与某个完整 Suite 上的最佳结果并存。</p>
 <p><b>较新的 Agent 可能在特定 Suite 上下降。</b> GPT-6.1 Sol 与 GPT-6 Astra 运行在同一个 harness（Codex）中，Sol 是更新的模型。Sol 完成了 147 个 Standard 测试，比 Astra 的 157 个少 10 个，且下降集中在少数 Suite：在 BiGym 2.0 中，Astra 完成 10 个 Standard 测试中的 4 个，Sol 为 0；在 RoboDojo 中，12 个中为 3 对 0；在 DexHandExam 中，23 个中为 13 对 9。反过来，Sol 在 ManiGuard（7 个中 5 对 3）、RoboLab（6 个中 2 对 0）、iSpatialGym（8 个中 5 对 4）和 RoboDynamicExam（10 个中 4 对 3）上领先于 Astra。在 Privileged 下，Sol 在 BEHAVIOR-1K 和 MyoSuite 上领先 Astra，但在 DexToolBench（20 个中 10 对 13）和 RoboDojo（12 个中 6 对 10）上落后。</p>
 <figure class="fig">
@@ -554,7 +554,7 @@
 <p>在至少有五个 Standard 测试的 22 个 Suite 中，有 7 个 Suite 至少一半的测试未被五个强 Agent 中的任何一个完成。在拥有完整模拟器访问权限时，只有 HumanoidBench 一个 Suite 仍然如此难以企及。</p>
 <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="10">
- <p class="fig-cap"><span class="fc-t">在真实机器人规则下，七个 Suite 至少一半无人完成；在完整模拟器访问权限下，只剩一个。</span> 论文官方图 10。按 Suite 统计的成功率，仅包括在该设置下至少有五个核心测试的 Suite。圆点表示每个强 Agent 的成功率；柱形表示没有任何强 Agent 完成的测试比例。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
+ <p class="fig-cap"><span class="fc-t">在真实机器人约束下，七个 Suite 至少一半无人完成；在完整模拟器访问权限下，只剩一个。</span> 论文官方图 10。按 Suite 统计的成功率，仅包括在该设置下至少有五个核心测试的 Suite。圆点表示每个强 Agent 的成功率；柱形表示没有任何强 Agent 完成的测试比例。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
  <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="论文官方图 10：五个强 Agent 在各 Suite 上的 Standard 与 Privileged 成功率。在 22 个 Standard Suite 中，有 7 个至少一半的测试无一被它们完成：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
  </div>
 </figure>
@@ -571,7 +571,7 @@
  <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/tasktype_strong.png?v=a04d1d20" alt="五个强 Agent 在九种任务类型上的 Standard 成功率，从 Object Transport（Fable 64%，Astra 38%，Sol 43%，Opus 38%，Argon 39%）到 Tool Use（Fable 24%，Astra 20%，Sol 12%，Opus 4%，Argon 8%）。" width="2400" height="1720"></div>
  </div>
 </figure>
-<p>在 Object Transport（104 个任务）中，五个 Agent 完成了 38% 到 64% 的 Standard 测试：Claude Fable 5.2 为 64%，GPT-6.1 Sol 为 43%，Gemini 4 Argon 为 39%，GPT-6 Astra 和 Claude Opus 5.5 各为 38%。在 Tool Use（50 个任务）中，Fable 完成 24%（50 个中 12 个），Astra 20%（10 个），Sol 12%（6 个），Argon 8%（4 个），Opus 4%（2 个）；因此即使是成功次数最多的 Agent，在真实机器人规则下也有四分之三的工具使用测试失败。这与 Suite 视角一致：DexToolBench 要求灵巧手将工具移动经过一系列目标位姿，其中大部分测试仍无人完成。</p>
+<p>在 Object Transport（104 个任务）中，五个 Agent 完成了 38% 到 64% 的 Standard 测试：Claude Fable 5.2 为 64%，GPT-6.1 Sol 为 43%，Gemini 4 Argon 为 39%，GPT-6 Astra 和 Claude Opus 5.5 各为 38%。在 Tool Use（50 个任务）中，Fable 完成 24%（50 个中 12 个），Astra 20%（10 个），Sol 12%（6 个），Argon 8%（4 个），Opus 4%（2 个）；因此即使是成功次数最多的 Agent，在真实机器人约束下也有四分之三的工具使用测试失败。这与 Suite 视角一致：DexToolBench 要求灵巧手将工具移动经过一系列目标位姿，其中大部分测试仍无人完成。</p>
 <p>Fable 与下一名 Agent 之间的差距因类型而异。差距最大的是 Object Transport 和 Articulated Mechanisms，Fable 分别完成 64% 和 47%，其他四个 Agent 在 20% 到 43% 之间；差距最小的是需要精确接触、身体控制或工具的类型：在 Tool Use 中 Astra 比 Fable 低 4 个百分点（20% 对 24%），在 Precision &amp; Contact 中为 30% 对 36%，在 Locomotion &amp; Body Motion 中为 26% 对 32%。Astra 与 Sol 在 Dynamic Interaction（各 34%）和 Navigation &amp; Search（各 28%）上持平。</p>
 <p>排序的中间部分因 Agent 而异。Astra 在 Precision &amp; Contact 上（30%）好于 Articulated Mechanisms（24%），而 Fable 和 Sol 恰好相反。Argon 在 Dynamic Interaction（24%）和 Precision &amp; Contact（17%）上完成的测试多于 Opus（19% 和 13%），而 Opus 在 Navigation &amp; Search（18% 对 10%）、Articulated Mechanisms（24% 对 20%）和 Deformable &amp; Fluid（19% 对 12%）上领先。Argon 在 Navigation &amp; Search 上的成功率为 10%，与其 Tool Use 成功率接近。</p>
 <p>任务类型描述的是整个任务，而一种困难的类型可能出于多种原因而困难。阶段级失败标签为每个阶段分配一个类型，更适合用来分析具体哪一步出了问题（<a href="#same-stage">Agent 在任务的哪个环节失败？</a>）。</p>
@@ -633,12 +633,12 @@
  <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_settings.png?v=45a97383" alt="论文官方图 3 (b)：在 Privileged 中，容器 1 包含 Agent 和仿真器，Agent 可以步进、重置仿真器并查询物体信息，容器 2 回放提交的轨迹并评分。在 Standard 和 Realtime 中，容器 1 只包含 Agent，Agent 只能看到机器人 API；容器 2 包含仿真器和验证器，接收动作块、返回相机画面，并对实时回合评分。" width="2500" height="638"></div>
  </div>
  </figure>
- <p>这些任务还被设计为在真实机器人规则下依然困难，因此 Privileged 成功率高而 Standard 成功率低正是预期结果。二者之间的差距衡量的是 Agent 在必须像真实机器人一样工作时所损失的能力。下面各节分别考察 Privileged 中的成功有多少能保留到 Standard，以及这一差距究竟来自精确状态还是重试机会。</p>
+ <p>这些任务还被设计为在真实机器人约束下依然困难，因此 Privileged 成功率高而 Standard 成功率低正是预期结果。二者之间的差距衡量的是 Agent 在必须像真实机器人一样工作时所损失的能力。下面各节分别考察 Privileged 中的成功有多少能保留到 Standard，以及这一差距究竟来自精确状态还是重试机会。</p>
 
  <h3 id="transfer" data-short="Privileged 到 Standard">Privileged 下完成的任务，在 Standard 下有四成到六成多会失败</h3>
 <p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个 Agent 在 Privileged 中完成的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 286 个中 176 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的 Agent 这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明 Agent 原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
 <p>反过来的情况很少。在 Standard 中完成但在 Privileged 中未完成的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 5 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有 Agent 中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">Agent 在完整仿真器权限下完成的任务，很多在真实机器人规则下失败。</span>官方图 11。各 Agent 在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其完成任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=2b8ac182" alt="论文官方图 11：十个 Agent 在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">Agent 在完整仿真器权限下完成的任务，很多在真实机器人约束下失败。</span>官方图 11。各 Agent 在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其完成任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=2b8ac182" alt="论文官方图 11：十个 Agent 在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
 <p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的 Suite 中，Fable 的成功率除一个 Suite 外全部下降；根据网站数据，该 Suite 为 iSpatialGym，Fable 在两种设置下均完成 8 个任务中的 7 个。Astra 和 Sol 在所有这些 Suite 中都出现下降。Opus 在 ManiGuard（两种设置下均为 7 个完成 7 个）和 DexToolBench（两种设置下均未完成）中没有下降。Argon 在 MyoSuite（Standard 中 13 个完成 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个完成 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个完成 1 个）。</p>
 <p><b>在 Privileged 中看似相当的 Agent，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 完成的有 28 个，仅 Astra 完成的有 24 个，二者都完成的有 284 个，二者都未完成的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
@@ -700,7 +700,7 @@
  </div>
 </figure>
 <p>两次接球（RoboDynamicExam）展示了一个并非第一阶段的共同瓶颈（图 15）。一台握着杯子的 Franka 机械臂需要接住抛来的球，把球倒进一个槽中，待球滚下并从斜坡弹回后再次接住，然后把球倒进一辆移动的小车。在 Standard Setting 下，十个 Agent 全部失败，其中八个接住了第一次的球，随后在再次接球时以不同方式失败。在四次尝试中（GPT-6 Astra、Gemini 4 Argon、Gemini 3.8 Flash 和 Qwen3.8 Max），杯子在倒球或向下游移动时碰到了槽或回弹斜坡，这是任务所禁止的，会直接结束本回合。GPT-6.1 Sol 在约 10 s 时把球倒进了槽中，但在 16.7 s 调整杯子以迎接回弹的球时，机械臂碰到了场景。Claude Opus 5.5 的杯子在球离开斜坡时仍然过高；Opus 自己报告称，球离开杯子后只有约 1.3 至 1.6 s 可以接住，而仅在倒球后把杯子扶正就需要约 1.4 s。在 DeepSeek V4.1 Flash 和 GLM 5.3 Flash 的运行中，球始终没有离开倾斜的杯子。没有止步于再次接球的两次尝试走向了相反的方向：Kimi 3.1 Pro 没有移动机械臂，约 1 s 后在第一次接球时失败；而 Claude Fable 5.2 在 13.6 s 再次接住了球并进入最后阶段，球在 18.2 s 时落在移动小车旁边。</p>
-<p>这一瓶颈主要源于真实机器人规则下的时序与感知，而非对任务的理解。在 Realtime Setting（该任务的默认测试）下，Claude Fable 5.2 和 GPT-6.1 Sol 通过，其余 Agent 的七次可定位失败也全部发生在再次接球阶段。在 Privileged Setting 下，五个 Agent 完成了全部三个阶段：Claude Fable 5.2、GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5，以及在 Standard 下未移动机械臂的 Kimi 3.1 Pro。Gemini 4 Argon、Gemini 3.8 Flash 和 Qwen3.8 Max 在该设置下未提交答案，DeepSeek V4.1 Flash 和 GLM 5.3 Flash 则分别在小车阶段和再次接球阶段失败。</p>
+<p>这一瓶颈主要源于真实机器人约束下的时序与感知，而非对任务的理解。在 Realtime Setting（该任务的默认测试）下，Claude Fable 5.2 和 GPT-6.1 Sol 通过，其余 Agent 的七次可定位失败也全部发生在再次接球阶段。在 Privileged Setting 下，五个 Agent 完成了全部三个阶段：Claude Fable 5.2、GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5，以及在 Standard 下未移动机械臂的 Kimi 3.1 Pro。Gemini 4 Argon、Gemini 3.8 Flash 和 Qwen3.8 Max 在该设置下未提交答案，DeepSeek V4.1 Flash 和 GLM 5.3 Flash 则分别在小车阶段和再次接球阶段失败。</p>
 <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="15">
  <p class="fig-cap"><span class="fc-t">在 Standard 下，十个 Agent 全部未能完成两次接球；其中八个失败于同一步，即再次接球。</span> 论文官方图 15。两次接球（RoboDynamicExam）：在 Standard 与 Privileged 设置下，各 Agent 尝试所到达的阶段及失败所在阶段，以及三帧 Standard 下在再次接球处失败的回放画面（GPT-6 Astra 的杯子撞到斜坡，Claude Opus 5.5 的杯子位置过高接不到球，Gemini 4 Argon 的杯子撞到槽）。</p>
@@ -710,13 +710,13 @@
 
  <h3 id="same-across-settings" data-short="跨设置">Privileged 提高过关率，但难点阶段不变</h3>
 <p>Agent 在 Privileged Setting 下能完成多得多的测试，但一个任务中多数失败所在的阶段，在 Standard 与 Privileged 下通常相同。论文选取了在两种设置下失败都有唯一最常见阶段的 186 个任务。其中 150 个（81%）该阶段相同，而若每种设置的失败阶段独立随机抽取（同前，偏向早期阶段），这一比例为 47%。这种一致性很大程度上来自那些直接在第一阶段失败的任务：186 个任务中有 98 个，两种设置下的最常见阶段都是第一阶段。在其余 88 个任务上，最常见阶段仍有 59% 相同（95% 区间 49% 至 69%），而在不含两个最常见阶段均为第一阶段的抽样时，随机基线为 9%（图 14，子图 (a)，最下方条形）。</p>
-<p>当两个最常见阶段不同时，Standard 下的那个通常在任务中更靠前（25 个任务如此，另有 11 个任务更靠后）：在真实机器人规则下，Agent 更早被卡住。</p>
+<p>当两个最常见阶段不同时，Standard 下的那个通常在任务中更靠前（25 个任务如此，另有 11 个任务更靠后）：在真实机器人约束下，Agent 更早被卡住。</p>
 <p>两种设置在难点阶段之后差异显著。对每次尝试，论文取同一测试上其他 Agent 最常失败的阶段，考察该尝试是否越过了这一阶段。在越过的尝试中，Standard 下有 43% 通过测试，Privileged 下为 71%；其余 Standard 尝试大多在更靠后的阶段失败。就全部尝试而言，通过率分别为 15% 和 39%。越过该阶段与通过测试之间的关联部分来自阶段顺序，因为这样的尝试本就更接近任务终点。即便如此，43% 与 71% 之间的差距表明，在 Standard 下，攻克最难的一步往往并不足够：那些在完整访问下变得容易的后续阶段仍可能失败。</p>
-<p>因此，从 Privileged 到 Standard 的性能下降，主要并不是因为 Agent 在任务中走了不同的路线、遇到了新的障碍。同样的步骤在两种设置下都很难，而真实机器人规则让这些步骤更难，并在其后带来更多失败。这些统计描述的是失败落在何处，并不能说明 Agent 在两种设置下遵循的是同一套计划。</p>
+<p>因此，从 Privileged 到 Standard 的性能下降，主要并不是因为 Agent 在任务中走了不同的路线、遇到了新的障碍。同样的步骤在两种设置下都很难，而真实机器人约束让这些步骤更难，并在其后带来更多失败。这些统计描述的是失败落在何处，并不能说明 Agent 在两种设置下遵循的是同一套计划。</p>
 
  <h3 id="stage-kinds" data-short="阶段类型">材料变化和身体移动最易失败，但难点因 Suite 而异</h3>
 <p>每个阶段都有一个类型，标明促成该阶段的机器人动作；这些类型归为若干类别：关系（relation，将一个物体相对于另一个物体放置或装配）、位姿（pose）、机构（mechanism，门、盖子、按钮）、材料（material，擦拭、倾倒、绘画）、身体（body，行走、保持平衡）、动态（dynamic，接、击打）以及竞技（competition）。某一类别的失败率，是指尝试所到达的该类阶段中随后失败的比例。合并 Standard 与 Privileged 后，各类别的失败率差异很大（图 14，子图 (b)）：材料阶段失败率为 56%（到达的 1,313 个中有 741 个），身体阶段为 39%（1,227 个中 473 个），竞技和关系阶段各为 29%，动态阶段为 28%，位姿阶段为 19%，机构阶段为 17%（2,330 个中 387 个）。</p>
-<p>两端的结果在每种设置下单独成立，且在真实机器人规则下每个类别都更常失败：材料阶段在 Standard 下为 75%、Privileged 下为 35%，身体阶段为 58% 和 23%，机构阶段为 22% 和 11%。位姿、关系和动态类别居于其间，其相对顺序在两种设置下不同，因此论文不对这三者进行相互排序。</p>
+<p>两端的结果在每种设置下单独成立，且在真实机器人约束下每个类别都更常失败：材料阶段在 Standard 下为 75%、Privileged 下为 35%，身体阶段为 58% 和 23%，机构阶段为 22% 和 11%。位姿、关系和动态类别居于其间，其相对顺序在两种设置下不同，因此论文不对这三者进行相互排序。</p>
 <p>在同一类别内，机器人需要怎样动作与它作用于什么对象同样重要。在机构阶段中，打开门或盖子的失败率为 31%（907 个中 282 个），关闭门或盖子（初始时并非已关闭的情况下）为 15%，按压为 3%（435 个中 14 个）。以按压或擦拭完成的阶段，当机器人按压按钮等机构时失败率为 6%，当擦拭或按压材料时则为 62%。关系阶段在使用单手或单个夹爪时失败率为到达阶段的 29%，双臂协同时为 43%，由腿部或躯干承担机器人自重时为 59%（论文图 28）。借助工具作用则利弊皆有：当机器人通过杯子或球拍作用时，针对运动物体的阶段失败更少；而当其通过工具移动物体时，位姿阶段失败更多。</p>
 <p>这些失败率反映的是相关性而非因果，原因有三。第一，每个类别主要出现在特定 Suite 和特定机器人上：腿部和躯干属于足式机器人，而大多数材料类失败来自 RoboPaint 和 Embodied Safety Exam，因此较高的材料类失败率可能既反映材料本身，也同样反映这两个 Suite 的特点。第二，各阶段要求机器人完成的工作量不同。一个关系阶段通常涵盖抓取、搬运和释放物体，因为在包含关系阶段的 229 个任务中，任务图只在 11 个任务里把拾取单独列为一个阶段，所以按阶段计算的失败率比较的是大小不同的单位。第三，该分类体系记录的是一个阶段改变了什么，而不是它需要多少接触。</p>
 <p>在部分 Suite 上学到的难度排序，大多无法预测新 Suite 中的难度。论文每次留出一个 Suite，依据其余 Suite 上的失败率对每一对阶段类型排序，再在留出 Suite 中检验该排序。结果在 361 对阶段类型中有 55% 成立，仅略高于抛硬币的 50%；仅看接触方式时，163 对中为 48%；对于更粗粒度的阶段类别，82 对中为 65%。</p>
@@ -788,7 +788,7 @@
 </figure>
 <p><b>它几乎总能完成阶段所需的接触。</b> Fable 的失败尝试中只有 5.7% 未能完成所需接触，而 GPT-6 Astra 为 9.9%，GPT-6.1 Sol 为 12.5%。按到达的接触阶段计，Fable 因未接触而失败的比例为 1.0%，是十个 Agent 中最低的（其他强 Agent 为 2.7% 至 3.7%）。阻挡或碰撞（11.8%，Astra 为 16.9%）和违反约束（3.7% 对 6.7%）在其失败中的占比也更小。</p>
 <p><b>失去抓握在其失败中很常见，但按每次抓取计算则很少见。</b> 失去抓握占 Fable 失败尝试的 17.5%，在十个 Agent 中仅次于 Sol（20.2%），而 Astra 为 16.9%，Claude Opus 5.5 为 12.6%。这一占比会随 Agent 到达的抓取阶段增多而上升。按到达的抓取阶段计，Fable 失去抓握的比例为 4.1%，Astra 为 5.4%；只有 Fable 和 Gemini 4 Argon（4.4%）低于 Astra，而 Sol 在强 Agent 中最高，为 7.0%。论文中的穿绳案例展示了失去抓握的情形。在将绳子穿过五个通道的任务中，Fable 到约 91 s 时已穿过前三个，但在为穿第二个环而重新抓握绳端时，绳子在 99 s 和 125 s 两次从夹爪中滑脱。GPT-6 Astra 同样在第二个环处丢失了绳子；GPT-6.1 Sol 在越过第二个环后重新抓握时，闭合夹爪却没有抓住绳子；Claude Opus 5.5 是十个 Agent 中唯一完成该 Standard 测试的。</p>
-<p><b>它的部分失败源于放弃或仍在探索，而 Astra 很少如此。</b> Fable 的失败尝试中有 3.7% 属于该步骤未被尝试，而 Astra 为 0.3%，Sol 为 0.6%；另有 6.1% 是在 Agent 仍在探索场景时失败，而 Astra 为 3.2%。两者都符合前文观察到的习惯：Fable 在其估计显示将会失手时便停下，而 Astra 会一直行动到时间上限。两者的零进展比例相同，均占其在至少包含两个阶段任务上失败的 Standard 尝试的 26%。</p>
+<p><b>它的部分失败源于放弃或仍在探索，而 Astra 很少如此。</b> Fable 的失败尝试中有 3.7% 属于该步骤未被尝试，而 Astra 为 0.3%，Sol 为 0.6%；另有 6.1% 是在 Agent 仍在探索场景时失败，而 Astra 为 3.2%。两者都符合<a href="#check-vs-stop">第 5 部分</a>所述的习惯：Fable 在其估计显示将会失手时便停下，而 Astra 会一直行动到时间上限。两者的零进展比例相同，均占其在至少包含两个阶段任务上失败的 Standard 尝试的 26%。</p>
 <p><b>当两者都失败时，Astra 与 Fable 推进的程度大致相当。</b> 在两者都失败且至少包含三个阶段的测试上（不含平局），Astra 在 71 个测试中的 39 个上达成的阶段多于 Fable，即 55%，而 Astra 对其他每个 Agent 的这一比例为 73% 至 100%。在 78 个此类测试中，Fable 在 76% 的测试上达成的阶段多于 Opus。因此，Fable 的失败并不比 Astra 更早；主要区别在于它们在一个阶段内的哪个环节出错。</p>
 <p><b>这些标签能说明什么，不能说明什么。</b>基于回放视频和日志的标签往往无法区分估计错误与动作错误，因此“位姿不准确”既可能是误判了物体，也可能是手放错了位置。根因层面能支持的结论很少，因此这里我们比较的是现象和阶段，而非根因。每个 Agent 在每个测试上只有一次带标签的尝试，因此基于几十个测试得出的占比具有较大的不确定性。</p>
 
@@ -1012,7 +1012,7 @@
  <p>RoboPaint 中哪些测试能被完成，很大程度上取决于画的种类。在 Standard 设置下，10 幅丙烯画中有 7 幅至少被一个 Agent 完成（Sol 完成其中 5 幅，Astra 3 幅，Fable 和 Opus 各 1 幅），两幅油画都被多个 Agent 完成。毛笔书法则正好相反：10 个书法测试在 Standard 下只完成 2 个，都由 Astra 完成；6 个行书测试没有任何 Agent 完成。在能看到分数的 Privileged 设置下，每个书法测试都有 5 到 8 个 Agent 完成。写出这些字并不难；难的是在没有分数时，仅凭相机画面判断笔画的质量，Agent 正是在这里止步。</p>
  <figure class="fig">
  <div class="fig-body" data-fig="robopaint-types">
- <p class="fig-cap"><span class="fc-t">在 RoboPaint 中，书法在真实机器人规则下几乎无人完成，而在能看到分数时多数 Agent 都能完成。</span> 按画的种类划分的 22 个 RoboPaint 核心测试，数据来自排行榜：每一类在 Standard 下由哪些 Agent 完成，以及在 Privileged 下每个测试有几个 Agent （共十个）完成。</p>
+ <p class="fig-cap"><span class="fc-t">在 RoboPaint 中，书法在真实机器人约束下几乎无人完成，而在能看到分数时多数 Agent 都能完成。</span> 按画的种类划分的 22 个 RoboPaint 核心测试，数据来自排行榜：每一类在 Standard 下由哪些 Agent 完成，以及在 Privileged 下每个测试有几个 Agent （共十个）完成。</p>
  <div class="tscroll"><table class="fst">
  <thead><tr><th>画的种类（测试数）</th><th>Standard 下完成</th><th>Privileged 下完成每个测试的 Agent 数</th></tr></thead>
  <tbody>
