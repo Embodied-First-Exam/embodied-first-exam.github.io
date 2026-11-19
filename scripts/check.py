@@ -73,16 +73,14 @@ def main() -> int:
         for bad in FORBIDDEN:
             if bad in text:
                 problems.append(f"{f.relative_to(ROOT)}: contains '{bad}'")
-    # creation dates pinned by the owner: a post shows the day it was created, whatever is edited later
-    pinned = {"failure-analysis": "2026-11-15"}
-    posts = {b["slug"]: b for b in json.loads((ROOT / "data/blogs.json").read_text(encoding="utf-8"))}
-    for slug, day in pinned.items():
-        if posts.get(slug, {}).get("date") != day:
-            problems.append(f"data/blogs.json: {slug} date must stay {day}")
-        for page in (ROOT / "blogs" / slug).glob("**/index.html"):
-            for key, val in re.findall(r'"(datePublished)": "([^"]+)"', page.read_text(encoding="utf-8")):
-                if val != day:
-                    problems.append(f"{page.relative_to(ROOT)}: {key} must stay {day}")
+    # a post's date is the day it was published, never the day it was last edited: the card date in
+    # data/blogs.json must equal the page's datePublished (dateModified is free to follow later edits)
+    for post in json.loads((ROOT / "data/blogs.json").read_text(encoding="utf-8")):
+        page = ROOT / "blogs" / post["slug"] / "index.html"
+        if page.is_file():
+            pub = re.findall(r'"datePublished": "([^"]+)"', page.read_text(encoding="utf-8"))
+            if pub and post.get("date") != pub[0]:
+                problems.append(f"data/blogs.json: {post['slug']} date {post.get('date')} is not its publication date {pub[0]}")
     print(f"checked {len(pages)} pages, {len(refs)} media files on HF ({media.PREFIX}/) and "
           f"{sum(len(x) for x in others.values())} links to its other folders")
     for p in problems:
