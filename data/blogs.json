@@ -17,7 +17,7 @@
  {
   "slug": "failure-analysis",
   "title": "Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics",
-  "date": "2026-11-15",
+  "date": "2026-11-12",
   "kind": "Analysis",
   "summary": "What robotic tasks can coding agents solve, under what physical-world constraints, and where do they fail? Which tasks each of ten agents fails and why, what information matters in Privileged versus Standard, where in a task agents fail, how they act, and how the harness, spending and the task instruction change the result.",
   "tags": [
