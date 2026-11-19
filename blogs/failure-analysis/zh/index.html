@@ -387,7 +387,7 @@
  <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</a></li>
  <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 也可能退步</a></li>
  <li><a href="#suites-out-of-reach">7 个 Suite 在 Standard 下过半无人完成</a></li>
- <li><a href="#task-types">搬运最容易，工具使用最难，其他任务的难度因 Agent 而异</a></li>
+ <li><a href="#task-types">搬运容易，工具使用难</a></li>
  <li><a href="#eight-tests">Fable 为何会在别人能完成的测试上失败？</a></li>
  <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
  </ol></details></li>
@@ -559,8 +559,8 @@
 <p>从 70% 这条线来看，结论也一样，只是视角相反。按五个强 Agent 平均，成功率至少达到 70% 的 Standard Suite 只有一个，即 ManiGuard（71%）；而在至少有五个 Privileged 测试的 20 个 Suite 中，有 13 个达到这一水平：ManiGuard、Embodied Olympics - Match、MuJoCo Playground、RoboDynamicExam、RoboCasa365、EmbodiedSWE、RoboWits、BiGym 2.0、RoboPaint、Embodied Olympics - Fun、DexHandExam、iSpatialGym 和 RoboARC。</p>
 <p>在全部七个 Suite 中，五个较弱的 Agent 合计只完成了两个 Standard 测试，均由 Kimi 3.1 Pro 完成：一个是 MyoSuite 物体重定向测试，Fable、Astra 和 Opus 也完成了它；另一个是没有其他 Agent 完成的 RoboDojo 方块交换测试。</p>
 
- <h3 id="task-types" data-short="任务类型">搬运最容易，工具使用最难，其他任务的难度因 Agent 而异</h3>
-<p>论文为每个核心任务标注了九种任务类型中的一种或多种。汇总五个强 Agent，Object Transport 的 Standard 成功率最高，占其尝试的 45%，Tool Use 最低，为 14%。这一排序对每个 Agent 单独来看同样成立：五个 Agent 都在 Object Transport 上表现最好，在 Tool Use 上表现最差。</p>
+ <h3 id="task-types" data-short="任务类型">搬运容易，工具使用难</h3>
+<p><b>每个 Agent 都觉得搬运物体最容易、使用工具最难，中间类型的排序则因 Agent 而异。</b>论文为每个核心任务标注了九种任务类型中的一种或多种。汇总五个强 Agent，Object Transport 的 Standard 成功率最高，占其尝试的 45%，Tool Use 最低，为 14%。这一排序对每个 Agent 单独来看同样成立：五个 Agent 都在 Object Transport 上表现最好，在 Tool Use 上表现最差。</p>
 <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="22">
  <p class="fig-cap"><span class="fc-t">五个强 Agent 都在搬运物体上表现最好，在使用工具上表现最差。</span> 基于论文官方图 22（附录）的数据，针对五个强 Agent 重新绘制，并按从最容易到最难的类型排序。每个 Agent 完成的各类型 Standard 测试比例；括号中为该类型的核心任务数，一个任务可以属于多个类型。</p>
