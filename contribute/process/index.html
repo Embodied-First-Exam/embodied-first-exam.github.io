@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Call for Contribution · Embodied First Exam</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../assets/exam.css?v=bb3ca59b">
+<link rel="stylesheet" href="../../assets/blog.css?v=874f6bf5">
+<style>
+  .efs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; }
+  .efs .chart { margin: 4px 0 10px; }
+  @media (max-width: 640px) { .efs { grid-template-columns: minmax(0, 1fr); } }
+  figure.paper .pimg, .fig .pimg { margin: 6px 0 4px; padding: 0; border-radius: 10px; background: #fff; overflow: hidden; }
+  figure.paper .pimg img, .fig .pimg img { display: block; width: 100%; height: auto; }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; margin-bottom: 6px; }
+  @media (max-width: 560px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  figure.paper .pimg.narrow { max-width: 560px; margin-left: auto; margin-right: auto; }
+  table.fst { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.35; }
+  table.fst th, table.fst td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  table.fst thead th { font: 600 13px/1.3 var(--body); text-align: right; border-bottom: 2px solid currentColor; }
+  table.fst thead th:first-child, table.fst tbody th { text-align: left; }
+  table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
+  table.fst tbody th { font-weight: 400; color: var(--ink-2, var(--ink)); }
+  table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
+  table.fst td.lead, table.fst th.lead { font-weight: 650; }
+  table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
+  table.fst caption, .tbl-note { caption-side: bottom; text-align: left; margin: 10px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
+  @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
+  .draft-flag { display: inline-block; margin: 0 0 14px; padding: 3px 10px; border: 1px dashed var(--line-2); border-radius: 999px; font: 600 11px/1.6 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .src { font: 600 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .nav .icon-btn, .nav .ax-link { font: 600 12px/1 var(--mono); color: var(--ink-2); padding: 6px 10px; border: 0; background: none; cursor: pointer; text-decoration: none; }
+  .nav .mark svg, .nav .mark-svg, .footer .mark-svg { display: block; }
+  .nav .wordmark, .footer .wordmark { display: inline-flex; align-items: center; gap: 8px; }
+  .nav .ax-link { margin-left: 10px; }
+  .nav .icon-btn + .icon-btn { margin-left: 2px; }
+  #theme-toggle { margin-left: 8px; padding-left: 14px; border-left: 1px solid var(--line); border-radius: 0; }
+  figure.paper .fig-body { padding: 10px 10px 16px; }
+  @media (min-width: 1240px) {
+    .post > figure.fig.paper, .post > figure.fig.fig-wide { max-width: var(--col); }
+  }
+
+  .tldr .tldr-g { margin: 16px 0 6px; font: 600 11px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tldr .tldr-g:first-of-type { margin-top: 4px; }
+  .tldr .tldr-g a { color: inherit; border: 0; }
+  .tldr ul { margin: 0; padding-left: 1.2em; }
+  .tldr li { font-size: 16px; line-height: 1.55; margin: 0 0 0.65em; }
+  .tldr li:last-child { margin-bottom: 0; }
+  .tldr li b { color: var(--ink); }
+
+  .lede { font-size: 1.15em; line-height: 1.45; margin: 0 0 0.85em; }
+  .post ul.ba {
+    list-style: none;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--col);
+    margin: 0.15em auto 1.15em;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .post ul.ba li,
+  .post ul.ba li + li {
+    display: grid;
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    column-gap: 1.15rem;
+    align-items: baseline;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0.4em 0;
+    font-size: 16.5px;
+    line-height: 1.45;
+    border-bottom: 1px solid var(--line);
+  }
+  .post ul.ba li:last-child { border-bottom: 0; }
+  .post ul.ba .arr { font-weight: 650; min-width: 0; letter-spacing: 0.01em; }
+  .post ul.ba .txt { min-width: 0; }
+  .post ul.ba .frac { color: var(--ink-3); font-size: 0.92em; }
+  .post ul.ba li.hi {
+    background: color-mix(in srgb, var(--std, #3a7a5c) 9%, transparent);
+    border-bottom-color: transparent;
+    padding-top: 0.45em;
+    padding-bottom: 0.45em;
+  }
+  .post ul.ba li.hi:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-top: 0.55em;
+  }
+  .post ul.ba li.hi:has(+ li:not(.hi)) {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-bottom: 0.55em;
+  }
+  .post ul.ba li.hi .arr { font-weight: 750; color: var(--ink); }
+  .post ul.ba li.hi b { font-weight: 650; color: var(--ink); }
+
+  .post .toc-page {
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--col);
+    margin: 0 auto 1.35em;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+  }
+  .toc-page summary { cursor: pointer; padding: 10px 14px; font: 600 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); list-style: none; }
+  .toc-page summary::-webkit-details-marker { display: none; }
+  .toc-page summary::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 8px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-1px) rotate(45deg); }
+  .toc-page details[open] summary::after { transform: translateY(1px) rotate(-135deg); }
+  .toc-page ol { list-style: none; margin: 0; padding: 0 10px 12px; }
+  .toc-page a { display: grid; grid-template-columns: 24px 1fr; gap: 0 6px; padding: 6px 6px 6px 10px; border-left: 2px solid var(--line); font-size: 13px; line-height: 1.35; color: var(--ink-3); text-decoration: none; }
+  .toc-page a:hover { color: var(--ink); }
+  .toc-page a.on { color: var(--ink); border-left-color: var(--priv); font-weight: 600; }
+  .toc-page a .k { font: 500 10.5px/1.9 var(--mono); color: var(--ink-3); }
+  .toc-page a.on .k { color: var(--priv-ink); }
+  @media (min-width: 1420px) {
+    .toc-rail {
+      --toc-w: 180px;
+      --toc-gap: 24px;
+      opacity: 1;
+      visibility: visible;
+      width: var(--toc-w);
+      left: max(16px, calc((100vw - 1000px) / 2 - var(--toc-gap) - var(--toc-w)));
+    }
+    .post > figure.fig.paper,
+    .post > figure.fig.fig-wide { max-width: var(--col); }
+  }
+  @media (min-width: 1600px) {
+    .toc-rail {
+      --toc-w: 200px;
+      width: var(--toc-w);
+      left: max(16px, calc((100vw - 1000px) / 2 - var(--toc-gap) - var(--toc-w)));
+    }
+  }
+  @media (max-width: 1419px) { .post .toc-page { display: block; } }
+  figure.paper .pimg img.natural { width: 100%; height: auto; }
+  .hl { margin: 28px auto 8px; padding: 20px 24px; border: 1px solid var(--line-2); border-radius: 16px; background: var(--surface); max-width: var(--col); box-sizing: border-box; }
+  .hl .label, .toc-top .label { margin: 0 0 10px; font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .hl ol { margin: 0; padding-left: 1.3em; }
+  .hl li { margin: 0 0 .7em; font-size: 16.5px; line-height: 1.5; color: var(--ink-2); }
+  .hl li:last-child { margin-bottom: 0; }
+  .hl li a { border: 0; color: var(--ink); }
+  .hl li a b { font-weight: 650; }
+  .wwf-label { margin: 0 auto 10px; max-width: var(--col); font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .toc-top { margin: 18px auto 30px; padding: 18px 24px; border: 1px solid var(--line); border-radius: 16px; max-width: var(--col); box-sizing: border-box; }
+  .toc-top > ol { margin: 0; padding-left: 1.3em; }
+  .toc-top > ol > li { margin: 0 0 10px; font-weight: 600; font-size: 15px; }
+  .toc-top ol ol { margin: 4px 0 0; padding-left: 1.1em; list-style: disc; font-weight: 400; }
+  .toc-top ol ol li { font-size: 14px; line-height: 1.4; margin: 3px 0; color: var(--ink-3); }
+  .toc-top a { border: 0; color: var(--ink-2); }
+  .toc-top a:hover { color: var(--ink); }
+  .rq { margin: 8px auto 26px; padding: 20px 24px; border-left: 4px solid var(--std); background: var(--surface); border-radius: 0 14px 14px 0; max-width: var(--col); box-sizing: border-box; }
+  .rq .rq-label { margin: 0 0 6px; font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .rq .rq-text { margin: 0; font: 650 21px/1.35 var(--display); color: var(--ink); }
+  .wwf { margin: 18px auto 10px; max-width: var(--col); box-sizing: border-box; }
+  .wwf h4, .wwf .wwf-h { margin: 18px 0 6px; font: 650 17px/1.3 var(--display); color: var(--ink); }
+  .wwf ul { margin: 0 0 8px; padding-left: 1.2em; }
+  .wwf li { margin: 0 0 6px; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+  .toc-rail .fold-head > a { padding-right: 42px; }
+  .toc-top details > summary { cursor: pointer; list-style: none; }
+  .toc-top details > summary::-webkit-details-marker { display: none; }
+  .toc-top details > summary::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 10px; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: translateY(-3px) rotate(45deg); transition: transform .2s; }
+  .toc-top details[open] > summary::after { transform: translateY(0) rotate(-135deg); }
+  .toc-top details > ol { margin: 6px 0 4px; }
+  .toc-top a:hover, .toc-top a:focus-visible, .wwf a:hover { color: var(--priv-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .toc-rail a:hover { color: var(--priv-ink); border-left-color: var(--priv); }
+  .pimg video { display: block; width: 100%; height: auto; border-radius: 10px; background: #000; }
+</style>
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../../assets/app.js?v=f5982de7"></script>
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body data-page="notfound">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head post-head">
+    <p class="kicker">Embodied First Exam · Data Contributors</p>
+    <h1 class="post-title">Call for Contribution</h1>
+    <p class="byline"><span>November 2026</span></p>
+  </header>
+
+<article class="post">
+    <p>Thank you very much for the earlier discussions, and for your interest in and support of the Embodied First Exam. Several teams have kindly expressed interest in contributing. After learning what each team would like to contribute, we have put together the following shared criteria for your reference.</p>
+
+    <h2 id="authors">1. Author list updates</h2>
+    <p>Following the practice of Agent Last Exam, we plan to update the author list every three months.</p>
+    <ul>
+      <li>The first version was released in early November, and the paper was accepted to CoRL Late Breaking Results.</li>
+      <li>The second version is planned for around February 2027.</li>
+    </ul>
+
+    <h2 id="suites">2. Data contributions and suite acceptance</h2>
+    <p>Also following Agent Last Exam, new contributors will join as data contributors. Whether a suite is accepted depends mainly on the following.</p>
+
+    <h3>Original tasks, kept as a hidden set</h3>
+    <p>We would be grateful if contributed suites were original. These tasks will be used as a hidden set: they will not appear in any public dataset or paper, and models cannot find them on the web, so they measure what models can actually do. Public datasets are crawled regularly by model developers, so results on them may not reflect real ability. For this reason, we are unable to accept public datasets at this time.</p>
+
+    <h3>Manual review</h3>
+    <p>After a suite is submitted, we will review it by hand and decide whether to accept it, decline it, or ask for revisions. The review uses two criteria models, GPT-6 Astra (high) and Claude Opus 5.5 (high), which may be updated as new models are released. We look at four points:</p>
+    <ol>
+      <li><strong>Challenging:</strong> at least one criteria model has a success rate below about 10% in the Standard setting.</li>
+      <li><strong>Valid:</strong> at least one criteria model has a success rate above about 50% in the Privileged setting.</li>
+      <li><strong>Meaningful:</strong> we review each task by hand, based on the task videos and reference outputs you provide.</li>
+      <li><strong>Quantity:</strong> each data contributor contributes one suite of at least 30 tasks.</li>
+    </ol>
+
+    <p>If you have any questions about these criteria, or would like to discuss task ideas before starting, please feel free to contact us at <a href="mailto:embodiedfirstexam@gmail.com">embodiedfirstexam@gmail.com</a>. Thank you again for your support.</p>
+</article>
+</main>
+<div id="footer"></div>
+</body>
+</html>
