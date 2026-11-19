@@ -1069,6 +1069,22 @@
   </div>
 </figure>
 <p>The largest jump, from 12 to 33 of 54, comes from adding the recipe and the start-pose note: mostly information about what the check wants, although the scoring stages also spell out the steps of the task. Stating the check in full adds 4 more, to 37. Robot, scene and agent are the same in all three rows, so a score of 12 of 54 would have measured how well the instruction matched the check far more than how well Astra manipulates objects with two arms.</p>
+<p><b>With the exam’s instruction, agents solve most RoboDojo tasks.</b></p>
+<figure class="fig">
+  <div class="fig-body" data-fig="robodojo-all">
+    <p class="fig-cap"><span class="fc-t">The exam’s success rates on all 54 RoboDojo tasks, next to <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo’s own leaderboard</a>.</span></p>
+    <div class="tscroll"><table class="fst">
+      <thead><tr><th>Agent</th><th>EFE: success rate (54 tasks, solved only if fully completed)</th><th>RoboDojo leaderboard: average score (partial credit per step)</th><th>RoboDojo leaderboard: success rate</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Claude Fable 5.2</th><td>81%</td><td>64.90 (reported by Anthropic)</td><td>not reported</td></tr>
+        <tr><th scope="row">GPT-6 Astra</th><td>69%</td><td>28.97</td><td>22.48%</td></tr>
+        <tr><th scope="row">Claude Opus 5.5</th><td>59%</td><td>39.40 (reported by Anthropic)</td><td>not reported</td></tr>
+        <tr><th scope="row">GPT-6.1 Sol</th><td>61%</td><td>not listed</td><td>not listed</td></tr>
+        <tr><th scope="row">Gemini 4 Argon</th><td>61%</td><td>not listed</td><td>not listed</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</figure>
 <p><b>With the full goal, RoboDojo still separates agents, in both directions.</b> On the 12 core RoboDojo tests in the Standard Setting, Claude Fable 5.2 solves 6 (50%), Gemini 4 Argon 4, GPT-6 Astra 3 (25%), Claude Opus 5.5 2, Kimi 3.1 Pro 1, and GPT-6.1 Sol and the other four weaker agents none. The solved sets are not nested. Only Argon and Fable solve the randomized sweeping task in Standard (Sweep Blocks Random: hand a broom to the other arm and sweep small objects into a dustpan), which Astra fails, and the block-swapping test is solved in Standard by Kimi 3.1 Pro alone, none of the five strong agents included. In Privileged the counts rise to 11 for Fable and 10 for Astra, with Sol at 6, Opus 3, Argon 3 and Kimi 2. Sol goes from none in Standard to 6 in Privileged, while Argon goes the other way, 4 in Standard and 3 in Privileged.</p>
 <p>With the full goal, what remains is real physical difficulty. In one Standard attempt at inserting a key, Claude Opus 5.5 located the key and the lock from depth images but dropped the key at least nine times during hand-overs and large joint moves; its most accurate insertion, at minute 36, was about 9 mm off and hit the face of the lock. No agent solves that test in Standard, while Fable, Astra and Argon solve it in Privileged.</p>
 <p><b>The lesson for benchmark design.</b> If the success check tests a condition the instruction does not state, the benchmark measures whether the agent guessed that condition rather than the ability it was built to measure. Two rules follow: state every condition the check will test, including “return to the start pose” and similar housekeeping; and when comparing results across papers, check which instruction text each used. On RoboDojo, the text alone moves one agent from 12 to 37 of 54.</p>

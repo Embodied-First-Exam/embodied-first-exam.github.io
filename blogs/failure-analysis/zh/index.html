@@ -1071,6 +1071,22 @@
   </div>
 </figure>
 <p>最大的跃升，从 54 个中的 12 个到 33 个，来自加入任务方案和初始姿态说明：这些主要是关于判定要求的信息，尽管评分阶段也列出了任务的步骤。完整写明判定条件又多完成了 4 个，达到 37 个。三行中机器人、场景和 Agent 都相同，因此 54 个中 12 个的得分，衡量的更多是指令与判定的匹配程度，而远非 Astra 用双臂操作物体的能力。</p>
+<p><b>使用本次考试的指令，Agent 能完成大部分 RoboDojo 任务。</b></p>
+<figure class="fig">
+  <div class="fig-body" data-fig="robodojo-all">
+    <p class="fig-cap"><span class="fc-t">本次考试在全部 54 个 RoboDojo 任务上的成功率，与 <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo 自己的排行榜</a>对照。</span></p>
+    <div class="tscroll"><table class="fst">
+      <thead><tr><th>Agent</th><th>EFE：成功率（54 个任务，完全完成才算）</th><th>RoboDojo 榜：平均分（按步骤给部分分）</th><th>RoboDojo 榜：成功率</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Claude Fable 5.2</th><td>81%</td><td>64.90（Anthropic 报告）</td><td>未报告</td></tr>
+        <tr><th scope="row">GPT-6 Astra</th><td>69%</td><td>28.97</td><td>22.48%</td></tr>
+        <tr><th scope="row">Claude Opus 5.5</th><td>59%</td><td>39.40（Anthropic 报告）</td><td>未报告</td></tr>
+        <tr><th scope="row">GPT-6.1 Sol</th><td>61%</td><td>未列出</td><td>未列出</td></tr>
+        <tr><th scope="row">Gemini 4 Argon</th><td>61%</td><td>未列出</td><td>未列出</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</figure>
 <p><b>在完整目标下，RoboDojo 仍能区分 Agent，且方向各异。</b>在 Standard Setting 下的 12 个核心 RoboDojo 测试中，Claude Fable 5.2 完成 6 个（50%），Gemini 4 Argon 4 个，GPT-6 Astra 3 个（25%），Claude Opus 5.5 2 个，Kimi 3.1 Pro 1 个，GPT-6.1 Sol 和其余四个较弱的 Agent 均为 0。各 Agent 完成的测试集合并非相互包含。只有 Argon 和 Fable 在 Standard 中完成了随机化的清扫任务（Sweep Blocks Random：把扫帚递给另一只机械臂，再把小物体扫进簸箕），而 Astra 失败了；交换方块的测试在 Standard 中只有 Kimi 3.1 Pro 完成，五个强 Agent 都没有完成。在 Privileged 中，Fable 的数量升至 11 个，Astra 升至 10 个，Sol 为 6 个，Opus 3 个，Argon 3 个，Kimi 2 个。Sol 从 Standard 中的 0 个升至 Privileged 中的 6 个，而 Argon 方向相反，Standard 中 4 个，Privileged 中 3 个。</p>
 <p>在完整目标下，剩下的是真实的物理难度。在一次插入钥匙的 Standard 尝试中，Claude Opus 5.5 通过深度图像定位了钥匙和锁，但在交接和大幅关节运动中至少掉落钥匙九次；它最准确的一次插入发生在第 36 分钟，偏差约 9 mm，撞在了锁的表面上。在 Standard 中没有 Agent 完成该测试，而 Fable、Astra 和 Argon 在 Privileged 中完成了它。</p>
 <p><b>对基准设计的启示。</b>如果成功判定检查了指令没有写明的条件，那么基准衡量的就是 Agent 能否猜到这个条件，而不是它原本要衡量的能力。由此得出两条规则：写明判定将检查的每一个条件，包括“回到初始姿态”这类收尾要求；在跨论文比较结果时，核对各自使用的指令文本。在 RoboDojo 上，仅文本本身就能让同一个 Agent 从 54 个中的 12 个变为 37 个。</p>
