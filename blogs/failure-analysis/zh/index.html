@@ -385,7 +385,7 @@
  <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
  <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
  <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</a></li>
- <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 也可能退步</a></li>
+ <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 不一定最强</a></li>
  <li><a href="#suites-out-of-reach">7 个 Suite 在 Standard 下过半无人完成</a></li>
  <li><a href="#task-types">搬运容易，工具使用难</a></li>
  <li><a href="#eight-tests">Fable 为何会在别人能完成的测试上失败？</a></li>
@@ -507,7 +507,7 @@
 <p>这一差距正是本考试设计所要呈现的：任务的 Privileged 测试可以通过搜索完成，但在真实机器人约束下依然困难。在无人完成的 169 个 Standard 测试中，有 160 个所属任务也有 Privileged 测试，而这些 Privileged 测试中有 122 个被某个 Agent 完成。只有 38 个在两种设置下都无人完成；另外 9 个没有 Privileged 测试。在整个 Privileged Setting 中，391 个测试中只有 43 个（11%）无人完成，其中 19 个属于 BEHAVIOR-1K。强 Agent 合计完成 348 个 Privileged 测试（89%），较弱的 Agent 没有额外贡献。</p>
 <p>这些计数并不能说明一个测试为何无人完成。论文中阶段级的失败标签（一个阶段是任务所要求的一次世界状态变化，例如冰箱被打开；由编程 Agent 根据回放和日志为每次失败的尝试打标签，我们在开发提示词期间对标签做了人工抽查）指出了一次尝试在哪个阶段失败、在那里出了什么问题，但它们无法区分感知错误与控制错误，其根因层面也只能支持很少的确定结论。</p>
 
- <h3 id="where-each-leads" data-short="逐 Suite 对比">不同 Suite 的第一名不同，新 Agent 也可能退步</h3>
+ <h3 id="where-each-leads" data-short="逐 Suite 对比">不同 Suite 的第一名不同，新 Agent 不一定最强</h3>
 <p>按 Suite 拆分来看，成功次数最多的 Agent 多次易位。这些计数来自论文核心集的网站数据，采用论文的 Suite 划分，其中 RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
  <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="suite-diff">
