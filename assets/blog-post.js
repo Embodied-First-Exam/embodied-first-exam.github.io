@@ -10,10 +10,13 @@ function toc() {
   if (!heads.length) return;
   const subs0 = (h) => { const out = []; for (let el = h.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) if (el.tagName === 'H3' && el.id) out.push(el); return out; };
   const textOf = (el) => [...el.childNodes].filter((n) => !n.classList?.contains('num')).map((n) => n.textContent).join('').trim();
-  // parts are numbered in order (a part without subsections, such as a summary, gets no number); subsections by position
+  // parts are numbered as in the outline at the top of the post (parts left out of it, such as the summary or the sources,
+  // get no number; without an outline, a part without subsections gets none); subsections are lettered a, b, c
   let partNo = 0;
+  const outline = $('.toc-top');
+  const counted = (h) => (outline ? !!$(`a[href="#${h.id}"]`, outline) : subs0(h).length > 0);
   const nums = new Map(heads.map((h) => [h, (h.querySelector('.num')?.textContent || '').trim()]));
-  heads.forEach((h) => { if (!nums.get(h) && subs0(h).length) nums.set(h, String(++partNo)); });
+  heads.forEach((h) => { if (!nums.get(h) && counted(h)) nums.set(h, String(++partNo)); });
   const label = (h) => `<span class="k">${esc(nums.get(h) || '')}</span>${esc(h.dataset.short || textOf(h))}`;
   const subs = (h) => {
     const out = [];
@@ -24,7 +27,7 @@ function toc() {
     const s = subs(h);
     if (!s.length) return `<li><a href="#${h.id}">${label(h)}</a></li>`;
     return `<li class="fold"><div class="fold-head"><a href="#${h.id}">${label(h)}</a><button type="button" aria-expanded="false" aria-label="Show subsections">${s.length}</button></div>`
-      + `<div class="fold-body"><ol>${s.map((x, i) => `<li><a href="#${x.id}"><span class="k">${i + 1}</span>${esc(x.dataset.short || textOf(x))}</a></li>`).join('')}</ol></div></li>`;
+      + `<div class="fold-body"><ol>${s.map((x, i) => `<li><a href="#${x.id}"><span class="k">${String.fromCharCode(97 + i)}</span>${esc(x.dataset.short || textOf(x))}</a></li>`).join('')}</ol></div></li>`;
   }).join('');
   const lang = (document.documentElement.lang || 'en').slice(0, 2);
   const word = { zh: '目录', ja: '目次', ko: '목차', es: 'Contenido', fr: 'Sommaire', de: 'Inhalt' }[lang] || 'Contents';
