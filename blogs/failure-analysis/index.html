@@ -381,7 +381,7 @@
         <li><details open><summary><a href="#fail-why">Which tests does each agent fail, and why?</a></summary><ol>
           <li><a href="#cross-solve">Fable and Astra each solve tests the other cannot</a></li>
           <li><a href="#shared-boundary">Even ten agents together leave 169 Standard tests unsolved</a></li>
-          <li><a href="#where-each-leads">The top agent changes by suite; newer is not always better</a></li>
+          <li><a href="#where-each-leads">The top agent changes by suite; a newer agent is not always better</a></li>
           <li><a href="#suites-out-of-reach">In 7 suites, more than half the Standard tests stay unsolved</a></li>
           <li><a href="#task-types">Carrying is easy, tool use is hard</a></li>
           <li><a href="#eight-tests">Why does Fable fail tests that other agents solve?</a></li>
@@ -505,7 +505,7 @@
 <p>This gap is what the exam is designed to produce: tasks whose Privileged tests can be solved by search, but that stay hard under real-robot constraints. Of the 169 Standard tests no agent solves, 160 belong to tasks that also have a Privileged test, and some agent solves 122 of those Privileged tests. Only 38 stay unsolved in both settings; the other 9 have no Privileged test. Across the whole Privileged Setting, only 43 of 391 tests (11%) are solved by no agent, 19 of them in BEHAVIOR-1K. The strong agents together solve 348 Privileged tests (89%), and the weaker agents add none.</p>
 <p>The counts do not say why a test is unsolved. The paper’s stage-level failure labels (a stage is one change in the world that the task requires, such as the fridge being open; coding agents labeled each failed attempt from its replay and logs, and we spot-checked the labels by hand while developing the prompts) say at which stage an attempt fails and what went wrong there, but they cannot separate a perception error from a control error, and their root-cause layer supports few firm conclusions.</p>
 
-    <h3 id="where-each-leads" data-short="By suite">The top agent changes by suite; newer is not always better</h3>
+    <h3 id="where-each-leads" data-short="By suite">The top agent changes by suite; a newer agent is not always better</h3>
 <p><b>A newer agent can also do worse than an older one on specific suites.</b> Broken down by suite, the agent with the most successes changes several times. The counts are from the site data of the paper’s core set and use the paper’s suite split, with the IKEA assembly tasks of RoboARC counted as their own suite.</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="suite-diff">
