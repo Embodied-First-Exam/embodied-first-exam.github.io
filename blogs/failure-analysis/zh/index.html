@@ -382,7 +382,7 @@
  <nav class="toc-top" aria-label="目录">
  <p class="label">目录</p>
  <ol>
- <li><details><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
+ <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
  <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
  <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</a></li>
  <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 也可能退步</a></li>
@@ -391,17 +391,17 @@
  <li><a href="#eight-tests">Fable 为何会在别人能完成的测试上失败？</a></li>
  <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
  </ol></details></li>
- <li><details><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
+ <li><details open><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
  <li><a href="#settings-explained">三种设置：Agent 能看到什么、能做什么？</a></li>
- <li><a href="#transfer">Privileged 下完成的任务，在 Standard 下有四成到六成多会失败</a></li>
- <li><a href="#state-vs-resets">Reset 比精确位置更有帮助</a></li>
- <li><a href="#precise-stages">权限受限时，Precise 阶段受影响最大</a></li>
- <li><a href="#precise-resets">Coarse 阶段靠状态，Precise 阶段靠 reset</a></li>
+ <li><a href="#transfer">Privileged 下完成的任务，很多在 Standard 下失败</a></li>
+ <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
+ <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
+ <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
  <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
  </ol></details></li>
- <li><details><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
+ <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
  <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
- <li><a href="#same-across-settings">Privileged 提高过关率，但难点阶段不变</a></li>
+ <li><a href="#same-across-settings">无论 Standard 还是 Privileged，失败阶段往往相同</a></li>
  <li><a href="#stage-kinds">材料变化和身体移动最易失败，但难点因 Suite 而异</a></li>
  <li><a href="#by-suite">每个 Suite 有自己的失败方式</a></li>
  <li><a href="#by-robot">身体形态影响失败方式：承重机器人易摔倒，手部难以建立接触</a></li>
@@ -409,22 +409,22 @@
  <li><a href="#lunch-batteries">长程家务：完成前几件物品，却倒在前往下一件的途中</a></li>
  <li><a href="#cereal">取麦片和碗：强 Agent 在碗已触手可及时失败，较弱 Agent 在抓取前失败</a></li>
  </ol></details></li>
- <li><details><summary><a href="#act">Agent 如何工作？</a></summary><ol>
- <li><a href="#control-by-setting">直接控制、写代码控制，还是训练 policy？</a></li>
+ <li><details open><summary><a href="#act">Agent 如何工作？</a></summary><ol>
+ <li><a href="#control-by-setting">直接控制、写程序，还是训练 policy？</a></li>
  <li><a href="#soccer-gpu">给了 GPU，Agent 会训练 policy 吗？</a></li>
  <li><a href="#success-methods">成功的运行如何完成任务？演练，并从失败中改进</a></li>
  </ol></details></li>
- <li><details><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
+ <li><details open><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
  <li><a href="#spend-cost">失败尝试花费更高，低价 Agent 也能接近领先者</a></li>
  <li><a href="#spend-how">Fable 写得多、动得少，Astra 一直检查到时间用完，Opus 最早结束</a></li>
  </ol></details></li>
- <li><details><summary><a href="#conditions">换 Harness、Instruction、Reasoning、Randomness，分数会改变吗？</a></summary><ol>
- <li><a href="#harness-gap">Harness：同一模型最多相差 7.5 个百分点</a></li>
- <li><a href="#robodojo">任务指令：RoboDojo 写明复位等判定条件后，得分约为原来的三倍</a></li>
- <li><a href="#spend-effort">推理强度：中、高、最高之间只差 1.5 个百分点</a></li>
- <li><a href="#run-variance">重复运行：三次运行相差不超过 5 个百分点</a></li>
+ <li><details open><summary><a href="#conditions">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</a></summary><ol>
+ <li><a href="#harness-gap">Harness：最多相差 7.5 个百分点</a></li>
+ <li><a href="#robodojo">任务指令：RoboDojo 得分约为原来的三倍</a></li>
+ <li><a href="#spend-effort">推理强度：只差 1.5 个百分点</a></li>
+ <li><a href="#run-variance">重复运行：最多相差 5 个百分点</a></li>
  </ol></details></li>
- <li><details><summary><a href="#next">下一步与局限</a></summary><ol>
+ <li><details open><summary><a href="#next">下一步与局限</a></summary><ol>
  <li><a href="#closing-limits">局限</a></li>
  <li><a href="#next-hidden">隐藏任务集：衡量能力而非记忆</a></li>
  <li><a href="#next-real">真实机器人：沿用 Standard 接口</a></li>
@@ -631,39 +631,39 @@
  </figure>
  <p>这些任务还被设计为在真实机器人约束下依然困难，因此 Privileged 成功率高而 Standard 成功率低正是预期结果。二者之间的差距衡量的是 Agent 在必须像真实机器人一样工作时所损失的能力。下面各节分别考察 Privileged 中的成功有多少能保留到 Standard，以及这一差距究竟来自精确状态还是重试机会。</p>
 
- <h3 id="transfer" data-short="Privileged 到 Standard">Privileged 下完成的任务，在 Standard 下有四成到六成多会失败</h3>
+ <h3 id="transfer" data-short="Privileged 到 Standard">Privileged 下完成的任务，很多在 Standard 下失败</h3>
 <p>在同时具有 Standard 和 Privileged 测试的 391 个核心任务上，每个 Agent 在 Privileged 中完成的任务里，都有相当大比例在 Standard 中失败：Claude Fable 5.2 在 312 个中失败 137 个（44%），GPT-6 Astra 为 308 个中 192 个（62%），GPT-6.1 Sol 为 286 个中 176 个（62%），Claude Opus 5.5 为 233 个中 147 个（63%），Gemini 4 Argon 为 167 个中 106 个（63%）。五个较弱的 Agent 这一比例从 81%（Qwen3.8 Max，37 个中 30 个）到 92%（GLM 5.3 Flash，38 个中 35 个）不等。Privileged 中的成功只说明 Agent 原则上能找到解，并不说明它能够通过机器人的相机完成任务（图 11）。</p>
 <p>反过来的情况很少。在 Standard 中完成但在 Privileged 中未完成的任务，Fable 有 9 个，Astra 有 4 个，Sol 有 5 个，Opus 有 5 个；Gemini 4 Argon 有 18 个，是所有 Agent 中最多的。因此，Privileged 是针对任务集合整体的上界，而不是对每个单独任务都成立的上界。</p>
 <figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig11"><p class="fig-cap"><span class="fc-t">Agent 在完整仿真器权限下完成的任务，很多在真实机器人约束下失败。</span>官方图 11。各 Agent 在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的解题情况，按其完成任务所在的设置划分。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig11_transfer.png?v=2b8ac182" alt="论文官方图 11：十个 Agent 在 391 个任务上 Standard 与 Privileged 解题数的堆叠柱状图。Fable 在其 312 个 Privileged 任务中有 137 个在 Standard 中失败，Astra 为 308 个中 192 个，Sol 为 286 个中 176 个，Opus 为 233 个中 147 个。仅在 Standard 中成功的任务分别为 9、4、5 和 5 个，Argon 为 18 个。" width="1920" height="1080"></div></div></figure>
 <p><b>下降具有普遍性。</b>论文报告，在至少包含五个此类任务的 Suite 中，Fable 的成功率除一个 Suite 外全部下降；根据网站数据，该 Suite 为 iSpatialGym，Fable 在两种设置下均完成 8 个任务中的 7 个。Astra 和 Sol 在所有这些 Suite 中都出现下降。Opus 在 ManiGuard（两种设置下均为 7 个完成 7 个）和 DexToolBench（两种设置下均未完成）中没有下降。Argon 在 MyoSuite（Standard 中 13 个完成 1 个，Privileged 中为 0）和 RoboDojo（Standard 中 12 个完成 4 个，Privileged 中为 3 个）中出现小幅反转，在 RoboLab 中持平（两种设置下均为 6 个完成 1 个）。</p>
 <p><b>在 Privileged 中看似相当的 Agent，在 Standard 中可能差别很大。</b>在 391 个 Privileged 测试中，仅 Fable 完成的有 28 个，仅 Astra 完成的有 24 个，二者都完成的有 284 个，二者都未完成的有 55 个。在 Standard 中，Fable 保留了 175 个 Privileged 成功，Astra 仅保留 116 个（图 11）。区分二者的是：在没有精确状态和免费重试的情况下，能保留下来多少成功。这正是后面几节要拆解的两个因素。</p>
 
- <h3 id="state-vs-resets" data-short="重试与状态">Reset 比精确位置更有帮助</h3>
+ <h3 id="state-vs-resets" data-short="重试与状态">Reset 比精确物体状态更有帮助</h3>
 <p>当论文把 Privileged 的功能逐一加入 Standard 接口时，无限重置比精确物体状态弥合了更多差距。这表明（只是一种推断，而非已证实的结论）：对 Agent 而言，更难的部分是把动作做对，而不是知道物体在哪里。</p>
 <p>论文让 GPT-6 Astra 在 Codex 中运行，推理强度、时间限制和任务均与其排行榜运行一致，只改变上述功能。状态查询是只读的，对每个物体返回其位置、朝向、尺寸和包围盒、线速度和角速度，以及机器人和门、抽屉等铰接物体的关节位置。它从不返回成功标志、分数、阈值或目标区域，并隐藏应由 Agent 自行发现的字段，例如目标标记、提示说明和危险标签。重置功能将重置预算提高到 1,000 次，并增加了在某个句柄下保存仿真器状态、之后再恢复的调用。评分基于 391 个同时具有两种设置的核心任务各自的默认测试（即 Standard 测试，其中 50 个任务为 Realtime 测试），因此 29% 的基线是排行榜运行在这一任务集上的结果，而不是 Astra 在 456 个 Standard 测试中完成 157 个的成绩。</p>
 <p>Astra 在未修改的接口下完成 29%，加入状态查询后为 45%，加入无限重置与状态保存后为 53%，二者兼具时为 68%，仍比它在相同任务的 Privileged 测试中达到的 79% 低 11 个百分点（图 12a）。在 50 个 Realtime 测试上，两种功能之间的差距更大：基线为 30%，加入状态查询为 38%，加入重置为 64%，二者兼具为 80%，Privileged 为 84%（论文表 5）。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12"><p class="fig-cap"><span class="fc-t">重试比精确状态更有帮助。</span>官方图 12。(a) GPT-6 Astra 在 Codex 中、每种条件运行一次，在 391 个同时具有两种设置的核心任务的默认测试上，随各项功能加入的成功率变化。(b) 在至少两个 Suite 中进行比较的各类阶段，在 Standard 和 Privileged 中的失败率，覆盖十个 Agent。(c) 每次运行挽回的 Astra 在 Precise 阶段和 Coarse 阶段失败的比例。(b) 和 (c) 两个子图在后面两节讨论。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12_settings_ablation.png?v=8217f455" alt="论文官方图 12：(a) 随着加入精确状态和重置，Astra 的成功率从 29% 升至 45%（状态）、53%（重置）、68%（二者兼具），Privileged 为 79%；(b) Standard 与 Privileged 中各阶段类型的失败率，Precise 类型上升 19 到 51 个百分点；(c) 各次运行在 Precise 阶段和 Coarse 阶段解决的失败比例。" width="1920" height="1080"></div></div></figure>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12"><p class="fig-cap"><span class="fc-t">重试比精确状态更有帮助。</span>官方图 12。(a) GPT-6 Astra 在 Codex 中、每种条件运行一次，在 391 个同时具有两种设置的核心任务的默认测试上，随各项功能加入的成功率变化。(b) 在至少两个 Suite 中进行比较的各类阶段，在 Standard 和 Privileged 中的失败率，覆盖十个 Agent。(c) 每次运行挽回的 Astra 在 Precision 阶段和 Coarse 阶段失败的比例。(b) 和 (c) 两个子图在后面两节讨论。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12_settings_ablation.png?v=8217f455" alt="论文官方图 12：(a) 随着加入精确状态和重置，Astra 的成功率从 29% 升至 45%（状态）、53%（重置）、68%（二者兼具），Privileged 为 79%；(b) Standard 与 Privileged 中各阶段类型的失败率，Precision 类型上升 19 到 51 个百分点；(c) 各次运行在 Precision 阶段和 Coarse 阶段解决的失败比例。" width="1920" height="1080"></div></div></figure>
 <p><b>重置被用来重试困难阶段，而不是从头再来。</b>在重置运行的 206 次成功中，只有 14% 出现在第一个回合，136 次（66%）出现在从保存的任务中途状态开始的回合。Agent 回到困难阶段之前，重新尝试该阶段，而无需重复整个任务。真实机器人在 Standard 设置下做不到这一点：在困难阶段一次失手，通常就会结束被评分的回合。</p>
 <p><b>精确状态在相机难以胜任的地方有帮助。</b>论文发现，在难以通过相机测量场景的情况下（如 iSpatialGym 和 BEHAVIOR-1K），状态查询的帮助最大，而在 Embodied Olympics (Fun) 和 DexHandExam 中变化不大。在部分 Suite 中，看清场景确实是个问题；但就整个任务集而言，它是两者中较小的问题。</p>
 <p><b>局限。</b>每种条件只是单个 Agent 的单次运行，因此几个百分点的差异可能源于运行间波动，其他 Agent 也可能呈现不同的排序。两项新增功能都不允许 Agent 像 Privileged 那样步进物理仿真或调用规划原语，论文指出，剩余的 11 个百分点可能部分来自这些能力。</p>
 
- <h3 id="precise-stages" data-short="Precise 阶段">权限受限时，Precise 阶段受影响最大</h3>
-<p><b>Precise 阶段指需要紧密配合、到达目标位姿或动态接触的阶段；Coarse 阶段只需到达某个区域、抓取、打开或关上。</b>在 Standard 中比在 Privileged 中失败得多得多的阶段，正是需要精度的阶段。在至少两个 Suite 中进行比较的阶段类型中，Precise 类型的失败率上升 19 到 51 个百分点，而九个 Coarse 类型中有七个仅上升 3 到 18 个百分点（见上方图 12b）。</p>
-<p>论文依据定义将阶段类型分为两组。如果一个阶段需要紧密配合、啮合或螺纹连接关系、目标位姿或路径，或与运动物体接触，则为<b>Precise</b>阶段；13 种 Precise 类型为：插入、装配、拧紧或拧松、穿入或悬挂、连接、调整位姿、沿路径运动、稳定、重新抓取、投掷、击打、接住和运球。如果一个阶段只需到达某个区域、容器、抓取状态或机构的开合状态，则为<b>Coarse</b>阶段；12 种 Coarse 类型为：放置、放入、取出、收集、拿起、推、拉、打开、关闭、按压、开启或关闭开关，以及导航。清洁、倾倒等材料类阶段，以及导航以外的身体类阶段，不属于任何一组。某类型在某设置下的失败率，定义为尝试在该类型阶段失败的次数除以尝试到达该类型阶段的次数，并在每个 Suite 内部进行比较。</p>
-<p>Precise 类型的上升幅度如下：装配 51 个百分点，调整位姿和接住 37，拧紧或拧松 35，击打 33，插入 32，沿路径运动 21，穿入或悬挂 20，连接 19。Coarse 类型中，打开上升 18，放入 17，拿起 14，放置 13，开启或关闭开关 6，按压 4，关闭 3；例外是取出（42 个百分点）和导航（27 个百分点）。在 Suite 内汇总后，Precise 阶段的失败率在 Standard 中为 45%，在 Privileged 中为 16%（覆盖 13 个 Suite）；Coarse 阶段为 32% 对 18%（覆盖 25 个 Suite）。加入 Suite 固定效应后，Precise 阶段比 Coarse 阶段多上升 15 个百分点（95% 区间 9 到 21）。</p>
-<p><b>配对检验。</b>不同尝试可能到达不同类型的阶段，因此论文还只统计同一 Agent 在同一任务、两种设置下都到达的阶段。此时，Precise 阶段的失败率上升 22.7 个百分点，Coarse 阶段上升 13.4 个百分点，差异为 9.3 个百分点，较前述更小但仍然显著（95% 区间 4.6 到 14.4）。沿路径运动阶段（大多为 DexToolBench 的路径点）占这些 Precise 阶段的 39%，仅上升 12 个百分点；去掉这类阶段后，Precise 阶段上升 29.5 个百分点，比 Coarse 阶段多 16.1 个百分点（95% 区间 10.3 到 22.3）。击打、装配、调整位姿和接住上升 30 到 45 个百分点，而关闭、放置和拿起仅上升 2 到 15 个百分点。</p>
-<p><b>一个在 Standard 中失败的 Precise 阶段。</b>在一个 DexHandExam 任务中，灵巧手需要把风扇的前网罩安装到后网罩上并扣好四个卡扣；上方两个卡扣要求网罩已经就位。在 Standard 中，Claude Opus 5.5 握持网罩时与风扇轴线偏差 36 到 39 度，而就位最多只允许 5 度偏差；推入网罩时带动了整个风扇，回合在 24 s 时结束（图 13）。在 Privileged 中，它扣好下方卡扣，在 20 s 时让网罩就位，随后扣好上方卡扣。在同一个 Standard 测试中，GPT-6 Astra 两次让网罩就位，但每次都不到 2 s：手指撤回时网罩被一起带出，重新打开了一个下方卡扣，网罩掉落后尝试结束。根据网站数据，十个 Agent 中有五个（Fable、Astra、Sol、Opus 和 Kimi 3.1 Pro）在 Privileged 中完成此任务，而在 Standard 中无一完成。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig13"><p class="fig-cap"><span class="fc-t">一个依靠精确状态能够成功的 Precise 阶段，在依靠相机估计时失败。</span>官方图 13。Claude Opus 5.5 安装风扇网罩的回放帧：在 Standard 中（上）网罩偏离轴线 37°；在 Privileged 中（下）网罩就位，尝试通过。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig13_fan_assembly.png?v=028e99b0" alt="论文官方图 13：Claude Opus 5.5 安装风扇网罩的回放帧。在 Standard 中，它在 21.8 s 时握持的网罩偏离风扇轴线 37 度，风扇在 24.4 s 时被推动；在 Privileged 中，它以 0 度偏差让网罩就位并扣好上方卡扣。" width="1920" height="1080"></div></div></figure>
-<p><b>标签能说明什么，不能说明什么。</b>论文的标签将 Opus 的失败归因于对手中网罩位姿的估计错误，但阶段标签无法区分感知与控制：Precise 阶段失败，可能是因为位姿判断有误，也可能是因为动作执行不好，或二者兼有。标签显示的是 Standard 设置让任务在<i>哪里</i>变难；下一节的受控运行将精确状态与重试的作用区分开来。</p>
+ <h3 id="precise-stages" data-short="Precision 阶段">Precision 阶段在 Standard 下难得多</h3>
+<p><b>Precision 阶段指需要紧密配合、到达目标位姿或动态接触的阶段；Coarse 阶段只需到达某个区域、抓取、打开或关上。</b>在 Standard 中比在 Privileged 中失败得多得多的阶段，正是需要精度的阶段。在至少两个 Suite 中进行比较的阶段类型中，Precision 类型的失败率上升 19 到 51 个百分点，而九个 Coarse 类型中有七个仅上升 3 到 18 个百分点（见上方图 12b）。</p>
+<p>论文依据定义将阶段类型分为两组。如果一个阶段需要紧密配合、啮合或螺纹连接关系、目标位姿或路径，或与运动物体接触，则为<b>Precision</b>阶段；13 种 Precision 类型为：插入、装配、拧紧或拧松、穿入或悬挂、连接、调整位姿、沿路径运动、稳定、重新抓取、投掷、击打、接住和运球。如果一个阶段只需到达某个区域、容器、抓取状态或机构的开合状态，则为<b>Coarse</b>阶段；12 种 Coarse 类型为：放置、放入、取出、收集、拿起、推、拉、打开、关闭、按压、开启或关闭开关，以及导航。清洁、倾倒等材料类阶段，以及导航以外的身体类阶段，不属于任何一组。某类型在某设置下的失败率，定义为尝试在该类型阶段失败的次数除以尝试到达该类型阶段的次数，并在每个 Suite 内部进行比较。</p>
+<p>Precision 类型的上升幅度如下：装配 51 个百分点，调整位姿和接住 37，拧紧或拧松 35，击打 33，插入 32，沿路径运动 21，穿入或悬挂 20，连接 19。Coarse 类型中，打开上升 18，放入 17，拿起 14，放置 13，开启或关闭开关 6，按压 4，关闭 3；例外是取出（42 个百分点）和导航（27 个百分点）。在 Suite 内汇总后，Precision 阶段的失败率在 Standard 中为 45%，在 Privileged 中为 16%（覆盖 13 个 Suite）；Coarse 阶段为 32% 对 18%（覆盖 25 个 Suite）。加入 Suite 固定效应后，Precision 阶段比 Coarse 阶段多上升 15 个百分点（95% 区间 9 到 21）。</p>
+<p><b>配对检验。</b>不同尝试可能到达不同类型的阶段，因此论文还只统计同一 Agent 在同一任务、两种设置下都到达的阶段。此时，Precision 阶段的失败率上升 22.7 个百分点，Coarse 阶段上升 13.4 个百分点，差异为 9.3 个百分点，较前述更小但仍然显著（95% 区间 4.6 到 14.4）。沿路径运动阶段（大多为 DexToolBench 的路径点）占这些 Precision 阶段的 39%，仅上升 12 个百分点；去掉这类阶段后，Precision 阶段上升 29.5 个百分点，比 Coarse 阶段多 16.1 个百分点（95% 区间 10.3 到 22.3）。击打、装配、调整位姿和接住上升 30 到 45 个百分点，而关闭、放置和拿起仅上升 2 到 15 个百分点。</p>
+<p><b>一个在 Standard 中失败的 Precision 阶段。</b>在一个 DexHandExam 任务中，灵巧手需要把风扇的前网罩安装到后网罩上并扣好四个卡扣；上方两个卡扣要求网罩已经就位。在 Standard 中，Claude Opus 5.5 握持网罩时与风扇轴线偏差 36 到 39 度，而就位最多只允许 5 度偏差；推入网罩时带动了整个风扇，回合在 24 s 时结束（图 13）。在 Privileged 中，它扣好下方卡扣，在 20 s 时让网罩就位，随后扣好上方卡扣。在同一个 Standard 测试中，GPT-6 Astra 两次让网罩就位，但每次都不到 2 s：手指撤回时网罩被一起带出，重新打开了一个下方卡扣，网罩掉落后尝试结束。根据网站数据，十个 Agent 中有五个（Fable、Astra、Sol、Opus 和 Kimi 3.1 Pro）在 Privileged 中完成此任务，而在 Standard 中无一完成。</p>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig13"><p class="fig-cap"><span class="fc-t">一个依靠精确状态能够成功的 Precision 阶段，在依靠相机估计时失败。</span>官方图 13。Claude Opus 5.5 安装风扇网罩的回放帧：在 Standard 中（上）网罩偏离轴线 37°；在 Privileged 中（下）网罩就位，尝试通过。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig13_fan_assembly.png?v=028e99b0" alt="论文官方图 13：Claude Opus 5.5 安装风扇网罩的回放帧。在 Standard 中，它在 21.8 s 时握持的网罩偏离风扇轴线 37 度，风扇在 24.4 s 时被推动；在 Privileged 中，它以 0 度偏差让网罩就位并扣好上方卡扣。" width="1920" height="1080"></div></div></figure>
+<p><b>标签能说明什么，不能说明什么。</b>论文的标签将 Opus 的失败归因于对手中网罩位姿的估计错误，但阶段标签无法区分感知与控制：Precision 阶段失败，可能是因为位姿判断有误，也可能是因为动作执行不好，或二者兼有。标签显示的是 Standard 设置让任务在<i>哪里</i>变难；下一节的受控运行将精确状态与重试的作用区分开来。</p>
 
- <h3 id="precise-resets" data-short="Precise 阶段的重试">Coarse 阶段靠状态，Precise 阶段靠 reset</h3>
-<p>加入状态查询几乎无法挽回 Precise 阶段的失败，因此看不到精确位姿并不是主要原因。在 Precise 阶段，精确状态挽回了 GPT-6 Astra 21% 的失败，与简单的第二次尝试（19%）相当，而无限重置挽回了 36%。在 Coarse 阶段，排序则反过来：精确状态解决了 34% 的失败，而第二次尝试只有 14%。</p>
-<p>论文将受控运行与 Astra 在默认测试上已标注的失败结合起来。其中 256 个失败定位到了失败阶段：91 个在 Precise 阶段，97 个在 Coarse 阶段，36 个在材料类阶段，32 个在其他阶段。有些失败仅靠再试一次就会通过，因此每次运行都与一个第二次尝试基线进行比较：即既不加入任何功能、只隐藏成功信号的那次运行（见下一节）。它并非完全的重复运行，因为 Agent 必须自行结束回合，但其总体成功率与原始运行相差不超过 4 个百分点。</p>
-<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12c"><p class="fig-cap"><span class="fc-t">在 Coarse 阶段，精确状态和重置都有帮助；在 Precise 阶段，只有重置有帮助。</span>官方图 12c。每次受控运行（每种条件一次）挽回的 GPT-6 Astra 在 Precise 阶段（91 个）和 Coarse 阶段（97 个）已标注失败的比例。Precise 阶段：不含成功信号的第二次尝试 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。Coarse 阶段：14%、34%、44%、67% 和 62%。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12c_precise_stages.png?v=15c79c7c" alt="论文官方图 12c：Astra 失败被完成的比例。Precise 阶段：无成功信号 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。Coarse 阶段：14%、34%、44%、67%、62%。" width="1920" height="1080"></div></div></figure>
-<p><b>在 Precise 阶段，收益主要来自重置。</b>重置解决了 91 个 Precise 阶段失败中的 36%，几乎是第二次尝试的两倍，且这 33 次成功中有 31 次是在重置或恢复状态之后才出现的。它与精确状态的差异不太可能是偶然：在状态运行和重置运行中恰好只有一方解决的 22 个 Precise 阶段失败里，重置运行挽回了 18 个（精确 McNemar 检验，p = 0.004）。在可以重试的前提下，精确状态确实有帮助：二者兼具时，比例从 36% 升至 47%（在这两次运行中只有一方解决的 16 个失败里，二者兼具的运行挽回了 13 个，p = 0.021）。</p>
+ <h3 id="precise-resets" data-short="Precision 阶段的 reset">在 Precision 阶段，reset 有帮助，精确状态本身没有</h3>
+<p>加入状态查询几乎无法挽回 Precision 阶段的失败，因此看不到精确位姿并不是主要原因。在 Precision 阶段，精确状态挽回了 GPT-6 Astra 21% 的失败，与简单的第二次尝试（19%）相当，而无限重置挽回了 36%。在 Coarse 阶段，排序则反过来：精确状态解决了 34% 的失败，而第二次尝试只有 14%。</p>
+<p>论文将受控运行与 Astra 在默认测试上已标注的失败结合起来。其中 256 个失败定位到了失败阶段：91 个在 Precision 阶段，97 个在 Coarse 阶段，36 个在材料类阶段，32 个在其他阶段。有些失败仅靠再试一次就会通过，因此每次运行都与一个第二次尝试基线进行比较：即既不加入任何功能、只隐藏成功信号的那次运行（见下一节）。它并非完全的重复运行，因为 Agent 必须自行结束回合，但其总体成功率与原始运行相差不超过 4 个百分点。</p>
+<figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12c"><p class="fig-cap"><span class="fc-t">在 Coarse 阶段，精确状态和重置都有帮助；在 Precision 阶段，只有重置有帮助。</span>官方图 12c。每次受控运行（每种条件一次）挽回的 GPT-6 Astra 在 Precision 阶段（91 个）和 Coarse 阶段（97 个）已标注失败的比例。Precision 阶段：不含成功信号的第二次尝试 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。Coarse 阶段：14%、34%、44%、67% 和 62%。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12c_precise_stages.png?v=15c79c7c" alt="论文官方图 12c：Astra 失败被完成的比例。Precision 阶段：无成功信号 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。Coarse 阶段：14%、34%、44%、67%、62%。" width="1920" height="1080"></div></div></figure>
+<p><b>在 Precision 阶段，收益主要来自重置。</b>重置解决了 91 个 Precision 阶段失败中的 36%，几乎是第二次尝试的两倍，且这 33 次成功中有 31 次是在重置或恢复状态之后才出现的。它与精确状态的差异不太可能是偶然：在状态运行和重置运行中恰好只有一方解决的 22 个 Precision 阶段失败里，重置运行挽回了 18 个（精确 McNemar 检验，p = 0.004）。在可以重试的前提下，精确状态确实有帮助：二者兼具时，比例从 36% 升至 47%（在这两次运行中只有一方解决的 16 个失败里，二者兼具的运行挽回了 13 个，p = 0.021）。</p>
 <p><b>在 Coarse 阶段，精确状态很重要。</b>在 97 个 Coarse 阶段失败中，仅加入精确状态挽回了 34%，仅加入重置挽回了 44%。二者兼具时，Agent 挽回了 67%，与 Privileged 在相同任务上挽回的 62% 相当：对于只需到达某个区域、容器或抓取状态的阶段，这两项新增功能已大致达到完整仿真器权限的效果。</p>
-<p><b>在 Precise 阶段，与 Privileged 仍有差距。</b>二者兼具时，Agent 解决了 47% 的 Precise 阶段失败，而 Privileged 为 74%。在具有 Privileged 测试的 Precise 阶段失败上，二者兼具的运行相对第二次尝试的增益，相当于 Privileged 所取得增益的 52%（95% 区间 34% 到 69%）。Privileged 挽回了 26 个二者兼具的运行未解决的 Precise 阶段失败，并漏掉 2 个它解决的失败；这 26 个中有 17 个位于沿路径运动、穿入和装配阶段；在击打和接住阶段，二者解决的失败完全相同。剩余差距可能来自逐步步进物理仿真和调用规划原语，这是两项新增功能都不提供的；这表明，Precise 阶段能从在被评分的尝试之前先测试动作中获益。</p>
-<p><b>局限。</b>这只是每种条件的一次运行，且仅针对 GPT-6 Astra。Precise 阶段失败和 Coarse 阶段失败还来自不同的 Suite：大多数 Precise 阶段失败来自 Embodied Olympics (Fun)、DexToolBench 和 RoboARC，而 97 个 Coarse 阶段失败中有 38 个来自 BEHAVIOR-1K。论文报告，去掉任意一个 Suite 都不会使任何比较结论反转，但其区间和检验将失败的测试视为相互独立。</p>
+<p><b>在 Precision 阶段，与 Privileged 仍有差距。</b>二者兼具时，Agent 解决了 47% 的 Precision 阶段失败，而 Privileged 为 74%。在具有 Privileged 测试的 Precision 阶段失败上，二者兼具的运行相对第二次尝试的增益，相当于 Privileged 所取得增益的 52%（95% 区间 34% 到 69%）。Privileged 挽回了 26 个二者兼具的运行未解决的 Precision 阶段失败，并漏掉 2 个它解决的失败；这 26 个中有 17 个位于沿路径运动、穿入和装配阶段；在击打和接住阶段，二者解决的失败完全相同。剩余差距可能来自逐步步进物理仿真和调用规划原语，这是两项新增功能都不提供的；这表明，Precision 阶段能从在被评分的尝试之前先测试动作中获益。</p>
+<p><b>局限。</b>这只是每种条件的一次运行，且仅针对 GPT-6 Astra。Precision 阶段失败和 Coarse 阶段失败还来自不同的 Suite：大多数 Precision 阶段失败来自 Embodied Olympics (Fun)、DexToolBench 和 RoboARC，而 97 个 Coarse 阶段失败中有 38 个来自 BEHAVIOR-1K。论文报告，去掉任意一个 Suite 都不会使任何比较结论反转，但其区间和检验将失败的测试视为相互独立。</p>
 
  <h3 id="no-signal" data-short="无成功信号">Astra 几乎不依赖成功提示</h3>
 <p>隐藏成功信号几乎不改变 GPT-6 Astra 的成功频率：在 391 个同时具有两种设置的核心任务的默认测试上，它在无信号时完成 31%，有信号时为 29%；在 50 个 Realtime 测试上，分别为 26% 和 30%。精确状态，尤其是重试能力，重要得多。</p>
@@ -679,7 +679,7 @@
 <tr class="sep"><th scope="row">Privileged</th><td>79</td><td>84</td></tr>
 </tbody></table></div></div></figure>
 <p><b>这说明了什么。</b>如果 Agent 依赖成功信号来判断何时停止，或通过不断尝试动作直到标志出现来寻找解，那么隐藏信号应当会让许多测试失败。实际变化在默认测试上为 2 个百分点，在 Realtime 测试上为 4 个百分点，处于论文报告的运行间波动范围之内（GPT-6.1 Sol 三次运行间最多相差 5 个百分点）。Astra 达成目标时，通常自己就知道已经达成。限制它的信息不是回合结束时的判定结果，而是能否回到困难阶段重试，以及在 Coarse 阶段能否精确看到物体的位置。</p>
-<p><b>为什么这次运行可以作为第二次尝试。</b>由于隐藏信号带来的变化很小，论文将这次运行近似地视为对每个测试的重新运行，即上文 Precise 与 Coarse 阶段的比较中使用的基线。论文指出这只是近似：这次运行无法区分尝试间的正常波动与隐藏信号的影响，而且它只是单个 Agent 的单次运行。</p>
+<p><b>为什么这次运行可以作为第二次尝试。</b>由于隐藏信号带来的变化很小，论文将这次运行近似地视为对每个测试的重新运行，即上文 Precision 与 Coarse 阶段的比较中使用的基线。论文指出这只是近似：这次运行无法区分尝试间的正常波动与隐藏信号的影响，而且它只是单个 Agent 的单次运行。</p>
 
 
 <h2 id="where" data-short="失败环节">Agent 在哪个阶段失败？</h2>
@@ -704,7 +704,7 @@
  </div>
 </figure>
 
- <h3 id="same-across-settings" data-short="跨设置">Privileged 提高过关率，但难点阶段不变</h3>
+ <h3 id="same-across-settings" data-short="跨设置">无论 Standard 还是 Privileged，失败阶段往往相同</h3>
 <p>Agent 在 Privileged Setting 下能完成多得多的测试，但一个任务中多数失败所在的阶段，在 Standard 与 Privileged 下通常相同。论文选取了在两种设置下失败都有唯一最常见阶段的 186 个任务。其中 150 个（81%）该阶段相同，而若每种设置的失败阶段独立随机抽取（同前，偏向早期阶段），这一比例为 47%。这种一致性很大程度上来自那些直接在第一阶段失败的任务：186 个任务中有 98 个，两种设置下的最常见阶段都是第一阶段。在其余 88 个任务上，最常见阶段仍有 59% 相同（95% 区间 49% 至 69%），而在不含两个最常见阶段均为第一阶段的抽样时，随机基线为 9%（图 14，子图 (a)，最下方条形）。</p>
 <p>当两个最常见阶段不同时，Standard 下的那个通常在任务中更靠前（25 个任务如此，另有 11 个任务更靠后）：在真实机器人约束下，Agent 更早被卡住。</p>
 <p>两种设置在难点阶段之后差异显著。对每次尝试，论文取同一测试上其他 Agent 最常失败的阶段，考察该尝试是否越过了这一阶段。在越过的尝试中，Standard 下有 43% 通过测试，Privileged 下为 71%；其余 Standard 尝试大多在更靠后的阶段失败。就全部尝试而言，通过率分别为 15% 和 39%。越过该阶段与通过测试之间的关联部分来自阶段顺序，因为这样的尝试本就更接近任务终点。即便如此，43% 与 71% 之间的差距表明，在 Standard 下，攻克最难的一步往往并不足够：那些在完整访问下变得容易的后续阶段仍可能失败。</p>
@@ -824,7 +824,7 @@
 
 
 <h2 id="act" data-short="Agent 如何工作">Agent 如何工作？</h2>
- <h3 id="control-by-setting" data-short="控制方式">直接控制、写代码控制，还是训练 policy？</h3>
+ <h3 id="control-by-setting" data-short="控制方式">直接控制、写程序，还是训练 policy？</h3>
  <p>Agent 控制机器人有三种方式，也可以混合使用。<b>直接控制</b>时，模型本身就是控制器：它发出一个动作，查看相机图像或传感器读数，再决定下一个动作。<b>用代码控制</b>时，它编写规划器、控制器或其他程序，由程序产生机器人的动作。<b>训练 policy </b>时，它在仿真中训练一个 policy，再让 policy 控制机器人。下图给出每种方式的一次尝试，并附上 Agent 所写内容的节选。</p>
  <figure class="fig paper fig-wide">
  <div class="fig-body" data-fig="approaches">
@@ -1032,8 +1032,8 @@
 <p>每种习惯都有代价。Fable 未用完的时间往往帮不上忙，因为它已经用完了所有重置、把工具弄到了够不着的地方，或者把笔画用在了无法去除的颜料上。但在它估计出错的地方，这些时间本可能起作用：楷书临摹只差 0.004，锅铲只差 0.6 mm。Astra 的检查恰恰在这些测试上发挥了作用，但它也有 92 次 Standard 尝试是被时钟而非结果终止的。用掉更多时间本身并不能让尝试成功；关键在于 Agent 能否依据自身传感器判断离目标还有多远。</p>
 
 
-<h2 id="conditions" data-short="换个条件">换 Harness、Instruction、Reasoning、Randomness，分数会改变吗？</h2>
- <h3 id="harness-gap" data-short="Harness">Harness：同一模型最多相差 7.5 个百分点</h3>
+<h2 id="conditions" data-short="换个条件">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</h2>
+ <h3 id="harness-gap" data-short="Harness">Harness：最多相差 7.5 个百分点</h3>
 <p>本次考试中的每个 Agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及三个较弱的模型（Kimi 3.1 Pro、Qwen3.8 Max 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行同样的 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
 <p><b>GPT-6 Astra 离开 Codex 后下降 7.5 个百分点。</b>在其自带的 harness Codex 中，它完成了 456 个测试中的 157 个（34.4%），在 Claude Code 中完成了 123 个（27.0%）。单个测试的变化是双向的：75 个仅在 Codex 中完成，41 个仅在 Claude Code 中完成。论文认为这一差异显著（配对精确检验，p = 0.002，未做多重比较校正）。差异的大部分在第一个 episode、任何重置之前就已出现：Codex 中成功 119 次，Claude Code 中为 95 次（p = 0.015，未校正）。因此，这一差距并不只来自各 harness 处理多次重试的长会话的方式。</p>
 <p><b>Claude Opus 5.5 在两个 harness 中表现相近。</b>它在 Codex 中完成了 456 个中的 119 个，在其自带的 Claude Code 中完成了 114 个；第一个 episode 中分别为 97 和 96。细看之下，35 个测试仅在 Codex 中完成，30 个仅在 Claude Code 中完成。两项计数的差异均不显著。</p>
@@ -1060,7 +1060,7 @@
 <p><b>一点说明。</b>Codex 和 Claude Code 只支持各自提供商的 API 格式。在跨提供商的运行中，一个适配器将每个请求转发给另一家提供商，再把回复翻译回来，并调整系统提示词和模型元数据。论文指出这些运行只是近似原生设置，因此模型在非自带 harness 中的下降，可能有一部分来自这层转换，而非 harness 设计本身。harness 对比运行单独报告，不改变排行榜。</p>
 <p>因此，当一个 Agent 完成了另一个 Agent 失败的测试时，差异有一部分可能来自 harness。论文因此把每个结果都报告为某个模型在特定 harness 中的结果：harness 如何暴露工具、管理上下文以及结束会话，本身就是这次考试所衡量内容的一部分。</p>
 
- <h3 id="robodojo" data-short="任务指令">任务指令：RoboDojo 写明复位等判定条件后，得分约为原来的三倍</h3>
+ <h3 id="robodojo" data-short="任务指令">任务指令：RoboDojo 得分约为原来的三倍</h3>
 <p>RoboDojo 是本次考试改编的一个双臂操作基准，它为每个任务提供一句话的指令，但其成功判定会检查句子中未提及的条件。当目标完整写明判定条件时，同一个 Agent 的得分大约提高到三倍。差别在于 Agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
 <p><b>本次考试如何使用 RoboDojo。</b>考试保留了 RoboDojo 的场景、机器人和成功规则，并编写了一条指令，写明 Agent 无法通过观察推断出的所有约定。例如，“Fill Egg Holder”要求 Agent 把四个鸡蛋放进蛋托，盖上盖子，“并让机械臂回到初始位置”（来自网站的任务列表）。核心集中有 12 个 RoboDojo 任务，每个限时 60 分钟，各有一个 Standard 测试和一个 Privileged 测试（没有 Realtime 测试）。</p>
 <p><b>一句话指令遗漏了判定所检查的内容。</b>官方<a href="../../first-exam/">第一次考试报告</a>让 GPT-6 Astra 在 Standard Setting 下完成全部 54 个 RoboDojo 任务，使用三个版本的目标文本，场景、步数上限和成功判定保持不变。RoboDojo 自己的指令遗漏了判定所检查的条件，最主要的是两只机械臂最终都要回到初始姿态附近，54 个任务中有 47 个有此要求；一个完美完成可见任务、却让一只机械臂悬在桌面上方的 Agent 会被判失败。这些 54 个任务的计数来自第一次考试报告，而非论文的核心集表格：</p>
@@ -1082,7 +1082,7 @@
 <p>在完整目标下，剩下的是真实的物理难度。在一次插入钥匙的 Standard 尝试中，Claude Opus 5.5 通过深度图像定位了钥匙和锁，但在交接和大幅关节运动中至少掉落钥匙九次；它最准确的一次插入发生在第 36 分钟，偏差约 9 mm，撞在了锁的表面上（论文附录）。在 Standard 中没有 Agent 完成该测试，而 Fable、Astra 和 Argon 在 Privileged 中完成了它（网站数据）。</p>
 <p><b>对基准设计的启示。</b>如果成功判定检查了指令没有写明的条件，那么基准衡量的就是 Agent 能否猜到这个条件，而不是它原本要衡量的能力。由此得出两条规则：写明判定将检查的每一个条件，包括“回到初始姿态”这类收尾要求；在跨论文比较结果时，核对各自使用的指令文本。在 RoboDojo 上，仅文本本身就能让同一个 Agent 从 54 个中的 12 个变为 37 个。</p>
 
- <h3 id="spend-effort" data-short="推理强度">推理强度：中、高、最高之间只差 1.5 个百分点</h3>
+ <h3 id="spend-effort" data-short="推理强度">推理强度：只差 1.5 个百分点</h3>
 <p>另一种投入更多的方式，是让模型在每次行动前思考更久。所有排行榜 Agent 都以高推理强度运行；论文还在 Codex 中让 GPT-6.1 Sol 以中等和最高推理强度运行了 456 个核心 Standard 测试，其余条件与排行榜运行相同。</p>
 <figure class="fig">
  <div class="fig-body" data-fig="sol-effort">
@@ -1101,7 +1101,7 @@
 <p><b>改变的是 Agent 的工作方式。</b>推理强度更高时，Sol 输出更多 tokens、发送更少请求、运行更久：它在每一步之前思考更多，步数更少、每步更慢。两种风格在这些物理任务上完成的比例大致相同。</p>
 <p><b>成本基本不变，</b>每次尝试 $3.91 到 $4.10，可能是因为请求减少抵消了额外的输出 tokens。论文没有进一步拆分成本，因此这只是我们的解读，而非测得的结果。</p>
 
- <h3 id="run-variance" data-short="重复运行">重复运行：三次运行相差不超过 5 个百分点</h3>
+ <h3 id="run-variance" data-short="重复运行">重复运行：最多相差 5 个百分点</h3>
 <p>排行榜对每个 Agent 和每个测试只统计一次尝试。为了衡量成功率在不同运行之间变化多少，论文让 Codex 中的 GPT-6.1 Sol 以高推理强度在全部 456 个核心 Standard 测试上额外运行了两次，其余条件均与排行榜运行相同。</p>
 <figure class="fig">
  <div class="fig-body" data-fig="sol-runs">
