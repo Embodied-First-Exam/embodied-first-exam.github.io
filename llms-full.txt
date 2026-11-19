@@ -70,6 +70,18 @@ In a sample of 2,622 attempts, agents control the robot directly in 60% of Stand
 
 Yes. With RoboDojo’s one-sentence instructions, GPT-6 Astra solves 12 of 54 RoboDojo tasks; with the task recipe and the return-to-start note it solves 33, and with a goal that states the success check in full it solves 37. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
+## What is Embodied Olympics?
+
+Embodied Olympics is a benchmark in which coding agents build, run and revise the systems that control robots in 18 sports on six simulated robots, from humanoids to a racing drone and a race car. Agents start without supplied motor skills, work within fixed time and compute budgets, and in 16 sports the match keeps running while they reason. Episodic matches start from a fresh workspace; Continual seasons keep code, trained weights and experience. Checkpoint Evaluation replays each agent's first and last program of a match against fixed opponents. Report: https://www.embodied-first-exam.ai/blogs/embodied-olympics/ ; site: https://olympics.embodied-first-exam.ai/
+
+## Can coding agents keep improving their robots through competition?
+
+Mostly not yet. Across seven coding agents, the side with the better first program wins 89 of 98 decisive Episodic matches, because revisions barely change the program: against fixed opponents, revisions within a match gain 0.2 percentage points (3.9 against the current opponent). Agents analyze the opponent correctly in 66% of 515 Episodic seat-matches but field a changed program in 26%, and a change that wins more points in 4%. Over a Continual season, three of six agents improve (Gemini 4 Argon from 16% to 36% of points against fixed opponents, GPT-6 Astra from 34% to 48%, Kimi 3.1 Pro from 6% to 13%). Of 305 self-assessments that claim an improvement, replays confirm 35.
+
+## How far are agent-built robot systems from strong systems?
+
+The strongest agent's programs win 43% of their games against the strongest scripted opponent, and four agents lose all 32 wheeled-soccer matches against the RoboCup Small Size League champions' software without scoring. In badminton, when the shuttle lands out of reach, the robots of the two strongest agents move to it in 2 of 166 and 5 of 142 cases, against 112 of 116 for a scripted practice player.
+
 ## Key numbers at a glance
 
 - 1,156 tasks, 35 suites, 47 robots, 456 core tasks, 9 new suites

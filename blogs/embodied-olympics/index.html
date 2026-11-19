@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embodied Olympics: Can Agentic Robots Continually Improve Through Competition? · Blogs</title>
+<meta name="description" content="Coding agents as robotics engineers: on 18 simulated sports, seven coding agents build, run and revise the systems that control robots. They build a strong first system, but noticing a failure, changing the program and checking the change rarely improves the robot.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../assets/exam.css?v=bb3ca59b">
+<link rel="stylesheet" href="../../assets/blog.css?v=874f6bf5">
+<style>
+  .efs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; }
+  .efs .chart { margin: 4px 0 10px; }
+  @media (max-width: 640px) { .efs { grid-template-columns: minmax(0, 1fr); } }
+  figure.paper .pimg, .fig .pimg { margin: 6px 0 4px; padding: 0; border-radius: 10px; background: #fff; overflow: hidden; }
+  figure.paper .pimg img, .fig .pimg img { display: block; width: 100%; height: auto; }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; margin-bottom: 6px; }
+  @media (max-width: 560px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  figure.paper .pimg.narrow { max-width: 560px; margin-left: auto; margin-right: auto; }
+  table.fst { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.35; }
+  table.fst th, table.fst td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  table.fst thead th { font: 600 13px/1.3 var(--body); text-align: right; border-bottom: 2px solid currentColor; }
+  table.fst thead th:first-child, table.fst tbody th { text-align: left; }
+  table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
+  table.fst tbody th { font-weight: 400; color: var(--ink-2, var(--ink)); }
+  table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
+  table.fst td.lead, table.fst th.lead { font-weight: 650; }
+  table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
+  table.fst caption, .tbl-note { caption-side: bottom; text-align: left; margin: 10px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
+  @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
+  .draft-flag { display: inline-block; margin: 0 0 14px; padding: 3px 10px; border: 1px dashed var(--line-2); border-radius: 999px; font: 600 11px/1.6 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .src { font: 600 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .nav .icon-btn, .nav .ax-link { font: 600 12px/1 var(--mono); color: var(--ink-2); padding: 6px 10px; border: 0; background: none; cursor: pointer; text-decoration: none; }
+  .nav .mark svg, .nav .mark-svg, .footer .mark-svg { display: block; }
+  .nav .wordmark, .footer .wordmark { display: inline-flex; align-items: center; gap: 8px; }
+  .nav .ax-link { margin-left: 10px; }
+  .nav .icon-btn + .icon-btn { margin-left: 2px; }
+  #theme-toggle { margin-left: 8px; padding-left: 14px; border-left: 1px solid var(--line); border-radius: 0; }
+  figure.paper .fig-body { padding: 10px 10px 16px; }
+  @media (min-width: 1240px) {
+    .post > figure.fig.paper, .post > figure.fig.fig-wide { max-width: var(--col); }
+  }
+
+  .tldr .tldr-g { margin: 16px 0 6px; font: 600 11px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .tldr .tldr-g:first-of-type { margin-top: 4px; }
+  .tldr .tldr-g a { color: inherit; border: 0; }
+  .tldr ul { margin: 0; padding-left: 1.2em; }
+  .tldr li { font-size: 16px; line-height: 1.55; margin: 0 0 0.65em; }
+  .tldr li:last-child { margin-bottom: 0; }
+  .tldr li b { color: var(--ink); }
+
+  .lede { font-size: 1.15em; line-height: 1.45; margin: 0 0 0.85em; }
+  .post ul.ba {
+    list-style: none;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--col);
+    margin: 0.15em auto 1.15em;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .post ul.ba li,
+  .post ul.ba li + li {
+    display: grid;
+    grid-template-columns: 11.5rem minmax(0, 1fr);
+    column-gap: 1.15rem;
+    align-items: baseline;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0.4em 0;
+    font-size: 16.5px;
+    line-height: 1.45;
+    border-bottom: 1px solid var(--line);
+  }
+  .post ul.ba li:last-child { border-bottom: 0; }
+  .post ul.ba .arr { font-weight: 650; min-width: 0; letter-spacing: 0.01em; }
+  .post ul.ba .txt { min-width: 0; }
+  .post ul.ba .frac { color: var(--ink-3); font-size: 0.92em; }
+  .post ul.ba li.hi {
+    background: color-mix(in srgb, var(--std, #3a7a5c) 9%, transparent);
+    border-bottom-color: transparent;
+    padding-top: 0.45em;
+    padding-bottom: 0.45em;
+  }
+  .post ul.ba li.hi:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-top: 0.55em;
+  }
+  .post ul.ba li.hi:has(+ li:not(.hi)) {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-bottom: 0.55em;
+  }
+  .post ul.ba li.hi .arr { font-weight: 750; color: var(--ink); }
+  .post ul.ba li.hi b { font-weight: 650; color: var(--ink); }
+
+  .post .toc-page {
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--col);
+    margin: 0 auto 1.35em;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+  }
+  .toc-page summary { cursor: pointer; padding: 10px 14px; font: 600 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); list-style: none; }
+  .toc-page summary::-webkit-details-marker { display: none; }
+  .toc-page summary::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 8px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-1px) rotate(45deg); }
+  .toc-page details[open] summary::after { transform: translateY(1px) rotate(-135deg); }
+  .toc-page ol { list-style: none; margin: 0; padding: 0 10px 12px; }
+  .toc-page a { display: grid; grid-template-columns: 24px 1fr; gap: 0 6px; padding: 6px 6px 6px 10px; border-left: 2px solid var(--line); font-size: 13px; line-height: 1.35; color: var(--ink-3); text-decoration: none; }
+  .toc-page a:hover { color: var(--ink); }
+  .toc-page a.on { color: var(--ink); border-left-color: var(--priv); font-weight: 600; }
+  .toc-page a .k { font: 500 10.5px/1.9 var(--mono); color: var(--ink-3); }
+  .toc-page a.on .k { color: var(--priv-ink); }
+  @media (min-width: 1420px) {
+    .toc-rail {
+      --toc-w: 180px;
+      --toc-gap: 24px;
+      opacity: 1;
+      visibility: visible;
+      width: var(--toc-w);
+      left: max(16px, calc((100vw - 1000px) / 2 - var(--toc-gap) - var(--toc-w)));
+    }
+    .post > figure.fig.paper,
+    .post > figure.fig.fig-wide { max-width: var(--col); }
+  }
+  @media (min-width: 1600px) {
+    .toc-rail {
+      --toc-w: 200px;
+      width: var(--toc-w);
+      left: max(16px, calc((100vw - 1000px) / 2 - var(--toc-gap) - var(--toc-w)));
+    }
+  }
+  @media (max-width: 1419px) { .post .toc-page { display: block; } }
+  figure.paper .pimg img.natural { width: 100%; height: auto; }
+  .hl { margin: 28px auto 8px; padding: 20px 24px; border: 1px solid var(--line-2); border-radius: 16px; background: var(--surface); max-width: var(--col); box-sizing: border-box; }
+  .hl .label, .toc-top .label { margin: 0 0 10px; font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .hl ol { margin: 0; padding-left: 1.3em; }
+  .hl li { margin: 0 0 .7em; font-size: 16.5px; line-height: 1.5; color: var(--ink-2); }
+  .hl li:last-child { margin-bottom: 0; }
+  .hl li a { border: 0; color: var(--ink); }
+  .hl li a b { font-weight: 650; }
+  .wwf-label { margin: 0 auto 10px; max-width: var(--col); font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .toc-top { margin: 18px auto 30px; padding: 18px 24px; border: 1px solid var(--line); border-radius: 16px; max-width: var(--col); box-sizing: border-box; }
+  .toc-top > ol { margin: 0; padding-left: 1.3em; }
+  .toc-top > ol > li { margin: 0 0 10px; font-weight: 600; font-size: 15px; }
+  .toc-top ol ol { margin: 4px 0 0; padding-left: 1.1em; list-style: disc; font-weight: 400; }
+  .toc-top ol ol li { font-size: 14px; line-height: 1.4; margin: 3px 0; color: var(--ink-3); }
+  .toc-top a { border: 0; color: var(--ink-2); }
+  .toc-top a:hover { color: var(--ink); }
+  .rq { margin: 8px auto 26px; padding: 20px 24px; border-left: 4px solid var(--std); background: var(--surface); border-radius: 0 14px 14px 0; max-width: var(--col); box-sizing: border-box; }
+  .rq .rq-label { margin: 0 0 6px; font: 600 11px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .rq .rq-text { margin: 0; font: 650 21px/1.35 var(--display); color: var(--ink); }
+  .wwf { margin: 18px auto 10px; max-width: var(--col); box-sizing: border-box; }
+  .wwf h4, .wwf .wwf-h { margin: 18px 0 6px; font: 650 17px/1.3 var(--display); color: var(--ink); }
+  .wwf ul { margin: 0 0 8px; padding-left: 1.2em; }
+  .wwf li { margin: 0 0 6px; font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+  .toc-rail .fold-head > a { padding-right: 42px; }
+  .toc-top details > summary { cursor: pointer; list-style: none; }
+  .toc-top details > summary::-webkit-details-marker { display: none; }
+  .toc-top details > summary::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 10px; border: solid var(--ink-3); border-width: 0 1.5px 1.5px 0; transform: translateY(-3px) rotate(45deg); transition: transform .2s; }
+  .toc-top details[open] > summary::after { transform: translateY(0) rotate(-135deg); }
+  .toc-top details > ol { margin: 6px 0 4px; }
+  .toc-top a:hover, .toc-top a:focus-visible, .wwf a:hover { color: var(--priv-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .toc-rail a:hover { color: var(--priv-ink); border-left-color: var(--priv); }
+  .pimg video { display: block; width: 100%; height: auto; border-radius: 10px; background: #000; }
+</style>
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<script type="module" src="../../assets/app.js?v=f5982de7"></script>
+<script type="module" src="../../assets/blog-post.js?v=4a7fbd4d"></script>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Embodied First Exam">
+<meta property="og:title" content="Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?">
+<meta property="og:description" content="Coding agents as robotics engineers: on 18 simulated sports, seven coding agents build, run and revise the systems that control robots. They build a strong first system, but noticing a failure, changing the program and checking the change rarely improves the robot.">
+<meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/embodied-olympics/">
+<meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F2_match.png?v=6c2cbb8f">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="815">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?">
+<meta name="twitter:description" content="Coding agents as robotics engineers: on 18 simulated sports, seven coding agents build, run and revise the systems that control robots. They build a strong first system, but noticing a failure, changing the program and checking the change rarely improves the robot.">
+<meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F2_match.png?v=6c2cbb8f">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://www.embodied-first-exam.ai/blogs/embodied-olympics/#post",
+      "headline": "Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?",
+      "description": "Coding agents as robotics engineers: on 18 simulated sports, seven coding agents build, run and revise the systems that control robots. They build a strong first system, but noticing a failure, changing the program and checking the change rarely improves the robot.",
+      "datePublished": "2026-11-19",
+      "dateModified": "2026-11-19",
+      "inLanguage": "en",
+      "url": "https://www.embodied-first-exam.ai/blogs/embodied-olympics/",
+      "mainEntityOfPage": "https://www.embodied-first-exam.ai/blogs/embodied-olympics/",
+      "image": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F2_match.png?v=6c2cbb8f",
+      "author": {
+        "@type": "Organization",
+        "name": "Embodied First Exam",
+        "url": "https://www.embodied-first-exam.ai/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Embodied First Exam",
+        "url": "https://www.embodied-first-exam.ai/"
+      },
+      "about": [
+        "Embodied Olympics",
+        "agentic robots",
+        "coding agents for robotics",
+        "autoresearch for robot policies",
+        "continual improvement through competition"
+      ],
+      "keywords": [
+        "Embodied Olympics",
+        "agentic robots",
+        "coding agents for robotics",
+        "autoresearch for robot policies",
+        "robotic engineering with coding agents",
+        "continual improvement",
+        "robot competition benchmark",
+        "real-time robot control",
+        "humanoid soccer",
+        "Checkpoint Evaluation",
+        "Claude Fable 5.2",
+        "GPT-6 Astra",
+        "Claude Opus 5.5",
+        "Gemini 4 Argon"
+      ],
+      "isRelatedTo": {
+        "@type": "WebSite",
+        "name": "Embodied Olympics",
+        "url": "https://olympics.embodied-first-exam.ai/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Embodied First Exam",
+          "item": "https://www.embodied-first-exam.ai/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blogs",
+          "item": "https://www.embodied-first-exam.ai/blogs/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?",
+          "item": "https://www.embodied-first-exam.ai/blogs/embodied-olympics/"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<!-- search-meta:start -->
+<link rel="canonical" href="https://www.embodied-first-exam.ai/blogs/embodied-olympics/">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="keywords" content="Embodied Olympics, agentic robots, coding agents for robotics, autoresearch for robot policies, robotic engineering with coding agents, continual improvement, robot competition benchmark, real-time robot control, humanoid soccer, Checkpoint Evaluation, Claude Fable 5.2, GPT-6 Astra, Claude Opus 5.5, Gemini 4 Argon">
+<!-- search-meta:end -->
+</head>
+<body data-page="blogpost">
+<div id="nav"></div>
+<main>
+
+  <header class="page-head post-head">
+    <p class="kicker"><a href="../">Blogs</a> · Embodied Olympics</p>
+    <h1 class="post-title">Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?</h1>
+    <p class="byline"><span>November 2026</span> · <a href="https://olympics.embodied-first-exam.ai/sports/" target="_blank" rel="noopener">Sports</a> · <a href="https://olympics.embodied-first-exam.ai/leaderboard/" target="_blank" rel="noopener">Leaderboard</a> · <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Watch</a> · <a href="../first-exam/">EFE Blog</a></p>
+  </header>
+
+<article class="post">
+    <div class="rq"><p class="rq-label">Research question</p><p class="rq-text">Can coding agents act as robotics engineers that keep improving their robots through competition?</p></div>
+    <p>A robotics engineer works in a loop. They build a controller or train a policy, test it, field it, watch where it fails, revise it and test again. Coding agents can now run parts of this loop on their own: they write robot programs, launch policy training and read the results. This makes them candidates for autoresearch on robot policies, where the agent runs the whole engineering loop without a person in it. Whether the loop actually makes the robot better, match after match, has not been measured.</p>
+    <p>Embodied Olympics measures it through competition. Seven coding agents build, run and revise the systems that control robots in 18 sports on six simulated robots, from humanoids to a racing drone. Each agent starts without supplied motor skills, works within fixed time and compute budgets, and plays against systems that other agents build and revise. In 16 sports the match keeps running while the agent thinks. Competition suits the question: scores give an objective result, opponents expose weak strategies, and repeated matches show whether revisions help. We call a coding agent together with the programs it writes to control robots an <b>agentic robot</b>.</p>
+
+    <h2 id="found" data-short="What we found">What we found</h2>
+    <nav class="toc-top" aria-label="Outline">
+      <p class="label">Outline</p>
+      <ol>
+        <li><details><summary><a href="#loop">How Embodied Olympics measures the engineering loop</a></summary><ol>
+          <li><a href="#loop-seat">Each agent builds its system alone, in a private development world with a practice opponent</a></li>
+          <li><a href="#loop-formats">Episodic matches test one build; Continual seasons test whether experience accumulates</a></li>
+          <li><a href="#loop-checkpoint">Replaying saved programs separates an agent’s own improvement from its opponent’s changes</a></li>
+          <li><a href="#loop-sports">18 sports on six robots, each played under the real sport’s rules and the real robot’s limits</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#build">Build: the first program largely decides the match</a></summary><ol>
+          <li><a href="#build-deliver">Agents almost always deliver a working system, but its quality differs widely</a></li>
+          <li><a href="#build-decides">The side with the better first program wins 89 of 98 decisive matches</a></li>
+          <li><a href="#build-gpu">Given a GPU, agents train policies to walk and hand-write their ball skills</a></li>
+          <li><a href="#build-cost">What an agent spends and how good its system is do not move together</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#deploy">Deploy: robots plan the action well but fail to complete it</a></summary><ol>
+          <li><a href="#deploy-aspects">For every agent, perception and prediction run ahead of the outcome</a></li>
+          <li><a href="#deploy-reach">In net sports, the robots stand still while the ball lands out of reach</a></li>
+          <li><a href="#deploy-team">Robots rarely pass to each other, and humanoids almost never</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#diagnose">Diagnose: agents read the opponent correctly but rarely act on it</a></summary><ol>
+          <li><a href="#diagnose-chain">Two thirds of reviews analyze the opponent correctly; 4% lead to a change that wins more points</a></li>
+          <li><a href="#diagnose-rematch">Changes made for a known opponent do not win the rematch</a></li>
+          <li><a href="#diagnose-series">Over ten straight matches, one agent did adapt to its opponent</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#revise">Revise and verify: revisions help some agents, slowly, and agents overrate them</a></summary><ol>
+          <li><a href="#revise-match">Within a match, revisions add almost nothing against fixed opponents</a></li>
+          <li><a href="#revise-season">Over a season, three of six agents improve, and they improve match by match</a></li>
+          <li><a href="#revise-self">Agents report improvements that replays rarely confirm</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#gap">How far today’s agentic robots are from strong systems</a></summary><ol>
+          <li><a href="#gap-l3">Against strong scripted opponents and RoboCup champion software, the best systems still lose</a></li>
+          <li><a href="#gap-tiers">The agents separate into clear tiers, and replays keep the order</a></li>
+        </ol></details></li>
+        <li><details><summary><a href="#next">What’s next</a></summary><ol>
+          <li><a href="#next-limits">Limitations</a></li>
+          <li><a href="#next-loop">Closing the loop from noticing a failure to fielding a fix that works</a></li>
+          <li><a href="#cite">Data and citation</a></li>
+        </ol></details></li>
+      </ol>
+    </nav>
+    <p class="wwf-label">Overall results</p>
+    <div class="wwf">
+      <div class="wwf-b">
+        <h4>Where the loop works</h4>
+        <ul>
+          <li>Agents deliver a working system in 983 of 1,044 seat-matches (94%) across all sports and both formats.</li>
+          <li>The best first programs score 56% of the points against fixed opponents, and their robots perceive the ball and predict its path well.</li>
+          <li>Over a season, Gemini 4 Argon rises from 16% to 36%, GPT-6 Astra from 34% to 48% and Kimi 3.1 Pro from 6% to 13%.</li>
+        </ul>
+      </div>
+      <div class="wwf-b">
+        <h4>Where the loop breaks</h4>
+        <ul>
+          <li>The side with the better first program wins 89 of 98 decisive matches, because revisions barely change the program.</li>
+          <li>Agents analyze the opponent correctly in 66% of seat-matches but field a change in 26%, and a change that wins more points in 4%.</li>
+          <li>Against fixed opponents, revisions within a match gain 0.2 percentage points; of 305 self-assessments that claim an improvement, replays confirm 35.</li>
+        </ul>
+      </div>
+      <div class="wwf-b">
+        <h4>How far from strong systems</h4>
+        <ul>
+          <li>The strongest agent’s programs win 43% of their games against the strongest scripted opponent.</li>
+          <li>Four agents lose all 32 wheeled-soccer matches against the RoboCup champions’ software without scoring a goal.</li>
+          <li>When a badminton shuttle lands out of reach, Fable’s robot moves to it in 2 of 166 cases and Astra’s in 5 of 142; our scripted practice player does in 112 of 116.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="loop" data-short="The loop">How Embodied Olympics measures the engineering loop</h2>
+    <h3 id="loop-seat" data-short="The seat">Each agent builds its system alone, in a private development world with a practice opponent</h3>
+    <p>Each agent works from its own <b>seat</b>, a container with fixed compute and time. The seat holds a <b>development world</b>, a private copy of the match world that the agent can reset and, in most sports, query for the true state of the ball and the robots. Where the sport has an opponent, the development world also has a black-box <b>practice player</b> to play against. The seat provides simulators and general-purpose libraries, but no motor skill such as walking or kicking, and no reward function, curriculum or example policy. Whatever the robot does in a match, the agent built.</p>
+    <p>In the match itself, the agent’s system sees what a real robot would: camera images, noisy joint and inertial readings, and the referee’s announcements. No sport reveals the true position of the ball or of the opponents. The system acts through low-level commands in the form the real robot accepts, from joint targets on the humanoids to thruster valves on the stunt car. In most team sports one agent commands every robot of its side, up to 11.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="match">
+        <p class="fig-cap"><span class="fc-t">An agent builds in its own seat, plays in a shared world, and revises between points.</span> Paper Figure 2. Each agent develops its system in its own seat, with a private development world and a practice player (top left). All systems act in one shared official world (top). Play alternates with review windows, and every fielded version is saved for Checkpoint Evaluation (bottom left). The Continual format keeps the workspace across matches, and the Episodic format resets it (bottom right).</p>
+        <div class="pimg"><img class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F2_match.png?v=6c2cbb8f" alt="Paper Figure 2. Top: agent A's seat holds a development world with a practice player and a workspace of program versions v1, v2, v3; the agent's program runs in the official world, a humanoid soccer match against agent B, in real time. Bottom left: one match is preparation (builds v1), play (v1 plays), review (fixes to v2) and play again (v2 plays), with each version saved for Checkpoint Evaluation. Bottom right: in Episodic each match starts from an empty folder; in Continual the folder carries over from match to match." width="2400" height="815"></div>
+      </div>
+    </figure>
+    <p>A match has one <b>preparation</b> phase, 30 minutes to 2 hours in which the official world stands still while the agent builds. Then <b>play</b> and <b>review</b> alternate. In 16 of the 18 sports, the official world advances one control step every 10 or 20 milliseconds of real time whether or not a command has arrived, so time spent deciding is time in which the world moves on. Curling and billiards are turn-based, with a chess clock per side. After each point or goal, the world freezes for a review window in which the agent can inspect what happened and revise its system. During play, the agent can also send commands from its shell, start programs that run continuously and may call the model, and replace a running program at any moment.</p>
+
+    <h3 id="loop-formats" data-short="Two formats">Episodic matches test one build; Continual seasons test whether experience accumulates</h3>
+    <p>Two formats set what an agent keeps from one match to the next. In the <b>Episodic</b> format, every match starts from a fresh workspace. It tests what an agent builds from scratch and how it adjusts its system within one match. In the <b>Continual</b> format, the agent keeps its workspace, its harness memory and its session history through a season of matches, and it also receives the referee log, statistics and video of its earlier matches. Programs, trained weights and experience can accumulate. This is the format that asks whether the engineering loop keeps improving the robot.</p>
+    <p>Each sport holds one competition in each format. In Episodic, every pair of players meets once, in independent matches on the same hidden seed. In Continual, the same round robin is followed by play-offs. Six agents enter both formats: GPT-6 Astra, Claude Opus 5.5, Gemini 4 Argon, Kimi 3.1 Pro, DeepSeek V4.1 Flash and GLM-5.3 Flash. Claude Fable 5.2 joined after the Continual seasons and enters Episodic only, so every season result below leaves out the agent that does best in Episodic. Each agent runs in its provider’s own harness at high reasoning effort, so each result belongs to a model and its harness together.</p>
+
+    <h3 id="loop-checkpoint" data-short="Checkpoint Evaluation">Replaying saved programs separates an agent’s own improvement from its opponent’s changes</h3>
+    <p>A better match result does not show that an agent improved, because the opponent also revises its system. <b>Checkpoint Evaluation</b> separates the two. Every version that commands a robot is saved as a restartable copy, and two versions per player and match are replayed: the <b>Initial</b> program, in control when the first game starts, and the <b>Final</b> program, in control at the end. Each replayed program runs from its saved copy without access to the model.</p>
+    <p>The replays answer different questions. Playing the two Final programs of a match again on new seeds tests whether the result holds. Playing all four pairings of the two players’ Initial and Final programs measures what a revision gains against the current opponent. Playing both versions against three scripted opponents of rising strength that we wrote for each sport, L1, L2 and L3, plus the practice player, measures what a revision gains against a reference that is the same for every agent.</p>
+    <p>The main measure of a program in this post is its <b>level</b>: the share of points or goals it scores against these fixed opponents, own over own plus opponent. Unless stated otherwise, a level averages seven real-time duel and team sports with equal weight. A <b>seat-match</b> is one agent’s side of one match. Error intervals are 95% bootstrap intervals, and a change is <b>measurable</b> when its interval excludes zero.</p>
+
+    <h3 id="loop-sports" data-short="18 sports">18 sports on six robots, each played under the real sport’s rules and the real robot’s limits</h3>
+    <p>The 18 sports span four kinds of event, solo, duel, team and race, on six simulated robots: the Unitree G1 and Booster T1 humanoids, a RoboCup Small Size League wheeled robot, a racing quadrotor, a full-size race car and a thruster stunt car. Each sport follows three principles. A referee program enforces the rule book of the real sport, and every deviation is declared. Each robot keeps the vendor’s model, actuator limits and latency, and balls, implements and surfaces are calibrated against real measurements. And each venue is scaled so that the robot can perform the basic actions of the sport within these limits. The badminton court, for example, is scaled to 0.4 of its official size, so that a receiver that knows the true state returns at least 90% of legal serves. A robot that misses the shuttle therefore fails because of its program, not the court.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="sports">
+        <p class="fig-cap"><span class="fc-t">The 18 sports, from sprints and javelin to soccer, racing and drone flight.</span> From paper Figure 1. Solo, duel, team and race events on the Unitree G1 and Booster T1 humanoids, an SSL wheeled robot, a racing quadrotor, a full-size race car and a thruster stunt car. Curling and billiards are turn-based; the other 16 sports run in real time.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F1_sports.png?v=91ddfe81" alt="One frame of each of the 18 sports. Solo: 100 m sprint, 110 m hurdles, javelin, stunt car. Duel: badminton, table tennis, curling, billiards, tennis. Team: humanoid soccer (HSL), HSL Team, wheeled soccer (SSL), 3x3 basketball, American football, baseball, beach volleyball. Race: drone racing, full-size racing." width="2400" height="428"></div>
+      </div>
+    </figure>
+
+    <h2 id="build" data-short="Build">Build: the first program largely decides the match</h2>
+    <h3 id="build-deliver" data-short="Delivery">Agents almost always deliver a working system, but its quality differs widely</h3>
+    <p>The first step of the loop works. Across all sports and both formats, 983 of 1,044 seat-matches (94%) end with a fielded program and a result other than a forfeit. Delivery is lower for GLM-5.3 Flash (122 of 148) and Gemini 4 Argon (152 of 172).</p>
+    <p>What the agents deliver differs widely in quality. The Initial programs, fielded at the first game before any match experience, score 56% of the points against the fixed opponents for Claude Fable 5.2, 38% for GPT-6 Astra and 36% for Claude Opus 5.5, and under 10% for Kimi 3.1 Pro, DeepSeek V4.1 Flash and GLM-5.3 Flash. These levels pool seven real-time duel and team sports.</p>
+    <figure class="fig">
+      <div class="fig-body" data-fig="clip-build">
+        <p class="fig-cap"><span class="fc-t">One build, from first version to deployment.</span> From the Embodied Olympics video: GPT-6 Astra develops five versions of its stunt-car controller, runs 818 practice jumps and a parameter sweep to test and debug it, and fields it in the match, where it scores 149.1 points.</p>
+        <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.jpg?v=1c2af13a" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.mp4?v=73e576d2"></video></div>
+      </div>
+    </figure>
+
+    <h3 id="build-decides" data-short="First program decides">The side with the better first program wins 89 of 98 decisive matches</h3>
+    <p>In the Episodic format, the side whose Initial program has the higher level wins 89 of the 98 matches that have a winner and two different Initial levels. The first program decides so much because the Final program is barely better than it. In the seven pooled sports, the level goes from 56% to 57% for Fable 5.2, from 38% to 40% for Astra and from 36% to 37% for Opus 5.5 between the first game and the end of the match. Whatever the agent learns during the match, little of it reaches the program.</p>
+
+    <h3 id="build-gpu" data-short="Training">Given a GPU, agents train policies to walk and hand-write their ball skills</h3>
+    <p>Agents spend the GPU on learning to move. In the 425 Episodic seat-matches with a GPU, they launch policy training in 56%, mostly reinforcement learning for walking or getting up. Ball skills are trained in only 14% of the seat-matches that train at all. Agents train in 97% of the seat-matches in sports that demand walking and running, but in 21% in net sports, where they write the stroke by hand, tune it with parameter search and keep the robot’s feet planted.</p>
+    <p>Training is not what separates good systems from weak ones. Within the same agent and sport, launching training shows no detectable association with the Final level (−1.1 points, 95% interval −7.8 to +4.1).</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="engineering">
+        <p class="fig-cap"><span class="fc-t">Agents spend the GPU on locomotion, and level and cost spread widely.</span> Paper Figure 6. (a) Level against cost. Level is the share of points that the Final program wins against the fixed opponents, pooled over seven real-time duel and team sports (Episodic). Cost is the median cost of one Episodic seat-match at list prices, on a log scale. (b) Share of the preparation time with the seat’s GPU busy, by sport (Episodic, the 12 sports with a GPU); in javelin the GPU searches throw plans.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F_engineering.png?v=711726a6" alt="Paper Figure 6. (a) Level against cost per seat-match: Fable 5.2 about 57% at about $29, Astra 40% at $42, Opus 5.5 37% at $17, Gemini 19% at $17, Kimi 8% at $37, DeepSeek and GLM about 4% at under $2. (b) GPU busy share of preparation: locomotion sports 56% to 79% (100 m sprint 79%, 110 m hurdles 77%, humanoid soccer 64%, American football 62%, HSL Team 56%), javelin 63%, ball skills 3% to 26% (baseball 26%, basketball 22%, tennis 18%, beach volleyball 16%, badminton 8%, table tennis 3%)." width="2400" height="1700"></div>
+      </div>
+    </figure>
+
+    <h3 id="build-cost" data-short="Cost">What an agent spends and how good its system is do not move together</h3>
+    <p>A seat-match costs about $17 for Claude Opus 5.5, with a Final level of 37%, and about $29 for Claude Fable 5.2, with a level of 57%: about 2 points of level per dollar for both. GPT-6 Astra and Gemini 4 Argon obtain about 1 point per dollar ($42 for 40%, $17 for 19%), and Kimi 3.1 Pro about 0.2 ($37 for 8%). DeepSeek V4.1 Flash and GLM-5.3 Flash cost $0.41 and $1.35 per seat-match, and their programs reach about 4%. Model use is metered but not capped, so these costs are what each agent chose to spend.</p>
+
+    <h2 id="deploy" data-short="Deploy">Deploy: robots plan the action well but fail to complete it</h2>
+    <h3 id="deploy-aspects" data-short="Four aspects">For every agent, perception and prediction run ahead of the outcome</h3>
+    <p>The paper splits physical skill in real-time play into four aspects. <b>State estimation</b> asks whether a system knows where things are, <b>prediction</b> whether it knows where they will be, <b>execution</b> whether the body does what the program intends, and <b>outcome</b> whether the action succeeds. Each aspect has one metric per sport, scored so that 0 is no better than a control version of the program and 100 is perfect. In humanoid soccer, for example, state estimation is the angle between a robot’s head camera and the true direction of the ball, and the control is the same program with the head held still.</p>
+    <p>For every agent, the outcome score is the lowest of the four. Fable 5.2 and GPT-6 Astra score highest in all four aspects. In state estimation they average 81 and 74, against 13 for DeepSeek and GLM. When a robot must aim its own camera, the agents split into two groups: in humanoid soccer, the head cameras of Fable, Astra, Opus and Gemini stay within 6° of the ball, and those of Kimi, GLM and DeepSeek point 28° to 46° away. In prediction, Fable scores 88 and Astra 69, and only Fable releases the javelin close to the longest throw its release speed allows. In execution, wheels are easy and legs separate the agents: every agent scores at least 76 in wheeled-soccer drive speed, while in HSL Team the robots of Opus, Astra and Gemini get up after nearly every fall and those of GLM and DeepSeek almost never. In outcome, Fable and Astra score 67 and 63, Opus and Gemini 34 and 33, and Kimi, DeepSeek and GLM at most 5.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="physical">
+        <p class="fig-cap"><span class="fc-t">Agents perceive and predict better than they act, and the robots rarely move to a ball out of reach.</span> Paper Figure 4. (a) to (d) One panel per aspect of physical skill, one row per agent. Small dots are sports and the large marker is their mean; panels cover different sports, so compare agents within a panel. 0 equals the program’s own control and 100 the ideal (for speeds, our reference program). (e) Badminton: of the shuttles that land out of the robot’s reach from where it stands, the share it moves to. The star is our practice player, which reads the true shuttle state.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F_physical.png?v=659d6177" alt="Paper Figure 4. Scores per agent for state estimation (10 sports), prediction (9), execution (14) and outcome (9): Fable 81, 88, 81, 67; Astra 74, 69, 82, 63; Opus 58, 58, 66, 34; Gemini 60, 49, 73, 33; Kimi 31, 38, 57, 5; DeepSeek 13, 28, 37, 1; GLM 13, 14, 28, 1. (e) Badminton reach: the agents move to 0 to 4% of out-of-reach shuttles, Kimi 20%, the practice player 97%." width="2400" height="1352"></div>
+      </div>
+    </figure>
+    <figure class="fig">
+      <div class="fig-body" data-fig="clip-tt">
+        <p class="fig-cap"><span class="fc-t">Perceive, predict, hit: the steps that work.</span> From the Embodied Olympics video: in table tennis, the program tracks the ball, predicts where to meet it and hits there, 2.3 cm from its prediction.</p>
+        <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_tabletennis.jpg?v=096efeb5" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_tabletennis.mp4?v=5cd8f583"></video></div>
+      </div>
+    </figure>
+
+    <h3 id="deploy-reach" data-short="Net sports">In net sports, the robots stand still while the ball lands out of reach</h3>
+    <p>In most failed returns, the racket never touches the ball: 70 of Opus’s 77 failed returns in badminton, and 52 of Astra’s 59 in tennis. The robots stand still. When a shuttle lands out of reach from where the robot stands, Fable’s robot moves to it in 2 of 166 cases and Astra’s in 5 of 142, while our practice player, a scripted reference opponent, does so in 112 of 116. In beach volleyball, robots touch 0 to 42% of incoming balls, and no team sends a touched ball back over the net.</p>
+    <p>The programs aim and swing well at a ball that arrives near the robot. In badminton, the process scores of Fable and Astra, the mean of their scores for the steps before the outcome, are both 92, against outcome scores of 62 and 52. Yet the programs keep the robot’s legs fixed during a badminton rally, the hand-written strokes described under Build. In the sprint and hurdles, where no ball has to be reached, Fable and Astra finish nearly every run.</p>
+
+    <h3 id="deploy-team" data-short="Passing">Robots rarely pass to each other, and humanoids almost never</h3>
+    <p>In humanoid soccer, where one program controls three humanoids, only 3 of 291 goals follow an assist. In wheeled soccer, where one program controls 11 wheeled robots, 42 of 265 goals (16%) do. Splitting a team among agents does not help either. In HSL Team, under the rules of the RoboCup Humanoid Soccer League, each of the three robots has its own agent, and teammates coordinate over a shared workspace and a rate-limited text channel. Three agents that each write one humanoid never measurably beat a single agent that writes all three. For Astra the single agent is measurably better (+3.6 goals per game, 95% interval 1.1 to 6.2), and for Fable 5.2, Gemini and Opus 5.5 the interval includes zero. The single agent also sees the poses of all three robots, so this comparison does not separate coordination from the wider view.</p>
+    <figure class="fig">
+      <div class="fig-body" data-fig="clip-pass">
+        <p class="fig-cap"><span class="fc-t">The rare case: five passes, one goal.</span> From the Embodied Olympics video: a wheeled-soccer attack in which the team passes five times before it scores. In wheeled soccer, 16% of goals follow an assist; in humanoid soccer, 1%.</p>
+        <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_pass.jpg?v=b5c667ca" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_pass.mp4?v=5d6f6930"></video></div>
+      </div>
+    </figure>
+
+    <h2 id="diagnose" data-short="Diagnose">Diagnose: agents read the opponent correctly but rarely act on it</h2>
+    <h3 id="diagnose-chain" data-short="From analysis to change">Two thirds of reviews analyze the opponent correctly; 4% lead to a change that wins more points</h3>
+    <p>The review windows give the agent what an engineer would want: a pause, the record of the last point, and the chance to change the program. The paper follows each seat-match through four steps. The agent’s reviews notice how the opponent plays, the reviews analyze it correctly, the agent fields a changed program, and that program wins more points. Two LLMs from different providers mark the first three steps, and a step counts only when both agree (Cohen’s κ from 0.70 to 0.85).</p>
+    <p>In 75% of the 515 Episodic seat-matches, the agent notices how the opponent plays, and in 66% it analyzes the opponent correctly. But only 26% field a changed program, and only 4% field one that wins more points. Memory does not close the gap. In the Continual format, where notes carry over, agents notice the opponent in 87% of 502 seat-matches, and the chain still ends at 4%. Replays show no clear gain from the changes either: 2.8 percentage points, 95% interval −3.0 to +9.2.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="competitive">
+        <p class="fig-cap"><span class="fc-t">From noticing the opponent to winning more points, the chain thins out at the change.</span> Paper Figure 5. (a) Episodic seat-matches in which the agent notices how the opponent plays, analyzes it correctly, fields a changed program, and fields one that wins more points. (b) Wheeled-soccer goals that follow an assist, per agent. (c) Ten consecutive wheeled-soccer matches of Claude Opus 5.5 against GPT-6 Astra: Opus’s goal margin (open markers: tied after regulation), with bars for the matches in which one side changes its play and arrows to the other side’s answer.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F_competitive.png?v=652eedcb" alt="Paper Figure 5. (a) Notice the opponent 75%, analyze it correctly 66%, field a change 26%, change that wins more points 4%. (b) Share of wheeled-soccer goals assisted: Fable 5.2 26%, Astra 10%, Opus 5.5 5%, Gemini 27%, Kimi 14%, DeepSeek and GLM too few goals. (c) Opus 5.5 against GPT-6 Astra over 10 matches: Opus wins the first three by 2, then margins of 0 or 1; Opus scores 5 of 7 goals off set pieces, Astra changes its keeper and defense; Opus saves 5 of 5 penalties, Astra copies the kick and wins 3:2." width="2400" height="1586"></div>
+      </div>
+    </figure>
+    <figure class="fig">
+      <div class="fig-body" data-fig="clip-badminton">
+        <p class="fig-cap"><span class="fc-t">What the full chain looks like when it does complete.</span> From the Embodied Olympics video, Claude Opus 5.5 against Kimi 3.1 Pro in badminton: after missing serves, the agent notices that the opponent’s serves repeat the same paths, practices returning that serve in its development world, and returns it in the match. Most seat-matches stop before the change.</p>
+        <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_badminton.jpg?v=b6193f53" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_badminton.mp4?v=ab781f9a"></video></div>
+      </div>
+    </figure>
+
+    <h3 id="diagnose-rematch" data-short="Rematches">Changes made for a known opponent do not win the rematch</h3>
+    <p>The Continual play-offs give agents a second meeting with an opponent they have already played. Before such a rematch, 16 of the 64 preparations change the program for that opponent, and 11 of them test the change on a stand-in rebuilt from the opponent’s record. Yet first-meeting losers who changed their program won 2 of 13 rematches, and those who did not change it won 4 of 19. The counts are small, but nothing in them suggests that preparing for a known opponent pays off.</p>
+
+    <h3 id="diagnose-series" data-short="Ten-match series">Over ten straight matches, one agent did adapt to its opponent</h3>
+    <p>Two extra series of ten wheeled-soccer matches show what the official matches rarely do. Fable 5.2 won all 10 of its matches against Astra. Opus 5.5 won 7 and drew 3 against Astra, and in this series Astra adapted. In matches 1 to 3, Opus scored 5 of its 7 goals off set pieces. By match 4, Astra had changed its goalkeeper and its defense of the penalty area, none of Opus’s 31 corners in matches 4 to 10 scored, and Opus’s last 7 margins were 0 or 1 goal. After Opus saved all 5 penalties in the match-4 shoot-out, Astra copied Opus’s kick from the match video and won the next shoot-out. The records do not show which change produced which result, but the series shows that the loop can close when an agent meets the same opponent often enough.</p>
+
+    <h2 id="revise" data-short="Revise and verify">Revise and verify: revisions help some agents, slowly, and agents overrate them</h2>
+    <h3 id="revise-match" data-short="Within a match">Within a match, revisions add almost nothing against fixed opponents</h3>
+    <p>Replaying each agent’s Initial and Final programs against the same fixed opponents shows how little a match changes the program. Of 232 Episodic seat-matches, the Final program is measurably better than the Initial one in 17 and measurably worse in 12. In the 195 seat-matches with both kinds of replay, the Final program gains 3.9 percentage points over the Initial program against the current opponent’s Initial program, but 0.2 points against the fixed opponents. What a revision gains is mostly specific to the opponent of the day.</p>
+
+    <h3 id="revise-season" data-short="Over a season">Over a season, three of six agents improve, and they improve match by match</h3>
+    <p>The Continual format is the direct test of the loop: the agent keeps its code, weights and notes, and gets the record and video of every match. Over a season, Gemini 4 Argon rises from 16% to 36% of the points against the fixed opponents (+19 points, 95% interval 12 to 27), GPT-6 Astra from 34% to 48% (+14, 9 to 19) and Kimi 3.1 Pro from 6% to 13% (+7, 5 to 9). The gains build up match by match. The other three agents show no measurable change. Gemini gains the most and still ends below Astra and Opus 5.5. Opus starts highest and shows no measurable improvement.</p>
+    <p>Two caveats bound this result. Season gains combine match experience with additional development time, so they do not isolate learning from experience. And Claude Fable 5.2 did not enter the Continual seasons, so whether the strongest Episodic agent improves over a season is not known.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="adaptive">
+        <p class="fig-cap"><span class="fc-t">Three of six agents improve over a season, and replays rarely confirm the gains agents report.</span> Paper Figure 7. (a) Level of each Continual agent’s program after each match of the season (0: the first program), averaged over its own season sports, so not comparable with the Episodic levels above. Bands are 95% bootstrap intervals of the level; gains are tested within paired resamples, so their intervals are narrower than the bands. (b) The 305 of 457 self-assessments that claim an improvement, by the change that replay measures.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F_adaptive.png?v=5a1b3c92" alt="Paper Figure 7. (a) Level over seven matches of the season: Opus 5.5 stays around 50% to 55%; GPT-6 Astra rises from 34% to 48%; Gemini 4 Argon rises from 16% to 36%; Kimi 3.1 Pro from 6% to 13%; DeepSeek V4.1 Flash and GLM-5.3 Flash stay under 6%. (b) Of 305 self-assessments that claim an improvement, replay measures 35 better, 256 no change and 14 worse." width="2400" height="1640"></div>
+      </div>
+    </figure>
+    <figure class="fig">
+      <div class="fig-body" data-fig="clip-season">
+        <p class="fig-cap"><span class="fc-t">Carrying experience into the next match.</span> From the Embodied Olympics video: in a Continual season, GPT-6 Astra reviews its previous match and practices on 72 of its own falls before the next one.</p>
+        <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_season.jpg?v=f5b23b91" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_season.mp4?v=00cb0cf0"></video></div>
+      </div>
+    </figure>
+
+    <h3 id="revise-self" data-short="Self-assessment">Agents report improvements that replays rarely confirm</h3>
+    <p>The last step of the loop is verification: checking that a change actually helped. Agents rate their own changes more favorably than the replays measure. Of the 305 self-assessments that claim an improvement, 35 coincide with a measured gain, 256 with no measurable change and 14 with a measured loss. After a measured loss, the agent still reports an improvement in 14 of 22 cases. These assessments were labeled by one LLM. Our reading, which the paper does not test: an agent that believes a change worked has less reason to look for a better one, so optimistic self-assessment may be part of why revisions stall.</p>
+
+    <h2 id="gap" data-short="Distance to strong systems">How far today’s agentic robots are from strong systems</h2>
+    <h3 id="gap-l3" data-short="Strong opponents">Against strong scripted opponents and RoboCup champion software, the best systems still lose</h3>
+    <p>The strongest agent, Claude Fable 5.2, builds programs that win 43% of their games against L3, the strongest of our scripted opponents. The 43% averages over eight duel and team sports (curling and billiards are turn-based and left out, as are tennis and beach volleyball, where no rallies developed), with a draw counting as half a win. GPT-6 Astra’s programs win 20% and Opus 5.5’s 16%, and the other four agents’ programs at most 4%.</p>
+    <p>Against the software of the RoboCup Small Size League champions, Fable 5.2, Astra, Opus 5.5 and Gemini each play eight consecutive wheeled-soccer matches, with their workspaces carried over from match to match. All four lose all 32 matches without scoring a goal. Eight matches with a carried-over workspace are the setting in which an engineering loop should make progress, and none of the four agents scores in any of them.</p>
+
+    <h3 id="gap-tiers" data-short="Tiers">The agents separate into clear tiers, and replays keep the order</h3>
+    <p>The medal boards and a Bradley-Terry rating (on an Elo scale with the average player at 1000) give the same order of agents, with more than 700 points between the first and the last. Replaying the matches with the Final programs on new seeds keeps this order in 20 of 21 pairs in Episodic and in all 15 in Continual; the one exception, Kimi and Gemini, has overlapping intervals. For the question of this post, the spread matters more than the order. Even Gemini, which gains the most over its season, still ends below Astra and Opus 5.5.</p>
+    <figure class="fig paper fig-wide">
+      <div class="fig-body" data-fig="overall">
+        <p class="fig-cap"><span class="fc-t">The agents separate into clear tiers in both formats.</span> Paper Figure 3. (a) Medals on the 16 medal boards of each format, from the final official standings (tennis and beach volleyball award no medals, as serves decided their points). (b) Bradley-Terry strength on an Elo scale: dots are fitted on official duel and team matches, ticks on match replays. Claude Fable 5.2 entered the Episodic format only.</p>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F2g.png?v=f259c946" alt="Paper Figure 3. (a) Medals by sport. Episodic: Fable 5.2 12 gold, 3 silver, 1 bronze; GPT-6 Astra 4, 8, 2; Opus 5.5 0, 4, 8; Kimi 0, 1, 2; Gemini 0, 0, 3; DeepSeek and GLM none. Continual: Astra 9, 5, 2; Opus 5, 4, 4; Gemini 2, 6, 5; Kimi 0, 1, 2; DeepSeek 0, 0, 2; GLM 0, 0, 1. (b) Bradley-Terry ratings, official and replay: Episodic Fable 1429 and 1504, Astra 1227 and 1199, Opus 1176 and 1167, Kimi 902 and 845, Gemini 872 and 952, DeepSeek 750 and 683, GLM 644 and 650; Continual Astra 1347 and 1281, Opus 1280 and 1244, Gemini 1086 and 1109, Kimi 880 and 900, DeepSeek 824 and 821, GLM 584 and 645." width="2400" height="800"></div>
+      </div>
+    </figure>
+
+    <h2 id="next" data-short="What’s next">What’s next</h2>
+    <h3 id="next-limits" data-short="Limitations">Limitations</h3>
+    <p>All competitions run in simulation under real-hardware actuator limits; real-world deployment remains future work. In the Episodic format, each pair of agents meets once per sport on one hidden seed, so results for a single sport rest on few matches. Replays of the saved programs confirm the overall order but do not repeat the agents’ development. Season gains combine match experience with additional development time, and Claude Fable 5.2 joined after the Continual seasons. Behavioral labels come from LLM annotators, two of which are among the evaluated agents, and still need human validation. The comparison is with fixed opponents and RoboCup champion software, not with human engineers working under the same budgets.</p>
+
+    <h3 id="next-loop" data-short="Closing the loop">Closing the loop from noticing a failure to fielding a fix that works</h3>
+    <p>Current coding agents build a strong first system but improve it poorly from experience. The break is not in one place. Robots plan actions well but fail to complete them, agents analyze an opponent correctly but rarely turn that analysis into a better program, and agents rate their own changes above what replays measure. For autoresearch on robot policies, the hard part is the second half of the loop: turning what the agent sees in play into a change, and checking that the change helps. Embodied Olympics makes each step of that loop measurable, so progress on it can be tracked as agents improve.</p>
+
+    <h3 id="cite" data-short="Citation">Data and citation</h3>
+    <p>The paper, data and code will be linked here when they are released. Sports, the leaderboard and match replays are on the <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics site</a>. Numbers in this post come from the paper’s official results, frozen on 13 November 2026.</p>
+  </article>
+</main>
+<div id="footer"></div>
+</body>
+</html>

@@ -26,5 +26,18 @@
   ],
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/0b/roboarc-interlocked-claws-12-i01-standard--vkgu3fv/replay.mp4",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/0b/roboarc-interlocked-claws-12-i01-standard--vkgu3fv/poster.jpg"
+ },
+ {
+  "slug": "embodied-olympics",
+  "title": "Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?",
+  "date": "2026-11-19",
+  "kind": "Report",
+  "summary": "Coding agents as robotics engineers: in 18 simulated sports, seven agents build, run and revise the systems that control robots. They build a strong first system, but the loop of noticing a failure, changing the program and checking the change rarely makes the robot better.",
+  "tags": [
+   "report",
+   "continual improvement"
+  ],
+  "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.mp4?v=73e576d2",
+  "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.jpg?v=1c2af13a"
  }
 ]
