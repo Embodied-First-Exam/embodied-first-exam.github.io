@@ -277,7 +277,7 @@
 <main>
 
   <header class="page-head post-head">
-    <p class="kicker"><a href="../">Blogs</a> · Embodied Olympics</p>
+    <p class="kicker"><a href="../">Blogs</a> · <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a></p>
     <h1 class="post-title">Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?</h1>
     <p class="byline"><span>November 2026</span> · <a href="https://olympics.embodied-first-exam.ai/sports/" target="_blank" rel="noopener">Sports</a> · <a href="https://olympics.embodied-first-exam.ai/leaderboard/" target="_blank" rel="noopener">Leaderboard</a> · <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Watch</a> · <a href="../first-exam/">EFE Blog</a></p>
   </header>
@@ -285,7 +285,7 @@
 <article class="post">
     <div class="rq"><p class="rq-label">Research question</p><p class="rq-text">Can coding agents act as robotics engineers that keep improving their robots through competition?</p></div>
     <p>A robotics engineer works in a loop. They build a controller or train a policy, test it, field it, watch where it fails, revise it and test again. Coding agents can now run parts of this loop on their own: they write robot programs, launch policy training and read the results. This makes them candidates for autoresearch on robot policies, where the agent runs the whole engineering loop without a person in it. Whether the loop actually makes the robot better, match after match, has not been measured.</p>
-    <p>Embodied Olympics measures it through competition. Seven coding agents build, run and revise the systems that control robots in 18 sports on six simulated robots, from humanoids to a racing drone. Each agent starts without supplied motor skills, works within fixed time and compute budgets, and plays against systems that other agents build and revise. In 16 sports the match keeps running while the agent thinks. Competition suits the question: scores give an objective result, opponents expose weak strategies, and repeated matches show whether revisions help. We call a coding agent together with the programs it writes to control robots an <b>agentic robot</b>.</p>
+    <p><a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> measures it through competition. Seven coding agents build, run and revise the systems that control robots in <a href="https://olympics.embodied-first-exam.ai/sports/" target="_blank" rel="noopener">18 sports</a> on six simulated robots, from humanoids to a racing drone. Each agent starts without supplied motor skills, works within fixed time and compute budgets, and plays against systems that other agents build and revise. In 16 sports the match keeps running while the agent thinks. Competition suits the question: scores give an objective result, opponents expose weak strategies, and repeated matches show whether revisions help. We call a coding agent together with the programs it writes to control robots an <b>agentic robot</b>.</p>
 
     <h2 id="found" data-short="What we found">What we found</h2>
     <nav class="toc-top" aria-label="Outline">
@@ -382,7 +382,7 @@
     <p>The 18 sports span four kinds of event, solo, duel, team and race, on six simulated robots: the Unitree G1 and Booster T1 humanoids, a RoboCup Small Size League wheeled robot, a racing quadrotor, a full-size race car and a thruster stunt car. Each sport follows three principles. A referee program enforces the rule book of the real sport, and every deviation is declared. Each robot keeps the vendor’s model, actuator limits and latency, and balls, implements and surfaces are calibrated against real measurements. And each venue is scaled so that the robot can perform the basic actions of the sport within these limits. The badminton court, for example, is scaled to 0.4 of its official size, so that a receiver that knows the true state returns at least 90% of legal serves. A robot that misses the shuttle therefore fails because of its program, not the court.</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="sports">
-        <p class="fig-cap"><span class="fc-t">The 18 sports, from sprints and javelin to soccer, racing and drone flight.</span> From paper Figure 1. Solo, duel, team and race events on the Unitree G1 and Booster T1 humanoids, an SSL wheeled robot, a racing quadrotor, a full-size race car and a thruster stunt car. Curling and billiards are turn-based; the other 16 sports run in real time.</p>
+        <p class="fig-cap"><span class="fc-t">The 18 sports, from sprints and javelin to soccer, racing and drone flight.</span> From paper Figure 1; each sport has its own page on the <a href="https://olympics.embodied-first-exam.ai/sports/" target="_blank" rel="noopener">Embodied Olympics site</a>. Solo, duel, team and race events on the Unitree G1 and Booster T1 humanoids, an SSL wheeled robot, a racing quadrotor, a full-size race car and a thruster stunt car. Curling and billiards are turn-based; the other 16 sports run in real time.</p>
         <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/F1_sports.png?v=91ddfe81" alt="One frame of each of the 18 sports. Solo: 100 m sprint, 110 m hurdles, javelin, stunt car. Duel: badminton, table tennis, curling, billiards, tennis. Team: humanoid soccer (HSL), HSL Team, wheeled soccer (SSL), 3x3 basketball, American football, baseball, beach volleyball. Race: drone racing, full-size racing." width="2400" height="428"></div>
       </div>
     </figure>
@@ -393,7 +393,7 @@
     <p>What the agents deliver differs widely in quality. The Initial programs, fielded at the first game before any match experience, score 56% of the points against the fixed opponents for Claude Fable 5.2, 38% for GPT-6 Astra and 36% for Claude Opus 5.5, and under 10% for Kimi 3.1 Pro, DeepSeek V4.1 Flash and GLM-5.3 Flash. These levels pool seven real-time duel and team sports.</p>
     <figure class="fig">
       <div class="fig-body" data-fig="clip-build">
-        <p class="fig-cap"><span class="fc-t">One build, from first version to deployment.</span> From the Embodied Olympics video: GPT-6 Astra develops five versions of its stunt-car controller, runs 818 practice jumps and a parameter sweep to test and debug it, and fields it in the match, where it scores 149.1 points.</p>
+        <p class="fig-cap"><span class="fc-t">One build, from first version to deployment.</span> From the <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Embodied Olympics video</a>: GPT-6 Astra develops five versions of its stunt-car controller, runs 818 practice jumps and a parameter sweep to test and debug it, and fields it in the match, where it scores 149.1 points.</p>
         <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.jpg?v=1c2af13a" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.mp4?v=73e576d2"></video></div>
       </div>
     </figure>
@@ -426,7 +426,7 @@
     </figure>
     <figure class="fig">
       <div class="fig-body" data-fig="clip-tt">
-        <p class="fig-cap"><span class="fc-t">Perceive, predict, hit: the steps that work.</span> From the Embodied Olympics video: in table tennis, the program tracks the ball, predicts where to meet it and hits there, 2.3 cm from its prediction.</p>
+        <p class="fig-cap"><span class="fc-t">Perceive, predict, hit: the steps that work.</span> From the <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Embodied Olympics video</a>: in table tennis, the program tracks the ball, predicts where to meet it and hits there, 2.3 cm from its prediction.</p>
         <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_tabletennis.jpg?v=096efeb5" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_tabletennis.mp4?v=5cd8f583"></video></div>
       </div>
     </figure>
@@ -439,7 +439,7 @@
     <p>In humanoid soccer, where one program controls three humanoids, only 3 of 291 goals follow an assist. In wheeled soccer, where one program controls 11 wheeled robots, 42 of 265 goals (16%) do. Splitting a team among agents does not help either. In HSL Team, under the rules of the RoboCup Humanoid Soccer League, each of the three robots has its own agent, and teammates coordinate over a shared workspace and a rate-limited text channel. Three agents that each write one humanoid never measurably beat a single agent that writes all three. For Astra the single agent is measurably better (+3.6 goals per game, 95% interval 1.1 to 6.2), and for Fable 5.2, Gemini and Opus 5.5 the interval includes zero. The single agent also sees the poses of all three robots, so this comparison does not separate coordination from the wider view.</p>
     <figure class="fig">
       <div class="fig-body" data-fig="clip-pass">
-        <p class="fig-cap"><span class="fc-t">The rare case: five passes, one goal.</span> From the Embodied Olympics video: a wheeled-soccer attack in which the team passes five times before it scores. In wheeled soccer, 16% of goals follow an assist; in humanoid soccer, 1%.</p>
+        <p class="fig-cap"><span class="fc-t">The rare case: five passes, one goal.</span> From the <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Embodied Olympics video</a>: a wheeled-soccer attack in which the team passes five times before it scores. In wheeled soccer, 16% of goals follow an assist; in humanoid soccer, 1%.</p>
         <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_pass.jpg?v=b5c667ca" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_pass.mp4?v=5d6f6930"></video></div>
       </div>
     </figure>
@@ -456,7 +456,7 @@
     </figure>
     <figure class="fig">
       <div class="fig-body" data-fig="clip-badminton">
-        <p class="fig-cap"><span class="fc-t">What the full chain looks like when it does complete.</span> From the Embodied Olympics video, Claude Opus 5.5 against Kimi 3.1 Pro in badminton: after missing serves, the agent notices that the opponent’s serves repeat the same paths, practices returning that serve in its development world, and returns it in the match. Most seat-matches stop before the change.</p>
+        <p class="fig-cap"><span class="fc-t">What the full chain looks like when it does complete.</span> From the <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Embodied Olympics video</a>, Claude Opus 5.5 against Kimi 3.1 Pro in badminton: after missing serves, the agent notices that the opponent’s serves repeat the same paths, practices returning that serve in its development world, and returns it in the match. Most seat-matches stop before the change.</p>
         <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_badminton.jpg?v=b6193f53" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_badminton.mp4?v=ab781f9a"></video></div>
       </div>
     </figure>
@@ -482,7 +482,7 @@
     </figure>
     <figure class="fig">
       <div class="fig-body" data-fig="clip-season">
-        <p class="fig-cap"><span class="fc-t">Carrying experience into the next match.</span> From the Embodied Olympics video: in a Continual season, GPT-6 Astra reviews its previous match and practices on 72 of its own falls before the next one.</p>
+        <p class="fig-cap"><span class="fc-t">Carrying experience into the next match.</span> From the <a href="https://olympics.embodied-first-exam.ai/watch/" target="_blank" rel="noopener">Embodied Olympics video</a>: in a Continual season, GPT-6 Astra reviews its previous match and practices on 72 of its own falls before the next one.</p>
         <div class="pimg"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_season.jpg?v=f5b23b91" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_season.mp4?v=00cb0cf0"></video></div>
       </div>
     </figure>
