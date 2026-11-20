@@ -3,7 +3,7 @@
 # 1. edit NEW_ROWS in lb9.py (the site's Standard view: solved / core Standard tests, in the leaderboard's order);
 # 2. sh run.sh WORKDIR   -> WORKDIR/out/efe-intro.mp4, plus checks;
 # 3. upload it to MLL-Lab/embodied-exam-data at site/blog/efe-intro.mp4 and set ?v=<first 8 of its sha256> on the
-#    pages that use it (index.html, blogs/first-exam/index.html, data/blogs.json).
+#    pages that use it (index.html, blogs/agentic-robotics-benchmark/index.html, data/blogs.json).
 # Needs ffmpeg, Python with numpy, Pillow and Playwright (Chromium).
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd); W=${1:?workdir}

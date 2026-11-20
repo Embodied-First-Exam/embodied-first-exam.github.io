@@ -371,14 +371,14 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   <header class="page-head post-head">
     <p class="kicker"><a href="../../">博客</a> · Embodied First Exam</p>
     <h1 class="post-title">如今的 Agentic Robots 在哪里成功，又在哪里失败？<span class="post-sub">理解编程 Agent 在机器人任务上的能力边界</span></h1>
-    <p class="byline"><span>2026年11月</span> · <a href="../../first-exam/">EFE 博客</a> · <a href="../../../leaderboard/">排行榜</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">代码</a></p>
+    <p class="byline"><span>2026年11月</span> · <a href="../../agentic-robotics-benchmark/">EFE 博客</a> · <a href="../../../leaderboard/">排行榜</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">代码</a></p>
     <p class="lang-switch"><a href="../" hreflang="en" lang="en">English</a><span aria-current="true">中文</span><a href="../es/" hreflang="es" lang="es">Español</a></p>
   </header>
 
   <article class="post">
 
  <div class="rq"><p class="rq-label">研究问题</p><p class="rq-text">通用编程 Agent 能够完成哪些机器人任务？在怎样的物理世界约束下能够完成？又在哪些地方失败？</p></div>
- <p><a href="../../first-exam/">第一篇报告</a>介绍了 Embodied First Exam 本身；本文关注的是 Embodied First Exam 的结果对编程 Agent 意味着什么。Embodied First Exam 的独特之处在于，它精确控制了 Agent 能看到什么、能做什么。每个任务在至多三种设定下运行，场景、成功判定规则和时间限制完全相同：在 <b>Standard</b> 设定下，Agent 只能看到机器人自身的传感器数据，且默认无法重置环境，与真实机器人的情形一致；<b>Realtime</b> 设定与之相同，但 Agent 思考时世界仍在持续运行；<b>Privileged</b> 设定则提供完整的仿真器状态，并允许无限次重置。通过对比这三种设定，可以看出 Agent 依赖哪些信息和能力。十个 Agent 在 456 个高难度核心任务上，对每个测试各尝试一次。</p>
+ <p><a href="../../agentic-robotics-benchmark/">第一篇报告</a>介绍了 Embodied First Exam 本身；本文关注的是 Embodied First Exam 的结果对编程 Agent 意味着什么。Embodied First Exam 的独特之处在于，它精确控制了 Agent 能看到什么、能做什么。每个任务在至多三种设定下运行，场景、成功判定规则和时间限制完全相同：在 <b>Standard</b> 设定下，Agent 只能看到机器人自身的传感器数据，且默认无法重置环境，与真实机器人的情形一致；<b>Realtime</b> 设定与之相同，但 Agent 思考时世界仍在持续运行；<b>Privileged</b> 设定则提供完整的仿真器状态，并允许无限次重置。通过对比这三种设定，可以看出 Agent 依赖哪些信息和能力。十个 Agent 在 456 个高难度核心任务上，对每个测试各尝试一次。</p>
 
  <h2 id="found" data-short="主要发现">主要发现</h2>
  <nav class="toc-top" aria-label="目录">
@@ -1055,7 +1055,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
  <h3 id="robodojo" data-short="任务指令">任务指令：RoboDojo 得分约为原来的三倍</h3>
 <p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> 为每个任务提供一句话的指令，但其成功判定会检查句子中未提及的条件。当目标完整写明判定条件时，同一个 Agent 的得分大约提高到三倍。差别在于 Agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
 <p><b>Embodied First Exam 如何使用 RoboDojo。</b>RoboDojo 的仿真基准共有 42 个任务。其中 12 个测试泛化能力，并且各有一个随机化版本，换用其他物体模型、光照、背景和杂物，因此共有 54 个任务。RoboDojo 在多个评测 episode 上为每个任务打分，每个 episode 是场景的一种不同随机布局：泛化任务及其随机化版本各 25 个，其余 30 个任务各 50 个。Embodied First Exam 为这 54 个任务各固定一种布局，保留 RoboDojo 的场景、机器人和成功规则，并编写了一条指令，写明 Agent 无法通过观察推断出的所有约定。这 54 个任务中有 12 个在核心集中，每个限时 60 分钟，各有一个 Standard 测试和一个 Privileged 测试（没有 Realtime 测试）。</p>
-<p><b>一句话指令遗漏了判定所检查的内容。</b><a href="../../first-exam/">第一次考试报告</a>让 GPT-6 Astra 在 Standard Setting 下完成这 54 个 RoboDojo 任务，使用三个版本的目标文本，场景、步数上限和成功判定保持不变。RoboDojo 自己的指令遗漏了判定所检查的条件，最主要的是两只机械臂最终都要回到初始姿态附近，54 个任务中有 47 个有此要求；一个完美完成可见任务、却让一只机械臂悬在桌面上方的 Agent 会被判失败。</p>
+<p><b>一句话指令遗漏了判定所检查的内容。</b><a href="../../agentic-robotics-benchmark/">第一次考试报告</a>让 GPT-6 Astra 在 Standard Setting 下完成这 54 个 RoboDojo 任务，使用三个版本的目标文本，场景、步数上限和成功判定保持不变。RoboDojo 自己的指令遗漏了判定所检查的条件，最主要的是两只机械臂最终都要回到初始姿态附近，54 个任务中有 47 个有此要求；一个完美完成可见任务、却让一只机械臂悬在桌面上方的 Agent 会被判失败。</p>
 <figure class="fig">
  <div class="fig-body" data-fig="robodojo-goals">
  <p style="text-align:left">RoboDojo：“Place the four eggs from the basket into the egg holder, then close the lid.”</p>
