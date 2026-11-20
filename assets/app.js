@@ -230,10 +230,6 @@ function pageSetting(scope, mode) {
   if (scope !== 'all') return m;
   return { ...m, all: true, label: `All · ${m.label}` };
 }
-// how to read a count (owner and Manling Li, 2026-11-19)
-const LB_READ = (u) => `a / b = ${u}s solved / ${u}s tested for this model.`;
-// the All set's reading (owner, 2026-11-19): a share, then solved / tested, the tested count being this model's own
-const LB_ALL_READ = (u) => `Each cell gives the success rate (SR), then solved / tested: the ${u}s this model solved over the ${u}s it was run on in that suite. Models were run on different numbers of ${u}s, so the denominators differ between models.`;
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 // "433 of the 498 core tasks have a privileged mode" (owner, 2026-11-19); "All 498 core tasks" when every core task has the mode
 const modeShare = (n) => (CORE_TASKS && n !== CORE_TASKS ? `${int(n)} of the ${int(CORE_TASKS)} core tasks` : `All ${int(n)} core tasks`);
@@ -392,13 +388,13 @@ function lbBoard(ex, tasks, onDraw) {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
       { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
-      { const d = $('#lb-read'); if (d) d.textContent = `Each row gives the success rate, then ${LB_READ(set.overall ? 'task' : 'test')}`; }
+      { const d = $('#lb-read'); if (d) d.textContent = ''; }   // the column head says it (owner, 2026-11-20: no repeated readings)
       // two groups (owner, 2026-11-19): Ready, the models whose results cover the current core set, ranked; then Updating,
       // the models whose runs on it go on, listed by share with their own counts
       const ready = main.filter((r) => !updatingIn(r.id, g.totals)), upd = main.filter((r) => updatingIn(r.id, g.totals));
       html = lbAxis(g.tests, set) + (upd.length ? '<div class="lbh-sec"><b>Ready</b><span>Results on the whole core set</span></div>' : '')
         + ready.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
-      if (upd.length) html += `<div class="lbh-sec upd"><b>Updating</b><span>Each row counts this model’s own core ${set.overall ? 'tasks' : 'tests'}: a / b = solved / tested</span></div>`
+      if (upd.length) html += `<div class="lbh-sec upd"><b>Updating</b></div>`
         + upd.map((r) => lbRow(r, scores[r.id].v, 0, best, set, { norank: true, open: state.open === r.id }) + (state.open === r.id ? lbDetail(ex, r, scores[r.id], set, false) : '')).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
@@ -454,8 +450,7 @@ function lbSuites(el, ex, runs, scores, set, totals = {}, allTests = 0) {
   const nU = (n) => `${int(n)} ${u}${n === 1 ? '' : 's'}`;
   // what the numbers mean (readers' questions, 2026-10-19 and 2026-11-19)
   const sn = $('#lb-suites-note');
-  if (sn) sn.textContent = set.all ? `All counts every task of the exam: ${nU(allTests)} in this setting. ${LB_ALL_READ(u)}`
-    : `${set.overall ? 'Overall counts each core task once, solved only if every mode it has was solved.' : set.id === 'realtime' ? 'Realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here.' : 'The core set’s tests in this setting.'} Each cell gives the success rate (SR), then ${LB_READ(u)}`;
+  if (sn) sn.textContent = set.all ? `Different models were evaluated on different tasks, so the results are not fully comparable.` : '';   // owner, 2026-11-20: no small print under Suite by suite except All's
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
   const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
   const suites = ranked(ex).filter((s) => totals[s.id] || runs.some((r) => scores[r.id]?.suites?.[s.id]));
@@ -2146,16 +2141,14 @@ function suiteResults(el, ex, tasks, s = {}) {
     const shown = set.all ? group.filter((r) => g.scores[r.id].v[1]) : group;
     const order = [...shown].sort((a, b) => P(b) - P(a) || a.model.localeCompare(b.model));
     const best = Math.max(0, P(order[0]));
-    $('[data-read]', el).textContent = set.all
-      ? `All: every task of the suite, ${int(g.tests)} ${u}s in this setting. Each row gives the success rate (SR), then solved / tested: the ${u}s this model solved over the ${u}s it was run on here. Models were run on different numbers of ${u}s, so the denominators differ; the rows are listed by success rate, not ranked.`
-      : `Core: the suite’s ${int(g.tests)} core ${u}s in this setting, the ones the leaderboard counts. Each row gives the success rate (SR), then ${LB_READ(u)}`;
+    $('[data-read]', el).textContent = set.all ? `Different models were evaluated on different tasks, so the results are not fully comparable.` : '';   // owner, 2026-11-20
     let rank = 0, prev = null;
     const sid = tasks[0]?.suite;
     const ready = set.all ? order : order.filter((r) => !updatingOn(r.id, sid));
     const upd = set.all ? [] : order.filter((r) => updatingOn(r.id, sid) && g.scores[r.id].v[1]);
     $('.lbh-rows', el).innerHTML = (upd.length ? '<div class="lbh-sec"><b>Ready</b><span>Results on all of the suite’s core tests</span></div>' : '')
       + ready.map((r, i) => { if (P(r) !== prev) { rank = i + 1; prev = P(r); } return lbRow(r, g.scores[r.id].v, rank, best, set, { still: true, norank: !!set.all }); }).join('')
-      + (upd.length ? `<div class="lbh-sec upd"><b>Updating</b><span>Each row counts this model’s own core ${u}s: a / b = solved / tested</span></div>`
+      + (upd.length ? `<div class="lbh-sec upd"><b>Updating</b></div>`
         + upd.map((r) => lbRow(r, g.scores[r.id].v, 0, best, set, { still: true, norank: true })).join('') : '');
     $('.lbh-ax', el).innerHTML = lbAxis(g.tests, set);
   };
