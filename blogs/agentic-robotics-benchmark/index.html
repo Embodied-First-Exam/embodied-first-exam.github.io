@@ -37,7 +37,7 @@
 
   <header class="page-head post-head">
     <p class="kicker"><a href="../">Blogs</a> · Embodied First Exam</p>
-    <p class="post-q post-q-top"><span>Coding agents have passed many exams in the digital world.</span> <em>What is their first exam before entering the physical world?</em></p>
+    <p class="post-q post-q-top"><em>What is the first exam for coding agents to enter the physical world?</em></p>
     <h1 class="post-title">Embodied First Exam: An Agentic Robotics Benchmark<span class="post-sub">Testing Coding Agents for Robotics on 1,156 Tasks and 47 Robots</span></h1>
     <p class="authors"><span class="au">Kangrui Wang<sup>1*§</sup></span>, <span class="au">Qineng Wang<sup>1*§</sup></span>, <span class="au">Changhe Chen<sup>1*§</sup></span>, <span class="au">Pingyue Zhang<sup>1*§</sup></span>, <span class="au">Chi Gui<sup>1*§</sup></span>, <span class="au">Feishi Wang<sup>1*§</sup></span>, <span class="au">Canyu Chen<sup>1*§</sup></span>, <span class="au">Wenli Xiao<sup>2§</sup></span>, <span class="au">Xiaoyu Huang<sup>3§</sup></span>, <span class="au">Tonghe Zhang<sup>2§</sup></span>, <span class="au">Linjie Li<sup>4§</sup></span>, <span class="au">Zihan Wang<sup>1</sup></span>, <span class="au">Minyeong Kim<sup>5</sup></span>, <span class="au">Yiyou Sun<sup>3</sup></span>, <span class="au">Mingkai Deng<sup>2</sup></span>, <span class="au">Jinyu Hou<sup>2</sup></span>, <span class="au">Qi Zhu<sup>1</sup></span>, <span class="au">Han Liu<sup>1</sup></span>, <span class="au">Eric P. Xing<sup>2</sup></span>, <span class="au">Huaxiu Yao<sup>6</sup></span>, <span class="au">Zhiwen Fan<sup>7</sup></span>, <span class="au">Yuejiang Liu<sup>5</sup></span>, <span class="au">Dawn Song<sup>3</sup></span>, <span class="au">Pieter Abbeel<sup>3</sup></span>, <span class="au">Li Fei-Fei<sup>5</sup></span>, <span class="au">Jiajun Wu<sup>5</sup></span>, <span class="au">Yuke Zhu<sup>8</sup></span>, <span class="au">Guanya Shi<sup>2†</sup></span>, <span class="au">Ruohan Zhang<sup>1†</sup></span>, <span class="au">Manling Li<sup>1†</sup></span></p>
     <p class="au-note"><span><sup>1</sup> Northwestern University</span> · <span><sup>2</sup> Carnegie Mellon University</span> · <span><sup>3</sup> UC Berkeley</span> · <span><sup>4</sup> University of Washington</span> · <span><sup>5</sup> Stanford University</span> · <span><sup>6</sup> UNC-Chapel Hill</span> · <span><sup>7</sup> Texas A&amp;M University</span> · <span><sup>8</sup> UT Austin</span></p>
@@ -52,7 +52,7 @@
     <ol class="qs">
       <li><h3>What robotic tasks can coding agents solve?</h3><p>One command connects a coding agent to <span data-s="tasks"></span> tasks in <span data-s="suites"></span> suites, on robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models. The agent chooses its own control approach: direct control, code to control, or train a policy to control.</p></li>
       <li><h3>Under what physical-world constraints?</h3><p>The Privileged Setting gives the full simulator state and unlimited resets. The Standard Setting gives only the robot’s sensors and, by default, no resets, and its Realtime variant keeps the world running while the agent reasons.</p></li>
-      <li><h3>Where do they fail?</h3><p>We label the stage at which each failed attempt goes wrong and compare failures across agents, settings and stages. Every run is published with its full trace and a replay.</p></li>
+      <li><h3>Where do they fail?</h3><p>We label the stage at which each failed attempt goes wrong and compare failures across agents, settings and stages. Every run is published with its full trace and a replay. The full analysis is in <a href="../failure-analysis/">Where Do Today’s Agentic Robots Succeed and Fail?</a></p></li>
     </ol>
 
     <figure class="fig">
@@ -166,7 +166,7 @@
 
     <!-- ===================================================================================== 4 -->
     <h2 id="findings" data-short="Findings"><span class="num">04</span>Findings</h2>
-    <p>The paper reports four findings. Each one below gives its main evidence, a figure or a representative run, and a section you can expand with more cases and caveats.</p>
+    <p>The paper reports four findings. Each one below gives its main evidence, a figure or a representative run, and a section you can expand with more cases and caveats. For the full analysis of where agents succeed and fail, see <a href="../failure-analysis/">Where Do Today’s Agentic Robots Succeed and Fail?</a></p>
 
     <div class="finding">
       <h3 id="f1" data-short="Privileged versus Standard"><button type="button" class="finding-toggle" aria-expanded="true" aria-controls="f1-body"><span class="fn">Finding 1</span>Resets close more of the gap to the Privileged Setting than the exact state does.</button></h3>
