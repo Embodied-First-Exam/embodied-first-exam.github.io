@@ -13,7 +13,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Failure analysis: failed attempts are labeled by the stage at which they go wrong and compared across agents, settings, and stage categories. Every run is published with its full trace and a replay.
 - Unlike robotics benchmarks built around visuomotor policy learning, EFE treats the coding agent as the system under test and lets it choose its own control approach.
 
-## Findings of the blog post on failure modes (https://www.embodied-first-exam.ai/blogs/failure-analysis/)
+## Where do agentic robots succeed and fail? Findings of the failure analysis blog post (https://www.embodied-first-exam.ai/blogs/failure-analysis/)
 
 - Under real-robot rules (Standard Setting), 169 of the 456 core tests (37%) are solved by none of the ten agents.
 - Being able to retry helps more than knowing the exact state: in controlled runs of GPT-6 Astra, exact object state raises success from 29% to 45%, unlimited resets with saved states to 53%, both to 68%, against 79% in Privileged.
@@ -47,7 +47,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Blog post: https://www.embodied-first-exam.ai/blogs/first-exam/
 - Blog post, "Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?" (coding agents as robotics engineers: seven agents build, run and revise robot control systems in 18 simulated sports; the first program largely decides the match, agents analyze opponents correctly in 66% of matches but change their program in 26%, and three of six agents improve over a season): https://www.embodied-first-exam.ai/blogs/embodied-olympics/
 - Language versions of the failure analysis post: 中文: https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/, Español: https://www.embodied-first-exam.ai/blogs/failure-analysis/es/
-- Blog post, "Fable 5.2 on EFE: Where Today’s Agents Succeed and Fail in Robotics" (which robot tasks each of ten coding agents fails and why; what information matters, Privileged versus Standard; where in a task agents fail; control approaches; harness, spending and task instructions): https://www.embodied-first-exam.ai/blogs/failure-analysis/
+- Blog post, "Where Do Agentic Robots Succeed and Fail? Ten Coding Agents on the Embodied First Exam" (which robot tasks each of ten coding agents fails and why; what information matters, Privileged versus Standard; where in a task agents fail; control approaches; harness, spending and task instructions): https://www.embodied-first-exam.ai/blogs/failure-analysis/
 - Announcement thread: https://x.com/ManlingLi_/status/2112307226224292176
 - Full FAQ for language models: https://www.embodied-first-exam.ai/llms-full.txt
 

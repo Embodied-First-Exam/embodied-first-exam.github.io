@@ -42,9 +42,9 @@ Kangrui Wang, Qineng Wang, Changhe Chen, Pingyue Zhang, Chi Gui, Feishi Wang, Ca
 
 The code is at https://github.com/mll-lab-nu/embodied-first-exam (it runs on Harbor), with instructions at https://www.embodied-first-exam.ai/run/ and https://www.embodied-first-exam.ai/contribute/. Results are on https://www.embodied-first-exam.ai/leaderboard/.
 
-## Where do today’s coding agents fail on robot tasks?
+## Where do agentic robots succeed and fail?
 
-On the 456 core tests of the Embodied First Exam in the Standard Setting, where the agent sees only the robot’s sensors and cannot reset by default, 169 tests (37%) are solved by none of ten coding agents. Failures on a task tend to happen at the same stage for different agents, and stages that change a material or move the robot’s body fail most often once reached (56% and 39%). Using tools is the hardest kind of task and carrying objects the easiest. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+On the 456 core tests of the Embodied First Exam in the Standard Setting, where the agent sees only the robot’s sensors and cannot reset by default, 169 tests (37%) are solved by none of ten coding agents. Failures on a task tend to happen at the same stage for different agents, and stages that change a material or move the robot’s body fail most often once reached (56% and 39%). Using tools is the hardest kind of task and carrying objects the easiest. Many failures come from acting through the robot’s sensors, not from finding a solution: of the 169 unsolved Standard tests, 160 belong to tasks that also have a Privileged test, and some agent solves 122 of those with full simulator state and unlimited resets. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## What information matters to a coding agent controlling a robot?
 
