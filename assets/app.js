@@ -2166,7 +2166,10 @@ function suiteResults(el, ex, tasks, s = {}) {
 async function suitePage(ex) {
   const s = ex._suites[Q.get('id') || document.body.dataset.suite] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
-  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark that tests coding agents on robot tasks. ${s.blurb || ''}`.trim());
+  { // search results show about 160 characters: cut the blurb at a word, never mid-word
+    let d = `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark for coding agents. ${s.blurb || ''}`.trim();
+    if (d.length > 160) d = d.slice(0, 159).replace(/[\s,;:.]+\S*$/, '') + '\u2026';
+    document.querySelector('meta[name="description"]')?.setAttribute('content', d); }
   const cover = coverOf(s);
   const crop = cropFor(s.id, cover?.task);
   // the suite's own pages, always in this order: paper, website, code, then the rest (owners, 2026-10-18)
