@@ -1,5 +1,5 @@
-/* The blog's figures and numbers. The results are computed here from data/exam.json and data/tasks.json, the files the
-   leaderboard reads, with the leaderboard's own rules (the core set; the latest finished attempt per model and test; only
+/* The blog's figures and numbers. The results are computed here from data/blog_snapshot/exam.json and tasks.json, a
+   frozen copy of the leaderboard's data as of the post (the post gives the scores of its day; the leaderboard is live), with the leaderboard's own rules (the core set; the latest finished attempt per model and test; only
    all the core tests of each setting, a test without a finished result counted as failed), so the blog and the site cannot disagree.
    The wording follows the paper (docs/arxiv.pdf): its setting names, its suites (the IKEA assembly tasks of RoboARC
    apart) and its four findings; what only the paper holds (the stage labels, the controlled runs, the harness
@@ -485,7 +485,7 @@ function zoomFigs() {
 
 const settle = findings();
 refs();
-Promise.all([getJSON('data/exam.json'), getJSON('data/tasks.json'), getJSON('data/blog.json')]).then(([ex, tasks, b]) => {
+Promise.all([getJSON('data/blog_snapshot/exam.json'), getJSON('data/blog_snapshot/tasks.json'), getJSON('data/blog.json')]).then(([ex, tasks, b]) => {
   const R = compute(ex, tasks, b);
   fill(R.S);
   const kinds = $('#bodies');
