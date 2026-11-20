@@ -2204,11 +2204,15 @@ async function suitePage(ex) {
 }
 
 /** A suite's prompt versions under its description (exam.json suites[].prompts; owner, 2026-11-20: RoboDojo): a short
- *  note, one line per version with GPT-6 Astra's share and solved / tasks, then one task's three prompts, collapsed. */
+ *  note, one line per version with each model's share and solved / tasks (p.models; `solved` one [solved, tasks] per
+ *  model, or one pair for a single model), then one task's three prompts, collapsed. */
 const promptText = (t) => prose(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 function suitePrompts(p) {
   if (!p?.items?.length) return '';
   const pct = (v) => `${Math.round(100 * v[0] / v[1])}%`;
+  const pairs = (v) => (!v ? [] : Array.isArray(v[0]) ? v : [v]);
+  const cell = (v) => `<em class="sp-n">${pct(v)} (${int(v[0])}/${int(v[1])})</em>`;
+  const head = p.models?.length > 1 ? `<li class="sp-head"><span></span>${p.models.map((m) => `<em class="sp-n">${esc(m)}</em>`).join('')}</li>` : '';
   const blocks = (bs) => {
     let out = '', list = [];
     const flush = () => { if (list.length) out += `<ul>${list.map((x) => `<li>${promptText(x)}</li>`).join('')}</ul>`; list = []; };
@@ -2218,7 +2222,7 @@ function suitePrompts(p) {
   };
   const ex = p.example;
   return `<div class="note suite-prompts"><p><b>${esc(p.title || '')}</b> ${esc(p.text || '')}</p>
-    <ul class="sp-list">${p.items.map((it) => `<li><span><b>${esc(it.name)}:</b> ${esc(it.text)}</span>${it.solved ? `<em>${pct(it.solved)} (${int(it.solved[0])}/${int(it.solved[1])})</em>` : ''}</li>`).join('')}</ul>
+    <ul class="sp-list">${head}${p.items.map((it) => `<li><span><b>${esc(it.name)}:</b> ${esc(it.text)}</span>${pairs(it.solved).map(cell).join('')}</li>`).join('')}</ul>
     ${p.after ? `<p>${esc(p.after)}</p>` : ''}
     ${ex?.prompts?.length ? `<details class="sp-ex"><summary>${esc(ex.title || 'Example')}</summary>${ex.prompts.map((q) => `<div class="sp-box"><b class="sp-name">${esc(q.name)}</b>${blocks(q.blocks)}</div>`).join('')}${ex.after ? `<p class="sp-after">${esc(ex.after)}</p>` : ''}</details>` : ''}</div>`;
 }

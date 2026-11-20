@@ -1856,6 +1856,11 @@ html { overflow-x: clip; }
 .suite-prompts .sp-list { margin: 8px 0 0; padding: 0; list-style: none; }
 .suite-prompts .sp-list li { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--line); }
 .suite-prompts .sp-list em { font-style: normal; font-family: var(--mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
+.suite-prompts .sp-list > li > span { flex: 1 1 auto; }
+.suite-prompts .sp-list .sp-n { flex: 0 0 104px; text-align: right; }
+.suite-prompts .sp-list .sp-head { border-top: 0; padding-bottom: 2px; }
+.suite-prompts .sp-list .sp-head .sp-n { font-family: inherit; font-size: 12px; font-weight: 600; color: var(--ink-2); white-space: normal; }
+@media (max-width: 560px) { .suite-prompts .sp-list .sp-n { flex-basis: 78px; font-size: 12px; } }
 .suite-prompts .sp-ex { margin-top: 10px; }
 .suite-prompts .sp-ex summary { cursor: pointer; color: var(--ink); font-weight: 600; }
 .suite-prompts .sp-box { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--bg-2); overflow-wrap: anywhere; }
