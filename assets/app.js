@@ -69,8 +69,19 @@ const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!
 // tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them, and
 // only the Results list of a suite with no core test (suiteListed, owner 2026-11-12) lists them with the other runs
 const UNRANKED_RUNS = new Set();
+// per run and suite, the core set its shown result covers (exam.json leaderboard.shared.shown_sets; owner and Manling Li,
+// 2026-11-19: models are updated independently)
+const SHOWN_SETS = {};
 let CORE_TASKS = 0;   // exam.json totals.core_tasks: the size of the core set, for the mode lines under the switch
-const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); CORE_TASKS = ex.totals?.core_tasks || 0; Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
+const UPDATING = new Set();   // exam.json leaderboard.shared.updating: the runs shown in the leaderboard's Updating group
+const updatingOn = (id, suite) => SHOWN_SETS[id] && SHOWN_SETS[id][suite] !== 0;
+// a run is in a setting's Updating group only when a suite with core tests in that setting is updating for it (11-19:
+// GPT-6 Luna's RoboDojo, which has no realtime tests, keeps it Ready in Realtime)
+const updatingIn = (id, totals) => UPDATING.has(id) && Object.keys(totals || {}).some((s) => totals[s] && updatingOn(id, s));
+const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id);
+  Object.assign(SHOWN_SETS, ex.leaderboard?.shared?.shown_sets || {});
+  CORE_TASKS = ex.totals?.core_tasks || 0;
+  for (const id of ex.leaderboard?.shared?.updating || []) UPDATING.add(id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
 /* ------------------------------------------------------------------------------------------- page chrome */
@@ -219,7 +230,10 @@ function pageSetting(scope, mode) {
   if (scope !== 'all') return m;
   return { ...m, all: true, label: `All · ${m.label}` };
 }
-const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (a number’s tooltip gives the count), and these numbers are not comparable between models.';
+// how to read a count (owner and Manling Li, 2026-11-19)
+const LB_READ = (u) => `a / b = ${u}s solved / ${u}s tested for this model.`;
+// the All set's reading (owner, 2026-11-19): a share, then solved / tested, the tested count being this model's own
+const LB_ALL_READ = (u) => `Each cell gives the success rate (SR), then solved / tested: the ${u}s this model solved over the ${u}s it was run on in that suite. Models were run on different numbers of ${u}s, so the denominators differ between models.`;
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
 // "433 of the 498 core tasks have a privileged mode" (owner, 2026-11-19); "All 498 core tasks" when every core task has the mode
 const modeShare = (n) => (CORE_TASKS && n !== CORE_TASKS ? `${int(n)} of the ${int(CORE_TASKS)} core tasks` : `All ${int(n)} core tasks`);
@@ -238,18 +252,39 @@ const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
  *  {suite: [solved, the suite's tests]}}}} */
 function scoreGroup(group, tasks, set) {
   const scores = Object.fromEntries(group.map((r) => [r.id, { v: [0, 0, 0], suites: {} }]));
+  // totals: each suite's number of tests (tasks, for Overall) in this set and setting, whatever any model ran (owner, 11-19)
+  const totals = {};
   let tests = 0;
-  for (const t of tasks) {
-    if (t.suite === 'robosuite') continue;
+  // the result keys that decide a task: the setting's own, or for Overall every mode the task has (in the core set);
+  // `core` is the core modes of the set counted ("ps", "-" for none)
+  const keysOf = (t, core) => {
     const k = set.key;
-    if (!k) continue;
-    // the result keys that decide the task: the setting's own, or for Overall every mode the task has (in the core set)
-    const ks = set.overall ? (set.all ? (t.modes || []).map((m) => MODE_KEY[m]).filter(Boolean) : [...(t.core || '')].filter((c) => c in RKEY_LABEL))
-      : (set.all ? (t.modes || []).some((m) => MODE_KEY[m] === k) : t.core && t.core.includes(k)) ? [k] : [];   // the core set only (owners, 2026-10-18)
-    if (!ks.length) continue;
-    tests += 1;
+    return set.overall ? (set.all ? (t.modes || []).map((m) => MODE_KEY[m]).filter(Boolean) : [...(core || '')].filter((c) => c in RKEY_LABEL))
+      : (set.all ? (t.modes || []).some((m) => MODE_KEY[m] === k) : core && core.includes(k)) ? [k] : [];   // the core set only (owners, 2026-10-18)
+  };
+  for (const t of tasks) {
+    if (t.suite === 'robosuite' || !set.key) continue;
+    const ks = keysOf(t, t.core);
+    if (ks.length) {
+      tests += 1;
+      totals[t.suite] = (totals[t.suite] || 0) + 1;
+    }
     for (const r of group) {
-      const sts = ks.map((x) => scored(t.results?.[r.id]?.[x]));
+      // models are updated independently (owner and Manling Li, 2026-11-19): in the core set a run is counted, suite by
+      // suite, on the core set its shown result covers (exam.json leaderboard.shared.shown_sets: 0 the current one, i an
+      // earlier one, t.core_was[i]; -1 the current one's tests it has finished so far, a task counting in Overall once
+      // all its modes are); a suite it has no shown result for does not count for it
+      let rks = ks;
+      if (!set.all && SHOWN_SETS[r.id]) {
+        const i = SHOWN_SETS[r.id][t.suite];
+        if (i == null) continue;
+        if (i < 0) {
+          const done = ks.filter((x) => GRADED.has(scored(t.results?.[r.id]?.[x])));
+          rks = set.overall && done.length < ks.length ? [] : done;
+        } else rks = i ? keysOf(t, t.core_was?.[i] ?? t.core) : ks;
+      }
+      if (!rks.length) continue;
+      const sts = rks.map((x) => scored(t.results?.[r.id]?.[x]));
       if (set.all && sts.includes(undefined)) continue;
       const ok = sts.every((st) => st === 'S');
       const o = scores[r.id];
@@ -261,7 +296,7 @@ function scoreGroup(group, tasks, set) {
       ss[1] += 1;
     }
   }
-  return { tests, scores };
+  return { tests, scores, totals };
 }
 const MODE_KEY = { standard: 's', 'realtime': 't', privileged: 'p' };
 
@@ -303,13 +338,13 @@ function suiteBars(ex, suites, set) {
 
 /** One ranked row in one setting: place (gold, silver, bronze), maker's mark, model and harness, the share solved as an
  *  ink bar (deeper for higher, relative to `best`), then the share and solved / sat. `part`: a smaller run, not ranked. */
-function lbRow(r, v, rank, best, set, { part = false, open = false, still = false } = {}) {
+function lbRow(r, v, rank, best, set, { part = false, open = false, still = false, norank = false } = {}) {
   const q = pctOf(v);
   const k = Math.round(38 + 62 * (q ?? 0) / Math.max(best || 0, 1));
   const tag = still ? 'div' : 'button';
   return `<${still ? 'div' : 'button type="button"'} class="lbh-row lb1${part ? ' part' : ''}${open ? ' on' : ''}${still ? ' still' : ''}" data-id="${esc(r.id)}" style="--i:${Math.min(rank || 12, 12)}"${still ? '' : ` aria-expanded="${open}"`}
       aria-label="${esc(r.model)}${part ? '' : `, place ${rank}`}: ${esc(set.label)}, ${v?.[1] ? `${v[0]} of ${v[1]} solved, ${Math.round(q)}%` : 'not sat'}">
-    <span class="rk r${part ? 0 : rank}">${part ? '·' : rank}</span>${makerMark(r.model)}
+    <span class="rk r${part || norank ? 0 : rank}">${part || norank ? '·' : rank}</span>${makerMark(r.model)}
     <span class="lbh-name"><span class="lbh-nl"><b>${esc(r.model)}</b><span class="lbh-set">${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</span></span></span>
     <span class="lbh-track">${q != null ? `<span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span>` : ''}</span>
     <span class="lbh-val" style="--k:${k}%"><b>${q != null ? `${Math.round(q)}<small>%</small>` : '–'}</b><em>${solvedOf(v)}</em></span>
@@ -357,7 +392,14 @@ function lbBoard(ex, tasks, onDraw) {
       let rank = 0, prev = null;
       const best = Math.max(0, ...main.map((r) => pctOf(scores[r.id].v) ?? 0));
       { const d = $('#lb-desc'); if (d) d.textContent = lbDesc(set.id, g.tests); }
-      html = lbAxis(g.tests, set) + main.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
+      { const d = $('#lb-read'); if (d) d.textContent = `Each row gives the success rate, then ${LB_READ(set.overall ? 'task' : 'test')}`; }
+      // two groups (owner, 2026-11-19): Ready, the models whose results cover the current core set, ranked; then Updating,
+      // the models whose runs on it go on, listed by share with their own counts
+      const ready = main.filter((r) => !updatingIn(r.id, g.totals)), upd = main.filter((r) => updatingIn(r.id, g.totals));
+      html = lbAxis(g.tests, set) + (upd.length ? '<div class="lbh-sec"><b>Ready</b><span>Results on the whole core set</span></div>' : '')
+        + ready.map((r, i) => { const k = key(scores[r.id]); if (k !== prev) { rank = i + 1; prev = k; } return row(r, scores[r.id], rank, false, best); }).join('');
+      if (upd.length) html += `<div class="lbh-sec upd"><b>Updating</b><span>Each row counts this model’s own core ${set.overall ? 'tasks' : 'tests'}: a / b = solved / tested</span></div>`
+        + upd.map((r) => lbRow(r, scores[r.id].v, 0, best, set, { norank: true, open: state.open === r.id }) + (state.open === r.id ? lbDetail(ex, r, scores[r.id], set, false) : '')).join('');
       if (partial.length) {
         const open = state.small || partial.some((r) => r.id === state.open);
         html += `<div class="db-group"><button type="button" class="btn small" data-small>${open ? 'Hide' : 'Show'} ${partial.length} smaller run${partial.length === 1 ? '' : 's'}, under ${minSuites} suites, not ranked</button></div>`;
@@ -369,7 +411,8 @@ function lbBoard(ex, tasks, onDraw) {
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
     // the suite-by-suite table may show the All set, on the same runs in the board's order
     const sset = pageSetting(state.scope, state.set);
-    if (onDraw) onDraw({ state, main, scores: sset.all ? scoreGroup([...main, ...partial], tasks, sset).scores : scores, set: sset });
+    const sg = sset.all ? scoreGroup([...main, ...partial], tasks, sset) : g;
+    if (onDraw) onDraw({ state, main, scores: sg.scores, totals: sg.totals, tests: sg.tests, set: sset });
   }
   function sync() {
     $('#lb-harness').value = state.harness;
@@ -399,46 +442,48 @@ function lbBoard(ex, tasks, onDraw) {
 }
 
 /** Suite by suite: a table of numbers, one row per suite and one column per model, each cell tinted by its value, in the
- *  setting the board shows (on the same tests). The best cell of a row is underlined. */
-function lbSuites(el, ex, runs, scores, set) {
+ *  setting the board shows (on the same tests). Each cell is the success rate, then solved / tested (owner, 2026-11-19):
+ *  in the core set every model is counted on all of a suite's core tests, so the denominators match; in the All set each
+ *  model is counted on the tests it was run on, so they can differ. The name cell gives the suite's own total in the set
+ *  and setting (`totals`, never "up to"), and a last row sums all suites. The best cell of a row is underlined. */
+function lbSuites(el, ex, runs, scores, set, totals = {}, allTests = 0) {
   if (!el) return;
   const h = $('#lb-suites-set');
   if (h) h.textContent = set.label;
-  // a note on why some suites have few tests in a setting (readers' question, 2026-10-19)
+  const u = set.overall ? 'task' : 'test';
+  const nU = (n) => `${int(n)} ${u}${n === 1 ? '' : 's'}`;
+  // what the numbers mean (readers' questions, 2026-10-19 and 2026-11-19)
   const sn = $('#lb-suites-note');
-  if (sn) sn.textContent = set.all ? `All counts every task of the exam. ${LB_NOT_COMPARABLE}`
-    : set.overall ? 'Overall counts each core task once, solved only if every mode it has was solved; the number of tasks is under each suite’s name.'
-    : set.id === 'realtime' ? 'Realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here; the number of tests is under each suite’s name.'
-    : 'The number of tests each suite has in this setting is under its name.';
+  if (sn) sn.textContent = set.all ? `All counts every task of the exam: ${nU(allTests)} in this setting. ${LB_ALL_READ(u)}`
+    : `${set.overall ? 'Overall counts each core task once, solved only if every mode it has was solved.' : set.id === 'realtime' ? 'Realtime covers only tasks with dynamic environments, so some suites have just one or a few tests here.' : 'The core set’s tests in this setting.'} Each cell gives the success rate (SR), then ${LB_READ(u)}`;
   if (!runs.length) { el.innerHTML = '<div class="empty-state">No ranked model in this view.</div>'; return; }
   const value = (r, s) => pctOf(scores[r.id]?.suites?.[s.id]);
-  const suites = ranked(ex).filter((s) => runs.some((r) => scores[r.id]?.suites?.[s.id]));
-  const cell = (r, s, best) => {
-    const v = value(r, s);
-    if (v == null) return '<span class="sx-cell na" title="Not sat">–</span>';
-    const sv = scores[r.id].suites[s.id];
-    const tip = `${s.name} · ${r.model}, ${set.label}: ${sv[0]} of ${sv[1]} solved`;
+  const suites = ranked(ex).filter((s) => totals[s.id] || runs.some((r) => scores[r.id]?.suites?.[s.id]));
+  const cellOf = (r, name, sv, best, upd = false) => {
+    const v = pctOf(sv);
+    if (v == null) return `<span class="sx-cell na${upd ? ' upd' : ''}" title="${esc(`${name} · ${r.model}: ${upd ? 'updating' : `no ${u} of this setting run for this model`}`)}">–</span>`;
+    const tip = `${name} · ${r.model}, ${set.label}: SR ${Math.round(v)}%, ${int(sv[0])} solved of the ${nU(sv[1])} tested for this model`;
     // tints stay light enough for dark text everywhere: up to 60% of the colour
     const tint = Math.round(4 + v * 0.56);
-    // where the build carries the suite's runs page (the internal site), a number opens that model's attempts there
-    const href = s.pages?.runs ? `${site(s.pages.runs)}?run=${encodeURIComponent(r.id)}` : '';
-    const tag = href ? `a href="${href}"` : 'span';
-    return `<${tag} class="sx-cell${best ? ' best' : ''}" style="--t:${tint}%" title="${esc(tip)}">${Math.round(v)}<small>%</small></${href ? 'a' : 'span'}>`;
+    return `<span class="sx-cell lu-cell${best ? ' best' : ''}${upd ? ' upd' : ''}" style="--t:${tint}%" title="${esc(tip)}"><b>${Math.round(v)}<small>%</small></b><em>${int(sv[0])}/${int(sv[1])}</em></span>`;
   };
   // no small effort line under a model's name (owner, 2026-10-19): the harness joins the name only where a model appears twice
   const twice = (r) => runs.filter((x) => x.model === r.model).length > 1;
-  const head = `<div class="sx-row sx-head"><span></span>${runs.map((r) => `<span class="sx-col" title="${esc([r.harness, r.effort].filter(Boolean).join(' · '))}"><b>${esc(r.model)}${twice(r) && r.harness ? ` · ${esc(r.harness)}` : ''}</b></span>`).join('')}</div>`;
+  const head = `<div class="sx-row sx-head"><span class="sx-key"><b>SR</b> % · solved / tested</span>${runs.map((r) => `<span class="sx-col" title="${esc([r.harness, r.effort].filter(Boolean).join(' · '))}"><b>${esc(r.model)}${twice(r) && r.harness ? ` · ${esc(r.harness)}` : ''}</b>${!set.all && updatingIn(r.id, totals) ? '<small class="upd-tag">Updating</small>' : ''}</span>`).join('')}</div>`;
   const row = (s) => {
     const vals = runs.map((r) => value(r, s));
     const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
-    // how many tests the suite has in this setting, so a 100% on one test reads as one test (owners' readers, 2026-10-19)
-    const n = Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${set.all ? 'up to ' : ''}${n} ${set.overall ? 'task' : 'test'}${n === 1 ? '' : 's'}</small></span></a>
-      ${runs.map((r, i) => cell(r, s, vals[i] != null && Math.round(vals[i]) === top && top > 0)).join('')}</div>`;
+    // the suite's own number of tests (tasks) in this set and setting (owner, 2026-11-19: the actual total, not "up to")
+    const n = totals[s.id] || Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${nU(n)}</small></span></a>
+      ${runs.map((r, i) => cellOf(r, s.name, scores[r.id]?.suites?.[s.id], vals[i] != null && Math.round(vals[i]) === top && top > 0, !set.all && updatingOn(r.id, s.id))).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
   const rows = suiteGroups(suites).map(([title, list]) => `<div class="sx-grp">${title}</div>${list.map(row).join('')}`).join('');
-  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id}" style="--n:${runs.length}">${head}${rows}</div></div>`;
+  // all suites together: the same cell over every test of the setting (the board's number in the core set)
+  const total = allTests ? `<div class="sx-rule" aria-hidden="true"></div><div class="sx-row sx-total"><span class="sd-name"><span class="code-mark sx-sum" aria-hidden="true">Σ</span><span>All suites<small class="sd-n">${nU(allTests)}</small></span></span>
+      ${runs.map((r) => cellOf(r, 'All suites', scores[r.id]?.v, false, !set.all && updatingIn(r.id, totals))).join('')}</div>` : '';
+  el.innerHTML = `<div class="sd-scroll"><div class="sx-grid sx-${set.id} sx-frac" style="--n:${runs.length}">${head}${rows}${total}</div></div>`;
 }
 
 /* ---------------------------------------------------------------------------------------------- suites */
@@ -637,7 +682,8 @@ const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
 // runs the owners took off the site: not listed, not counted as a setting, not watched (owner, 2026-11-17: the site
 // matches the paper, D64)
-const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh', 'claude_code-qwen3_8_max-high']);
+// runs off the site: not listed in the run viewer (Qwen3.8 Max, owner 2026-11-19)
+const HIDDEN_RUNS = new Set(['claude_code-qwen3_8_max-high']);
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
@@ -715,7 +761,7 @@ function openTask(ex, t, runs) {
       const cls = c.r ? 'rs' : c.s === 'S' ? `S ${RK[mode]}` : c.s;
       return `<span class="lbh-c"><span class="lbh-v ${cls}">${stateWord(c.s)}</span>${c.r ? `<small>with ${c.r} resets</small>` : ''}</span>`;
     };
-    return `<div class="lbh-res${r.unranked ? ' unranked' : ''}">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}${r.unranked ? ' <span class="unranked-tag" title="Not ranked: the screening run that chose the core set. It counts in no ranking or score.">not ranked</span>' : ''}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
+    return `<div class="lbh-res${r.unranked ? ' unranked' : ''}">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}${r.unranked ? ' <span class="unranked-tag">not ranked</span>' : ''}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
   }).join('');
   const facts = [
     ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}?id=${s.id}">${esc(s.name)}</a>`],
@@ -786,7 +832,7 @@ function taskBrowser(el, ex, tasks, opts = {}) {
   drawerShell();
   if (runs.length && !$('.dots-key', el.parentElement)) el.insertAdjacentHTML('beforebegin', dotsKey());
   const index = new Map(tasks.map((t) => [`${t.suite}/${t.id}`, t]));
-  const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60,
+  const state = { q: Q.get('q') || '', suite: opts.suite || Q.get('suite') || '', body: '', tag: '', oracle: '', result: '', limit: 60, set: '', ran: '',
     tags: (opts.suite ? '' : Q.get('tags') || '').split(',').filter((x) => ex._tags[x]) };
   const f = $('.filters', el.parentElement);
   if (f && !opts.suite) {
@@ -802,7 +848,26 @@ function taskBrowser(el, ex, tasks, opts = {}) {
     f.addEventListener('input', (e) => { const k = e.target.dataset.f; if (!k) return; state[k] = e.target.value; state.limit = 60; draw(); });
     f.addEventListener('click', (e) => { if (e.target.closest('.tagset button')) { state.tags = []; state.limit = 60; draw(); } });
   }
+  // a suite's own list (owner, 2026-11-19): Core or All tasks, and the tasks one model was run on, with its counts
+  const ranOn = (t, id) => Object.values(t.results?.[id] || {}).filter((c) => GRADED.has(scored(c))).length;
+  let sf = null;
+  if (opts.suite) {
+    const nCore = tasks.filter((t) => t.set === 'core').length;
+    const nTests = tasks.reduce((n, t) => n + (t.modes?.length || 0), 0);
+    const ranOf = (r) => tasks.reduce((n, t) => n + ranOn(t, r.id), 0);
+    sf = document.createElement('div');
+    sf.className = 'suite-tfilters';
+    sf.innerHTML = `${nCore ? '<div class="seg lb-set" data-tset></div>' : ''}
+      <select class="lb-select" data-ran aria-label="Tasks a model was run on"><option value="">Every model’s tasks</option>${runs.map((r) => `<option value="${esc(r.id)}">Run on ${esc(r.model)} · ${int(ranOf(r))} of ${int(nTests)} tests</option>`).join('')}</select>
+      <span class="tf-note"></span>`;
+    el.before(sf);
+    if (nCore) settingSwitch($('[data-tset]', sf), '', (id) => { state.set = id; draw(); }, [{ id: '', label: `All tasks · ${int(tasks.length)}` }, { id: 'core', label: `Core tasks · ${int(nCore)}` }]);
+    $('[data-tset]', sf)?.setAttribute('aria-label', 'Task set');
+    $('[data-ran]', sf).addEventListener('change', (e) => { state.ran = e.target.value; draw(); });
+  }
   function match(t) {
+    if (state.set && t.set !== state.set) return false;
+    if (state.ran && !ranOn(t, state.ran)) return false;
     if (state.suite && t.suite !== state.suite) return false;
     if (state.body && t.body !== state.body) return false;
     if (state.tag && !(t.tags || []).includes(state.tag)) return false;
@@ -830,6 +895,12 @@ function taskBrowser(el, ex, tasks, opts = {}) {
       : '<div class="empty-state">No task matches these filters.</div>';
     const c = f && $('.count', f);
     if (c) c.textContent = `${int(hits.length)} of ${int(tasks.length)} tasks`;
+    if (sf) {
+      const r = runs.find((x) => x.id === state.ran);
+      const tests = r ? hits.reduce((n, t) => n + ranOn(t, r.id), 0) : 0;
+      $('.tf-note', sf).textContent = r ? `${int(hits.length)} ${state.set ? 'core ' : ''}tasks run on ${r.model}, ${int(tests)} tests; the squares show each model’s result.`
+        : `${int(hits.length)} ${state.set ? 'core ' : ''}tasks.`;
+    }
     const chip = f && $('.tagset', f);
     if (chip) chip.innerHTML = state.tags.length ? `${state.tags.map((g) => esc(ex._tags[g].name)).join(' <span>×</span> ')} <button type="button" aria-label="Clear the labels">✕</button>` : '';
     if (chip) chip.hidden = !state.tags.length;
@@ -2025,7 +2096,7 @@ async function leaderboardPage(ex) {
   const lb = ex.leaderboard || {};
   { const pre = $('#lb-pre-text'); if (pre) pre.textContent = lb.note || ''; }
   const tasks = await loadTasks();
-  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set));
+  lbBoard(ex, tasks, (d) => lbSuites($('#lb-suites'), ex, d.main, d.scores, d.set, d.totals, d.tests));
 }
 
 async function suitesPage(ex) {
@@ -2043,72 +2114,52 @@ async function suitesPage(ex) {
   suitesGrid($('#suites'), ex, state);
 }
 
-/** A suite with no core test (owner, 2026-11-12): no ranking reads it, so its Results list every run that has results on
- *  its tests: per run the share of tests solved over the modes pooled, per mode, and the share of
- *  tasks solved in at least one mode, each over the tests (tasks) the run has a valid result for. The runs sat different
- *  tests, so the rows are listed (most tests first), not ranked. False when no run has a result here. */
-function suiteListed(el, ex, tasks) {
-  const all = [...ex.runs, ...(ex.unranked_runs || [])].filter((r) => !HIDDEN_RUNS.has(r.id));
-  const modes = ['standard', 'realtime', 'privileged'].filter((m) => tasks.some((t) => (t.modes || []).includes(m)));
-  const tests = tasks.reduce((n, t) => n + (t.modes?.length || 0), 0);
-  const rows = all.map((r) => {
-    const o = { r, all: [0, 0], task: [0, 0], s: [0, 0], t: [0, 0], p: [0, 0] };
-    for (const t of tasks) {
-      const res = t.results?.[r.id];
-      if (!res) continue;
-      let graded = false, solved = false;
-      for (const m of t.modes || []) {
-        const k = MODE_KEY[m], st = scored(res[k]);
-        if (st !== 'S' && st !== 'F') continue;
-        graded = true; solved ||= st === 'S';
-        for (const v of [o[k], o.all]) { v[0] += st === 'S'; v[1] += 1; }
-      }
-      if (graded) { o.task[0] += solved; o.task[1] += 1; }
-    }
-    return o;
-  }).filter((o) => o.all[1]).sort((a, b) => b.all[1] - a.all[1] || a.r.model.localeCompare(b.r.model));
-  if (!rows.length) return false;
-  const cols = [{ id: 'all', label: 'All modes', sub: 'tests solved' },
-    ...modes.map((m) => ({ id: MODE_KEY[m], label: { standard: 'Standard', realtime: 'Realtime', privileged: 'Privileged' }[m], sub: 'tests solved' })),
-    { id: 'task', label: 'Any mode', sub: 'tasks solved' }];
-  const cell = (o, c) => {
-    const v = o[c.id];
-    if (!v[1]) return `<span class="sx-cell na" title="${esc(o.r.model)}: no result in this mode">–</span>`;
-    const q = pctOf(v);
-    return `<span class="sx-cell lu-cell" style="--t:${Math.round(4 + q * 0.56)}%" title="${esc(`${o.r.model}: ${int(v[0])} of the ${int(v[1])} ${c.id === 'task' ? 'tasks' : 'tests'} it has a result for solved`)}"><b>${Math.round(q)}<small>%</small></b><em>${int(v[0])} / ${int(v[1])}</em></span>`;
-  };
-  const head = `<div class="sx-row sx-head"><span></span>${cols.map((c) => `<span class="sx-col"><b>${c.label}</b><small>${c.sub}</small></span>`).join('')}</div>`;
-  const row = (o) => `<div class="sx-row"><a class="sd-name" href="${exam('run/')}?suite=${encodeURIComponent(tasks[0].suite)}&setting=${encodeURIComponent(o.r.id)}" title="Watch these runs">${makerMark(o.r.model)}<span>${esc(o.r.model)}<small class="sd-n">${esc([o.r.harness, o.r.effort].filter(Boolean).join(' · '))}</small><small class="sd-n">${int(o.all[1])} of ${int(tests)} tests</small></span></a>
-      ${cols.map((c) => cell(o, c)).join('')}</div>`;
-  el.innerHTML = `<p class="sr-note">This suite has no core test, so it counts in no ranking. Every run with results on its tests is listed here, not ranked: each count is over the tests the run has a valid result for, and the runs sat different tests, so the rows are not comparable. A run’s name opens its runs step by step.</p>
-    <div class="sdots sr-listed"><div class="sd-scroll"><div class="sx-grid" style="--n:${cols.length}">${head}${rows.map(row).join('')}</div></div></div>`;
-  return true;
-}
-
-/** A suite's results, as on the leaderboard (owners, 2026-10-19): the ranked agents, one setting at a time behind a
- *  switch (the settings this suite has core tests in, standard first), each on all the suite's core tests of the setting, a
- *  test without a result counted as failed. */
-function suiteResults(el, ex, tasks) {
+/** A suite's results, as on the leaderboard (owners, 2026-10-19), behind two switches (owner, 2026-11-19): the task set,
+ *  Core (the ranking: every model on all the suite's core tests of the setting, a test without a result counted as
+ *  failed) or All (every task of the suite, each model on the tests it was run on: success rate, then solved / tested,
+ *  listed by share and not ranked), and the setting. */
+function suiteResults(el, ex, tasks, s = {}) {
   if (!el) return;
   const runs = runMap(ex);
   const group = (ex.leaderboard?.shared?.runs || []).map((id) => runs[id] || { id, model: id });
-  const sets = LB_SETTINGS.map((set) => ({ set, g: scoreGroup(group, tasks, set) })).filter((x) => x.g.tests);
-  if (!sets.length && suiteListed(el, ex, tasks)) return;
-  if (!group.length || !sets.length) { el.innerHTML = `<div class="empty-state">${sets.length ? 'No ranked agent yet.' : 'No core test in this suite.'}</div>`; return; }
-  el.innerHTML = `<div class="lbh-top"><div class="seg lb-set"></div></div><div class="lbh-chart"><div class="lbh-ax"></div><div class="lbh-rows"></div></div>`;
-  const draw = (id) => {
-    const { set, g } = sets.find((x) => x.set.id === id) || sets[0];
+  const scopes = LB_SCOPES.map((sc) => ({ sc, sets: LB_SETTINGS.map((m) => pageSetting(sc.id, m.id))
+    .map((set) => ({ set, g: scoreGroup(group, tasks, set) })).filter((x) => x.g.tests) })).filter((x) => x.sets.length);
+  if (!group.length || !scopes.length) { el.innerHTML = '<div class="empty-state">No ranked agent yet.</div>'; return; }
+  const st = { scope: scopes[0].sc.id, mode: scopes[0].sets[0].set.id };
+  el.innerHTML = `<div class="lbh-top sr-scope"><span data-scope></span><span data-mode></span></div><p class="sr-read" data-read></p>
+    <div class="lbh-chart"><div class="lbh-ax"></div><div class="lbh-rows"></div></div>`;
+  // a switch drawn afresh into its slot (settingSwitch adds its listeners to the element it is given)
+  const sw = (slot, current, pick, list, label) => {
+    const box = $(slot, el);
+    box.innerHTML = '<div class="seg lb-set"></div>';
+    settingSwitch($('.lb-set', box), current, pick, list);
+    $('.lb-set', box).setAttribute('aria-label', label);
+  };
+  const draw = () => {
+    const scope = scopes.find((x) => x.sc.id === st.scope) || scopes[0];
+    const { set, g } = scope.sets.find((x) => x.set.id === st.mode) || scope.sets[0];
+    st.mode = set.id;
+    sw('[data-scope]', scope.sc.id, (id) => { st.scope = id; draw(); }, scopes.map((x) => x.sc), 'Task set');
+    sw('[data-mode]', set.id, (id) => { st.mode = id; draw(); }, scope.sets.map((x) => ({ ...x.set, label: lbSetting(x.set.id).label })), 'Setting');
+    const u = set.overall ? 'task' : 'test';
     const P = (r) => pctOf(g.scores[r.id].v) ?? -1;
-    const order = [...group].sort((a, b) => P(b) - P(a) || a.model.localeCompare(b.model));
+    const shown = set.all ? group.filter((r) => g.scores[r.id].v[1]) : group;
+    const order = [...shown].sort((a, b) => P(b) - P(a) || a.model.localeCompare(b.model));
     const best = Math.max(0, P(order[0]));
+    $('[data-read]', el).textContent = set.all
+      ? `All: every task of the suite, ${int(g.tests)} ${u}s in this setting. Each row gives the success rate (SR), then solved / tested: the ${u}s this model solved over the ${u}s it was run on here. Models were run on different numbers of ${u}s, so the denominators differ; the rows are listed by success rate, not ranked.`
+      : `Core: the suite’s ${int(g.tests)} core ${u}s in this setting, the ones the leaderboard counts. Each row gives the success rate (SR), then ${LB_READ(u)}`;
     let rank = 0, prev = null;
-    $('.lbh-rows', el).innerHTML = order.map((r, i) => { if (P(r) !== prev) { rank = i + 1; prev = P(r); } return lbRow(r, g.scores[r.id].v, rank, best, set, { still: true }); }).join('');
+    const sid = tasks[0]?.suite;
+    const ready = set.all ? order : order.filter((r) => !updatingOn(r.id, sid));
+    const upd = set.all ? [] : order.filter((r) => updatingOn(r.id, sid) && g.scores[r.id].v[1]);
+    $('.lbh-rows', el).innerHTML = (upd.length ? '<div class="lbh-sec"><b>Ready</b><span>Results on all of the suite’s core tests</span></div>' : '')
+      + ready.map((r, i) => { if (P(r) !== prev) { rank = i + 1; prev = P(r); } return lbRow(r, g.scores[r.id].v, rank, best, set, { still: true, norank: !!set.all }); }).join('')
+      + (upd.length ? `<div class="lbh-sec upd"><b>Updating</b><span>Each row counts this model’s own core ${u}s: a / b = solved / tested</span></div>`
+        + upd.map((r) => lbRow(r, g.scores[r.id].v, 0, best, set, { still: true, norank: true })).join('') : '');
     $('.lbh-ax', el).innerHTML = lbAxis(g.tests, set);
   };
-  const sw = $('.lb-set', el);
-  sw.innerHTML = '';
-  settingSwitch(sw, sets[0].set.id, draw, sets.map((x) => x.set));
-  draw(sets[0].set.id);
+  draw();
 }
 
 async function suitePage(ex) {
@@ -2146,7 +2197,7 @@ async function suitePage(ex) {
   realRobot($('#real-robot'), s.real_robot);
   const tasks = (await loadTasks()).filter((t) => t.suite === s.id);
   $('#suite-tasks-count').textContent = tasksTests(tasks.length, tasks.reduce((n, t) => n + (t.modes?.length || 0), 0));
-  suiteResults($('#suite-results'), ex, tasks);
+  suiteResults($('#suite-results'), ex, tasks, s);
   taskBrowser($('#tasks'), ex, tasks, { suite: s.id });
 }
 
@@ -2266,7 +2317,7 @@ const BENCH_SUITE = { behavior: 'behavior-1k', mujoco_playground: 'mujoco-playgr
   'roboolympics-fun': 'embodied-olympics-fun', 'roboolympics-match': 'embodied-olympics-match' };
 // a run's setting, harness · model · effort, from the eval's run id (harness-model-effort, e.g. claude_code-opus_5_5-high)
 const HARNESS_NAME = { codex: 'Codex', claude_code: 'Claude Code', antigravity_cli: 'Antigravity CLI', dsh: 'DeepSeek Harness' };
-const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
+const RUN_MODEL_NAME = { gpt6_astra: 'GPT-6 Astra', gpt6_luna: 'GPT-6 Luna', gpt6_sol: 'GPT-6 Sol', gpt6_1_sol: 'GPT-6.1 Sol', opus_5_5: 'Claude Opus 5.5', fable_5_2: 'Claude Fable 5.2',
   glm_5_3_flash: 'GLM-5.3 Flash', qwen3_8_27b: 'Qwen3.8 27B', qwen3_8_max: 'Qwen3.8 Max', kimi_3_1_pro: 'Kimi 3.1 Pro', gemini_3_8_flash: 'Gemini 3.8 Flash', gemini_4_argon: 'Gemini 4 Argon', deepseek_v4_1_flash: 'DeepSeek V4.1 Flash' };
 // runs that change one rule of the exam for a study (ablations): run id = harness-<model>_<variant>-effort; listed in
 // the run viewer with their rule in the setting's name, after the other runs; in no ranking (one suite, under min_suites)

@@ -1868,3 +1868,28 @@ html { overflow-x: clip; }
 .suite-prompts .sp-box p + p, .suite-prompts .sp-box ul + p, .suite-prompts .sp-box p + ul { margin-top: 6px; }
 .suite-prompts .sp-box ul { margin: 4px 0 0; padding-left: 18px; }
 .suite-prompts .sp-after { margin-top: 10px; }
+/* Suite by suite and a suite's Results: success rate, then solved / tested (owner, 2026-11-19) */
+.sx-frac .sx-row .sd-name { height: 46px; }
+.sx-frac .sx-cell { height: 46px; }
+.sx-frac .lu-cell b { font-weight: 500; }
+.sx-frac .lu-cell.best b { font-weight: 700; }
+.sx-frac .sx-cell.best::after { bottom: 3px; }
+.sx-head .sx-key { align-self: end; padding: 0 6px 8px; font: 500 11px/1.4 var(--mono); color: var(--ink-3); }
+.sx-head .sx-key b { color: var(--ink-2); }
+.sx-rule { grid-column: 1 / -1; height: 1px; margin: 8px 0 2px; background: var(--line-2); }
+.sx-total .sd-name { color: var(--ink); font-weight: 600; }
+.sx-sum { display: inline-flex; align-items: center; justify-content: center; font: 600 12px/1 var(--mono); }
+.sr-scope { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.sr-read { max-width: 820px; margin: 12px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); }
+.sr-version { margin: 0 0 18px; }
+.sr-version .sr-read { margin-top: 10px; }
+.suite-tfilters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 16px; }
+.suite-tfilters .tf-note { font-size: 13px; color: var(--ink-3); }
+/* the leaderboard's two groups (owner, 2026-11-19): Ready, then Updating */
+.lbh-sec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 14px 0 4px; padding: 0 6px; }
+.lbh-sec b { font: 650 13px/1.2 var(--display); color: var(--ink); }
+.lbh-sec span { font-size: 12.5px; color: var(--ink-3); }
+.lbh-sec.upd { margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+.lbh-sec.upd b::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--std); vertical-align: 1px; }
+.sx-head .sx-col .upd-tag { display: block; margin-top: 2px; font: 500 10px/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--std-ink, var(--ink-3)); }
+.sx-cell.upd { box-shadow: inset 0 0 0 1px var(--line-2); background-image: none; border: 1px dashed var(--line-2); }
