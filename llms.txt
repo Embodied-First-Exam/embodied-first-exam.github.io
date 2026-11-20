@@ -37,7 +37,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ## Where do agentic robots succeed and fail?
 
-- Read the analysis of ten coding agents: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+- Read the analysis: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Links
 
@@ -52,7 +52,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Blog post: https://www.embodied-first-exam.ai/blogs/first-exam/
 - Blog post, "Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?" (coding agents as robotics engineers: seven agents build, run and revise robot control systems in 18 simulated sports; the first program largely decides the match, agents analyze opponents correctly in 66% of matches but change their program in 26%, and three of six agents improve over a season): https://www.embodied-first-exam.ai/blogs/embodied-olympics/
 - Language versions of the failure analysis post: 中文: https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/, Español: https://www.embodied-first-exam.ai/blogs/failure-analysis/es/
-- Blog post, "Where Do Agentic Robots Succeed and Fail? Ten Coding Agents on the Embodied First Exam" (which robot tasks each of ten coding agents fails and why; what information matters, Privileged versus Standard; where in a task agents fail; control approaches; harness, spending and task instructions): https://www.embodied-first-exam.ai/blogs/failure-analysis/
+- Blog post, "Where Do Agentic Robots Succeed and Fail? The Capability Boundary of Coding Agents and Agentic Robots" (which robot tasks each of ten coding agents fails and why; what information matters, Privileged versus Standard; where in a task agents fail; control approaches; harness, spending and task instructions): https://www.embodied-first-exam.ai/blogs/failure-analysis/
 - Announcement thread: https://x.com/ManlingLi_/status/2112307226224292176
 - Full FAQ for language models: https://www.embodied-first-exam.ai/llms-full.txt
 

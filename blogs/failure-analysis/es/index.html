@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam</title>
+<title>¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos</title>
 <meta name="description" content="Dónde aciertan y dónde fallan los agentes de programación actuales en robótica: diez agentes en el Embodied First Exam. Qué tareas robóticas falla cada agente y por qué, qué información importa (Privileged frente a Standard), en qué parte de una tarea fallan los agentes, cómo controlan los robots y cómo cambian el resultado el harness, el gasto y la instrucción de la tarea.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,14 +173,14 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <script type="module" src="../../../assets/blog-post.js?v=5f4231e3"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
-<meta property="og:title" content="¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam">
+<meta property="og:title" content="¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos">
 <meta property="og:description" content="Dónde aciertan y dónde fallan los agentes de programación actuales en robótica: diez agentes en el Embodied First Exam. Qué tareas robóticas falla cada agente y por qué, qué información importa (Privileged frente a Standard), en qué parte de una tarea fallan los agentes, cómo controlan los robots y cómo cambian el resultado el harness, el gasto y la instrucción de la tarea.">
 <meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/failure-analysis/">
 <meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam">
+<meta name="twitter:title" content="¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos">
 <meta name="twitter:description" content="Dónde aciertan y dónde fallan los agentes de programación actuales en robótica: diez agentes en el Embodied First Exam. Qué tareas robóticas falla cada agente y por qué, qué información importa (Privileged frente a Standard), en qué parte de una tarea fallan los agentes, cómo controlan los robots y cómo cambian el resultado el harness, el gasto y la instrucción de la tarea.">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <script type="application/ld+json">
@@ -190,7 +190,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     {
       "@type": "BlogPosting",
       "@id": "https://www.embodied-first-exam.ai/blogs/failure-analysis/es/#post",
-      "headline": "¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam",
+      "headline": "¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos",
       "description": "Dónde aciertan y dónde fallan los agentes de programación actuales en robótica: diez agentes en el Embodied First Exam. Qué tareas robóticas falla cada agente y por qué, qué información importa (Privileged frente a Standard), en qué parte de una tarea fallan los agentes, cómo controlan los robots y cómo cambian el resultado el harness, el gasto y la instrucción de la tarea.",
       "datePublished": "2026-11-12",
       "inLanguage": "es",
@@ -284,7 +284,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam",
+          "name": "¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos",
           "item": "https://www.embodied-first-exam.ai/blogs/failure-analysis/es/"
         }
       ]
@@ -370,7 +370,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
   <header class="page-head post-head">
     <p class="kicker"><a href="../../">Blogs</a> · Embodied First Exam</p>
-    <h1 class="post-title">¿Dónde aciertan y dónde fallan los robots agénticos? Diez agentes de programación en el Embodied First Exam</h1>
+    <h1 class="post-title">¿Dónde aciertan y dónde fallan los robots agénticos? Los límites de capacidad de los agentes de programación y los robots agénticos</h1>
     <p class="byline"><span>Noviembre de 2026</span> · <a href="../../first-exam/">EFE Blog</a> · <a href="../../../leaderboard/">Clasificación</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Artículo</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Código</a></p>
     <p class="lang-switch"><a href="../" hreflang="en" lang="en">English</a><a href="../zh/" hreflang="zh-Hans" lang="zh-Hans">中文</a><span aria-current="true">Español</span></p>
   </header>
