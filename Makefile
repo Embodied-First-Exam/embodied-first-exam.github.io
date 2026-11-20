@@ -8,10 +8,12 @@ PY   ?= python3
 # huggingface_hub for `make media` (e.g. HFPY="uv run --with huggingface_hub python")
 MEDIA_DIR ?=
 HFPY ?= $(PY)
+# the Python that has Playwright for `make prerender` (pip install playwright; it uses Google Chrome)
+PRPY ?= $(PY)
 export MEDIA_DIR
 
 .DEFAULT_GOAL := help
-.PHONY: help serve data media stamp check release
+.PHONY: help serve data media stamp prerender check release
 
 help: ## List the targets
 	@grep -hE '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  \033[36m%-8s\033[0m %s\n", $$1, $$2}'
@@ -30,7 +32,10 @@ media: ## Upload new or replaced media from the stage to HF (site/); DRY=1 only 
 stamp: ## Give the pages' CSS and JS links a content hash
 	$(PY) scripts/stamp.py
 
+prerender: ## Write what app.js draws into the pages' HTML, and one page per suite (suite/<id>/), for readers without JavaScript
+	$(PRPY) scripts/prerender.py
+
 check: ## Check every link, that every picture and video is on HF, and that nothing points at other sites' internals
 	$(PY) scripts/check.py
 
-release: stamp check ## What to run before a commit: stamp, then check
+release: stamp prerender check ## What to run before a commit: stamp, prerender, then check

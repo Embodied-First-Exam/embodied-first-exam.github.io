@@ -36,9 +36,15 @@ make serve                 # preview at http://127.0.0.1:8870/ (PORT=... to chan
 make data SRC=<checkout>   # refresh data/ from the exam's source (its public mode); new or replaced media are made
                            #   into web copies in a local stage (MEDIA_DIR, default ~/.cache/efe-export/media)
 make media                 # upload what make data listed as not on HF yet (needs an HF token with write access)
-make release               # stamp the CSS and JS links, then check every link, and every picture and video on HF
+make release               # stamp the CSS and JS links, prerender the pages, then check every link, picture and video
 git push                   # GitHub Pages publishes main within a minute or two
 ```
+
+`make prerender` (part of `make release`) opens every page in headless Chrome and writes what `assets/app.js` draws
+into the HTML, between `<!--pre:ID-->` and `<!--/pre:ID-->`, so readers that do not run JavaScript see the same text.
+It also writes one page per suite, `suite/<id>/index.html`, from the template `suite/index.html` (edit the template,
+not the copies). It needs Playwright for Python (`pip install playwright`, or `PRPY="uv run --with playwright python"`)
+and Google Chrome. Run it after every `make data`, or the pages show the old numbers until the scripts have loaded.
 
 `make check` also fails if any page or data file points at the internals of other sites (run logs, review pages,
 private repositories): this site links only to its own pages and to public upstream projects.

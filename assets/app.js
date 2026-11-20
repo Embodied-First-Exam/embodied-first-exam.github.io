@@ -159,6 +159,7 @@ function footer(ex) {
   f.outerHTML = `<footer class="footer"><div class="footer-grid">
     <div>
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
+      <div class="tagline">An agentic robotics benchmark: coding agents for robotics, tested on ${int(ex.totals?.instances || 1156)} tasks and ${int(ex.totals?.robots || 47)} robots.</div>
       <div class="prov">Questions as of ${esc(date(ts.date))} · results updated ${esc(date(ex.build?.at))}</div>
       <div class="copy">© 2026 Embodied First Exam</div>
     </div>
@@ -328,7 +329,7 @@ function suiteBars(ex, suites, set) {
   const minis = ranked(ex).filter((s) => suites[s.id]?.[1]).map((s) => {
     const v = suites[s.id], q = pctOf(v);
     const k = Math.round(38 + 62 * (q ?? 0) / 100);
-    return `<a class="lbh-mini" href="${exam('suite/')}?id=${s.id}" style="--i:0" title="${esc(s.name)}, ${esc(set.label)}: ${v[0]} of ${v[1]} solved">
+    return `<a class="lbh-mini" href="${exam('suite/')}${s.id}/" style="--i:0" title="${esc(s.name)}, ${esc(set.label)}: ${v[0]} of ${v[1]} solved">
       <span class="nm">${codeMark(s)}<span>${esc(s.name)}</span></span>
       <span class="lbh-track"><span class="lbh-s" style="--w:${q.toFixed(1)}%;--k:${k}%"></span></span>
       <span class="lbh-val" style="--k:${k}%"><b>${Math.round(q)}<small>%</small></b><em>${solvedOf(v)}</em></span></a>`;
@@ -476,7 +477,7 @@ function lbSuites(el, ex, runs, scores, set, totals = {}, allTests = 0) {
     const top = Math.max(...vals.filter((v) => v != null).map((v) => Math.round(v)));
     // the suite's own number of tests (tasks) in this set and setting (owner, 2026-11-19: the actual total, not "up to")
     const n = totals[s.id] || Math.max(0, ...runs.map((r) => scores[r.id]?.suites?.[s.id]?.[1] || 0));
-    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}?id=${s.id}">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${nU(n)}</small></span></a>
+    return `<div class="sx-row"><a class="sd-name" href="${exam('suite/')}${s.id}/">${codeMark(s)}<span>${esc(s.name)}<small class="sd-n">${nU(n)}</small></span></a>
       ${runs.map((r, i) => cellOf(r, s.name, scores[r.id]?.suites?.[s.id], vals[i] != null && Math.round(vals[i]) === top && top > 0, !set.all && updatingOn(r.id, s.id))).join('')}</div>`;
   };
   // the team's own suites and the others under their headings, as on the Suites page (owner, 2026-10-19)
@@ -493,7 +494,7 @@ function suiteCard(ex, s) {
   const cover = coverOf(s);
   const robot = s.robots?.[0]?.name || '';
   const more = (s.robots?.length || 0) > 1 ? ` and ${s.robots.length - 1} more` : '';
-  return `<a class="suite-card" href="${exam('suite/')}?id=${s.id}">
+  return `<a class="suite-card" href="${exam('suite/')}${s.id}/">
     <div class="media">${cover ? poster(cover, cropFor(s.id, cover.task)) : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`}${hoverVideo(s, cropFor(s.id, cover?.task))}${releaseTag(s)}</div>
     <div class="body"><h4>${esc(s.name)}${nameTag(s)}</h4><p>${esc(s.blurb || '')}</p>
       <div class="meta">${tasksTests(s.instances, s.task_dirs)} · ${s.robots_label ? esc(s.robots_label) : `${esc(robot)}${more}`}</div></div></a>`;
@@ -765,7 +766,7 @@ function openTask(ex, t, runs) {
     return `<div class="lbh-res${r.unranked ? ' unranked' : ''}">${makerMark(r.model)}<span class="lbh-name"><b>${esc(r.model)}${r.unranked ? ' <span class="unranked-tag">not ranked</span>' : ''}</b><small>${esc([r.harness, r.effort].filter(Boolean).join(' · '))}</small></span>${cols.map(cell).join('')}</div>`;
   }).join('');
   const facts = [
-    ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}?id=${s.id}">${esc(s.name)}</a>`],
+    ['Suite', `${codeMark(s)} <a class="link" href="${exam('suite/')}${s.id}/">${esc(s.name)}</a>`],
     ['Robot', esc((s.robots || []).find((r) => r.id === t.robot)?.name || t.robot || '')],
     ['Modes', (t.modes || []).map((x) => `<span class="pill ${MK[x]}">${x}</span>`).join(' ')],
     ['Reference solution', esc({ full: 'Full: the oracle solves it', partial: 'Partial: the oracle reaches part of the goal', none: 'None: solvability shown in human review' }[t.oracle] || '')],
@@ -785,7 +786,7 @@ function openTask(ex, t, runs) {
     ${allRuns.some((r) => t.results[r.id]?.s?.r) ? '<p class="board-foot">A standard trial marked with resets ran with resets allowed. It is reported apart and counts in no ranking (protocol §4.5).</p>' : ''}
     <h3>About the task</h3><table class="facts-table"><tbody>${facts.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>
     <div id="drawer-related"></div>
-    <div class="link-list" id="drawer-links"><a class="btn small" href="${exam('suite/')}?id=${s.id}">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
+    <div class="link-list" id="drawer-links"><a class="btn small" href="${exam('suite/')}${s.id}/">More from ${esc(s.name)} <span class="arr">→</span></a></div>`;
   // the runs to watch: this suite's runs index, fetched when the drawer opens; a placeholder holds the place meanwhile
   const key = `${t.suite}/${t.id}`;
   watchable(t.suite).then((m) => {
@@ -1888,7 +1889,7 @@ function gallery(el, ex) {
   const item = (s) => {
     const cover = coverOf(s), demo = demoOf(s), crop = cropFor(s.id, cover?.task);
     const img = cover ? `<img src="${esc(site(cover.poster))}" alt="" loading="lazy" decoding="async"${crop ? ` class="${crop}"` : ''}>` : `<div class="placeholder-art"><span>${esc(s.code)}</span><small>no pictures yet</small></div>`;
-    return `<a class="g-item" href="${exam('suite/')}?id=${esc(s.id)}" data-suite="${esc(s.id)}" aria-haspopup="dialog"><div class="img">${img}${hoverVideo(s, crop)}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
+    return `<a class="g-item" href="${exam('suite/')}${esc(s.id)}/" data-suite="${esc(s.id)}" aria-haspopup="dialog"><div class="img">${img}${hoverVideo(s, crop)}${releaseTag(s)}</div><b>${esc(s.name)}${nameTag(s)}</b>
       <span>${int(s.instances)} tasks · ${esc(bodyLabel(ex, s))}</span></a>`;
   };
   // the team's own suites and the others under their headings (owner, 2026-10-19)
@@ -1962,7 +1963,7 @@ function suiteDialog(ex, s, opener) {
       ${s.blurb ? `<p class="sm-lead">${esc(s.blurb)}</p>` : ''}
       ${s.description ? `<p class="sm-desc">${prose(s.description)}</p>` : ''}
       <dl class="sm-nums">${nums.map(([v, k, cls]) => `<div${cls ? ` class="${cls}"` : ''}><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
-      <div class="sm-cta"><a class="btn primary" href="${exam('suite/')}?id=${esc(s.id)}">Open suite page <span class="arr">→</span></a>${ext}</div>
+      <div class="sm-cta"><a class="btn primary" href="${exam('suite/')}${esc(s.id)}/">Open suite page <span class="arr">→</span></a>${ext}</div>
     </div>`;
   const video = $('video', card);
   const focusables = () => $$('a[href], button, video[controls]', card);
@@ -2163,9 +2164,9 @@ function suiteResults(el, ex, tasks, s = {}) {
 }
 
 async function suitePage(ex) {
-  const s = ex._suites[Q.get('id')] || ranked(ex)[0];
+  const s = ex._suites[Q.get('id') || document.body.dataset.suite] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
-  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark for coding agents. ${s.blurb || ''}`.trim());
+  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark that tests coding agents for robotics. ${s.blurb || ''}`.trim());
   const cover = coverOf(s);
   const crop = cropFor(s.id, cover?.task);
   // the suite's own pages, always in this order: paper, website, code, then the rest (owners, 2026-10-18)
@@ -2351,7 +2352,7 @@ const settingName = (id) => (Object.keys(HARNESS_NAME).some((h) => id.startsWith
  *  site's own order unless ?suite= says otherwise. "All suites" loads every suite, a few at a time, and the list grows
  *  as they come in. The filters and pages work on the rows loaded. */
 async function runIndex(ex, head) {
-  head.innerHTML = '<p class="kicker">Runs</p><h1>Watch an agent work</h1>';
+  head.innerHTML = `<p class="kicker">Runs</p><h1>Watch an agent work</h1><a class="post-pill" href="${exam('blogs/failure-analysis/')}"><span class="hn-tag">Analysis</span><span class="pp-q">Where do today’s agentic robots succeed and fail? Read more</span><span class="arr">→</span></a>`;
   $('#run-strip').remove();
   $('#run-side').remove();
   $('#run-log').innerHTML = '<div class="run-loading"><span class="spin"></span>Loading the runs…</div>';

@@ -25,15 +25,15 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ## The 9 new suites
 
-- RoboPaint (fine tool control: a robot arm reproduces a picture with a brush or pen, from Chinese calligraphy to oil painting): https://www.embodied-first-exam.ai/suite/?id=robopaint
-- RoboARC (tangled, deformable and multi-part objects: wire puzzles, ropes, cloth, IKEA furniture): https://www.embodied-first-exam.ai/suite/?id=roboarc
-- RoboDynamicExam (moving objects: catching, striking, carrying and handing over objects in motion): https://www.embodied-first-exam.ai/suite/?id=pandadyn
-- Embodied Olympics - Fun (humanoid motor skills from sports): https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-fun
-- Embodied Olympics - Match (full matches of table tennis, badminton, soccer, foosball and fencing against an opponent): https://www.embodied-first-exam.ai/suite/?id=embodied-olympics-match
-- Embodied Safety Exam (carry out safe requests, refuse harmful ones, and explain the risk): https://www.embodied-first-exam.ai/suite/?id=embodied-safety-exam
-- DexHandExam (five-finger dexterous hand manipulation): https://www.embodied-first-exam.ai/suite/?id=dexhand
-- iSpatialGym (spatial reasoning from a goal image): https://www.embodied-first-exam.ai/suite/?id=ispatialgym
-- RoboEngineer (the engineering loop: build a controller in a public simulator, deploy it to one with hidden dynamics, and fix it): https://www.embodied-first-exam.ai/suite/?id=roboengineer
+- RoboPaint (fine tool control: a robot arm reproduces a picture with a brush or pen, from Chinese calligraphy to oil painting): https://www.embodied-first-exam.ai/suite/robopaint/
+- RoboARC (tangled, deformable and multi-part objects: wire puzzles, ropes, cloth, IKEA furniture): https://www.embodied-first-exam.ai/suite/roboarc/
+- RoboDynamicExam (moving objects: catching, striking, carrying and handing over objects in motion): https://www.embodied-first-exam.ai/suite/pandadyn/
+- Embodied Olympics - Fun (humanoid motor skills from sports): https://www.embodied-first-exam.ai/suite/embodied-olympics-fun/
+- Embodied Olympics - Match (full matches of table tennis, badminton, soccer, foosball and fencing against an opponent): https://www.embodied-first-exam.ai/suite/embodied-olympics-match/
+- Embodied Safety Exam (carry out safe requests, refuse harmful ones, and explain the risk): https://www.embodied-first-exam.ai/suite/embodied-safety-exam/
+- DexHandExam (five-finger dexterous hand manipulation): https://www.embodied-first-exam.ai/suite/dexhand/
+- iSpatialGym (spatial reasoning from a goal image): https://www.embodied-first-exam.ai/suite/ispatialgym/
+- RoboEngineer (the engineering loop: build a controller in a public simulator, deploy it to one with hidden dynamics, and fix it): https://www.embodied-first-exam.ai/suite/roboengineer/
 
 ## Where do agentic robots succeed and fail?
 
