@@ -74,6 +74,9 @@ const UNRANKED_RUNS = new Set();
 const SHOWN_SETS = {};
 let CORE_TASKS = 0;   // exam.json totals.core_tasks: the size of the core set, for the mode lines under the switch
 const UPDATING = new Set();   // exam.json leaderboard.shared.updating: the runs shown in the leaderboard's Updating group
+// runs on the site but off the Core boards and tables, shown in the All views only (exam.json leaderboard.shared.core_off;
+// owner, 2026-11-20)
+const CORE_OFF = new Set();
 const updatingOn = (id, suite) => SHOWN_SETS[id] && SHOWN_SETS[id][suite] !== 0;
 // a run is in a setting's Updating group only when a suite with core tests in that setting is updating for it (11-19:
 // GPT-6 Luna's RoboDojo, which has no realtime tests, keeps it Ready in Realtime)
@@ -81,6 +84,7 @@ const updatingIn = (id, totals) => UPDATING.has(id) && Object.keys(totals || {})
 const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id);
   Object.assign(SHOWN_SETS, ex.leaderboard?.shared?.shown_sets || {});
   CORE_TASKS = ex.totals?.core_tasks || 0;
+  for (const id of ex.leaderboard?.shared?.core_off || []) CORE_OFF.add(id);
   for (const id of ex.leaderboard?.shared?.updating || []) UPDATING.add(id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
@@ -373,7 +377,8 @@ function lbBoard(ex, tasks, onDraw) {
     harness: 'all', kind: 'agent', open: Q.get('open'), small: false };
   function draw() {
     const set = pageSetting('core', state.set);
-    const pool = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
+    const poolAll = ex.runs.filter((r) => (r.kind || 'agent') === state.kind && (state.harness === 'all' || r.harness === state.harness));
+    const pool = poolAll.filter((r) => !CORE_OFF.has(r.id));   // the board is the core set: no core_off run
     const main = pool.filter((r) => (r.suites?.length || 0) >= minSuites);
     const partial = pool.filter((r) => (r.suites?.length || 0) < minSuites).sort((a, b) => (b.suites?.length || 0) - (a.suites?.length || 0));
     const g = scoreGroup([...main, ...partial], tasks, set);
@@ -407,8 +412,9 @@ function lbBoard(ex, tasks, onDraw) {
     $$('.lbh-row', board).forEach((row) => row.addEventListener('click', () => { state.open = state.open === row.dataset.id ? null : row.dataset.id; draw(); }));
     // the suite-by-suite table may show the All set, on the same runs in the board's order
     const sset = pageSetting(state.scope, state.set);
-    const sg = sset.all ? scoreGroup([...main, ...partial], tasks, sset) : g;
-    if (onDraw) onDraw({ state, main, scores: sg.scores, totals: sg.totals, tests: sg.tests, set: sset });
+    const off = sset.all ? poolAll.filter((r) => CORE_OFF.has(r.id) && (r.suites?.length || 0) >= minSuites) : [];
+    const sg = sset.all ? scoreGroup([...main, ...off, ...partial], tasks, sset) : g;
+    if (onDraw) onDraw({ state, main: [...main, ...off], scores: sg.scores, totals: sg.totals, tests: sg.tests, set: sset });
   }
   function sync() {
     $('#lb-harness').value = state.harness;
@@ -2117,8 +2123,10 @@ function suiteResults(el, ex, tasks, s = {}) {
   if (!el) return;
   const runs = runMap(ex);
   const group = (ex.leaderboard?.shared?.runs || []).map((id) => runs[id] || { id, model: id });
+  // All also lists the runs that are off the Core tables (leaderboard.shared.core_off; owner, 2026-11-20)
+  const groupAll = [...group, ...(ex.leaderboard?.shared?.core_off || []).filter((id) => runs[id]).map((id) => runs[id])];
   const scopes = LB_SCOPES.map((sc) => ({ sc, sets: LB_SETTINGS.map((m) => pageSetting(sc.id, m.id))
-    .map((set) => ({ set, g: scoreGroup(group, tasks, set) })).filter((x) => x.g.tests) })).filter((x) => x.sets.length);
+    .map((set) => ({ set, g: scoreGroup(sc.id === 'all' ? groupAll : group, tasks, set) })).filter((x) => x.g.tests) })).filter((x) => x.sets.length);
   if (!group.length || !scopes.length) { el.innerHTML = '<div class="empty-state">No ranked agent yet.</div>'; return; }
   const st = { scope: scopes[0].sc.id, mode: scopes[0].sets[0].set.id };
   el.innerHTML = `<div class="lbh-top sr-scope"><span data-scope></span><span data-mode></span></div><p class="sr-read" data-read></p>
@@ -2138,7 +2146,7 @@ function suiteResults(el, ex, tasks, s = {}) {
     sw('[data-mode]', set.id, (id) => { st.mode = id; draw(); }, scope.sets.map((x) => ({ ...x.set, label: lbSetting(x.set.id).label })), 'Setting');
     const u = set.overall ? 'task' : 'test';
     const P = (r) => pctOf(g.scores[r.id].v) ?? -1;
-    const shown = set.all ? group.filter((r) => g.scores[r.id].v[1]) : group;
+    const shown = set.all ? groupAll.filter((r) => g.scores[r.id].v[1]) : group;
     const order = [...shown].sort((a, b) => P(b) - P(a) || a.model.localeCompare(b.model));
     const best = Math.max(0, P(order[0]));
     $('[data-read]', el).textContent = set.all ? `Different models were evaluated on different tasks, so the results are not fully comparable.` : '';   // owner, 2026-11-20
