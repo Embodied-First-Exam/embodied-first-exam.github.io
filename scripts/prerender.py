@@ -141,8 +141,11 @@ async def render(paths: list[Path], port: int) -> dict[Path, dict]:
             async with sem:
                 rel = p.relative_to(ROOT).as_posix()
                 url = f"http://127.0.0.1:{port}/{rel[:-len('index.html')]}"
-                text = shell(p.read_text(encoding="utf-8"))
+                before = p.read_text(encoding="utf-8")
+                text = shell(before)
                 ids = targets(text)
+                # elements that had content last time must have it again (an empty one means app.js had not finished)
+                had = {m.group(1) for m in BLOCK.finditer(before)} & set(ids)
                 page = await ctx.new_page()
                 errors: list[str] = []
                 page.on("pageerror", lambda e: errors.append(str(e)))
@@ -161,6 +164,14 @@ async def render(paths: list[Path], port: int) -> dict[Path, dict]:
                     last = n
                     await page.wait_for_timeout(500)
                 got = await page.evaluate(CAPTURE, ids)
+                for _ in range(10):  # slow data (a large JSON file, a busy machine): wait for it, up to 30 s more
+                    missing = sorted(i for i in had if not got["parts"].get(i))
+                    if not missing:
+                        break
+                    await page.wait_for_timeout(3000)
+                    got = await page.evaluate(CAPTURE, ids)
+                else:
+                    errors.append(f"still empty after waiting: {', '.join(missing)}")
                 await page.close()
                 got["errors"] = errors
                 results[p] = got
