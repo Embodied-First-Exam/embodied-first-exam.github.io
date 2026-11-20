@@ -398,7 +398,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
           <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
           <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
-          <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
+          <li><a href="#no-signal">Agent 需要来自 verifier 的信息吗？</a></li>
         </ol></details></li>
         <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
           <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
@@ -658,9 +658,9 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>在 Precision 阶段，与 Privileged 仍有差距。</b>二者兼具时，Agent 解决了 47% 的 Precision 阶段失败，而 Privileged 为 74%。在具有 Privileged 测试的 Precision 阶段失败上，二者兼具的运行相对第二次尝试的增益，相当于 Privileged 所取得增益的 52%（95% 区间 34% 到 69%）。Privileged 挽回了 26 个二者兼具的运行未解决的 Precision 阶段失败，并漏掉 2 个它解决的失败；这 26 个中有 17 个位于沿路径运动、穿入和装配阶段；在击打和接住阶段，二者解决的失败完全相同。剩余差距可能来自逐步步进物理仿真和调用规划原语，这是两项新增功能都不提供的；这表明，Precision 阶段能从在被评分的尝试之前先测试动作中获益。</p>
 <p><b>局限。</b>Precision 阶段失败和 Coarse 阶段失败还来自不同的 Suite：大多数 Precision 阶段失败来自 Embodied Olympics (Fun)、DexToolBench 和 RoboARC，而 97 个 Coarse 阶段失败中有 38 个来自 BEHAVIOR-1K。论文报告，去掉任意一个 Suite 都不会使任何比较结论反转，但其区间和检验将失败的测试视为相互独立。</p>
 
- <h3 id="no-signal" data-short="无成功信号">Astra 几乎不依赖成功提示</h3>
-<p>隐藏成功信号几乎不改变 GPT-6 Astra 的成功频率：在 391 个同时具有两种设置的核心任务的默认测试上，它在无信号时完成 31%，有信号时为 29%；在 50 个 Realtime 测试上，分别为 26% 和 30%。精确状态，尤其是重试能力，重要得多。</p>
-<p>在常规 Standard 接口中，仿真器会在回合成功时报告并立即结束回合。在无信号运行中，不返回任何成功标志、进度或分数，满足成功规则时回合也不会结束。Agent 必须自行判断已经完成并调用 finish，否则回合会在时间耗尽或触发任务自身的失败规则时结束；随后在最终状态上检查成功规则。这在某一方面更严格：已经达成又被破坏的成功，例如物体已正确放置后又被碰落，会被计为失败。</p>
+ <h3 id="no-signal" data-short="Verifier 信息">Agent 需要来自 verifier 的信息吗？</h3>
+<p>在 Standard 设置中，verifier 会在任务成功的那一刻告诉 Agent，并就此结束回合，这就是成功信号。隐藏这一信号，GPT-6 Astra 的成功率几乎不变：在 391 个同时具有两种设置的核心任务的默认测试上，它在无信号时完成 31%，有信号时为 29%；在 50 个 Realtime 测试上，分别为 26% 和 30%。精确状态，尤其是重试能力，重要得多。</p>
+<p>在无信号运行中，不返回任何成功标志、进度或分数，满足成功规则时回合也不会结束。Agent 必须自行判断已经完成并调用 finish，否则回合会在时间耗尽或触发任务自身的失败规则时结束；随后在最终状态上检查成功规则。这在某一方面更严格：已经达成又被破坏的成功，例如物体已正确放置后又被碰落，会被计为失败。</p>
 <figure class="fig"><div class="fig-body" data-fig="tab5"><p class="fig-cap"><span class="fc-t">隐藏成功信号影响很小；加入重置影响很大。</span>论文表 5。GPT-6 Astra 在 Codex 中，在 391 个同时具有 Standard 和 Privileged 测试的核心任务上的成功率（%）。默认测试为 Standard 测试，其中 50 个任务为 Realtime 测试；Realtime 列覆盖这 50 个测试。Privileged 行使用相同任务的 Privileged 测试。</p><div class="tscroll"><table class="fst">
 <thead><tr><th>运行</th><th>默认测试</th><th>Realtime</th></tr></thead>
 <tbody>
