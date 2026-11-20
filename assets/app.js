@@ -2048,13 +2048,14 @@ function bodyLabel(ex, s) {
 }
 
 /** What's new: one small line by the hero's search (owner and Canyu Chen, 2026-11-18): the blog's latest posts from
- *  data/blogs.json, newest first, one at a time, and a link to all posts. With more than one post it turns every few
- *  seconds, holds while hovered or focused, and stays on the newest post for a viewer who prefers less motion. */
+ *  data/blogs.json (up to six, owner 2026-11-20), newest first, one at a time, and a link to all posts. With more than
+ *  one post it scrolls up to the next every few seconds (the shown title leaves upward, the next comes in from below),
+ *  holds while hovered or focused, and stays on the newest post for a viewer who prefers less motion. */
 async function homeNews(el) {
   if (!el) return;
   let posts = [];
   try { posts = await getJSON('data/blogs.json'); } catch (e) { return; }
-  posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 3);
+  posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 6);
   if (!posts.length) return;
   el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts">${posts.map((p, i) => `<a class="hn-post${i ? '' : ' on'}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"><span class="hn-title">${esc(p.short || p.title)}</span></a>`).join('')}</span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
   const items = $$('.hn-post', el);
@@ -2065,10 +2066,12 @@ async function homeNews(el) {
   el.addEventListener('mouseleave', off); el.addEventListener('focusout', () => setTimeout(off));
   setInterval(() => {
     if (hold || document.hidden) return;
-    items[at].classList.remove('on');
+    const out = items[at];
+    out.classList.remove('on'); out.classList.add('out');
+    setTimeout(() => out.classList.remove('out'), 500);
     at = (at + 1) % items.length;
     items[at].classList.add('on');
-  }, 5000);
+  }, 4000);
 }
 
 async function home(ex) {

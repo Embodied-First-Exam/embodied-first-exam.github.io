@@ -1834,10 +1834,12 @@ html { overflow-x: clip; }
 .home-news:empty { display: none; }
 .hn-tag { flex: none; padding: 5px 9px; border-radius: 999px; background: linear-gradient(100deg, var(--priv) 0%, #e8913a 45%, var(--std) 100%); color: #fff;
   font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-.hn-posts { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
-.hn-post { grid-area: 1 / 1; display: flex; align-items: baseline; gap: 8px; min-width: 0; color: var(--ink); opacity: 0; visibility: hidden; transform: translateY(5px);
+.hn-posts { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; overflow: hidden; }
+/* a vertical ticker (owner, 2026-11-20): the shown title scrolls up and out, the next scrolls up from below */
+.hn-post { grid-area: 1 / 1; display: flex; align-items: baseline; gap: 8px; min-width: 0; color: var(--ink); opacity: 0; visibility: hidden; transform: translateY(110%);
   transition: opacity .45s, transform .45s, visibility 0s .45s; }
 .hn-post.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s, transform .45s, visibility 0s; }
+.hn-post.out { transform: translateY(-110%); }
 .hn-title { min-width: 0; }   /* the whole title, on its own line under the search box (owner, 2026-11-20) */
 .hn-post:hover .hn-title { text-decoration: underline; text-underline-offset: 3px; }
 .hn-date { flex: none; font: 500 11px/1 var(--mono); color: var(--ink-3); }
