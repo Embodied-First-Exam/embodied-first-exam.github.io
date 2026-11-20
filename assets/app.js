@@ -69,7 +69,8 @@ const getJSON = (p) => fetch(exam(p), { cache: 'no-cache' }).then((r) => { if (!
 // tasks.json and show in the task drawer, marked "not ranked"; no ranking, score, square, filter or count reads them, and
 // only the Results list of a suite with no core test (suiteListed, owner 2026-11-12) lists them with the other runs
 const UNRANKED_RUNS = new Set();
-const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
+let CORE_TASKS = 0;   // exam.json totals.core_tasks: the size of the core set, for the mode lines under the switch
+const loadExam = () => (examData ??= getJSON('data/exam.json').then((ex) => { for (const r of ex.unranked_runs || []) UNRANKED_RUNS.add(r.id); CORE_TASKS = ex.totals?.core_tasks || 0; Object.assign(TASK_ALIAS, ex.task_alias || {}); return ex; }));
 const loadTasks = () => (taskData ??= getJSON('data/tasks.json'));
 
 /* ------------------------------------------------------------------------------------------- page chrome */
@@ -220,11 +221,13 @@ function pageSetting(scope, mode) {
 }
 const LB_NOT_COMPARABLE = 'Not every model has been run on every task, so each model is scored only on the tests it was run on (a number’s tooltip gives the count), and these numbers are not comparable between models.';
 /** One line under the switch saying what the setting shown measures (owners, 2026-10-19); n is its number of tests. */
+// "433 of the 498 core tasks have a privileged mode" (owner, 2026-11-19); "All 498 core tasks" when every core task has the mode
+const modeShare = (n) => (CORE_TASKS && n !== CORE_TASKS ? `${int(n)} of the ${int(CORE_TASKS)} core tasks` : `All ${int(n)} core tasks`);
 const LB_DESC = {
   overall: (n) => `${int(n)} core tasks. A task counts as solved only if the agent solved every mode it has (standard, and privileged or realtime where the task has them).`,
-  standard: (n) => `${int(n)} core tasks have a standard mode. The agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. The core set is the harder part of the exam: experts among the authors and a coding agent selected it through trial runs, choosing tasks that are challenging and representative of their suite.`,
-  'realtime': (n) => `Tasks with dynamic environments, ${int(n)} of them in the core set, run in realtime mode: the rules follow standard mode, but the world keeps running while the agent thinks.`,
-  privileged: (n) => `In privileged mode (${int(n)} core tasks), the agent and simulator run in the same container, giving the agent access to the full simulator state and letting it reset the simulator as often as needed.`,
+  standard: (n) => `${modeShare(n)} have a standard mode, in which the agent and simulator run in separate containers and communicate only through predefined APIs. The agent can receive sensor data (RGB, RGB-D, etc.) and proprioceptive information, but can't access object poses. The core set is the harder part of the exam: experts among the authors and a coding agent selected it through trial runs, choosing tasks that are challenging and representative of their suite.`,
+  'realtime': (n) => `${modeShare(n)} have a realtime mode, for dynamic environments: the rules follow standard mode, but the world keeps running while the agent thinks.`,
+  privileged: (n) => `${modeShare(n)} have a privileged mode, in which the agent and simulator run in the same container: the agent can read the full simulator state and reset the simulator as often as needed.`,
 };
 const lbDesc = (id, n) => (LB_DESC[id] ? LB_DESC[id](n) : '');
 
