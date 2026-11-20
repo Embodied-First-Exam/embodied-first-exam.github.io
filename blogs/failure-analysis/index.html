@@ -27,7 +27,9 @@
   table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
   table.fst tbody th { font-weight: 400; color: var(--ink-2, var(--ink)); }
   table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
-  table.fst td.lead, table.fst th.lead { font-weight: 650; }
+  table.fst.text td { white-space: normal; text-align: left; font: 400 14px/1.45 var(--body); }
+table.fst.text thead th { text-align: left; }
+table.fst td.lead, table.fst th.lead { font-weight: 650; }
   table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
   table.fst caption, .tbl-note { caption-side: bottom; text-align: left; margin: 10px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
   @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
@@ -379,52 +381,52 @@
       <ol>
         <li><details open><summary><a href="#fail-why">Which tests does each agent fail, and why?</a></summary><ol>
           <li><a href="#cross-solve">Fable and Astra each solve tests the other cannot</a></li>
-          <li><a href="#shared-boundary">Even ten agents together leave 169 Standard tests unsolved</a></li>
-          <li><a href="#where-each-leads">The top agent changes by suite; a newer agent is not always the strongest</a></li>
-          <li><a href="#suites-out-of-reach">In 7 suites, more than half the Standard tests stay unsolved</a></li>
+          <li><a href="#shared-boundary">169 Standard tests stay unsolved; in 7 suites, most tests do</a></li>
+          <li><a href="#where-each-leads">Different suites, different leaders</a></li>
           <li><a href="#task-types">Carrying is easy, tool use is hard</a></li>
           <li><a href="#eight-tests">Why do agents fail tests that others solve? The case of Fable</a></li>
-          <li><a href="#realtime">Which tasks can be solved in Realtime?</a></li>
+          <li><a href="#realtime">Which tasks remain solvable in Realtime?</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#information">Which information matters most? Privileged versus Standard</a></summary><ol>
-          <li><a href="#settings-explained">Three settings: what can the agent see and do?</a></li>
+        <li><details open><summary><a href="#information">What access matters most? Privileged vs Standard</a></summary><ol>
+          <li><a href="#settings-explained">Three settings: what can agents observe and do?</a></li>
           <li><a href="#transfer">Many tasks solved in Privileged fail in Standard</a></li>
-          <li><a href="#state-vs-resets">Resets help more than the exact object state</a></li>
+          <li><a href="#state-vs-resets">Resets help more than exact object state</a></li>
           <li><a href="#precise-stages">Precision stages get much harder in Standard</a></li>
           <li><a href="#precise-resets">At precision stages, resets help; exact state alone does not</a></li>
           <li><a href="#no-signal">Astra barely needs the success signal</a></li>
         </ol></details></li>
         <li><details open><summary><a href="#where">At which stage do agents fail?</a></summary><ol>
-          <li><a href="#same-stage">Agents tend to fail at the same stage</a></li>
-          <li><a href="#same-across-settings">Standard or Privileged, the failure stage is usually the same</a></li>
-          <li><a href="#stage-kinds">Changing a material or moving the body is the hardest</a></li>
-          <li><a href="#by-suite">Each suite fails in its own way</a></li>
-          <li><a href="#by-robot">The body shapes the failure: robots fall, hands miss contact</a></li>
-          <li><a href="#weaker-early">Weaker agents fail before contact, Fable after</a></li>
+          <li><a href="#same-stage">Different agents often fail at the same stage</a></li>
+          <li><a href="#same-across-settings">The failure stage often stays the same across settings</a></li>
+          <li><a href="#stage-kinds">Material and body stages have the highest failure rates</a></li>
+          <li><a href="#by-suite">Failure patterns differ by suite</a></li>
+          <li><a href="#by-robot">Robot bodies shape how failures happen</a></li>
+          <li><a href="#weaker-early">Weaker agents often fail before contact; Fable usually after</a></li>
           <li><a href="#lunch-batteries">Long household tasks: the first items get done; balance is the hard part</a></li>
           <li><a href="#cereal">Cereal and a bowl: strong agents get the bowl within reach; weaker agents are still working on the grasp</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#act">How do agents work?</a></summary><ol>
+        <li><details open><summary><a href="#act">Which control approaches do agents use?</a></summary><ol>
           <li><a href="#control-by-setting">Control directly, write programs, or train a policy?</a></li>
-          <li><a href="#soccer-gpu">Given a GPU, do agents train a policy?</a></li>
+          <li><a href="#soccer-gpu">Given GPUs, agents can train RL policies</a></li>
           <li><a href="#success-methods">How do solved runs succeed? Learn from failure</a></li>
         </ol></details></li>
         <li><details open><summary><a href="#spend">Does spending more help?</a></summary><ol>
-          <li><a href="#spend-cost">Failed attempts cost more, and a cheaper agent comes close to the leaders</a></li>
+          <li><a href="#spend-cost">Failed attempts cost more</a></li>
+          <li><a href="#spend-price">Sol approaches Astra’s success rate at under one-sixth the cost</a></li>
           <li><a href="#spend-how">Fable writes more, Astra acts more, Opus stops early</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#conditions">What changes the score: harness, task instruction, reasoning effort, or another run?</a></summary><ol>
-          <li><a href="#harness-gap">Harness: up to 7.5 points</a></li>
-          <li><a href="#robodojo">Task instruction: the RoboDojo score roughly triples</a></li>
-          <li><a href="#spend-effort">Reasoning effort: only 1.5 points</a></li>
-          <li><a href="#run-variance">Between runs: at most 5 points</a></li>
+        <li><details open><summary><a href="#conditions">How sensitive are the results to the harness, task instruction, reasoning effort and repeated runs?</a></summary><ol>
+          <li><a href="#harness-gap">Harness: the same model, up to 7.5 points apart</a></li>
+          <li><a href="#robodojo">Task instruction: RoboDojo’s score tripled with explicit success conditions</a></li>
+          <li><a href="#spend-effort">Reasoning effort: little change in Sol’s success rate</a></li>
+          <li><a href="#run-variance">Repeated runs: Sol’s success rate varies by less than 5 points</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#next">What’s next, and limitations</a></summary><ol>
+        <li><details open><summary><a href="#next">Limitations and next steps</a></summary><ol>
           <li><a href="#closing-limits">Limitations</a></li>
-          <li><a href="#next-hidden">A hidden set: measuring ability, not memory</a></li>
-          <li><a href="#next-real">Real robots: starting from the Standard interface</a></li>
+          <li><a href="#next-hidden">Hidden tasks: testing ability rather than memory</a></li>
+          <li><a href="#next-real">Real robots: starting with the Standard interface</a></li>
         </ol></details></li>
-        <li><a href="#closing-olympics">Another evaluation: Embodied Olympics Episodic Learning</a></li>
+        <li><a href="#closing-olympics">Embodied Olympics: Continual Learning for Agents</a></li>
       </ol>
     </nav>
 
@@ -490,7 +492,7 @@
 <p>A failure by the agent with the most successes does not mark a test as hard. Eight tests Fable fails are solved by at least four of the other nine agents, and one, an Embodied Safety Exam pour, by six, including Kimi, Gemini 3.8 Flash, Qwen and DeepSeek (all eight are listed in <a href="#eight-tests">Fable’s misses on widely solved tests</a>).</p>
 <p>With full simulator access the split between Fable and Astra is nearly even: in Privileged, 28 tests only Fable solves and 24 only Astra solves, with 284 solved by both and 55 by neither (391 tests). Astra is the only strong solver of 12 Privileged tests, Fable of 9, Sol of 5, Argon of 2 and Opus of 1. The Realtime split is in <a href="#realtime">the Realtime section</a>.</p>
 
-    <h3 id="shared-boundary" data-short="Unsolved by all">Even ten agents together leave 169 Standard tests unsolved</h3>
+    <h3 id="shared-boundary" data-short="Unsolved tests">169 Standard tests stay unsolved; in 7 suites, most tests do</h3>
 <p>Pooling all ten agents, 287 of the 456 Standard tests are solved by at least one and 169 (37%) by none. The five strong agents together solve 286 (63%), and the five weaker agents add one test. This shared boundary is the clearest measure in the exam of what current coding agents cannot yet do under real-robot constraints, and it does not depend on which agent we look at.</p>
 <p>Most of what one agent fails, every agent fails. Of the 230 Standard tests Claude Fable 5.2 fails, 169 are these unsolved tests; only about a quarter (61) are tests another agent solved.</p>
 <figure class="fig paper fig-wide">
@@ -502,7 +504,20 @@
 <p>In Standard, the five strong agents solve 226, 157, 147, 114 and 110 of 456 tests, and the five weaker agents 46, 29, 17, 14 and 11. Few tests are solved by many agents: 33 by all five strong agents, and only one, a button-press test, by all ten. At the other end, 77 tests are solved by exactly one agent.</p>
 <p>The unsolved tests cluster in a few suites: BEHAVIOR-1K contributes 36 of the 169, Embodied Olympics - Fun 26, DexToolBench 17, RoboARC 14 plus 7 IKEA assembly tests, RoboPaint 11, MyoSuite 8 and HumanoidBench 7 (<a href="#suites-out-of-reach">suites out of reach</a> looks at these suites).</p>
 <p>This gap is what the exam is designed to produce: tasks whose Privileged tests can be solved by search, but that stay hard under real-robot constraints. Of the 169 Standard tests no agent solves, 160 belong to tasks that also have a Privileged test, and some agent solves 122 of those Privileged tests. Only 38 stay unsolved in both settings; the other 9 have no Privileged test. Across the whole Privileged Setting, only 43 of 391 tests (11%) are solved by no agent, 19 of them in BEHAVIOR-1K. The strong agents together solve 348 Privileged tests (89%), and the weaker agents add none.</p>
-<h3 id="where-each-leads" data-short="By suite">The top agent changes by suite; a newer agent is not always the strongest</h3>
+
+<p id="suites-out-of-reach">Of the 22 suites with at least five Standard tests, 7 have at least half their tests solved by none of the five strong agents. With full simulator access, only one, HumanoidBench, is still that far out of reach.</p>
+<figure class="fig paper fig-wide">
+  <div class="fig-body" data-fig="10">
+    <p class="fig-cap"><span class="fc-t">Under real-robot constraints, seven suites stay at least half unsolved; with full simulator access, only one does.</span> Paper Figure 10. Success rates by suite, for suites with at least five core tests in the setting. Dots give each strong agent’s success rate; bars give the share of tests that none of them solves. The IKEA assembly tasks of RoboARC count as their own suite.</p>
+    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="Paper Figure 10: suite-by-suite Standard and Privileged success rates of the five strong agents. In 7 of 22 Standard suites at least half the tests are solved by none of them: HumanoidBench, IKEA assembly, DexToolBench, MyoSuite, BEHAVIOR-1K, RoboPaint and RoboDojo. In Privileged only HumanoidBench is." width="1920" height="1080"></div>
+  </div>
+</figure>
+<p>The seven Standard suites, with the number of tests no strong agent solves, are HumanoidBench (7 of 8), the IKEA assembly tasks (7 of 8), DexToolBench (17 of 20), MyoSuite (8 of 13), BEHAVIOR-1K (36 of 71), RoboPaint (11 of 22) and RoboDojo (6 of 12). They cover different kinds of difficulty: whole-body humanoid control, furniture assembly and tool use with a dexterous hand, muscle-driven arms and hands, long household activities, painting that can only be checked through the cameras, and goals whose success check is written in different ways. In the two hardest, no strong agent solves more than two tests: Astra’s 2 is the most in DexToolBench, and in the IKEA assembly tasks only Fable and Astra solve one each.</p>
+<p>This is the pattern the exam is designed to produce. In Privileged, the share of tests no strong agent solves falls to 4 of 20 in DexToolBench, 6 of 13 in MyoSuite, 19 of 71 in BEHAVIOR-1K, 1 of 12 in RoboDojo, and 0 in both RoboPaint (22 tests) and the IKEA assembly tasks (8 tests); only HumanoidBench stays at least half unsolved, at 4 of 8. So for six of the seven suites, exact state and unlimited resets let the strong agents find a solution, and what blocks them in Standard is doing the same work through cameras and sensors with few or no resets.</p>
+<p>The 70% line shows the same from the other end. Averaged over the five strong agents, success reaches at least 70% in only one Standard suite, ManiGuard (71%), but in 13 of the 20 suites with at least five Privileged tests: ManiGuard, Embodied Olympics - Match, MuJoCo Playground, RoboDynamicExam, RoboCasa365, EmbodiedSWE, RoboWits, BiGym 2.0, RoboPaint, Embodied Olympics - Fun, DexHandExam, iSpatialGym and RoboARC.</p>
+<p>Across all seven suites, the five weaker agents together solve two Standard tests, both by Kimi 3.1 Pro: a MyoSuite object reorientation that Fable, Astra and Opus also solve, and the RoboDojo block-swapping test that no other agent solves.</p>
+
+<h3 id="where-each-leads" data-short="By suite">Different suites, different leaders</h3>
 <p><b>A newer agent can also do worse than an older one on specific suites.</b> Broken down by suite, the agent with the most successes changes several times. The IKEA assembly tasks of RoboARC count as their own suite.</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="suite-diff">
@@ -539,19 +554,6 @@
     </table></div>
   </div>
 </figure>
-<h3 id="suites-out-of-reach" data-short="Out-of-reach suites">In 7 suites, more than half the Standard tests stay unsolved</h3>
-<p>Of the 22 suites with at least five Standard tests, 7 have at least half their tests solved by none of the five strong agents. With full simulator access, only one, HumanoidBench, is still that far out of reach.</p>
-<figure class="fig paper fig-wide">
-  <div class="fig-body" data-fig="10">
-    <p class="fig-cap"><span class="fc-t">Under real-robot constraints, seven suites stay at least half unsolved; with full simulator access, only one does.</span> Paper Figure 10. Success rates by suite, for suites with at least five core tests in the setting. Dots give each strong agent’s success rate; bars give the share of tests that none of them solves. The IKEA assembly tasks of RoboARC count as their own suite.</p>
-    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="Paper Figure 10: suite-by-suite Standard and Privileged success rates of the five strong agents. In 7 of 22 Standard suites at least half the tests are solved by none of them: HumanoidBench, IKEA assembly, DexToolBench, MyoSuite, BEHAVIOR-1K, RoboPaint and RoboDojo. In Privileged only HumanoidBench is." width="1920" height="1080"></div>
-  </div>
-</figure>
-<p>The seven Standard suites, with the number of tests no strong agent solves, are HumanoidBench (7 of 8), the IKEA assembly tasks (7 of 8), DexToolBench (17 of 20), MyoSuite (8 of 13), BEHAVIOR-1K (36 of 71), RoboPaint (11 of 22) and RoboDojo (6 of 12). They cover different kinds of difficulty: whole-body humanoid control, furniture assembly and tool use with a dexterous hand, muscle-driven arms and hands, long household activities, painting that can only be checked through the cameras, and goals whose success check is written in different ways. In the two hardest, no strong agent solves more than two tests: Astra’s 2 is the most in DexToolBench, and in the IKEA assembly tasks only Fable and Astra solve one each.</p>
-<p>This is the pattern the exam is designed to produce. In Privileged, the share of tests no strong agent solves falls to 4 of 20 in DexToolBench, 6 of 13 in MyoSuite, 19 of 71 in BEHAVIOR-1K, 1 of 12 in RoboDojo, and 0 in both RoboPaint (22 tests) and the IKEA assembly tasks (8 tests); only HumanoidBench stays at least half unsolved, at 4 of 8. So for six of the seven suites, exact state and unlimited resets let the strong agents find a solution, and what blocks them in Standard is doing the same work through cameras and sensors with few or no resets.</p>
-<p>The 70% line shows the same from the other end. Averaged over the five strong agents, success reaches at least 70% in only one Standard suite, ManiGuard (71%), but in 13 of the 20 suites with at least five Privileged tests: ManiGuard, Embodied Olympics - Match, MuJoCo Playground, RoboDynamicExam, RoboCasa365, EmbodiedSWE, RoboWits, BiGym 2.0, RoboPaint, Embodied Olympics - Fun, DexHandExam, iSpatialGym and RoboARC.</p>
-<p>Across all seven suites, the five weaker agents together solve two Standard tests, both by Kimi 3.1 Pro: a MyoSuite object reorientation that Fable, Astra and Opus also solve, and the RoboDojo block-swapping test that no other agent solves.</p>
-
     <h3 id="task-types" data-short="Task types">Carrying is easy, tool use is hard</h3>
 <p><b>Every agent finds carrying objects easiest and using tools hardest, while the types in between change order from agent to agent.</b> The paper gives each core task one or more of nine task types. Pooling the five strong agents, Object Transport has the highest Standard success rate, 45% of their attempts, and Tool Use the lowest, 14%. The order also holds for each agent separately: every one of the five does best on Object Transport and worst on Tool Use.</p>
 <figure class="fig paper fig-wide">
@@ -604,15 +606,15 @@
 <p><b>It had no margin left.</b> On a drone-control test its controller passed 9 of the 10 hidden flights, and the test needs all 10 (<a href="../../run/?r=roboengineer-neuralfly-general-skydio-i01-standard--2lmjgra">run</a>).</p>
 <p><b>A Privileged case of the same pattern.</b> This case lies outside the 8 Standard tests. Fable solved RoboWits’ stand-the-bulb test in the Standard Setting but failed it in the Privileged Setting, which six of the other nine agents solved. With privileged access, it spent the hour trying to make the bulb stand by itself in a leaning pose, resetting the simulation about 700 times, and the time limit came before it had saved a trajectory (<a href="../../run/?r=robowits-stand-bulb-i00-privileged--hbmnxvr">run</a>). GPT-6 Astra stood the bulb in the ring that the scene provides and saved a checked trajectory at minute 10 (<a href="../../run/?r=robowits-stand-bulb-i00-privileged--7yfezvr">run</a>). In the Standard Setting the order reverses: Fable and Opus solve this test, and Astra does not.</p>
 
-    <h3 id="realtime" data-short="Realtime">Which tasks can be solved in Realtime?</h3>
+    <h3 id="realtime" data-short="Realtime">Which tasks remain solvable in Realtime?</h3>
 <p>Realtime is harder than Standard for every strong agent. The simulation does not pause while the agent thinks, so a slow decision costs time on the robot. On the 54 core tasks that have both a Standard and a Realtime test, 25 of the 54 Realtime tests (46%) are solved by no agent, against 19 of the 54 Standard tests (35%).</p>
 <p>On these 54 tasks, Claude Fable 5.2 solves 27 Standard tests and 22 Realtime tests, GPT-6 Astra 23 and 17, GPT-6.1 Sol 17 and 13, Claude Opus 5.5 10 and 4, and Gemini 4 Argon 15 and 5. Opus and Argon lose the most, and Realtime is the one setting where Argon solves more than Opus, by one test. Kimi 3.1 Pro solves 4 Realtime tests, as many as Opus; Gemini 3.8 Flash, Qwen3.8 Max and DeepSeek V4.1 Flash solve 1 each, and GLM 5.3 Flash none.</p>
 <p>The drop is not uniform, and some tasks go better in Realtime. Of the 54 tasks, 12 are solved in Standard by some agent but in Realtime by none, and 6 the other way round. Every strong agent except Argon solves some Realtime tests it fails in Standard: Fable 9, Astra 3, Sol 3 and Opus 2. The suites differ. In BiGym 2.0, 8 of 10 Realtime tests stay unsolved, against 3 of 10 in Standard, and in Embodied Olympics - Match 5 of 12 against 2 of 12. In RoboDynamicExam the direction reverses: 1 of 8 Realtime tests stays unsolved, against 3 of 8 in Standard, and Fable solves 6 Realtime tests there against 3 Standard tests. In Realtime, 94% of the sampled attempts control the robot with a program, most of them one that runs the control loop (<a href="#control-by-setting">control approach</a>), so tasks that reward a fast closed loop can gain from this setting.</p>
 <p>The two-way comparisons between agents shift as well. In Realtime, 9 tests are solved only by Fable and 4 only by Astra, with 13 solved by both and 28 by neither. Sol solves 5 Realtime tests that Fable fails, one more than Astra, while Astra solves 7 that Sol fails and Sol 3 that Astra fails.</p>
 
 
-    <h2 id="information" data-short="Which information matters">Which information matters most? Privileged versus Standard</h2>
-    <h3 id="settings-explained" data-short="Three settings">Three settings: what can the agent see and do?</h3>
+    <h2 id="information" data-short="What access matters">What access matters most? Privileged vs Standard</h2>
+    <h3 id="settings-explained" data-short="Three settings">Three settings: what can agents observe and do?</h3>
     <p>The three tests of a task share the initial scene, the success rule and the time limit, and a verifier outside the agent’s control grades every attempt. Only the agent’s access to the world changes (paper Figure 3, below).</p>
     <p>In the <b>Standard</b> Setting, the agent runs in its own container and reaches the robot only through the robot’s interface: it requests camera images, depth and joint readings, submits chunks of actions, and must estimate poses from images and depth. It never gets object poses, segmentation, contact forces or the success checker, and it cannot reset the scene unless the task grants a reset budget (seven suites do, with 3 to 50 resets). The simulator and the verifier share a second container and grade the live episode as it runs, so an error stays in the graded result. The simulation pauses while the agent thinks. The <b>Realtime</b> Setting is the same, except that the simulation never waits.</p>
     <p>In the <b>Privileged</b> Setting, the agent shares a container with the simulator. It can read the exact state of every object (pose, size, velocity, joint positions), step the physics itself, call planning primitives, reset the scene without limit, and save and restore states. It submits a low-level trajectory (for some tasks, a controller program), which a separate verifier replays on a fresh copy of the scene, so mistakes made while exploring cost nothing. The time limit is the same as in Standard: Privileged gives more access, not more time. The tasks are designed so that this access is enough to find a solution by search; a high Privileged rate shows that a task is solvable, and the paper treats it as an approximate upper bound.</p>
@@ -631,7 +633,7 @@
 <p><b>The drop is broad.</b> The paper reports that Fable’s success rate drops in all but one of the suites with at least five such tasks; that suite is iSpatialGym, where Fable solves 7 of 8 tasks in both settings. Astra and Sol drop in every one of these suites. Opus does not drop in ManiGuard (7 of 7 in both) or DexToolBench (none in either). Argon shows small reversals in MyoSuite (1 of 13 in Standard, 0 in Privileged) and RoboDojo (4 of 12 in Standard, 3 in Privileged), and ties in RoboLab (1 of 6 in both).</p>
 <p><b>Agents that look even in Privileged can differ a lot in Standard.</b> Of the 391 Privileged tests, only Fable solves 28, only Astra 24, both 284 and neither 55. In Standard, Fable keeps 175 of its Privileged successes and Astra 116 (Figure 11). What separates them is how much survives without exact state and free retries, the two features the next sections take apart.</p>
 
-    <h3 id="state-vs-resets" data-short="Resets versus state">Resets help more than the exact object state</h3>
+    <h3 id="state-vs-resets" data-short="Resets versus state">Resets help more than exact object state</h3>
 <p>When the paper adds the Privileged features to the Standard interface one at a time, unlimited resets close more of the gap than exact object state. This suggests that the harder part for the agent is getting the action right, not knowing where things are.</p>
 <p>The paper ran GPT-6 Astra in Codex with the reasoning effort, time limit and tasks of its leaderboard run, changing only these features. The state query is read-only and returns, for every object, its position, orientation, size and bounding box, linear and angular velocity, and the joint positions of the robot and of articulated objects such as doors and drawers. It never returns success flags, scores, thresholds or goal regions, and it hides fields the agent is meant to find out itself, such as goal markers, hint notes and hazard labels. The reset feature raises the reset budget to 1,000 and adds calls that save the simulator state under a handle and restore it later. Runs are scored on the default test of each of the 391 core tasks that have both settings (the Standard test, or the Realtime test for 50 of them), so the 29% baseline is the leaderboard run counted on this set, not Astra’s 157 of 456 Standard tests.</p>
 <p>Astra solves 29% with the unmodified interface, 45% with the state query, 53% with unlimited resets and saved states, and 68% with both, still 11 points short of the 79% it reaches on the Privileged tests of the same tasks (Figure 12a). On the 50 Realtime tests, the gap between the two features is wider: 30% at baseline, 38% with the state query, 64% with resets, 80% with both and 84% in Privileged (paper Table 5).</p>
@@ -676,7 +678,7 @@
 
 
     <h2 id="where" data-short="Where they fail">At which stage do agents fail?</h2>
-    <h3 id="same-stage" data-short="Same stage">Agents tend to fail at the same stage</h3>
+    <h3 id="same-stage" data-short="Same stage">Different agents often fail at the same stage</h3>
 <p>Each task is divided into stages, each a change in the world that the task requires: the fridge is open, the tomato is inside, the fridge is closed again. The failure analysis records the stage at which each failed attempt went wrong, so we can ask whether two agents that fail the same test fail at the same point. Mostly they do.</p>
 <p>The paper measures this as the concentration of failure stages: the chance that two failed attempts on a test, picked at random, failed at the same stage (they always come from different agents, since each agent makes one attempt per test). On the Standard tests that at least two agents failed at located stages, on tasks with at least two stages, the concentration averages 58% over the ten agents. If each failure fell at a random stage, with early stages favoured in the same proportion as on the other tasks, it would be 35% (Figure 14, panel (a)). In the Privileged Setting it is 49% against 32%.</p>
 <p>The weaker agents do not drive this number, although they often fail before meeting any stage and two failures at the very first stage agree trivially. Among the five strong agents alone, on the Standard tests where at least two of them failed at located stages, the concentration is 55%, against 30% for a random baseline built from their own failures on the other Standard tasks.</p>
@@ -697,20 +699,20 @@
   </div>
 </figure>
 
-    <h3 id="same-across-settings" data-short="Across settings">Standard or Privileged, the failure stage is usually the same</h3>
+    <h3 id="same-across-settings" data-short="Across settings">The failure stage often stays the same across settings</h3>
 <p>Agents solve far more tests in the Privileged Setting, yet the stage at which most failures of a task fall is usually the same in Standard and Privileged. The paper takes the 186 tasks whose failures have a single most common stage in both settings. In 150 of them, or 81%, that stage is the same, against 47% if the failure stages of each setting were drawn independently at random, with early stages favoured as before. Much of this agreement comes from tasks that simply fail at their first stage: in 98 of the 186 tasks, the common stage is the first stage in both settings. On the remaining 88 tasks the common stage is still the same in 59% (95% interval 49% to 69%), against 9% under the random baseline, not counting draws where both common stages are the first stage (Figure 14, panel (a), bottom bar).</p>
 <p>Where the two common stages differ, the Standard one usually comes earlier in the task (in 25 tasks, against 11 where it comes later): under real-robot constraints, agents get stuck sooner.</p>
 <p>The settings differ sharply after the hard stage. For each attempt, the paper takes the stage at which the other agents on the same test most often failed and asks whether the attempt got past it. Of the attempts that did, 43% passed the test in Standard, against 71% in Privileged; most of the other Standard attempts failed at a later stage. Over all attempts, the pass rates are 15% and 39%. Part of the link between getting past the stage and passing comes from stage order, since such an attempt is already closer to the end of the task. Even so, the gap between 43% and 71% says that in Standard, clearing the hardest step is often not enough: later stages that full access makes easy can still fail.</p>
 <p>So the drop from Privileged to Standard is not mainly agents taking a different route through the task and hitting new obstacles. The same steps are hard in both settings, and real-robot constraints make them harder and add failures after them. These counts describe where failures fall; they do not show that an agent follows the same plan in the two settings.</p>
 
-    <h3 id="stage-kinds" data-short="Stage kinds">Changing a material or moving the body is the hardest</h3>
+    <h3 id="stage-kinds" data-short="Stage kinds">Material and body stages have the highest failure rates</h3>
 <p><b>Changing a material or moving the robot’s body fails most often, but which kinds of stage are hardest does not carry over from one suite to another.</b> Every stage has a type naming the robot action that brings it about, and the types fall into categories: relation (placing or fitting one object relative to another), pose, mechanism (doors, lids, buttons), material (wiping, pouring, painting), body (walking, keeping balance), dynamic (catching, striking) and competition. A category’s failure rate is the share of its stages that attempts reach and then fail. Pooled over Standard and Privileged, the rates spread widely (Figure 14, panel (b)): material stages fail at 56% (741 of 1,313 reached), body stages at 39% (473 of 1,227), competition and relation stages at 29% each, dynamic stages at 28%, pose stages at 19% and mechanism stages at 17% (387 of 2,330).</p>
 <p>The extremes hold in each setting separately, and every category fails more often under real-robot constraints: material stages at 75% in Standard and 35% in Privileged, body stages at 58% and 23%, and mechanism stages at 22% and 11%. The pose, relation and dynamic categories lie between, in an order that differs between the settings, so the paper does not rank these three against each other.</p>
 <p>Within a category, how the robot has to act matters as much as what it acts on. Among mechanism stages, opening a door or a lid fails at 31% (282 of 907), closing one at 15% when it is not already closed at the start, and pressing at 3% (14 of 435). Stages done by pressing or wiping fail at 6% when the robot presses on a mechanism such as a button, and at 62% when it wipes or presses on a material. Relation stages fail at 29% of reached stages with one hand or gripper, at 43% when two arms act together, and at 59% when the legs or torso carry the robot’s weight (paper Figure 28). Acting through a tool cuts both ways: stages on moving objects fail less often when the robot acts through a cup or a racket, while pose stages fail more often when it moves an object through a tool.</p>
 <p>A difficulty ranking learned in some suites mostly does not predict difficulty in a new one. The paper holds out one suite at a time, ranks each pair of stage types by their failure rates on the other suites, and checks the ranking inside the held-out suite. It holds for 55% of 361 pairs of stage types, barely above the 50% of a coin flip; for the mode of contact alone, 48% of 163 pairs; for the coarser stage categories, 65% of 82 pairs.</p>
 <p>What does predict failure at a stage is who is acting. The paper predicts whether an attempt that reaches a stage fails there from the setting plus one other attribute, with cross-validation over tasks, and reports how much each attribute improves on the setting alone: the agent by 15%, the stage type by 6.0%, the contact (who touches and how) by 6.0%, the stage category by 4.7%, the suite by 4.3% and the kind of robot body by 3.2%. So a specific stage of a specific task is often a shared bottleneck, but the general kind of that stage is a weak guide to difficulty in other suites.</p>
 
-    <h3 id="by-suite" data-short="By suite">Each suite fails in its own way</h3>
+    <h3 id="by-suite" data-short="By suite">Failure patterns differ by suite</h3>
 <p>Broken down by suite, the 5,517 analyzed failures show that the suite largely decides where and how agents fail (Figure 26).</p>
 <p><b>The failure stage is often fixed by the suite’s design.</b> Every RoboPaint failure is at a material stage, every Embodied Olympics - Match failure at a competition stage, and every DexToolBench failure with a located stage at a pose stage. In Embodied Olympics - Match and DexToolBench this follows from the tasks, since every stage of every task there is of that category. Elsewhere one category dominates without being the only one: dynamic stages hold 63% of RoboDynamicExam failures and 58% of Embodied Olympics - Fun failures, body stages 93% of MuJoCo Playground failures, and pose stages 73% of MyoSuite failures. Relation stages dominate the household and tabletop suites: 54% of BEHAVIOR-1K failures, 68% of RoboARC and BiGym 2.0, 87% of RoboDojo, 89% of KinDER, 91% of RoboCasa365 and all of RoboLab’s. Over all failures, relation stages are the most common, at 38%.</p>
 <p><b>How far a failed attempt gets also differs sharply.</b> In DexToolBench and KinDER, most failed attempts never meet a single stage of the task (69% and 77%), and in BiGym 2.0 51% meet none: the agent never establishes the first grasp or tool pose. In RoboPaint, 95% of failed attempts meet at least half of the stages, because painting fails on how well the strokes match, not on whether the robot begins. In Embodied Safety Exam and ManiGuard, some failed attempts meet every stage at one moment (14% and 22%) and still fail; in Embodied Safety Exam most of these break a safety constraint.</p>
@@ -723,7 +725,7 @@
   </div>
 </figure>
 
-    <h3 id="by-robot" data-short="By robot">The body shapes the failure: robots fall, hands miss contact</h3>
+    <h3 id="by-robot" data-short="By robot">Robot bodies shape how failures happen</h3>
 <p><b>Robots that carry their own weight fall, and hands fail to make contact.</b> Figure 27 breaks the same 5,517 failures down by the kind of robot body, by agent and by setting. Each kind of body comes from only a few suites (three quarters of the mobile-manipulator failures are BEHAVIOR-1K’s, and all quadruped failures come from MuJoCo Playground).</p>
 <p><b>Robots that support their own weight mostly fail by falling.</b> Loss of balance or a gait failure is the most common phenomenon for quadrupeds (88% of their failures), humanoids (32%) and mobile manipulators (25%). Every quadruped failure is at a body stage. Humanoid failures are spread more widely, with 35% at dynamic stages and 28% at body stages, because many humanoid tasks come from the Embodied Olympics.</p>
 <p><b>Hands often fail before they get going.</b> Failure to make the contact a stage needs is the most common phenomenon for dexterous hands (32%) and for the musculoskeletal models of MyoSuite (34%). For dexterous hands, 55% of failed attempts never meet a stage of the task, and 69% of failures are at pose stages: the hand never reaches the grasp or tool pose that the rest of the task depends on.</p>
@@ -737,7 +739,7 @@
   </div>
 </figure>
 
-    <h3 id="weaker-early" data-short="Early and late failures">Weaker agents fail before contact, Fable after</h3>
+    <h3 id="weaker-early" data-short="Early and late failures">Weaker agents often fail before contact; Fable usually after</h3>
 <p>The weaker agents do not fail the same steps more often than the strong ones; they fail earlier. Their attempts more often end before the task has started, and at stages that need contact they miss the contact several times more often. Almost everything a weaker agent solves, some strong agent also solves.</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="16">
@@ -815,7 +817,7 @@
 <p>With exact state the bowl is manageable: in the Privileged Setting, Fable, Astra, Sol and Opus all solve this test.</p>
 
 
-    <h2 id="act" data-short="How agents work">How do agents work?</h2>
+    <h2 id="act" data-short="Control approaches">Which control approaches do agents use?</h2>
     <h3 id="control-by-setting" data-short="Control approach">Control directly, write programs, or train a policy?</h3>
     <p>An agent can control the robot in three ways, or mix them. In <b>direct control</b>, the model itself is the controller: it sends a move, looks at the camera images or sensor readings, and chooses the next move. In <b>code to control</b>, it writes a planner, a controller or another program, and the program produces the robot’s actions. In <b>train a policy</b>, it trains a policy in simulation and lets the policy control the robot. The figure shows one attempt of each kind, with an excerpt of what the agent wrote.</p>
     <figure class="fig paper fig-wide">
@@ -838,7 +840,7 @@
     <p><b>The same agent changes approach when the setting changes.</b> On a RoboTwin 2.0 task that asks for three bottles to go into a dustbin, GPT-6 Astra in the Standard Setting sent end-effector commands one at a time and checked the camera images after each. It knocked one bottle over, picked it up again with the other arm, and finished about 30 seconds before the time limit. In the Privileged Setting it read the task’s source code, scripted the grasps with the simulator’s motion primitives, handed the bottles from one arm to the other in mid-air and submitted after five minutes.</p>
     <p><b>Training a policy is rare unless the test supplies the tools.</b> Only 15 of the 2,622 sampled attempts trained a policy: 0.7% of the Standard sample, 2% of the Realtime sample and 0.2% of the Privileged sample. Many Privileged tests give the agent a GPU to run the simulator, but their instructions name no training library. Apart from these, only eight tests give the agent a GPU: the GPU versions of a soccer match and of a table tennis match in each setting, and two RoboEngineer tests that ask the agent to train a walking policy. When a test does supply a GPU and a training library, agents train, as the soccer match below shows.</p>
 
-    <h3 id="soccer-gpu" data-short="GPU and policies">Given a GPU, do agents train a policy?</h3>
+    <h3 id="soccer-gpu" data-short="GPU and policies">Given GPUs, agents can train RL policies</h3>
     <p><b>In Standard and Realtime, almost every win comes from a policy the agent trained.</b> In the Standard and Realtime settings of a humanoid soccer match, agents trained a policy when given a GPU and a training library, and 8 of the 9 wins used a trained policy. Without the GPU, agents wrote walking gaits by hand and won once. In the Privileged Setting, 7 of the 9 wins instead reused the opponent’s walking network.</p>
     <p><b>Two versions of one match.</b> The soccer match of Embodied Olympics - Match comes in two versions with the same frozen scene and the same opponent, a team that plays with a learned policy. Each team has two Booster T1 humanoids, and the limit is four hours. The agent controls its two robots joint by joint, so it needs a walking gait before it can play at all. The GPU version adds a GPU with 12 GiB of memory, the mjlab simulator with the rsl_rl reinforcement-learning library and PyTorch, training copies of the match that run on the GPU, and an instruction that lets the agent train or write a controller and gives an example of training a walking policy with rsl_rl. The CPU version has no GPU and no machine-learning framework, and its instruction allows learning code in NumPy or SciPy.</p>
     <figure class="fig">
@@ -902,21 +904,23 @@
 
 
     <h2 id="spend" data-short="Spending more">Does spending more help?</h2>
-    <h3 id="spend-cost" data-short="Does it help?">Failed attempts cost more, and a cheaper agent comes close to the leaders</h3>
-<p><b>An agent at less than a sixth of the price comes within about two points.</b> Across agents, the cost of an attempt and the chance of success are only loosely related. Within one agent, the expensive attempts are mostly the failures: a failing agent keeps working, and the bill keeps growing. For the five strong agents, the Privileged Setting raises success sharply while lowering the cost per attempt. Money spent mostly tracks how long the agent tried; it does not buy success.</p>
+    <h3 id="spend-cost" data-short="Failed attempts cost more">Failed attempts cost more</h3>
+<p>Across agents, the cost of an attempt and the chance of success are only loosely related. Within one agent, the expensive attempts are mostly the failures: a failing agent keeps working, and the bill keeps growing. For the five strong agents, the Privileged Setting raises success sharply while lowering the cost per attempt. Money spent mostly tracks how long the agent tried; it does not buy success.</p>
 <p><b>How cost is measured.</b> The paper prices each attempt from the token counts of its API requests at the providers’ list prices (Figure 21), not at what anyone was billed. The 8,923 priced attempts across the ten agents and all settings add up to about $64,530.</p>
+<p><b>For every agent, failure is the expensive outcome.</b> In both Standard and Privileged, the median failed attempt costs more than the median solved one, for all ten agents. Standard medians, solved against failed, are $9.01 and $25.90 for Astra, $1.05 and $3.14 for Sol, $8.81 and $12.75 for Fable, $2.97 and $4.66 for Opus, and $2.85 and $5.95 for Argon. Costlier suites do not explain this: within the same suite, the median failed Standard attempt in a typical suite costs 1.29 times (Opus) to 1.92 times (Gemini 3.8 Flash) the median solved one.</p>
+<p><b>Much of the extra cost is extra time, for some agents.</b> 52.5% of Astra’s failed Standard attempts, 54.7% of Sol’s and 78.6% of Argon’s ran to at least 95% of the time limit, against 2.5%, 4.1% and 9.1% of their solved attempts. Only 8.3% of Fable’s and 6.4% of Opus’s failed Standard attempts ran that long, yet their failures also cost more than their successes.</p>
+<p><b>Better information beats more spending.</b> For the five strong agents, a Privileged attempt costs less on average than a Standard one and succeeds far more often: Astra $22.92 against $27.12, Fable $11.36 against $13.43, Sol $3.98 against $4.10, Opus $4.79 against $6.45, and Argon $4.21 against $6.27. What lifts success there is what the agent can know and undo (exact object state, unlimited resets with saved states, a private simulator), not what it spends.</p>
+
+ <h3 id="spend-price" data-short="Price and success">Sol approaches Astra’s success rate at under one-sixth the cost</h3>
+<p><b>GPT-6.1 Sol costs $4.10 per Standard attempt, under a sixth of GPT-6 Astra’s $27.12, and solves 32.2% of the Standard tests against Astra’s 34.4%.</b> <b>Price is only a rough guide to success.</b> In the Standard Setting, an attempt of GPT-6 Astra costs $27.12 on average, about twice one of Claude Fable 5.2 ($13.43) and about four times one of Claude Opus 5.5 ($6.45) or Gemini 4 Argon ($6.27). GPT-6.1 Sol costs the least of the five strong agents, $4.10, less than a sixth of Astra’s price, and solves 147 of 456 Standard tests (32.2%) against Astra’s 157 (34.4%), and more than Opus (114) or Argon (110). In the other direction, Kimi 3.1 Pro ($8.05) and Gemini 3.8 Flash ($7.09) spend more per attempt than Opus or Argon and solve less than half as many Standard tests, 46 and 29. Across all three settings, the mean cost per attempt is $24.61 for Astra and $12.48 for Fable.</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="cost">
     <p class="fig-cap"><span class="fc-t">Cost and success are only loosely tied: agents at very different prices reach similar success rates.</span> Paper Figure 21. Success rate of each agent against the mean list-price cost of one attempt (log scale), in the Standard Setting (filled circles, 456 tests) and the Privileged Setting (hollow circles, 391 tests). The line joins each agent’s two settings.</p>
     <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig_cost_vs_success.png?v=9fe3b39d" alt="Paper Figure 21: success rate versus mean list-price cost per attempt for ten agents in the Standard and Privileged settings. GPT-6 Astra costs about $27 per Standard attempt and Claude Fable 5.2 about $13; GPT-6.1 Sol costs about $4 and reaches a Standard success rate close to Astra’s. For most agents the Privileged point lies to the left of and above the Standard point." width="3334" height="1250"></div>
   </div>
 </figure>
-<p><b>Price is only a rough guide to success.</b> In the Standard Setting, an attempt of GPT-6 Astra costs $27.12 on average, about twice one of Claude Fable 5.2 ($13.43) and about four times one of Claude Opus 5.5 ($6.45) or Gemini 4 Argon ($6.27). GPT-6.1 Sol costs the least of the five strong agents, $4.10, less than a sixth of Astra’s price, and solves 147 of 456 Standard tests (32.2%) against Astra’s 157 (34.4%), and more than Opus (114) or Argon (110). In the other direction, Kimi 3.1 Pro ($8.05) and Gemini 3.8 Flash ($7.09) spend more per attempt than Opus or Argon and solve less than half as many Standard tests, 46 and 29. Across all three settings, the mean cost per attempt is $24.61 for Astra and $12.48 for Fable.</p>
 <p>More expensive agents do tend to solve more: the rank correlation between mean cost and success rate across the ten agents is 0.76 in Standard and 0.64 in Privileged. The examples above show how wide the spread around that trend is.</p>
 <p><b>Per solved test, the order changes again.</b> Total Standard spending divided by tests solved gives the cost of one success: $12.72 for Sol, $13.07 for DeepSeek V4.1 Flash, $25.80 for Opus, $26.01 for Argon, $27.09 for Fable, $27.46 for GLM 5.3 Flash, $78.76 for Astra, $79.80 for Kimi 3.1 Pro, $89.89 for Qwen3.8 Max and $111.47 for Gemini 3.8 Flash. A low number does not mean an agent can do the hard tests: DeepSeek V4.1 Flash ($0.40 per Standard attempt) and GLM 5.3 Flash ($0.66) have low costs per success but solve only 14 and 11 of 456.</p>
-<p><b>For every agent, failure is the expensive outcome.</b> In both Standard and Privileged, the median failed attempt costs more than the median solved one, for all ten agents. Standard medians, solved against failed, are $9.01 and $25.90 for Astra, $1.05 and $3.14 for Sol, $8.81 and $12.75 for Fable, $2.97 and $4.66 for Opus, and $2.85 and $5.95 for Argon. Costlier suites do not explain this: within the same suite, the median failed Standard attempt in a typical suite costs 1.29 times (Opus) to 1.92 times (Gemini 3.8 Flash) the median solved one.</p>
-<p><b>Much of the extra cost is extra time, for some agents.</b> 52.5% of Astra’s failed Standard attempts, 54.7% of Sol’s and 78.6% of Argon’s ran to at least 95% of the time limit, against 2.5%, 4.1% and 9.1% of their solved attempts. Only 8.3% of Fable’s and 6.4% of Opus’s failed Standard attempts ran that long, yet their failures also cost more than their successes.</p>
-<p><b>Better information beats more spending.</b> For the five strong agents, a Privileged attempt costs less on average than a Standard one and succeeds far more often: Astra $22.92 against $27.12, Fable $11.36 against $13.43, Sol $3.98 against $4.10, Opus $4.79 against $6.45, and Argon $4.21 against $6.27. What lifts success there is what the agent can know and undo (exact object state, unlimited resets with saved states, a private simulator), not what it spends.</p>
 
     <h3 id="spend-how" data-short="How an attempt is spent">Fable writes more, Astra acts more, Opus stops early</h3>
     <p><b>Fable writes more and acts less, Astra acts more and runs to the time limit, and Opus stops earliest.</b> How long, how many steps and how much output an attempt takes is a second way to look at spending. The table gives these numbers for three agents in each setting (a step is one turn of the agent with its tool calls; the time limit is each test’s own). Three patterns hold in all three settings. Fable writes the most output per attempt (about 124k to 146k tokens, against about 45k to 55k for Astra) and takes the fewest steps in Standard and Privileged. Astra takes the most steps and is the only agent that often runs into the time limit (92 Standard and 45 Privileged attempts). Opus is the cheapest of the three and ends its failed attempts earliest: a median 45% of the time limit in Standard, against 67% for Fable and 97% for Astra.</p>
@@ -1024,8 +1028,8 @@
 <p>Each habit has a cost. Often Fable’s unused time would not have helped, because it had used every reset, dropped the tool out of reach, or spent its strokes in paint that cannot be removed. Where its estimate was wrong, though, the time could have mattered: the kaishu copy missed by 0.004, and the spatula by 0.6 mm. Astra’s checking pays off on exactly these tests, but it also leaves 92 Standard attempts ended by the clock rather than by a result. Using more of the time limit does not by itself make an attempt succeed; what matters is whether the agent can tell from its own sensors how close it is.</p>
 
 
-    <h2 id="conditions" data-short="What changes the score">What changes the score: harness, task instruction, reasoning effort, or another run?</h2>
-    <h3 id="harness-gap" data-short="Harness">Harness: up to 7.5 points</h3>
+    <h2 id="conditions" data-short="How sensitive the results are">How sensitive are the results to the harness, task instruction, reasoning effort and repeated runs?</h2>
+    <h3 id="harness-gap" data-short="Harness">Harness: the same model, up to 7.5 points apart</h3>
 <p>Every agent in this exam is a model running inside a harness: the program that hands the model its tools, keeps its conversation, and decides when a session ends. Claude Fable 5.2, Claude Opus 5.5 and three of the weaker models (Kimi 3.1 Pro, Qwen3.8 Max and GLM 5.3 Flash) run in Claude Code, GPT-6 Astra and GPT-6.1 Sol in Codex, the two Gemini models in Antigravity CLI, and DeepSeek V4.1 Flash in DeepSeek Harness, DeepSeek’s own. To measure the harness’s share, the paper ran three models in other harnesses on the same 456 core Standard tests, with the leaderboard’s time limits and reasoning effort (Figure 16c). The effect ranges from 7.5 points to almost nothing, and a model’s own harness is not always its best.</p>
 <p><b>GPT-6 Astra loses 7.5 points outside Codex.</b> It solves 157 of 456 tests (34.4%) in Codex, its own harness, and 123 (27.0%) in Claude Code. Single tests move both ways: 75 are solved only in Codex and 41 only in Claude Code. The paper finds the difference significant (p = 0.002). Most of it is already there in the first episode, before any reset: 119 successes in Codex against 95 (p = 0.015). So the gap does not come only from how the harnesses handle long sessions with many retries.</p>
 <p><b>Claude Opus 5.5 is about the same in both.</b> It solves 119 of 456 in Codex and 114 in its own Claude Code, and 97 against 96 in the first episode. Underneath, 35 tests are solved only in Codex and 30 only in Claude Code. Neither count differs significantly.</p>
@@ -1052,14 +1056,14 @@
 <p><b>A caveat.</b> Codex and Claude Code speak only their own provider’s API format. In the cross-provider runs, an adapter passes each request to the other provider, translates the answer back, and adapts the system prompt and model metadata. The harness runs are reported separately and do not change the leaderboard.</p>
 <p>So when one agent solves a test that another fails, part of the difference can come from the harness. The paper therefore reports every result for a model in a particular harness: how the harness exposes tools, manages the context and ends a session is part of what the exam measures.</p>
 
-    <h3 id="robodojo" data-short="Task instruction">Task instruction: the RoboDojo score roughly triples</h3>
+    <h3 id="robodojo" data-short="Task instruction">Task instruction: RoboDojo’s score tripled with explicit success conditions</h3>
 <p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> gives each task a one-sentence instruction, but its success check tests conditions the sentence does not mention. Given a goal that states the check in full, the same agent’s score roughly triples. The difference lies in whether the agent knows what will be graded, not in the robot skill being tested.</p>
 <p><b>How the exam uses RoboDojo.</b> The exam keeps RoboDojo’s scenes, robots and success rules, and writes an instruction that states every convention the agent cannot infer by looking. Twelve RoboDojo tasks are in the core set, each with a 60-minute limit and a Standard and a Privileged test (no Realtime test).</p>
 <p><b>The one-sentence instructions leave out what the check tests.</b> The <a href="../first-exam/">first-exam report</a> gave GPT-6 Astra all 54 RoboDojo tasks in the Standard Setting with three versions of the goal text, keeping the scenes, step limits and success checks the same. RoboDojo’s own instructions omit conditions its check tests, above all that both arms end near their start pose, which 47 of the 54 tasks require; an agent that does the visible task perfectly and leaves an arm hovering over the table fails.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-goals">
     <p class="fig-cap"><span class="fc-t">Most of the gain comes from telling the agent what is checked.</span> One task’s instruction in RoboDojo and in the exam, and GPT-6 Astra’s result on all 54 RoboDojo tasks in the Standard Setting with each kind of instruction. With RoboDojo’s task recipe and start-pose note added to its sentence, Astra solves 33 of 54.</p>
-    <div class="tscroll"><table class="fst">
+    <div class="tscroll"><table class="fst text">
       <thead><tr><th></th><th>RoboDojo’s instruction</th><th>The exam’s instruction</th></tr></thead>
       <tbody>
         <tr><th scope="row">Fill Egg Holder</th><td>“Place the four eggs from the basket into the egg holder, then close the lid.”</td><td>“Move the four eggs from the egg basket into the egg holder (an articulated tray with a lid), close the lid, and return the arm home.”</td></tr>
@@ -1089,7 +1093,7 @@
 <p>With the full goal, what remains is real physical difficulty. In one Standard attempt at inserting a key, Claude Opus 5.5 located the key and the lock from depth images but dropped the key at least nine times during hand-overs and large joint moves; its most accurate insertion, at minute 36, was about 9 mm off and hit the face of the lock. No agent solves that test in Standard, while Fable, Astra and Argon solve it in Privileged.</p>
 <p><b>The lesson for benchmark design.</b> If the success check tests a condition the instruction does not state, the benchmark measures whether the agent guessed that condition rather than the ability it was built to measure. Two rules follow: state every condition the check will test, including “return to the start pose” and similar housekeeping; and when comparing results across papers, check which instruction text each used. On RoboDojo, the text alone moves one agent from 12 to 37 of 54.</p>
 
-    <h3 id="spend-effort" data-short="Reasoning effort">Reasoning effort: only 1.5 points</h3>
+    <h3 id="spend-effort" data-short="Reasoning effort">Reasoning effort: little change in Sol’s success rate</h3>
 <p>Another way to spend more is to let the model think longer before each action. Every leaderboard agent runs at high reasoning effort; the paper also ran GPT-6.1 Sol in Codex on the 456 core Standard tests at medium and at maximum effort, with everything else as in the leaderboard run.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
@@ -1108,7 +1112,7 @@
 <p><b>What changes is the way the agent works.</b> With more effort, Sol writes more output tokens, sends fewer requests and runs longer: it thinks more before each step and takes fewer, slower steps. Both styles solve about the same share of these physical tasks.</p>
 <p><b>The cost stays about the same,</b> $3.91 to $4.10 per attempt, probably because fewer requests offset the extra output tokens.</p>
 
-    <h3 id="run-variance" data-short="Between runs">Between runs: at most 5 points</h3>
+    <h3 id="run-variance" data-short="Repeated runs">Repeated runs: Sol’s success rate varies by less than 5 points</h3>
 <p>The leaderboard counts one attempt per agent and test. To measure how much the success rate changes from one run to the next, the paper ran GPT-6.1 Sol in Codex on all 456 core Standard tests two more times at high effort, with everything else as in the leaderboard run.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-runs">
@@ -1128,14 +1132,14 @@
 <p>Reasoning effort moves the result less than repeating the run: Sol at medium, high and maximum effort solves 30.7%, 32.2% and 30.9% of the Standard tests, a spread of 1.5 points (<a href="#spend-effort">details</a>).</p>
 
 
-    <h2 id="next" data-short="What’s next">What’s next, and limitations</h2>
+    <h2 id="next" data-short="Limitations and next steps">Limitations and next steps</h2>
     <h3 id="closing-limits" data-short="Limitations">Limitations</h3>
     <p>Every comparison here comes from one attempt per agent and test; three runs of GPT-6.1 Sol in the Standard Setting give a success rate of 30.8% ± 2.5 (see <a href="#run-variance">Run to run</a>). The stage labels behind Part 3 come from a labeling pipeline that combines labeling by coding agents (GPT-6.1 Sol and Claude Sonnet 5.5) with human spot checks while the prompts were developed. All results except one real-robot demonstration are in simulation. The paper discusses these and further limits, including possible memorization of public benchmarks and how the core set was screened (<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">paper, Limitations</a>).</p>
 
-    <h3 id="next-hidden" data-short="Hidden set">A hidden set: measuring ability, not memory</h3>
+    <h3 id="next-hidden" data-short="Hidden set">Hidden tasks: testing ability rather than memory</h3>
     <p>Because results on tasks adapted from public benchmarks may partly reflect what a model has seen before, we are building a hidden set of held-out tasks that will not be released. Agents will be evaluated on it under the same settings and the same external verifier, so a result there shows how an agent handles a task it could not have seen.</p>
 
-    <h3 id="next-real" data-short="Real robots">Real robots: starting from the Standard interface</h3>
+    <h3 id="next-real" data-short="Real robots">Real robots: starting with the Standard interface</h3>
     <p>The Standard Setting gives the agent only the robot’s sensor readings and control interface, so the same interface can drive a physical robot once the outcome can be graded. We are extending the exam to real robots, with tasks and protocols that let a real-robot attempt be run and graded consistently.</p>
 
 <p>As a first test on hardware, the authors connected GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game (paper Figure 34). The robot holds the handle of a metal loop and must guide it along a bent wire fixed to a wooden board without touching it. Loop and wire form one electric circuit, so any contact turns on a light and a buzzer and ends the trial, as in RoboARC’s simulated buzz wire tasks on a Franka Panda arm. The agent sends discrete commands: move the gripper up, down, left or right, or rotate it either way. Each agent ran eight trials in a row on the same wire, each scored by progress, the share of the wire the loop covered before the trial ended (100% is the whole wire without a contact).</p>
@@ -1155,7 +1159,7 @@
 <p>It shows that a coding agent can control a physical robot arm in this game.</p>
 
 
-    <h2 id="closing-olympics" data-short="Olympics">Another evaluation: Embodied Olympics Episodic Learning</h2>
+    <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics: Continual Learning for Agents</h2>
 
 <p>On the separate <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> Episodic Learning board, agents play matches against each other. Claude Fable 5.2 joined on 10 November 2026 and played one fresh match against each of the other six agents in 15 sports; it did not enter Humanoid Soccer · Team, drone racing or full-size racing. It holds 10 gold and 3 silver medals, with a 44-5 record (90%) in 10 duel and team-duel sports. Gemini did not start 5 of its 11 matches against Fable, each counted as a Fable win. Beach volleyball and tennis are exhibitions and count in neither the medal table nor the win rate.</p>
 <p>For the full analysis, see the <a href="../embodied-olympics/">Embodied Olympics report</a>.</p>

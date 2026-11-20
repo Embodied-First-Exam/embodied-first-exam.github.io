@@ -27,7 +27,9 @@
   table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
   table.fst tbody th { font-weight: 400; color: var(--ink-2, var(--ink)); }
   table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
-  table.fst td.lead, table.fst th.lead { font-weight: 650; }
+  table.fst.text td { white-space: normal; text-align: left; font: 400 14px/1.45 var(--body); }
+table.fst.text thead th { text-align: left; }
+table.fst td.lead, table.fst th.lead { font-weight: 650; }
   table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
   table.fst caption, .tbl-note { caption-side: bottom; text-align: left; margin: 10px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
   @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
@@ -1108,7 +1110,7 @@
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-goals">
     <p class="fig-cap"><span class="fc-t">La mayor parte de la mejora viene de decirle al agente qué se comprueba.</span> GPT-6 Astra en las 54 tareas de RoboDojo en la configuración Standard, un intento por tarea y texto de objetivo, según el informe oficial del primer examen. La Figura 10 del artículo usa solo los objetivos del examen, en las 12 pruebas del conjunto principal.</p>
-    <div class="tscroll"><table class="fst">
+    <div class="tscroll"><table class="fst text">
       <thead><tr><th>Texto del objetivo</th><th>Tareas resueltas</th></tr></thead>
       <tbody>
         <tr><th scope="row">La instrucción de una frase de RoboDojo</th><td>12 de 54</td></tr>

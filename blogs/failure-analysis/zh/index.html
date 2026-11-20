@@ -27,7 +27,9 @@
   table.fst thead .ag-f { color: var(--ag-fable); } table.fst thead .ag-a { color: var(--ag-astra); } table.fst thead .ag-o { color: var(--ag-opus); }
   table.fst tbody th { font-weight: 400; color: var(--ink-2, var(--ink)); }
   table.fst td { text-align: right; font: 400 13px var(--mono); white-space: nowrap; }
-  table.fst td.lead, table.fst th.lead { font-weight: 650; }
+  table.fst.text td { white-space: normal; text-align: left; font: 400 14px/1.45 var(--body); }
+table.fst.text thead th { text-align: left; }
+table.fst td.lead, table.fst th.lead { font-weight: 650; }
   table.fst tr.sep th, table.fst tr.sep td { border-top: 2px solid var(--line-2, var(--line)); }
   table.fst caption, .tbl-note { caption-side: bottom; text-align: left; margin: 10px 0 0; font: 400 12.5px/1.5 var(--body); color: var(--ink-3); }
   @media (max-width: 640px) { table.fst { font-size: 12.5px; } table.fst th, table.fst td { padding: 6px 5px; } }
@@ -381,56 +383,55 @@
  <nav class="toc-top" aria-label="目录">
  <p class="label">目录</p>
  <ol>
- <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
- <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
- <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</a></li>
- <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 不一定最强</a></li>
- <li><a href="#suites-out-of-reach">7 个 Suite 在 Standard 下过半无人完成</a></li>
- <li><a href="#task-types">搬运容易，工具使用难</a></li>
- <li><a href="#eight-tests">为什么会在别人能完成的测试上失败？以 Fable 为例</a></li>
- <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
- <li><a href="#settings-explained">三种设置：Agent 能看到什么、能做什么？</a></li>
- <li><a href="#transfer">Privileged 下完成的任务，很多在 Standard 下失败</a></li>
- <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
- <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
- <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
- <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
- <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
- <li><a href="#same-across-settings">无论 Standard 还是 Privileged，失败阶段往往相同</a></li>
- <li><a href="#stage-kinds">材料变化和身体移动最易失败，但难点因 Suite 而异</a></li>
- <li><a href="#by-suite">每个 Suite 有自己的失败方式</a></li>
- <li><a href="#by-robot">身体形态影响失败方式：承重机器人易摔倒，手部难以建立接触</a></li>
- <li><a href="#weaker-early">较弱 Agent 常在接触前失败，Fable 多在接触后失败</a></li>
- <li><a href="#lunch-batteries">长程家务：前几件能完成，难在途中保持平衡</a></li>
- <li><a href="#cereal">取麦片和碗：强 Agent 能把碗拿到手边，较弱 Agent 难在抓取</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#act">Agent 如何工作？</a></summary><ol>
- <li><a href="#control-by-setting">直接控制、写程序，还是训练 policy？</a></li>
- <li><a href="#soccer-gpu">给了 GPU，Agent 会训练 policy 吗？</a></li>
- <li><a href="#success-methods">成功的运行如何完成任务？演练，并从失败中改进</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
- <li><a href="#spend-cost">失败尝试花费更高，低价 Agent 也能接近领先者</a></li>
- <li><a href="#spend-how">Fable 写得多、动得少，Astra 一直检查到时间用完，Opus 最早结束</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#conditions">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</a></summary><ol>
- <li><a href="#harness-gap">Harness：最多相差 7.5 个百分点</a></li>
- <li><a href="#robodojo">任务指令：RoboDojo 得分约为原来的三倍</a></li>
- <li><a href="#spend-effort">推理强度：只差 1.5 个百分点</a></li>
- <li><a href="#run-variance">重复运行：最多相差 5 个百分点</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#next">下一步与局限</a></summary><ol>
- <li><a href="#closing-limits">局限</a></li>
- <li><a href="#next-hidden">隐藏任务集：衡量能力而非记忆</a></li>
- <li><a href="#next-real">真实机器人：沿用 Standard 接口</a></li>
- </ol></details></li>
- <li><a href="#closing-olympics">另一种评测：Embodied Olympics Episodic Learning</a></li>
- </ol>
- </nav>
+        <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
+          <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
+          <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成；7 个 Suite 过半无人完成</a></li>
+          <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 不一定最强</a></li>
+          <li><a href="#task-types">搬运容易，工具使用难</a></li>
+          <li><a href="#eight-tests">为什么会在别人能完成的测试上失败？以 Fable 为例</a></li>
+          <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
+          <li><a href="#settings-explained">三种设置：Agent 能看到什么、能做什么？</a></li>
+          <li><a href="#transfer">Privileged 下完成的任务，很多在 Standard 下失败</a></li>
+          <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
+          <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
+          <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
+          <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
+          <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
+          <li><a href="#same-across-settings">无论 Standard 还是 Privileged，失败阶段往往相同</a></li>
+          <li><a href="#stage-kinds">材料变化和身体移动最易失败，但难点因 Suite 而异</a></li>
+          <li><a href="#by-suite">每个 Suite 有自己的失败方式</a></li>
+          <li><a href="#by-robot">身体形态影响失败方式：承重机器人易摔倒，手部难以建立接触</a></li>
+          <li><a href="#weaker-early">较弱 Agent 常在接触前失败，Fable 多在接触后失败</a></li>
+          <li><a href="#lunch-batteries">长程家务：前几件能完成，难在途中保持平衡</a></li>
+          <li><a href="#cereal">取麦片和碗：强 Agent 能把碗拿到手边，较弱 Agent 难在抓取</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#act">Agent 如何工作？</a></summary><ol>
+          <li><a href="#control-by-setting">直接控制、写程序，还是训练 policy？</a></li>
+          <li><a href="#soccer-gpu">给了 GPU，Agent 会训练 policy 吗？</a></li>
+          <li><a href="#success-methods">成功的运行如何完成任务？演练，并从失败中改进</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
+          <li><a href="#spend-cost">失败尝试花费更高，低价 Agent 也能接近领先者</a></li>
+          <li><a href="#spend-how">Fable 写得多、动得少，Astra 一直检查到时间用完，Opus 最早结束</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#conditions">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</a></summary><ol>
+          <li><a href="#harness-gap">Harness：最多相差 7.5 个百分点</a></li>
+          <li><a href="#robodojo">任务指令：RoboDojo 得分约为原来的三倍</a></li>
+          <li><a href="#spend-effort">推理强度：只差 1.5 个百分点</a></li>
+          <li><a href="#run-variance">重复运行：最多相差 5 个百分点</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#next">下一步与局限</a></summary><ol>
+          <li><a href="#closing-limits">局限</a></li>
+          <li><a href="#next-hidden">隐藏任务集：衡量能力而非记忆</a></li>
+          <li><a href="#next-real">真实机器人：沿用 Standard 接口</a></li>
+        </ol></details></li>
+        <li><a href="#closing-olympics">Embodied Olympics：Agent 的持续学习</a></li>
+      </ol>
+    </nav>
 
 
  <p class="wwf-label">总体结果</p>
@@ -492,7 +493,7 @@
 <p>成功次数最多的 Agent 失败，并不意味着该测试就难。Fable 失败的测试中有 8 个被其余九个 Agent 中的至少四个完成，其中一个 Embodied Safety Exam 倾倒测试被六个 Agent 完成，包括 Kimi、Gemini 3.8 Flash、Qwen 和 DeepSeek（这 8 个测试全部列在 <a href="#eight-tests">Fable 在普遍被完成的测试上的失误</a>中）。</p>
 <p>在拥有完整模拟器访问权限时，Fable 与 Astra 之间的划分几乎持平：在 Privileged 下，只有 Fable 完成的测试有 28 个，只有 Astra 完成的有 24 个，两者都完成的有 284 个，都未完成的有 55 个（共 391 个测试）。在 Privileged 测试中，Astra 是 12 个测试的唯一强完成者，Fable 是 9 个，Sol 是 5 个，Argon 是 2 个，Opus 是 1 个。Realtime 下的划分见 <a href="#realtime">Realtime 一节</a>。</p>
 
- <h3 id="shared-boundary" data-short="无人完成">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成</h3>
+ <h3 id="shared-boundary" data-short="无人完成">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成；7 个 Suite 过半无人完成</h3>
 <p>汇总全部十个 Agent，456 个 Standard 测试中有 287 个至少被一个 Agent 完成，169 个（37%）无人完成。五个强 Agent 合计完成 286 个（63%），五个较弱的 Agent 只额外增加了一个测试。这一共同边界是本考试中对“当前编程 Agent 在真实机器人约束下尚无法做到什么”最清晰的度量，而且它不取决于我们关注哪个 Agent。</p>
 <p>一个 Agent 失败的测试，大多数是所有 Agent 都失败的。在 Claude Fable 5.2 失败的 230 个 Standard 测试中，有 169 个属于这些无人完成的测试；只有约四分之一（61 个）是被其他 Agent 完成的。</p>
 <figure class="fig paper fig-wide">
@@ -504,6 +505,19 @@
 <p>在 Standard 下，五个强 Agent 分别完成了 456 个测试中的 226、157、147、114 和 110 个，五个较弱的 Agent 分别完成了 46、29、17、14 和 11 个。被许多 Agent 共同完成的测试很少：33 个被全部五个强 Agent 完成，只有一个按钮按压测试被全部十个 Agent 完成。另一端，有 77 个测试恰好只被一个 Agent 完成。</p>
 <p>无人完成的 Suite 中在少数几个 Suite 中：在这 169 个测试中，BEHAVIOR-1K 占 36 个，Embodied Olympics - Fun 占 26 个，DexToolBench 占 17 个，RoboARC 占 14 个（另有 7 个 IKEA 组装测试），RoboPaint 占 11 个，MyoSuite 占 8 个，HumanoidBench 占 7 个（<a href="#suites-out-of-reach">难以企及的 Suite</a>一节专门分析这些 Suite）。</p>
 <p>这一差距正是本考试设计所要呈现的：任务的 Privileged 测试可以通过搜索完成，但在真实机器人约束下依然困难。在无人完成的 169 个 Standard 测试中，有 160 个所属任务也有 Privileged 测试，而这些 Privileged 测试中有 122 个被某个 Agent 完成。只有 38 个在两种设置下都无人完成；另外 9 个没有 Privileged 测试。在整个 Privileged Setting 中，391 个测试中只有 43 个（11%）无人完成，其中 19 个属于 BEHAVIOR-1K。强 Agent 合计完成 348 个 Privileged 测试（89%），较弱的 Agent 没有额外贡献。</p>
+
+<p id="suites-out-of-reach">在至少有五个 Standard 测试的 22 个 Suite 中，有 7 个 Suite 至少一半的测试未被五个强 Agent 中的任何一个完成。在拥有完整模拟器访问权限时，只有 HumanoidBench 一个 Suite 仍然如此难以企及。</p>
+<figure class="fig paper fig-wide">
+ <div class="fig-body" data-fig="10">
+ <p class="fig-cap"><span class="fc-t">在真实机器人约束下，七个 Suite 至少一半无人完成；在完整模拟器访问权限下，只剩一个。</span> 论文图 10。按 Suite 统计的成功率，仅包括在该设置下至少有五个核心测试的 Suite。圆点表示每个强 Agent 的成功率；柱形表示没有任何强 Agent 完成的测试比例。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
+ <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="论文图 10：五个强 Agent 在各 Suite 上的 Standard 与 Privileged 成功率。在 22 个 Standard Suite 中，有 7 个至少一半的测试无一被它们完成：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
+ </div>
+</figure>
+<p>这七个 Standard Suite 及其中没有任何强 Agent 完成的测试数分别为：HumanoidBench（8 个中 7 个）、IKEA 组装任务（8 个中 7 个）、DexToolBench（20 个中 17 个）、MyoSuite（13 个中 8 个）、BEHAVIOR-1K（71 个中 36 个）、RoboPaint（22 个中 11 个）和 RoboDojo（12 个中 6 个）。它们涵盖了不同类型的难度：人形机器人全身控制、灵巧手的家具组装与工具使用、肌肉驱动的手臂与手、长程家务活动、只能通过相机检查效果的绘画，以及成功判定以不同方式编写的目标。在最难的两个 Suite 中，没有强 Agent 完成超过两个测试：DexToolBench 中最多的是 Astra 的 2 个，而在 IKEA 组装任务中只有 Fable 和 Astra 各完成一个。</p>
+<p>这正是本考试设计所要呈现的模式。在 Privileged 下，没有强 Agent 完成的测试比例下降为：DexToolBench 20 个中 4 个，MyoSuite 13 个中 6 个，BEHAVIOR-1K 71 个中 19 个，RoboDojo 12 个中 1 个，RoboPaint（22 个测试）和 IKEA 组装任务（8 个测试）均为 0；只有 HumanoidBench 仍有至少一半无人完成，为 8 个中 4 个。因此，在七个 Suite 中的六个里，精确的状态信息和不限次数的重置让强 Agent 找到了解法，而在 Standard 下阻碍它们的，是要在只有少量重置或无法重置的条件下，通过相机和传感器完成同样的工作。</p>
+<p>从 70% 这条线来看，结论也一样，只是视角相反。按五个强 Agent 平均，成功率至少达到 70% 的 Standard Suite 只有一个，即 ManiGuard（71%）；而在至少有五个 Privileged 测试的 20 个 Suite 中，有 13 个达到这一水平：ManiGuard、Embodied Olympics - Match、MuJoCo Playground、RoboDynamicExam、RoboCasa365、EmbodiedSWE、RoboWits、BiGym 2.0、RoboPaint、Embodied Olympics - Fun、DexHandExam、iSpatialGym 和 RoboARC。</p>
+<p>在全部七个 Suite 中，五个较弱的 Agent 合计只完成了两个 Standard 测试，均由 Kimi 3.1 Pro 完成：一个是 MyoSuite 物体重定向测试，Fable、Astra 和 Opus 也完成了它；另一个是没有其他 Agent 完成的 RoboDojo 方块交换测试。</p>
+
 <h3 id="where-each-leads" data-short="逐 Suite 对比">不同 Suite 的第一名不同，新 Agent 不一定最强</h3>
 <p>按 Suite 拆分来看，成功次数最多的 Agent 多次易位。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
  <figure class="fig paper fig-wide">
@@ -541,19 +555,6 @@
  </table></div>
  </div>
 </figure>
-<h3 id="suites-out-of-reach" data-short="难以企及的 Suite">7 个 Suite 在 Standard 下过半无人完成</h3>
-<p>在至少有五个 Standard 测试的 22 个 Suite 中，有 7 个 Suite 至少一半的测试未被五个强 Agent 中的任何一个完成。在拥有完整模拟器访问权限时，只有 HumanoidBench 一个 Suite 仍然如此难以企及。</p>
-<figure class="fig paper fig-wide">
- <div class="fig-body" data-fig="10">
- <p class="fig-cap"><span class="fc-t">在真实机器人约束下，七个 Suite 至少一半无人完成；在完整模拟器访问权限下，只剩一个。</span> 论文图 10。按 Suite 统计的成功率，仅包括在该设置下至少有五个核心测试的 Suite。圆点表示每个强 Agent 的成功率；柱形表示没有任何强 Agent 完成的测试比例。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
- <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig10_suites.png?v=25cd9fdb" alt="论文图 10：五个强 Agent 在各 Suite 上的 Standard 与 Privileged 成功率。在 22 个 Standard Suite 中，有 7 个至少一半的测试无一被它们完成：HumanoidBench、IKEA 组装、DexToolBench、MyoSuite、BEHAVIOR-1K、RoboPaint 和 RoboDojo。在 Privileged 下只有 HumanoidBench 如此。" width="1920" height="1080"></div>
- </div>
-</figure>
-<p>这七个 Standard Suite 及其中没有任何强 Agent 完成的测试数分别为：HumanoidBench（8 个中 7 个）、IKEA 组装任务（8 个中 7 个）、DexToolBench（20 个中 17 个）、MyoSuite（13 个中 8 个）、BEHAVIOR-1K（71 个中 36 个）、RoboPaint（22 个中 11 个）和 RoboDojo（12 个中 6 个）。它们涵盖了不同类型的难度：人形机器人全身控制、灵巧手的家具组装与工具使用、肌肉驱动的手臂与手、长程家务活动、只能通过相机检查效果的绘画，以及成功判定以不同方式编写的目标。在最难的两个 Suite 中，没有强 Agent 完成超过两个测试：DexToolBench 中最多的是 Astra 的 2 个，而在 IKEA 组装任务中只有 Fable 和 Astra 各完成一个。</p>
-<p>这正是本考试设计所要呈现的模式。在 Privileged 下，没有强 Agent 完成的测试比例下降为：DexToolBench 20 个中 4 个，MyoSuite 13 个中 6 个，BEHAVIOR-1K 71 个中 19 个，RoboDojo 12 个中 1 个，RoboPaint（22 个测试）和 IKEA 组装任务（8 个测试）均为 0；只有 HumanoidBench 仍有至少一半无人完成，为 8 个中 4 个。因此，在七个 Suite 中的六个里，精确的状态信息和不限次数的重置让强 Agent 找到了解法，而在 Standard 下阻碍它们的，是要在只有少量重置或无法重置的条件下，通过相机和传感器完成同样的工作。</p>
-<p>从 70% 这条线来看，结论也一样，只是视角相反。按五个强 Agent 平均，成功率至少达到 70% 的 Standard Suite 只有一个，即 ManiGuard（71%）；而在至少有五个 Privileged 测试的 20 个 Suite 中，有 13 个达到这一水平：ManiGuard、Embodied Olympics - Match、MuJoCo Playground、RoboDynamicExam、RoboCasa365、EmbodiedSWE、RoboWits、BiGym 2.0、RoboPaint、Embodied Olympics - Fun、DexHandExam、iSpatialGym 和 RoboARC。</p>
-<p>在全部七个 Suite 中，五个较弱的 Agent 合计只完成了两个 Standard 测试，均由 Kimi 3.1 Pro 完成：一个是 MyoSuite 物体重定向测试，Fable、Astra 和 Opus 也完成了它；另一个是没有其他 Agent 完成的 RoboDojo 方块交换测试。</p>
-
  <h3 id="task-types" data-short="任务类型">搬运容易，工具使用难</h3>
 <p><b>每个 Agent 都觉得搬运物体最容易、使用工具最难，中间类型的排序则因 Agent 而异。</b>论文为每个核心任务标注了九种任务类型中的一种或多种。汇总五个强 Agent，Object Transport 的 Standard 成功率最高，占其尝试的 45%，Tool Use 最低，为 14%。这一排序对每个 Agent 单独来看同样成立：五个 Agent 都在 Object Transport 上表现最好，在 Tool Use 上表现最差。</p>
 <figure class="fig paper fig-wide">
@@ -1061,7 +1062,7 @@
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-goals">
     <p class="fig-cap"><span class="fc-t">大部分提升来自告诉 Agent 会检查什么。</span>同一个任务在 RoboDojo 和本次考试中的指令，以及 GPT-6 Astra 在 Standard Setting 下用两种指令完成全部 54 个 RoboDojo 任务的结果。在 RoboDojo 的一句话之外再加上任务方案和回到初始姿态的说明，Astra 完成 54 个中的 33 个。</p>
-    <div class="tscroll"><table class="fst">
+    <div class="tscroll"><table class="fst text">
       <thead><tr><th></th><th>RoboDojo 的指令</th><th>本次考试的指令</th></tr></thead>
       <tbody>
         <tr><th scope="row">Fill Egg Holder</th><td>“Place the four eggs from the basket into the egg holder, then close the lid.”</td><td>“Move the four eggs from the egg basket into the egg holder (an articulated tray with a lid), close the lid, and return the arm home.”</td></tr>
@@ -1156,7 +1157,7 @@
 </figure>
 <p>它表明编程 Agent 能够在这个游戏中控制实体机械臂。</p>
 
-<h2 id="closing-olympics" data-short="Olympics">另一种评测：Embodied Olympics Episodic Learning</h2>
+<h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：Agent 的持续学习</h2>
 
 <p>在独立的 <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> Episodic Learning 榜单上，Agent 之间相互比赛。Claude Fable 5.2 于 2026 年 11 月 10 日加入，在 15 个项目中与其他六个 Agent 各进行了一场新的比赛；它没有参加 Humanoid Soccer · Team、无人机竞速和全尺寸赛车。它目前获得 10 枚金牌和 3 枚银牌，在 10 个单挑和团队对抗项目中战绩为 44-5（90%）。Gemini 在对阵 Fable 的 11 场比赛中有 5 场没有开始，每场都计为 Fable 获胜。沙滩排球和网球是表演项目，既不计入奖牌榜，也不计入胜率。</p>
 <p>关于 Embodied Olympics 的完整分析，见 <a href="../../embodied-olympics/">Embodied Olympics 报告</a>。</p>
