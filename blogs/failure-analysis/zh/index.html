@@ -1061,17 +1061,12 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>一句话指令遗漏了判定所检查的内容。</b><a href="../../first-exam/">第一次考试报告</a>让 GPT-6 Astra 在 Standard Setting 下完成全部 54 个 RoboDojo 任务，使用三个版本的目标文本，场景、步数上限和成功判定保持不变。RoboDojo 自己的指令遗漏了判定所检查的条件，最主要的是两只机械臂最终都要回到初始姿态附近，54 个任务中有 47 个有此要求；一个完美完成可见任务、却让一只机械臂悬在桌面上方的 Agent 会被判失败。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-goals">
-    <p class="fig-cap"><span class="fc-t">大部分提升来自告诉 Agent 会检查什么。</span>同一个任务在 RoboDojo 和本次考试中的指令，以及 GPT-6 Astra 在 Standard Setting 下用两种指令完成全部 54 个 RoboDojo 任务的结果。在 RoboDojo 的一句话之外再加上任务方案和回到初始姿态的说明，Astra 完成 54 个中的 33 个。</p>
-    <div class="tscroll"><table class="fst text">
-      <thead><tr><th></th><th>RoboDojo 的指令</th><th>本次考试的指令</th></tr></thead>
-      <tbody>
-        <tr><th scope="row">Fill Egg Holder</th><td>“Place the four eggs from the basket into the egg holder, then close the lid.”</td><td>“Move the four eggs from the egg basket into the egg holder (an articulated tray with a lid), close the lid, and return the arm home.”</td></tr>
-        <tr><th scope="row">GPT-6 Astra 完成的任务数</th><td>54 个中的 12 个</td><td>54 个中的 37 个</td></tr>
-      </tbody>
-    </table></div>
+    <p class="fig-cap"><span class="fc-t">同一个任务在 RoboDojo 和本次考试中的指令。</span>Fill Egg Holder；加粗部分是本次考试补充的内容。</p>
+    <p>RoboDojo：“Place the four eggs from the basket into the egg holder, then close the lid.”</p>
+    <p>本次考试：“Move the four eggs from the egg basket into the egg holder <b>(an articulated tray with a lid)</b>, close the lid, <b>and return the arm home</b>.”</p>
   </div>
 </figure>
-<p>最大的跃升，从 54 个中的 12 个到 33 个，来自加入任务方案和初始姿态说明：这些主要是关于判定要求的信息，尽管评分阶段也列出了任务的步骤。完整写明判定条件又多完成了 4 个，达到 37 个。三个版本中机器人、场景和 Agent 都相同，因此 54 个中 12 个的得分，衡量的更多是指令与判定的匹配程度，而远非 Astra 用双臂操作物体的能力。</p>
+<p>使用 RoboDojo 的一句话指令时，GPT-6 Astra 完成 54 个 RoboDojo 任务中的 12 个；加上 RoboDojo 的任务方案和回到初始姿态的说明后为 33 个；使用本次考试的指令时为 37 个。最大的跃升，从 54 个中的 12 个到 33 个，来自加入任务方案和初始姿态说明：这些主要是关于判定要求的信息，尽管评分阶段也列出了任务的步骤。完整写明判定条件又多完成了 4 个，达到 37 个。三个版本中机器人、场景和 Agent 都相同，因此 54 个中 12 个的得分，衡量的更多是指令与判定的匹配程度，而远非 Astra 用双臂操作物体的能力。</p>
 <p><b>使用本次考试的指令，Agent 能完成大部分 RoboDojo 任务。</b></p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-all">
