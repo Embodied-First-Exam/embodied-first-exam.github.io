@@ -39,5 +39,16 @@
   ],
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.mp4?v=73e576d2",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.jpg?v=1c2af13a"
+ },
+ {
+  "slug": "gpt-6-2-astra",
+  "title": "GPT-6.2 Astra",
+  "date": "2026-11-20",
+  "kind": "Analysis",
+  "summary": "GPT-6.2 Astra solves the most tests of the Embodied First Exam in the Privileged and Standard Settings. Where it gains on Claude Fable 5.2, what an attempt costs, where it fails while other agents succeed, and runs side by side.",
+  "tags": [
+   "analysis",
+   "results"
+  ]
  }
 ]
