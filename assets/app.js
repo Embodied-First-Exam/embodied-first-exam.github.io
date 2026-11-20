@@ -2166,6 +2166,7 @@ function suiteResults(el, ex, tasks, s = {}) {
 async function suitePage(ex) {
   const s = ex._suites[Q.get('id')] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark for coding agents. ${s.blurb || ''}`.trim());
   const cover = coverOf(s);
   const crop = cropFor(s.id, cover?.task);
   // the suite's own pages, always in this order: paper, website, code, then the rest (owners, 2026-10-18)

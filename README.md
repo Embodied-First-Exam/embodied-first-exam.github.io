@@ -1,5 +1,7 @@
 # embodied-first-exam.github.io
 
+The Embodied First Exam (EFE) is an agentic robotics benchmark for coding agents in robotics and embodied AI: 1,156 tasks in 35 suites on 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it.
+
 The website of the **Embodied First Exam**: the first exam for code agents in the physical world. It shows the exam's
 questions, its leaderboard, the benchmark suites it is made of, how a question is marked, and how to contribute.
 
@@ -44,7 +46,7 @@ private repositories): this site links only to its own pages and to public upstr
 ## Intro video
 
 The intro video (`site/blog/efe-intro.mp4` on HF, on the home page, the report and its card in `data/blogs.json`) has
-no editable source project; its leaderboard slide (13.6–16.1 s) is re-rendered from HTML and spliced into the mp4.
+no editable source project; its leaderboard slide (13.6 to 16.1 s) is re-rendered from HTML and spliced into the mp4.
 To update its numbers, edit `ROWS` in `scripts/intro_video/lb9.py` (the leaderboard's Standard view) and run
 `sh scripts/intro_video/run.sh <workdir>`: only the slide's group of pictures is re-encoded, and the script checks that
 every other frame and the audio are bit-identical. Upload the result and set its `?v=` on those three pages.

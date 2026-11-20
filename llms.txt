@@ -1,22 +1,22 @@
 # Embodied First Exam
 
-> Embodied First Exam (EFE) is an agentic robotics benchmark: a unified, comprehensive, and agent-native embodied evaluation framework that asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
+> The Embodied First Exam (EFE) is an agentic robotics benchmark for coding agents in robotics and embodied AI: 1,156 tasks in 35 suites on 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. It asks whether coding agents can reliably control diverse robots under physical-world constraints. Paper: "Embodied First Exam" (arXiv 2611.12177, cs.RO and cs.AI, November 2026), from Northwestern University with Carnegie Mellon University, UC Berkeley, University of Washington, Stanford University, UNC-Chapel Hill, Texas A&M University and UT Austin. Advised by Guanya Shi, Ruohan Zhang and Manling Li.
 
 What is the Embodied First Exam? It is the first exam for coding agents before they enter the physical world. Early successes on agentic robotics point to a potential shift toward using coding agents to control robots, but existing robotics benchmarks are built around visuomotor policy learning. EFE instead lets a coding agent choose its own control approach: direct control, code to control, or train a policy to control.
 
 ## Key facts
 
-- Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models), with 498 core tasks.
+- Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models). The paper reports results on a core set of 456 hard tasks; the live leaderboard counts 498.
 - 9 new suites go beyond pick-and-place to spatial puzzles, dexterous manipulation, multi-robot interaction, dynamic whole-body control, and sim-to-sim engineering.
 - Evaluation settings: the Standard Setting mimics the real world (sensor observations only, no environment resets by default); its Realtime variant keeps the environment running while the agent reasons; the Privileged Setting gives full simulator state and unlimited resets, and its success rates serve as an approximate upper bound.
-- Headline result: on the 456 core tasks, the strongest of ten agents in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting, leaving much room for improvement.
+- Headline result: on the 456 core tasks, the highest Standard Setting success rate among the ten agents in the paper is 50%, leaving much room for improvement.
 - Failure analysis: failed attempts are labeled by the stage at which they go wrong and compared across agents, settings, and stage categories. Every run is published with its full trace and a replay.
 - Unlike robotics benchmarks built around visuomotor policy learning, EFE treats the coding agent as the system under test and lets it choose its own control approach.
-- Scale: With 1,156 tasks on 47 robots, EFE is more than 20 times larger than other benchmarks of coding agents for robotics, such as RLE-Bench (51 tasks), EmboCoach-Bench (32) and EmbodiedSWE-Bench (28), and it evaluates agents on 456 core tests, against the 7 tasks of CaP-Bench.
+- Size compared with other benchmarks: with 1,156 tasks on 47 robots, EFE is larger than other benchmarks of coding agents for robotics, such as RobotWorld (84 tasks), RLE-Bench (51), EmboCoach-Bench (32), EmbodiedSWE-Bench (28) and CaP-Bench (7 tasks, with 187 in CaP-Gym).
 
 ## Where do agentic robots succeed and fail? Findings of the failure analysis blog post (https://www.embodied-first-exam.ai/blogs/failure-analysis/)
 
-- Under real-robot rules (Standard Setting), 169 of the 456 core tests (37%) are solved by none of the ten agents.
+- Under real-robot constraints (Standard Setting), 169 of the 456 core tests (37%) are solved by none of the ten agents.
 - Being able to retry helps more than knowing the exact state: in controlled runs of GPT-6 Astra, exact object state raises success from 29% to 45%, unlimited resets with saved states to 53%, both to 68%, against 79% in Privileged.
 - Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol differ by at most five points in success rate (30.8% ± 2.5).
 - The harness changes results by up to 7.5 percentage points for the same model (GPT-6 Astra: 34.4% in Codex, 27.0% in Claude Code).
