@@ -12,6 +12,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - Headline result: on the 456 core tasks, the strongest of ten agents in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting, leaving much room for improvement.
 - Failure analysis: failed attempts are labeled by the stage at which they go wrong and compared across agents, settings, and stage categories. Every run is published with its full trace and a replay.
 - Unlike robotics benchmarks built around visuomotor policy learning, EFE treats the coding agent as the system under test and lets it choose its own control approach.
+- Scale: With 1,156 tasks on 47 robots, EFE is more than 20 times larger than other benchmarks of coding agents for robotics, such as RLE-Bench (51 tasks), EmboCoach-Bench (32) and EmbodiedSWE-Bench (28), and it evaluates agents on 456 core tests, against the 7 tasks of CaP-Bench.
 
 ## Where do agentic robots succeed and fail? Findings of the failure analysis blog post (https://www.embodied-first-exam.ai/blogs/failure-analysis/)
 
@@ -33,6 +34,10 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 - DexHandExam (five-finger dexterous hand manipulation): https://www.embodied-first-exam.ai/suite/?id=dexhand
 - iSpatialGym (spatial reasoning from a goal image): https://www.embodied-first-exam.ai/suite/?id=ispatialgym
 - RoboEngineer (the engineering loop: build a controller in a public simulator, deploy it to one with hidden dynamics, and fix it): https://www.embodied-first-exam.ai/suite/?id=roboengineer
+
+## Where do agentic robots succeed and fail?
+
+- Read the analysis of ten coding agents: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Links
 
