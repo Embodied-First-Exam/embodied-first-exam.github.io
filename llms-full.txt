@@ -8,7 +8,7 @@ In the Embodied First Exam paper, agentic robotics refers to using coding agents
 
 ## What is the Embodied First Exam?
 
-The Embodied First Exam is a unified, comprehensive, and agent-native evaluation framework in which coding agents choose their own control approach: direct control, code to control, or train a policy to control. It has 1,156 tasks in 35 suites on 47 robots, including 456 core tasks. It is meant as the first exam for coding agents before they enter the physical world.
+The Embodied First Exam is a unified, comprehensive, and agent-native evaluation framework in which coding agents choose their own control approach: direct control, code to control, or train a policy to control. It has 1,156 tasks in 35 suites on 47 robots, including 498 core tasks. It is meant as the first exam for coding agents before they enter the physical world.
 
 ## Is there a benchmark for agentic robotics or for coding agents controlling robots?
 
@@ -84,7 +84,7 @@ The strongest agent's programs win 43% of their games against the strongest scri
 
 ## Key numbers at a glance
 
-- 1,156 tasks, 35 suites, 47 robots, 456 core tasks, 9 new suites
+- 1,156 tasks, 35 suites, 47 robots, 498 core tasks, 9 new suites
 - 3 evaluation settings: Standard, Realtime (a variant of Standard), Privileged
 - 3 control approaches: direct control, code to control, train a policy to control
 - Best Standard Setting success rate on core tasks: 50% (Claude Fable 5.2 in Claude Code, strongest of ten agents)

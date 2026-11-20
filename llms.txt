@@ -6,7 +6,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ## Key facts
 
-- Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models), with 456 core tasks.
+- Scale: 1,156 tasks in 35 suites on 47 robots (robot arms, dexterous hands, humanoids, quadrupeds and musculoskeletal models), with 498 core tasks.
 - 9 new suites go beyond pick-and-place to spatial puzzles, dexterous manipulation, multi-robot interaction, dynamic whole-body control, and sim-to-sim engineering.
 - Evaluation settings: the Standard Setting mimics the real world (sensor observations only, no environment resets by default); its Realtime variant keeps the environment running while the agent reasons; the Privileged Setting gives full simulator state and unlimited resets, and its success rates serve as an approximate upper bound.
 - Headline result: on the 456 core tasks, the strongest of ten agents in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting, leaving much room for improvement.
