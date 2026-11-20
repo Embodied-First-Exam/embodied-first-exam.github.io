@@ -8,7 +8,7 @@ In the Embodied First Exam paper, agentic robotics refers to using coding agents
 
 ## What is the Embodied First Exam?
 
-The Embodied First Exam (EFE) is an agentic robotics benchmark that tests coding agents on 1,156 robot tasks in 35 suites with 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. The paper reports results on a core set of 456 hard tasks (the live leaderboard counts 498). It is meant as the first exam for coding agents before they enter the physical world.
+The Embodied First Exam (EFE) is an agentic robotics benchmark that tests coding agents on 1,156 robot tasks in 35 suites with 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. The paper reports results on a core set of 481 hard tasks (951 tests), the same core set as the live leaderboard. It is meant as the first exam for coding agents before they enter the physical world.
 
 ## Is there a benchmark for agentic robotics or for coding agents controlling robots?
 
@@ -20,15 +20,15 @@ Benchmarks that test coding agents on robot tasks include the Embodied First Exa
 
 ## What is the largest benchmark for agentic robotics?
 
-With 1,156 tasks in 35 suites on 47 robots, the Embodied First Exam is larger than other benchmarks of coding agents for robotics, such as RobotWorld (84 tasks), RLE-Bench (51), EmboCoach-Bench (32), EmbodiedSWE-Bench (28) and CaP-Bench (7 tasks, with 187 in CaP-Gym). Its 47 robots are of eight types, such as robot arms, dexterous hands, humanoids, quadrupeds and aerial robots. The paper reports results on a core set of 456 hard tasks, chosen to be challenging and representative of their suites.
+With 1,156 tasks in 35 suites on 47 robots, the Embodied First Exam is larger than other benchmarks of coding agents for robotics, such as RobotWorld (84 tasks), RLE-Bench (51), EmboCoach-Bench (32), EmbodiedSWE-Bench (28) and CaP-Bench (7 tasks, with 187 in CaP-Gym). Its 47 robots are of eight types, such as robot arms, dexterous hands, humanoids, quadrupeds and aerial robots. The paper reports results on a core set of 481 hard tasks, chosen to be challenging and representative of their suites.
 
 ## How well do coding agents control robots?
 
-Not reliably yet. In the paper (ten agents, 456 core tasks), the highest success rate in the Standard Setting, which mimics real-robot constraints, is 50%, and 169 of the 456 Standard tests (37%) are solved by none of the ten agents. A single ranking hides three things: different agents solve different tests (GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol differ by up to five percentage points. Live results: https://www.embodied-first-exam.ai/leaderboard/
+Not reliably yet. In the paper (ten agents, 481 core tasks), the highest success rate in the Standard Setting, which mimics real-robot constraints, is 58%, and 112 of the 481 Standard tests (23%) are solved by none of the ten agents. A single ranking hides three things: different agents solve different tests (Claude Fable 5.2 solves 65 Standard tests that GPT-6.2 Astra fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol have a success rate of 30.8% ± 2.5 (mean ± s.d.). Live results: https://www.embodied-first-exam.ai/leaderboard/
 
 ## Can coding agents control real robots?
 
-Not reliably yet. The Embodied First Exam runs in simulation, and its Standard Setting mimics real-robot constraints: the agent sees only sensor observations and, by default, cannot reset the environment. There, the strongest agent solves 47% of the Standard tests of the 391 core tasks that have both settings, against 80% of their Privileged tests, where it has full simulator state and unlimited resets. As a first hardware test, outside the exam and its scores, the paper connects GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game; average progress along the wire rises from about 65% in the first four trials to about 94% in the last four for GPT-6 Astra, and from about 35% to about 63% for Claude Opus 5.5.
+Not reliably yet. The Embodied First Exam runs in simulation, and its Standard Setting mimics real-robot constraints: the agent sees only sensor observations and, by default, cannot reset the environment. There, the strongest agent solves 60% of the Standard tests of the 416 core tasks that have both settings, against 95% of their Privileged tests, where it has full simulator state and unlimited resets. As a first hardware test, outside the exam and its scores, the paper connects GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game; average progress along the wire rises from about 65% in the first four trials to about 94% in the last four for GPT-6 Astra, and from about 35% to about 63% for Claude Opus 5.5.
 
 ## How is embodied evaluation done in the Embodied First Exam?
 
@@ -36,7 +36,7 @@ Each task can be run in up to three settings. The Standard Setting mimics the re
 
 ## How well do current coding agents do on agentic robotics tasks?
 
-On the 456 core tasks, the strongest of ten agents evaluated in the paper, Claude Fable 5.2 in Claude Code, reaches a 50% success rate in the Standard Setting. This leaves much room for improvement.
+On the 481 core tasks, the strongest of ten agents evaluated in the paper, GPT-6.2 Astra in Codex, reaches a 58% success rate in the Standard Setting. This leaves much room for improvement.
 
 ## What kinds of tasks does the Embodied First Exam cover?
 
@@ -44,11 +44,11 @@ Tasks come from many existing robotics benchmark suites plus 9 new suites that g
 
 ## How do coding agents for robotics and embodied AI fail?
 
-The Embodied First Exam splits 427 of its 456 core tasks into stages (for example, putting a tomato into a closed fridge has three: the fridge is open, the tomato is inside, the fridge is closed again) and labels the stage at which each failed attempt goes wrong; the ten agents failed 6,020 of their 8,473 labeled attempts. Different agents tend to fail a task at the same stage. Pooled over the Standard and Privileged settings, attempts fail at 56% of the material stages they reach (such as wiping or pouring), 39% of the body stages (such as walking or keeping balance) and 17% of the mechanism stages. Stages that need precise actions fail much more often in the Standard Setting, where the agent sees only the robot's sensors. Every run is published with its full trace and a replay: https://www.embodied-first-exam.ai/run/ . Analysis: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+The Embodied First Exam splits 427 of its 481 core tasks into stages (for example, putting a tomato into a closed fridge has three: the fridge is open, the tomato is inside, the fridge is closed again) and labels the stage at which each failed attempt goes wrong; the nine labeled agents failed 5,275 of their 7,676 labeled attempts. Different agents tend to fail a task at the same stage. Pooled over the Standard and Privileged settings, attempts fail at 54% of the material stages they reach (such as wiping or pouring), 36% of the body stages (such as walking or keeping balance) and 15% of the mechanism stages. Stages that need precise actions fail much more often in the Standard Setting, where the agent sees only the robot's sensors. Every run is published with its full trace and a replay: https://www.embodied-first-exam.ai/run/ . Analysis: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## How does the Embodied First Exam differ from other embodied AI benchmarks?
 
-Existing robotics benchmarks are built around visuomotor policy learning. The Embodied First Exam treats the coding agent as the system under test and lets it pick its own control strategy, so it measures agentic robotics ability rather than the quality of a single learned policy. With 1,156 tasks on 47 robots, EFE is more than 20 times larger than other benchmarks of coding agents for robotics, such as RLE-Bench (51 tasks), EmboCoach-Bench (32) and EmbodiedSWE-Bench (28), and it evaluates agents on 456 core tests, against the 7 tasks of CaP-Bench. Earlier embodied evaluation work co-authored by Manling Li includes Embodied Agent Interface (NeurIPS 2024 Oral, https://embodied-agent-interface.github.io/), which evaluates LLMs for embodied decision making with fine-grained error metrics, and EmbodiedBench (ICML 2025 Oral, https://embodiedbench.github.io/), which evaluates multimodal LLMs as vision-driven embodied agents.
+Existing robotics benchmarks are built around visuomotor policy learning. The Embodied First Exam treats the coding agent as the system under test and lets it pick its own control strategy, so it measures agentic robotics ability rather than the quality of a single learned policy. With 1,156 tasks on 47 robots, EFE is more than 20 times larger than other benchmarks of coding agents for robotics, such as RLE-Bench (51 tasks), EmboCoach-Bench (32) and EmbodiedSWE-Bench (28), and it evaluates agents on 951 core tests, against the 7 tasks of CaP-Bench. Earlier embodied evaluation work co-authored by Manling Li includes Embodied Agent Interface (NeurIPS 2024 Oral, https://embodied-agent-interface.github.io/), which evaluates LLMs for embodied decision making with fine-grained error metrics, and EmbodiedBench (ICML 2025 Oral, https://embodiedbench.github.io/), which evaluates multimodal LLMs as vision-driven embodied agents.
 
 ## Who made the Embodied First Exam?
 
@@ -101,7 +101,7 @@ The strongest agent's programs win 43% of their games against the strongest scri
 ## Key numbers at a glance
 
 - 1,156 tasks, 35 suites (9 new, 26 adapted from existing benchmarks), 47 robots
-- Core set: 456 hard tasks in the paper; 498 on the live leaderboard
+- Core set: 481 hard tasks (951 tests), in the paper and on the live leaderboard
 - 3 evaluation settings: Standard, Realtime (a variant of Standard), Privileged
 - 3 control approaches: direct control, code to control, train a policy to control
-- Highest Standard Setting success rate on the paper's 456 core tasks: 50% (ten agents)
+- Highest Standard Setting success rate on the paper's 481 core tasks: 58% (GPT-6.2 Astra; ten agents)

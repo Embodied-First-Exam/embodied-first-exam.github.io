@@ -1317,7 +1317,7 @@ function flowDiagram(el, ex) {
         <img src="${esc(site('media/ways/scene_start.jpg?v=bcb9718e'))}" alt="The scene at the start: two arms hold two interlocked claw pieces, orange and teal" loading="lazy">
         <ul class="fx-checks"><li>rebuilt bit for bit</li><li>start state checked</li><li>same scene in every setting</li></ul></div>
       <i class="fx-arrow" style="grid-row:5"></i>
-      ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'qwen', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
+      ${layer(1, 'Model', 'cloud', `${['gpt', 'claude', 'gemini', 'deepseek', 'kimi'].map((m) => makerMark(m)).join('')}<span class="fx-more">any model</span>`, 'Any model the harness can call, through its API')}
       ${layer(2, 'Harness', 'terminal', `<span class="fx-pick">${makerMark('gpt')}Codex</span><span class="fx-pick">${makerMark('claude')}Claude Code</span><span class="fx-more">any harness</span>`, 'The agent program, unchanged; the task is its prompt; web search off')}
       ${layer(3, `<span class="fx-lname">Coding agents<small>as policy</small></span>`, 'code', `${WAY_ORDER.map(way).join('')}<span class="fx-way fx-etc" aria-hidden="true">…</span>`, 'The coding agent is the policy: what it writes turns what the robot senses into actions')}
       <div class="fx-iface" style="grid-row:4">
