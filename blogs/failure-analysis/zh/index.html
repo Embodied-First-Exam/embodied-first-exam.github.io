@@ -1062,8 +1062,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-goals">
     <p class="fig-cap"><span class="fc-t">同一个任务在 RoboDojo 和本次考试中的指令。</span>Fill Egg Holder；加粗部分是本次考试补充的内容。</p>
-    <p>RoboDojo：“Place the four eggs from the basket into the egg holder, then close the lid.”</p>
-    <p>本次考试：“Move the four eggs from the egg basket into the egg holder <b>(an articulated tray with a lid)</b>, close the lid, <b>and return the arm home</b>.”</p>
+    <p style="text-align:left">RoboDojo：“Place the four eggs from the basket into the egg holder, then close the lid.”</p>
+    <p style="text-align:left">本次考试：“Move the four eggs from the egg basket into the egg holder <b>(an articulated tray with a lid)</b>, close the lid, <b>and return the arm home</b>.”</p>
   </div>
 </figure>
 <p>使用 RoboDojo 的一句话指令时，GPT-6 Astra 完成 54 个 RoboDojo 任务中的 12 个；加上 RoboDojo 的任务方案和回到初始姿态的说明后为 33 个；使用本次考试的指令时为 37 个。最大的跃升，从 54 个中的 12 个到 33 个，来自加入任务方案和初始姿态说明：这些主要是关于判定要求的信息，尽管评分阶段也列出了任务的步骤。完整写明判定条件又多完成了 4 个，达到 37 个。三个版本中机器人、场景和 Agent 都相同，因此 54 个中 12 个的得分，衡量的更多是指令与判定的匹配程度，而远非 Astra 用双臂操作物体的能力。</p>
