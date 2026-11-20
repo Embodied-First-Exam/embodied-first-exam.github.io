@@ -159,7 +159,7 @@ function footer(ex) {
   f.outerHTML = `<footer class="footer"><div class="footer-grid">
     <div>
       <a class="wordmark" href="${exam()}"><span class="mark" aria-hidden="true">${MARK}</span>Embodied First Exam</a>
-      <div class="tagline">An agentic robotics benchmark: coding agents for robotics, tested on ${int(ex.totals?.instances || 1156)} tasks and ${int(ex.totals?.robots || 47)} robots.</div>
+      <div class="tagline">An agentic robotics benchmark that tests coding agents on ${int(ex.totals?.instances || 1156)} tasks and ${int(ex.totals?.robots || 47)} robots.</div>
       <div class="prov">Questions as of ${esc(date(ts.date))} · results updated ${esc(date(ex.build?.at))}</div>
       <div class="copy">© 2026 Embodied First Exam</div>
     </div>
@@ -2166,7 +2166,7 @@ function suiteResults(el, ex, tasks, s = {}) {
 async function suitePage(ex) {
   const s = ex._suites[Q.get('id') || document.body.dataset.suite] || ranked(ex)[0];
   document.title = `${s.name} · Embodied First Exam`;
-  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark that tests coding agents for robotics. ${s.blurb || ''}`.trim());
+  document.querySelector('meta[name="description"]')?.setAttribute('content', `${s.name}, a suite of the Embodied First Exam, an agentic robotics benchmark that tests coding agents on robot tasks. ${s.blurb || ''}`.trim());
   const cover = coverOf(s);
   const crop = cropFor(s.id, cover?.task);
   // the suite's own pages, always in this order: paper, website, code, then the rest (owners, 2026-10-18)

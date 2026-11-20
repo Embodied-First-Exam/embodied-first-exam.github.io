@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics · Blogs</title>
-<meta name="description" content="Where do today’s agentic robots succeed and fail? Understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
+<title>Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics · Blogs</title>
+<meta name="description" content="Where do today’s agentic robots succeed and fail? Towards understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Crect x='8.8' y='22.6' width='10.4' height='3' rx='1.5' fill='%23f4f6f9'/%3E%3Crect x='12.1' y='10' width='3.8' height='12' fill='%23f4f6f9'/%3E%3Cpath d='M14 10L9.2 14.8' stroke='%23f4f6f9' stroke-width='3.5'/%3E%3Cpath d='M10.5 16.2L7.9 13.6M10.5 16.2L9.2 17.5M7.9 13.6L6.6 14.9' stroke='%23f4f6f9' stroke-width='1.8'/%3E%3Ccircle cx='14' cy='21.4' r='2.8' fill='%23f4f6f9'/%3E%3Ccircle cx='14' cy='10' r='2.8' fill='%234fc1d4'/%3E%3Cpath d='M18.6 18.6L20.9 20.9L25.2 15.8' stroke='%23ff7b4f' stroke-width='2.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -169,19 +169,19 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 .fig .fig-cap, .fig figcaption { font-style: italic !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=716117a6"></script>
+<script type="module" src="../../assets/app.js?v=1353e48d"></script>
 <script type="module" src="../../assets/blog-post.js?v=5f4231e3"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
-<meta property="og:title" content="Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics">
-<meta property="og:description" content="Where do today’s agentic robots succeed and fail? Understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
+<meta property="og:title" content="Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics">
+<meta property="og:description" content="Where do today’s agentic robots succeed and fail? Towards understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
 <meta property="og:url" content="https://www.embodied-first-exam.ai/blogs/failure-analysis/">
 <meta property="og:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics">
-<meta name="twitter:description" content="Where do today’s agentic robots succeed and fail? Understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
+<meta name="twitter:title" content="Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics">
+<meta name="twitter:description" content="Where do today’s agentic robots succeed and fail? Towards understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig09_task_agent_matrix.png?v=732c756b">
 <script type="application/ld+json">
 {
@@ -190,8 +190,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     {
       "@type": "BlogPosting",
       "@id": "https://www.embodied-first-exam.ai/blogs/failure-analysis/#post",
-      "headline": "Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics",
-      "description": "Where do today’s agentic robots succeed and fail? Understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.",
+      "headline": "Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics",
+      "description": "Where do today’s agentic robots succeed and fail? Towards understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.",
       "datePublished": "2026-11-12",
       "inLanguage": "en",
       "url": "https://www.embodied-first-exam.ai/blogs/failure-analysis/",
@@ -281,7 +281,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics",
+          "name": "Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics",
           "item": "https://www.embodied-first-exam.ai/blogs/failure-analysis/"
         }
       ]
@@ -381,7 +381,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
   <header class="page-head post-head">
     <p class="kicker"><a href="../">Blogs</a> · <a href="../../">Embodied First Exam</a></p>
-    <h1 class="post-title">Where Do Today’s Agentic Robots Succeed and Fail?<span class="post-sub">Understanding the Capability Boundary of Coding Agents in Robotics</span></h1>
+    <h1 class="post-title">Where Do Today’s Agentic Robots Succeed and Fail?<span class="post-sub">Towards Understanding the Capability Boundary of Coding Agents in Robotics</span></h1>
     <p class="byline"><span>November 2026</span> · <a href="../agentic-robotics-benchmark/">EFE Blog</a> · <a href="../../leaderboard/">Leaderboard</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Paper</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Code</a></p>
     <p class="lang-switch"><span aria-current="true">English</span><a href="zh/" hreflang="zh-Hans" lang="zh-Hans">中文</a><a href="es/" hreflang="es" lang="es">Español</a></p>
   </header>
@@ -1191,8 +1191,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <path d="M15 9L8.6 15.4" stroke="currentColor" stroke-width="4.4"></path><path d="M10.3 17.1L6.9 13.7M10.3 17.1L8.5 18.9M6.9 13.7L5.1 15.5" stroke="currentColor" stroke-width="2.2"></path>
     <circle cx="15" cy="24" r="3.5" fill="currentColor"></circle><circle cx="15" cy="9" r="3.5" fill="var(--std)"></circle></g>
   <path d="M21.2 20.4L24 23.2L29.2 16.8" stroke="var(--priv)" stroke-width="3.2"></path></svg></span>Embodied First Exam</a>
-      <div class="tagline">An agentic robotics benchmark: coding agents for robotics, tested on 1,156 tasks and 47 robots.</div>
-      <div class="prov">Questions as of 5 November 2026 · results updated 16 November 2026</div>
+      <div class="tagline">An agentic robotics benchmark that tests coding agents on 1,156 tasks and 47 robots.</div>
+      <div class="prov">Questions as of 5 November 2026 · results updated 20 November 2026</div>
       <div class="copy">© 2026 Embodied First Exam</div>
     </div>
     <div><h5>The exam</h5><ul>
