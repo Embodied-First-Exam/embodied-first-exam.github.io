@@ -2055,8 +2055,7 @@ async function homeNews(el) {
   try { posts = await getJSON('data/blogs.json'); } catch (e) { return; }
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 3);
   if (!posts.length) return;
-  const day = (iso) => { const d = new Date(`${iso}T00:00:00Z`); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); };
-  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts">${posts.map((p, i) => `<a class="hn-post${i ? '' : ' on'}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"><span class="hn-title">${esc(p.title)}</span>${p.date ? `<span class="hn-date">${esc(day(p.date))}</span>` : ''}</a>`).join('')}</span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
+  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts">${posts.map((p, i) => `<a class="hn-post${i ? '' : ' on'}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"><span class="hn-title">${esc(p.short || p.title)}</span></a>`).join('')}</span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
   const items = $$('.hn-post', el);
   if (items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let at = 0, hold = false;
