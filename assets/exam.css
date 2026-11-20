@@ -1852,3 +1852,19 @@ html { overflow-x: clip; }
   .hn-posts { max-width: 530px; }
 }
 @media (prefers-reduced-motion: reduce) { .hn-post, .hn-post.on { transition: none; } }
+
+/* RoboDojo suite page: the three prompt versions under the description (owner, 2026-11-20) */
+.suite-prompts { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; line-height: 1.55; }
+.suite-prompts p { margin: 0; }
+.suite-prompts p + p, .suite-prompts .sp-list + p { margin-top: 8px; }
+.suite-prompts b { color: var(--ink); }
+.suite-prompts .sp-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.suite-prompts .sp-list li { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--line); }
+.suite-prompts .sp-list em { font-style: normal; font-family: var(--mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
+.suite-prompts .sp-ex { margin-top: 10px; }
+.suite-prompts .sp-ex summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.suite-prompts .sp-box { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--bg-2); overflow-wrap: anywhere; }
+.suite-prompts .sp-box .sp-name { display: block; margin-bottom: 4px; }
+.suite-prompts .sp-box p + p, .suite-prompts .sp-box ul + p, .suite-prompts .sp-box p + ul { margin-top: 6px; }
+.suite-prompts .sp-box ul { margin: 4px 0 0; padding-left: 18px; }
+.suite-prompts .sp-after { margin-top: 10px; }

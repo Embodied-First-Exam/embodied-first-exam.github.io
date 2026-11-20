@@ -634,7 +634,7 @@ const runShards = new Map();   // suite id -> promise of its rows
 /** index.json: {v, total, suites: {id: n}, solved, settings: {run id: n}}; a v1 index is summarised the same way. */
 // runs the owners took off the site: not listed, not counted as a setting, not watched (owner, 2026-11-17: the site
 // matches the paper, D64)
-const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh']);
+const HIDDEN_RUNS = new Set(['codex-gpt6_luna-xhigh', 'claude_code-qwen3_8_max-high']);
 const shown = (rows) => (rows || []).filter((r) => !HIDDEN_RUNS.has(r.run));
 const runSummary = () => (runSummaryP ??= runJSON('index.json').then((d) => {
   for (const id of HIDDEN_RUNS) if (d.settings) delete d.settings[id];
@@ -1341,7 +1341,7 @@ const RUNTIME = {
     lead: 'The reference mode. Agent and simulator share one container: the agent reads the full simulator state, resets at will and plans offline. Only its deliverable leaves the container, and a fresh simulator replays it.',
     agent: ['the harness calling its model', 'the simulator, the frozen scene and the suite’s own tools', 'the full simulator state; resets at will', 'writes <code>/app/output/trajectory.npz</code>, or code for a policy task'],
     stop: ['the harness stops the agent', 'only <code>/app/output/</code> is collected; nothing else the agent did counts'],
-    verify: ['empties <code>/logs/verifier</code>; drops links, pipes and devices from <code>/app/output</code>', 'rebuilds the frozen scene from its own byte-identical copy (another start state: no verdict, an infrastructure failure)', 'replays the trajectory in a fresh process, twice; the final-state hashes must match', 'judges success on the end state: <code>reward.txt</code> (1 or 0), <code>reward.json</code>', 'a policy task’s code runs as an unprivileged user, in its own process, with no network, unable to read the simulator or the grader'],
+    verify: ['empties <code>/logs/verifier</code>; drops links, pipes and devices from <code>/app/output</code>', 'rebuilds the frozen scene from its own byte-identical copy (another start state: no verdict, an infrastructure failure)', 'replays the trajectory in a fresh process; a task whose simulator does not replay bit for bit declares up to <i>N</i> replays (RoboDojo, BEHAVIOR-1K, RoboLab, AM-Bench: 3), each in a fresh process, and the attempt succeeds if any replay succeeds', 'judges success on the end state: <code>reward.txt</code> (1 or 0), <code>reward.json</code>', 'a policy task’s code runs as an unprivileged user, in its own process, with no network, unable to read the simulator or the grader'],
   },
 };
 const RT_RULES = ['one Docker Compose project per trial, run by Harbor', 'every image pinned: <code>eai-<em>suite</em>:<em>version</em></code>', 'the cutoff is wall-clock time, the same in both modes', 'one full retry for an infrastructure failure, nothing more', 'a verdict, once written, is never rewritten'];
@@ -2134,6 +2134,7 @@ async function suitePage(ex) {
         <h1 style="margin:10px 0 0;font:800 clamp(40px,5.6vw,76px)/.95 var(--display);letter-spacing:-.035em">${esc(s.name)}${nameTag(s)}</h1>
         <p class="lead" style="margin:16px 0 0;font-size:18px;color:var(--ink-2)">${esc(s.blurb || '')}</p>
         <p class="desc">${prose(s.description || '')}</p>
+        ${suitePrompts(s.prompts)}
         ${ext ? `<div class="link-list">${ext}</div>` : ''}
       </div>
  <div><div class="cover frame">${releaseTag(s, true)}${cover ? (cover.video ? `<video src="${esc(site(cover.video))}" poster="${esc(site(cover.poster || ''))}" muted loop autoplay playsinline${crop ? ` class="${crop}"` : ''}></video>` : poster(cover, crop)) : `<div class="placeholder-art">${esc(s.code)}</div>`}</div>
@@ -2144,6 +2145,26 @@ async function suitePage(ex) {
   $('#suite-tasks-count').textContent = tasksTests(tasks.length, tasks.reduce((n, t) => n + (t.modes?.length || 0), 0));
   suiteResults($('#suite-results'), ex, tasks);
   taskBrowser($('#tasks'), ex, tasks, { suite: s.id });
+}
+
+/** A suite's prompt versions under its description (exam.json suites[].prompts; owner, 2026-11-20: RoboDojo): a short
+ *  note, one line per version with GPT-6 Astra's share and solved / tasks, then one task's three prompts, collapsed. */
+const promptText = (t) => prose(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+function suitePrompts(p) {
+  if (!p?.items?.length) return '';
+  const pct = (v) => `${Math.round(100 * v[0] / v[1])}%`;
+  const blocks = (bs) => {
+    let out = '', list = [];
+    const flush = () => { if (list.length) out += `<ul>${list.map((x) => `<li>${promptText(x)}</li>`).join('')}</ul>`; list = []; };
+    for (const b of bs || []) { if (b.startsWith('- ')) list.push(b.slice(2)); else { flush(); out += `<p>${promptText(b)}</p>`; } }
+    flush();
+    return out;
+  };
+  const ex = p.example;
+  return `<div class="note suite-prompts"><p><b>${esc(p.title || '')}</b> ${esc(p.text || '')}</p>
+    <ul class="sp-list">${p.items.map((it) => `<li><span><b>${esc(it.name)}:</b> ${esc(it.text)}</span>${it.solved ? `<em>${pct(it.solved)} (${int(it.solved[0])}/${int(it.solved[1])})</em>` : ''}</li>`).join('')}</ul>
+    ${p.after ? `<p>${esc(p.after)}</p>` : ''}
+    ${ex?.prompts?.length ? `<details class="sp-ex"><summary>${esc(ex.title || 'Example')}</summary>${ex.prompts.map((q) => `<div class="sp-box"><b class="sp-name">${esc(q.name)}</b>${blocks(q.blocks)}</div>`).join('')}${ex.after ? `<p class="sp-after">${esc(ex.after)}</p>` : ''}</details>` : ''}</div>`;
 }
 
 /** A suite's videos on a real robot (data/exam.yml `real_robot` in the source: video, poster, aspect, caption), above
