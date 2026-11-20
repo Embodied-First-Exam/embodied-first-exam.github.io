@@ -422,12 +422,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <li><a href="#spend-effort">Reasoning effort: little change in Sol’s success rate</a></li>
           <li><a href="#run-variance">Repeated runs: Sol’s success rate varies by less than 5 points</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#next">Next steps</a></summary><ol>
-          <li><a href="#next-hidden">Hidden tasks</a></li>
-          <li><a href="#next-real">Real robots</a></li>
-        </ol></details></li>
         <li><a href="#closing-olympics">Embodied Olympics: Continual Learning</a></li>
-        <li><a href="#closing-limits">Limitations</a></li>
+        <li><a href="#closing-limits">Limitations and Next Steps on Hidden Tasks and Real Robots</a></li>
       </ol>
     </nav>
 
@@ -1127,12 +1123,16 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>Reasoning effort moves the result less than repeating the run: Sol at medium, high and maximum effort solves 30.7%, 32.2% and 30.9% of the Standard tests, a spread of 1.5 points (<a href="#spend-effort">details</a>).</p>
 
 
-    <h2 id="next" data-short="Next steps">Next steps</h2>
-    <h3 id="next-hidden" data-short="Hidden set">Hidden tasks</h3>
-    <p>Because results on tasks adapted from public benchmarks may partly reflect what a model has seen before, we are building a hidden set of held-out tasks that will not be released. Agents will be evaluated on it under the same settings and the same external verifier, so a result there shows how an agent handles a task it could not have seen.</p>
+    <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics: Continual Learning</h2>
 
-    <h3 id="next-real" data-short="Real robots">Real robots</h3>
-    <p>The Standard Setting gives the agent only the robot’s sensor readings and control interface, so the same interface can drive a physical robot once the outcome can be graded. We are extending Embodied First Exam to real robots, with tasks and protocols that let a real-robot attempt be run and graded consistently.</p>
+<p>In <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a>, agents build and run the systems that control robots in real-time matches against each other, on two boards. On <b>Continual Learning</b>, each agent keeps one workspace for the whole championship, so its programs, policy weights and notes carry from match to match. On <b>Episodic Learning</b>, every match starts from an empty workspace.</p>
+<p>Claude Fable 5.2 entered Episodic Learning. It joined on 10 November 2026 and played one fresh match against each of the other six agents in 15 sports; it did not enter Humanoid Soccer · Team, drone racing or full-size racing. It holds 10 gold and 3 silver medals, with a 44-5 record (90%) in 10 duel and team-duel sports. Beach volleyball and tennis are exhibitions and count in neither the medal table nor the win rate.</p>
+<p>For the full analysis, see the <a href="../embodied-olympics/">Embodied Olympics report</a>.</p>
+
+    <h2 id="closing-limits" data-short="Limitations and next steps">Limitations and Next Steps on Hidden Tasks and Real Robots</h2>
+    <p>Every comparison here comes from one attempt per agent and test; three runs of GPT-6.1 Sol in the Standard Setting give a success rate of 30.8% ± 2.5 (see <a href="#run-variance">Run to run</a>). The stage labels behind Part 3 come from a labeling pipeline that combines labeling by coding agents (GPT-6.1 Sol and Claude Sonnet 5.5) with human spot checks while the prompts were developed. All results except one real-robot demonstration are in simulation. The paper discusses these and further limits, including possible memorization of public benchmarks and how the core set was screened (<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">paper, Limitations</a>).</p>
+<p id="next-hidden">Because results on tasks adapted from public benchmarks may partly reflect what a model has seen before, we are building a hidden set of held-out tasks that will not be released. Agents will be evaluated on it under the same settings and the same external verifier, so a result there shows how an agent handles a task it could not have seen.</p>
+<p id="next-real">The Standard Setting gives the agent only the robot’s sensor readings and control interface, so the same interface can drive a physical robot once the outcome can be graded. We are extending Embodied First Exam to real robots, with tasks and protocols that let a real-robot attempt be run and graded consistently.</p>
 
 <p>As a first test on hardware, the authors connected GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game (paper Figure 34). The robot holds the handle of a metal loop and must guide it along a bent wire fixed to a wooden board without touching it. Loop and wire form one electric circuit, so any contact turns on a light and a buzzer and ends the trial, as in RoboARC’s simulated buzz wire tasks on a Franka Panda arm. The agent sends discrete commands: move the gripper up, down, left or right, or rotate it either way. Each agent ran eight trials in a row on the same wire, each scored by progress, the share of the wire the loop covered before the trial ended (100% is the whole wire without a contact).</p>
 <figure class="fig paper fig-wide">
@@ -1150,15 +1150,6 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 <p>It shows that a coding agent can control a physical robot arm in this game.</p>
 
-
-    <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics: Continual Learning</h2>
-
-<p>In <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a>, agents build and run the systems that control robots in real-time matches against each other, on two boards. On <b>Continual Learning</b>, each agent keeps one workspace for the whole championship, so its programs, policy weights and notes carry from match to match. On <b>Episodic Learning</b>, every match starts from an empty workspace.</p>
-<p>Claude Fable 5.2 entered Episodic Learning. It joined on 10 November 2026 and played one fresh match against each of the other six agents in 15 sports; it did not enter Humanoid Soccer · Team, drone racing or full-size racing. It holds 10 gold and 3 silver medals, with a 44-5 record (90%) in 10 duel and team-duel sports. Beach volleyball and tennis are exhibitions and count in neither the medal table nor the win rate.</p>
-<p>For the full analysis, see the <a href="../embodied-olympics/">Embodied Olympics report</a>.</p>
-
-    <h2 id="closing-limits" data-short="Limitations">Limitations</h2>
-    <p>Every comparison here comes from one attempt per agent and test; three runs of GPT-6.1 Sol in the Standard Setting give a success rate of 30.8% ± 2.5 (see <a href="#run-variance">Run to run</a>). The stage labels behind Part 3 come from a labeling pipeline that combines labeling by coding agents (GPT-6.1 Sol and Claude Sonnet 5.5) with human spot checks while the prompts were developed. All results except one real-robot demonstration are in simulation. The paper discusses these and further limits, including possible memorization of public benchmarks and how the core set was screened (<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">paper, Limitations</a>).</p>
 
     <h2 id="sources" data-short="Sources and citation">Data sources and citation</h2>
     <h3 id="closing-notes" data-short="Data sources">Data sources</h3>

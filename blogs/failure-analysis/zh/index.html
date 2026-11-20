@@ -384,55 +384,51 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
  <nav class="toc-top" aria-label="目录">
  <p class="label">目录</p>
  <ol>
- <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
- <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
- <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成；7 个 Suite 过半无人完成</a></li>
- <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 不一定最强</a></li>
- <li><a href="#task-types">搬运容易，工具使用难</a></li>
- <li><a href="#eight-tests">为什么会在别人能完成的测试上失败？以 Fable 为例</a></li>
- <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
- <li><a href="#settings-explained">三种设置：Agent 能看到什么、能做什么？</a></li>
- <li><a href="#transfer">Privileged 下完成的任务，很多在 Standard 下失败</a></li>
- <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
- <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
- <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
- <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
- <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
- <li><a href="#same-across-settings">无论 Standard 还是 Privileged，失败阶段往往相同</a></li>
- <li><a href="#stage-kinds">材料变化和身体移动最易失败，但难点因 Suite 而异</a></li>
- <li><a href="#by-suite">每个 Suite 有自己的失败方式</a></li>
- <li><a href="#by-robot">身体形态影响失败方式：承重机器人易摔倒，手部难以建立接触</a></li>
- <li><a href="#weaker-early">较弱 Agent 常在接触前失败，Fable 多在接触后失败</a></li>
- <li><a href="#lunch-batteries">长程家务：前几件能完成，难在途中保持平衡</a></li>
- <li><a href="#cereal">取麦片和碗：强 Agent 能把碗拿到手边，较弱 Agent 难在抓取</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#act">Agent 如何工作？</a></summary><ol>
- <li><a href="#control-by-setting">直接控制、写程序，还是训练 policy？</a></li>
- <li><a href="#soccer-gpu">给了 GPU，Agent 会训练 policy 吗？</a></li>
- <li><a href="#success-methods">成功的运行如何完成任务？演练，并从失败中改进</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
- <li><a href="#spend-cost">失败尝试花费更高，低价 Agent 也能接近领先者</a></li>
- <li><a href="#spend-how">Fable 写得多、动得少，Astra 一直检查到时间用完，Opus 最早结束</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#conditions">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</a></summary><ol>
- <li><a href="#harness-gap">Harness：最多相差 7.5 个百分点</a></li>
- <li><a href="#robodojo">任务指令：RoboDojo 得分约为原来的三倍</a></li>
- <li><a href="#spend-effort">推理强度：只差 1.5 个百分点</a></li>
- <li><a href="#run-variance">重复运行：最多相差 5 个百分点</a></li>
- </ol></details></li>
- <li><details open><summary><a href="#next">下一步</a></summary><ol>
- <li><a href="#next-hidden">隐藏任务集</a></li>
- <li><a href="#next-real">真实机器人</a></li>
- </ol></details></li>
- <li><a href="#closing-olympics">Embodied Olympics：Continual Learning</a></li>
- <li><a href="#closing-limits">局限</a></li>
- </ol>
- </nav>
+        <li><details open><summary><a href="#fail-why">每个 Agent 在哪些测试上失败，原因是什么？</a></summary><ol>
+          <li><a href="#cross-solve">Fable 和 Astra 各有对方完不成的任务</a></li>
+          <li><a href="#shared-boundary">十个 Agent 合起来，仍有 169 个 Standard 测试无人完成；7 个 Suite 过半无人完成</a></li>
+          <li><a href="#where-each-leads">不同 Suite 的第一名不同，新 Agent 不一定最强</a></li>
+          <li><a href="#task-types">搬运容易，工具使用难</a></li>
+          <li><a href="#eight-tests">为什么会在别人能完成的测试上失败？以 Fable 为例</a></li>
+          <li><a href="#realtime">哪些任务在 Realtime 下仍能完成？</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#information">哪些信息最重要？Privileged 与 Standard 对比</a></summary><ol>
+          <li><a href="#settings-explained">三种设置：Agent 能看到什么、能做什么？</a></li>
+          <li><a href="#transfer">Privileged 下完成的任务，很多在 Standard 下失败</a></li>
+          <li><a href="#state-vs-resets">Reset 比精确物体状态更有帮助</a></li>
+          <li><a href="#precise-stages">Precision 阶段在 Standard 下难得多</a></li>
+          <li><a href="#precise-resets">在 Precision 阶段，reset 有帮助，精确状态本身没有</a></li>
+          <li><a href="#no-signal">Astra 几乎不依赖成功提示</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#where">Agent 在哪个阶段失败？</a></summary><ol>
+          <li><a href="#same-stage">不同 Agent 常卡在同一阶段：难点属于任务本身</a></li>
+          <li><a href="#same-across-settings">无论 Standard 还是 Privileged，失败阶段往往相同</a></li>
+          <li><a href="#stage-kinds">材料变化和身体移动最易失败，但难点因 Suite 而异</a></li>
+          <li><a href="#by-suite">每个 Suite 有自己的失败方式</a></li>
+          <li><a href="#by-robot">身体形态影响失败方式：承重机器人易摔倒，手部难以建立接触</a></li>
+          <li><a href="#weaker-early">较弱 Agent 常在接触前失败，Fable 多在接触后失败</a></li>
+          <li><a href="#lunch-batteries">长程家务：前几件能完成，难在途中保持平衡</a></li>
+          <li><a href="#cereal">取麦片和碗：强 Agent 能把碗拿到手边，较弱 Agent 难在抓取</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#act">Agent 如何工作？</a></summary><ol>
+          <li><a href="#control-by-setting">直接控制、写程序，还是训练 policy？</a></li>
+          <li><a href="#soccer-gpu">给了 GPU，Agent 会训练 policy 吗？</a></li>
+          <li><a href="#success-methods">成功的运行如何完成任务？演练，并从失败中改进</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#spend">投入更多有用吗？</a></summary><ol>
+          <li><a href="#spend-cost">失败尝试花费更高，低价 Agent 也能接近领先者</a></li>
+          <li><a href="#spend-how">Fable 写得多、动得少，Astra 一直检查到时间用完，Opus 最早结束</a></li>
+        </ol></details></li>
+        <li><details open><summary><a href="#conditions">什么会改变分数：Harness、任务指令、推理强度，还是再跑一次？</a></summary><ol>
+          <li><a href="#harness-gap">Harness：最多相差 7.5 个百分点</a></li>
+          <li><a href="#robodojo">任务指令：RoboDojo 得分约为原来的三倍</a></li>
+          <li><a href="#spend-effort">推理强度：只差 1.5 个百分点</a></li>
+          <li><a href="#run-variance">重复运行：最多相差 5 个百分点</a></li>
+        </ol></details></li>
+        <li><a href="#closing-olympics">Embodied Olympics：Continual Learning</a></li>
+        <li><a href="#closing-limits">局限与下一步：隐藏任务和真实机器人</a></li>
+      </ol>
+    </nav>
 
 
  <p class="wwf-label">总体结果</p>
@@ -1126,12 +1122,16 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>推理强度对结果的影响小于重复运行：Sol 在中、高和最高推理强度下分别完成 Standard 测试的 30.7%、32.2% 和 30.9%，差距为 1.5 个百分点（<a href="#spend-effort">详情</a>）。</p>
 
 
-<h2 id="next" data-short="下一步">下一步</h2>
- <h3 id="next-hidden" data-short="隐藏集">隐藏任务集</h3>
- <p>由于改编自公开基准的任务上的结果可能部分反映模型此前见过的内容，我们正在构建一个不会公开发布的留出任务隐藏集。Agent 将在相同的设置和相同的外部验证器下接受评测，因此在该集合上的结果能够反映 Agent 如何处理它不可能见过的任务。</p>
+<h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：Continual Learning</h2>
 
- <h3 id="next-real" data-short="真实机器人">真实机器人</h3>
- <p>Standard Setting 只向 Agent 提供机器人的传感器读数和控制接口，因此只要结果可以评判，同一套接口就能驱动实体机器人。我们正在把 Embodied First Exam 扩展到真实机器人上，设计相应的任务和协议，使真机尝试能够以一致的方式运行和评判。</p>
+<p>在 <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> 中，Agent 搭建并运行控制机器人的系统，在实时比赛中相互对抗，共有两个榜单。在 <b>Continual Learning</b> 榜单上，每个 Agent 在整个赛季中使用同一个工作区，程序、policy 权重和笔记会一场接一场地保留下来。在 <b>Episodic Learning</b> 榜单上，每场比赛都从空的工作区开始。</p>
+<p>Claude Fable 5.2 参加的是 Episodic Learning，于 2026 年 11 月 10 日加入，在 15 个项目中与其他六个 Agent 各进行了一场新的比赛；它没有参加 Humanoid Soccer · Team、无人机竞速和全尺寸赛车。它目前获得 10 枚金牌和 3 枚银牌，在 10 个单挑和团队对抗项目中战绩为 44-5（90%）。沙滩排球和网球是表演项目，既不计入奖牌榜，也不计入胜率。</p>
+<p>关于 Embodied Olympics 的完整分析，见 <a href="../../embodied-olympics/">Embodied Olympics 报告</a>。</p>
+
+<h2 id="closing-limits" data-short="局限与下一步">局限与下一步：隐藏任务和真实机器人</h2>
+ <p>本文的每项比较都来自每个 Agent 在每个测试上的一次尝试；GPT-6.1 Sol 在 Standard Setting 下的三次运行成功率为 30.8% ± 2.5（见<a href="#run-variance">不同运行之间</a>）。第 3 部分所依据的阶段标签来自一个标注流程：由编程 Agent（GPT-6.1 Sol 和 Claude Sonnet 5.5）打标签，并在开发提示词期间辅以人工抽查。除一个真机演示外，所有结果都来自仿真。论文讨论了这些局限以及更多局限，包括对公开基准的可能记忆，以及核心集是如何筛选的（<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文，局限部分</a>）。</p>
+<p id="next-hidden">由于改编自公开基准的任务上的结果可能部分反映模型此前见过的内容，我们正在构建一个不会公开发布的留出任务隐藏集。Agent 将在相同的设置和相同的外部验证器下接受评测，因此在该集合上的结果能够反映 Agent 如何处理它不可能见过的任务。</p>
+<p id="next-real">Standard Setting 只向 Agent 提供机器人的传感器读数和控制接口，因此只要结果可以评判，同一套接口就能驱动实体机器人。我们正在把 Embodied First Exam 扩展到真实机器人上，设计相应的任务和协议，使真机尝试能够以一致的方式运行和评判。</p>
 
 <p>作为在硬件上的首次测试，作者将 GPT-6 Astra 和 Claude Opus 5.5 接入一台实体机械臂，玩电流急急棒游戏（论文图 34）。机器人握住一个金属环的手柄，必须引导它沿着固定在木板上的弯曲金属丝移动而不触碰金属丝。金属环与金属丝构成一个电路，任何接触都会点亮灯并触发蜂鸣器，结束该次试验，这与 RoboARC 中在 Franka Panda 机械臂上进行的仿真电流急急棒任务相同。Agent 发送离散指令：让夹爪向上、下、左、右移动，或向任一方向旋转。每个 Agent 在同一根金属丝上连续进行八次试验，每次按进度评分，即试验结束前金属环走过的金属丝比例（100% 表示无接触地走完整根金属丝）。</p>
 <figure class="fig paper fig-wide">
@@ -1148,15 +1148,6 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
  </div>
 </figure>
 <p>它表明编程 Agent 能够在这个游戏中控制实体机械臂。</p>
-
-<h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：Continual Learning</h2>
-
-<p>在 <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> 中，Agent 搭建并运行控制机器人的系统，在实时比赛中相互对抗，共有两个榜单。在 <b>Continual Learning</b> 榜单上，每个 Agent 在整个赛季中使用同一个工作区，程序、policy 权重和笔记会一场接一场地保留下来。在 <b>Episodic Learning</b> 榜单上，每场比赛都从空的工作区开始。</p>
-<p>Claude Fable 5.2 参加的是 Episodic Learning，于 2026 年 11 月 10 日加入，在 15 个项目中与其他六个 Agent 各进行了一场新的比赛；它没有参加 Humanoid Soccer · Team、无人机竞速和全尺寸赛车。它目前获得 10 枚金牌和 3 枚银牌，在 10 个单挑和团队对抗项目中战绩为 44-5（90%）。沙滩排球和网球是表演项目，既不计入奖牌榜，也不计入胜率。</p>
-<p>关于 Embodied Olympics 的完整分析，见 <a href="../../embodied-olympics/">Embodied Olympics 报告</a>。</p>
-
-<h2 id="closing-limits" data-short="局限">局限</h2>
- <p>本文的每项比较都来自每个 Agent 在每个测试上的一次尝试；GPT-6.1 Sol 在 Standard Setting 下的三次运行成功率为 30.8% ± 2.5（见<a href="#run-variance">不同运行之间</a>）。第 3 部分所依据的阶段标签来自一个标注流程：由编程 Agent（GPT-6.1 Sol 和 Claude Sonnet 5.5）打标签，并在开发提示词期间辅以人工抽查。除一个真机演示外，所有结果都来自仿真。论文讨论了这些局限以及更多局限，包括对公开基准的可能记忆，以及核心集是如何筛选的（<a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文，局限部分</a>）。</p>
 
  <h2 id="sources" data-short="数据来源与引用">数据来源与引用</h2>
  <h3 id="closing-notes" data-short="数据来源">数据来源</h3>
