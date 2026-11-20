@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://www.embodied-first-exam.ai/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://www.embodied-first-exam.ai/blogs/first-exam/</loc><lastmod>2026-11-14</lastmod></url>
   <url>
     <loc>https://www.embodied-first-exam.ai/blogs/embodied-olympics/</loc>
@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://www.embodied-first-exam.ai/blogs/failure-analysis/</loc>
-    <lastmod>2026-11-19</lastmod>
+    <lastmod>2026-11-20</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/"/>
     <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/es/"/>
@@ -16,7 +16,7 @@
   </url>
   <url>
     <loc>https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/</loc>
-    <lastmod>2026-11-19</lastmod>
+    <lastmod>2026-11-20</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/"/>
     <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/es/"/>
@@ -24,17 +24,17 @@
   </url>
   <url>
     <loc>https://www.embodied-first-exam.ai/blogs/failure-analysis/es/</loc>
-    <lastmod>2026-11-19</lastmod>
+    <lastmod>2026-11-20</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/"/>
     <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/zh/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/es/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.embodied-first-exam.ai/blogs/failure-analysis/"/>
   </url>
-  <url><loc>https://www.embodied-first-exam.ai/suites/</loc><lastmod>2026-11-14</lastmod></url>
-  <url><loc>https://www.embodied-first-exam.ai/tasks/</loc><lastmod>2026-11-14</lastmod></url>
-  <url><loc>https://www.embodied-first-exam.ai/leaderboard/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/suites/</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/tasks/</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/leaderboard/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://www.embodied-first-exam.ai/contribute/</loc><lastmod>2026-11-14</lastmod></url>
-  <url><loc>https://www.embodied-first-exam.ai/blogs/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://www.embodied-first-exam.ai/blogs/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://www.embodied-first-exam.ai/run/</loc><lastmod>2026-11-14</lastmod></url>
   <url><loc>https://www.embodied-first-exam.ai/suite/?id=behavior-1k</loc></url>
   <url><loc>https://www.embodied-first-exam.ai/suite/?id=robolab</loc></url>
