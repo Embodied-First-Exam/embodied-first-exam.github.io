@@ -16,7 +16,7 @@
  },
  {
   "slug": "failure-analysis",
-  "title": "Where Do Today’s Agentic Robots Succeed and Fail? The Capability Boundary of Coding Agents in Robotics",
+  "title": "Where Do Today’s Agentic Robots Succeed and Fail? Understanding the Capability Boundary of Coding Agents in Robotics",
   "date": "2026-11-12",
   "kind": "Analysis",
   "summary": "What robotic tasks can coding agents solve, under what physical-world constraints, and where do they fail? Which tasks each of ten agents fails and why, what information matters in Privileged versus Standard, where in a task agents fail, how they act, and how the harness, spending and the task instruction change the result.",
