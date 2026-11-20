@@ -642,3 +642,6 @@ table.heat thead th:first-child { width: 26%; text-align: left; }
 
 /* A post title's second line, smaller and quieter than the title. */
 .page-head.post-head h1.post-title .post-sub { display: block; margin-top: 10px; font: 700 clamp(20px, 2vw, 30px)/1.2 var(--display); letter-spacing: -.02em; color: var(--ink-2); }
+
+/* The question above a post title, where a badge used to sit. */
+.page-head.post-head .post-q.post-q-top { margin: 0 0 14px; }
