@@ -1,6 +1,6 @@
 # embodied-first-exam.github.io
 
-The Embodied First Exam (EFE) is an agentic robotics benchmark for coding agents in robotics and embodied AI: 1,156 tasks in 35 suites on 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it.
+The Embodied First Exam (EFE) is an agentic robotics benchmark that tests coding agents on 1,156 robot tasks in 35 suites with 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it.
 
 The website of the **Embodied First Exam**: the first exam for code agents in the physical world. It shows the exam's
 questions, its leaderboard, the benchmark suites it is made of, how a question is marked, and how to contribute.

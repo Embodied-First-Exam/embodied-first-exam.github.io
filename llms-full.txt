@@ -8,7 +8,7 @@ In the Embodied First Exam paper, agentic robotics refers to using coding agents
 
 ## What is the Embodied First Exam?
 
-The Embodied First Exam (EFE) is an agentic robotics benchmark for coding agents in robotics and embodied AI: 1,156 tasks in 35 suites on 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. The paper reports results on a core set of 456 hard tasks (the live leaderboard counts 498). It is meant as the first exam for coding agents before they enter the physical world.
+The Embodied First Exam (EFE) is an agentic robotics benchmark that tests coding agents on 1,156 robot tasks in 35 suites with 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. The paper reports results on a core set of 456 hard tasks (the live leaderboard counts 498). It is meant as the first exam for coding agents before they enter the physical world.
 
 ## Is there a benchmark for agentic robotics or for coding agents controlling robots?
 
