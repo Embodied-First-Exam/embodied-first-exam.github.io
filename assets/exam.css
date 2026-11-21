@@ -1828,27 +1828,26 @@ html { overflow-x: clip; }
 
 /* What's new: one small line by the hero's search (under it; beside it on a wide screen), the blog's latest posts in turn
    (owner and Canyu Chen, 2026-11-18) */
-.home-news { margin-top: 12px; display: flex; align-items: center; gap: 10px; max-width: 100%; width: fit-content; min-height: 30px; padding: 3px 14px 3px 4px; border-radius: 999px;
+.home-news { margin-top: 12px; display: flex; align-items: center; gap: 10px; max-width: 100%; width: fit-content; min-height: 30px; padding: 6px 14px 6px 6px; border-radius: 16px;
   border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 70%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   font: 500 13px/1.3 var(--body); }
 .home-news:empty { display: none; }
 .hn-tag { flex: none; padding: 5px 9px; border-radius: 999px; background: linear-gradient(100deg, var(--priv) 0%, #e8913a 45%, var(--std) 100%); color: #fff;
   font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-.hn-posts { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; overflow: hidden; }
-/* a vertical ticker (owner, 2026-11-20): the shown title scrolls up and out, the next scrolls up from below */
-.hn-post { grid-area: 1 / 1; display: flex; align-items: baseline; gap: 8px; min-width: 0; color: var(--ink); opacity: 0; visibility: hidden; transform: translateY(110%);
-  transition: opacity .45s, transform .45s, visibility 0s .45s; }
-.hn-post.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s, transform .45s, visibility 0s; }
-.hn-post.out { transform: translateY(-110%); }
-.hn-title { min-width: 0; }   /* the whole title, on its own line under the search box (owner, 2026-11-20) */
+.hn-posts { --row: 24px; height: calc(var(--rows, 1) * var(--row)); min-width: 0; overflow: hidden; }
+/* three rows at once, the list scrolling up one row at a time (owner, 2026-11-20) */
+.hn-track { display: flex; flex-direction: column; transition: transform .55s ease; }
+.hn-post { flex: none; height: var(--row); display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--ink); white-space: nowrap; }
+.hn-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }   /* the whole title, on its own line under the search box (owner, 2026-11-20) */
 .hn-post:hover .hn-title { text-decoration: underline; text-underline-offset: 3px; }
 .hn-date { flex: none; font: 500 11px/1 var(--mono); color: var(--ink-3); }
 .hn-all { flex: none; padding-left: 10px; border-left: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
 .hn-all:hover { color: var(--ink); }
 .hn-all .arr { font-family: var(--mono); }
-@media (max-width: 560px) { .hn-date { display: none; } } /* a narrow screen: the title gets the room */
+@media (max-width: 560px) { .home-news { flex-wrap: wrap; row-gap: 6px; padding: 8px 12px 8px 8px; } .hn-all { margin-left: auto; } .hn-posts { order: 3; flex: 1 0 100% !important; padding-left: 4px; } } /* a narrow screen: the tag and the link on top, the rows below with the full width */
+@media (max-width: 999px) { .home-news { width: auto; max-width: min(100%, calc(100vw - 32px)); } .hn-posts { flex: 1 1 0; } } /* the rows never push the box past the screen */
 @media (min-width: 1000px) { .home-news { width: max-content; max-width: min(1000px, calc(100vw - var(--gutter) * 2)); background: color-mix(in srgb, var(--surface) 86%, transparent); } }
-@media (prefers-reduced-motion: reduce) { .hn-post, .hn-post.on { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hn-track { transition: none; } }
 
 /* RoboDojo suite page: the three prompt versions under the description (owner, 2026-11-20) */
 .suite-prompts { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; line-height: 1.55; }

@@ -2047,31 +2047,32 @@ function bodyLabel(ex, s) {
   return `${low.slice(0, -1).join(', ')} and ${low[low.length - 1]}`;
 }
 
-/** What's new: one small line by the hero's search (owner and Canyu Chen, 2026-11-18): the blog's latest posts from
- *  data/blogs.json (up to six, owner 2026-11-20), newest first, one at a time, and a link to all posts. With more than
- *  one post it scrolls up to the next every few seconds (the shown title leaves upward, the next comes in from below),
- *  holds while hovered or focused, and stays on the newest post for a viewer who prefers less motion. */
+/** What's new: by the hero's search (owner and Canyu Chen, 2026-11-18): the blog's latest posts from data/blogs.json
+ *  (up to six, newest first, each with its date) and a link to all posts. Three rows show at once (owner, 2026-11-20);
+ *  with more posts than rows the list scrolls up one row every few seconds and wraps around, holds while hovered or
+ *  focused, and stays still for a viewer who prefers less motion. */
 async function homeNews(el) {
   if (!el) return;
   let posts = [];
   try { posts = await getJSON('data/blogs.json'); } catch (e) { return; }
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 6);
   if (!posts.length) return;
-  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts">${posts.map((p, i) => `<a class="hn-post${i ? '' : ' on'}" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"><span class="hn-title">${esc(p.short || p.title)}</span></a>`).join('')}</span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
-  const items = $$('.hn-post', el);
-  if (items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rows = Math.min(3, posts.length), loop = posts.length > rows;
+  const day = (iso) => (iso ? new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : '');
+  const row = (p, copy) => `<a class="hn-post" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"${copy ? ' aria-hidden="true" tabindex="-1"' : ''}><span class="hn-date">${esc(day(p.date))}</span><span class="hn-title">${esc(p.short || p.title)}</span></a>`;
+  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts" style="--rows:${rows}"><span class="hn-track">${posts.map((p) => row(p)).join('')}${loop ? posts.slice(0, rows).map((p) => row(p, true)).join('') : ''}</span></span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
+  if (!loop || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const track = $('.hn-track', el), first = $('.hn-post', el);
   let at = 0, hold = false;
   const on = () => { hold = true; }, off = () => { hold = el.matches(':hover, :focus-within'); };
   el.addEventListener('mouseenter', on); el.addEventListener('focusin', on);
   el.addEventListener('mouseleave', off); el.addEventListener('focusout', () => setTimeout(off));
+  const go = (i, animate) => { track.style.transition = animate ? '' : 'none'; track.style.transform = `translateY(${-i * first.offsetHeight}px)`; };
   setInterval(() => {
     if (hold || document.hidden) return;
-    const out = items[at];
-    out.classList.remove('on'); out.classList.add('out');
-    setTimeout(() => out.classList.remove('out'), 500);
-    at = (at + 1) % items.length;
-    items[at].classList.add('on');
-  }, 4000);
+    at += 1; go(at, true);
+    if (at === posts.length) setTimeout(() => { at = 0; go(0, false); }, 600);   // the copies of the first rows: back to the top unseen
+  }, 3500);
 }
 
 async function home(ex) {
