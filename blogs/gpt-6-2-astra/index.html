@@ -100,8 +100,8 @@
 
   <article class="post">
 
-    <p class="statement">Under real-robot rules it solves <b data-f="x_s_pct"></b> of the tests, against <b data-f="f_s_pct"></b> for Claude Fable 5.2.</p>
-    <p>We ran GPT-6.2 Astra in Codex on the core set of the <a href="../first-exam/">Embodied First Exam</a>, at high reasoning effort and with one attempt per test, on the tasks, settings and time limits of the current core set. It also solves <span data-f="x_p"></span> of the Privileged tests, <span data-f="x_t"></span> of the Realtime tests and <span data-f="x_o"></span> of the tasks. This post compares it test by test and attempt by attempt with Claude Fable 5.2 in Claude Code, the previous leader, and with GPT-6 Astra, its predecessor in Codex.</p>
+    <p class="statement">Under real-robot constraints it solves <b data-f="x_s_pct"></b> of the tests, against <b data-f="f_s_pct"></b> for Claude Fable 5.2.</p>
+    <p>We ran GPT-6.2 Astra in Codex on the core set of the <a href="../first-exam/">Embodied First Exam</a>, at high reasoning effort and with one attempt per test, on the tasks, settings and time limits of the current core set. It also solves <span data-f="x_p"></span> of the Privileged tests, <span data-f="x_t"></span> of the Realtime tests and <span data-f="x_o"></span> of the tasks. This post compares it test by test and attempt by attempt with Claude Fable 5.2 in Claude Code, which solves <span data-f="f_o"></span> of the tasks, and with GPT-6 Astra, its predecessor in Codex.</p>
 
     <!-- ===================================================================================== 1 -->
     <h2 id="results" data-short="Results"><span class="num">01</span>Results</h2>
@@ -261,7 +261,7 @@
     <!-- ===================================================================================== 4 -->
     <h2 id="cases" data-short="Case studies"><span class="num">04</span>Case studies</h2>
     <p>Two tests that GPT-6.2 Astra solved and Claude Fable 5.2 failed, with both agents’ runs side by side.</p>
-    <h3 id="c1">Painting under real-robot rules: GPT-6.2 Astra calibrated its brush and checked the sheet, and Claude Fable 5.2 painted most of its strokes without looking.</h3>
+    <h3 id="c1">Painting under real-robot constraints: GPT-6.2 Astra calibrated its brush and checked the sheet, and Claude Fable 5.2 painted most of its strokes without looking.</h3>
     <p>In RoboPaint, an arm copies The Great Wave off Kanagawa onto paper with a brush and ten paints, and the copy passes when its color error and structure are close enough to the target. The copy may use at most 376 strokes. Both agents solved this task in the Privileged Setting.</p>
     <div class="cmp">
       <a class="case s" href="../../run/?r=robopaint-acrylic-greatwave-i00-standard--ql4a85t"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/3a/robopaint-acrylic-greatwave-i00-standard--ql4a85t/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/3a/robopaint-acrylic-greatwave-i00-standard--ql4a85t/replay.mp4"></video>
@@ -270,7 +270,7 @@
               <span class="case-k">Out of strokes</span><b>Claude Fable 5.2 · failed</b><span class="case-m">Standard · minute 29 of 60</span><span class="case-t">A greedy planner fitted straight strokes of four widths to the picture. It painted 285 of them without looking, then photographed the sheet three times and replanned the remaining strokes from what was on the paper. With the stroke budget spent, its own estimate of the color error was about 3.1; the verifier measured 2.74, above the limit.</span></a>
     </div>
 
-    <h3 id="c2">Boxing up leftovers under real-robot rules: both agents lost tacos to the floor, and GPT-6.2 Astra recovered them in time.</h3>
+    <h3 id="c2">Boxing up leftovers under real-robot constraints: both agents lost tacos to the floor, and GPT-6.2 Astra recovered them in time.</h3>
     <p>In BEHAVIOR-1K, the R1 Pro mobile robot must put two tacos from their plates into a tupperware that starts in a kitchen cabinet, the tupperware into the refrigerator and both plates into the sink, and leave the refrigerator closed, in one episode of at most two hours. No other agent solved this Standard test; Claude Fable 5.2 solved it with privileged access.</p>
     <div class="cmp">
       <a class="case s" href="../../run/?r=behavior-boxing-food-after-dinner-i00-standard--pp6aszs"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/7a/behavior-boxing-food-after-dinner-i00-standard--pp6aszs/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/7a/behavior-boxing-food-after-dinner-i00-standard--pp6aszs/replay.mp4"></video>
