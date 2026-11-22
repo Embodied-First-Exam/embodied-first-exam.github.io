@@ -432,7 +432,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <li><a href="#spend-price">Cost and success are only loosely tied</a></li>
           <li><a href="#spend-how">How do agents use their time and tokens?</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#conditions">How sensitive are the results to the harness, task instruction, reasoning effort and repeated runs?</a></summary><ol>
+        <li><details open><summary><a href="#conditions">How sensitive are the results to the harness, task instruction and reasoning effort?</a></summary><ol>
           <li><a href="#harness-gap">Harness: the same model, up to 7.5 points apart</a></li>
           <li><a href="#robodojo">Task instruction: RoboDojo scores rise</a></li>
           <li><a href="#spend-effort">Reasoning effort: little change in Sol’s success rate</a></li>
@@ -1097,7 +1097,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>Each habit has a cost. Often Fable’s unused time would not have helped, because it had used every reset, dropped the tool out of reach, or spent its strokes in paint that cannot be removed. Where its estimate was wrong, though, the time could have mattered: the kaishu copy missed by 0.004, and the spatula by 0.6 mm. GPT-6 Astra’s checking pays off on exactly these tests, but 157 of its 306 failed Standard attempts also run to 95% or more of the time limit instead of ending on a result. More time helps only if the agent can tell from its own sensors how close it is.</p>
 
 
-    <h2 id="conditions" data-short="How sensitive the results are">How sensitive are the results to the harness, task instruction, reasoning effort and repeated runs?</h2>
+    <h2 id="conditions" data-short="How sensitive the results are">How sensitive are the results to the harness, task instruction and reasoning effort?</h2>
     <h3 id="harness-gap" data-short="Harness">Harness: the same model, up to 7.5 points apart</h3>
 <p>Every agent in Embodied First Exam is a model running inside a harness: the program that hands the model its tools, keeps its conversation, and decides when a session ends. Claude Fable 5.2, Claude Opus 5.5 and two of the weaker models (Kimi 3.1 Pro and GLM 5.3 Flash) run in Claude Code, GPT-6.2 Astra, GPT-6 Astra and GPT-6.1 Sol in Codex, the two Gemini models in Antigravity CLI, and DeepSeek V4.1 Flash in DeepSeek Harness, DeepSeek’s own. To measure the harness’s share, the paper ran three models in other harnesses on the 456 core Standard tests, with the leaderboard’s time limits and reasoning effort (Figure 16c). The effect ranges from 7.5 points to almost nothing, and a model’s own harness is not always its best.</p>
 <p><b>GPT-6 Astra loses 7.5 points outside Codex.</b> It solves 157 of 456 tests (34.4%) in Codex, its own harness, and 123 (27.0%) in Claude Code. Single tests move both ways: 75 are solved only in Codex and 41 only in Claude Code. The paper finds the difference significant (p = 0.002). Most of it is already there in the first episode, before any reset: 119 successes in Codex against 95 (p = 0.015). So the gap does not come only from how the harnesses handle long sessions with many retries.</p>
