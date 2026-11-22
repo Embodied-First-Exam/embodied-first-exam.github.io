@@ -2048,7 +2048,7 @@ function bodyLabel(ex, s) {
 }
 
 /** What's new: by the hero's search (owner and Canyu Chen, 2026-11-18): the blog's latest posts from data/blogs.json
- *  (up to six, newest first, titles only, no dates: note-for-kangrui §4) and a link to all posts. Three rows show at once (owner, 2026-11-20);
+ *  (up to six, newest first, each with its publication date as on the blog page, owner 2026-11-22) and a link to all posts. Three rows show at once (owner, 2026-11-20);
  *  with more posts than rows the list scrolls up one row every few seconds and wraps around, holds while hovered or
  *  focused, and stays still for a viewer who prefers less motion. */
 async function homeNews(el) {
@@ -2058,7 +2058,7 @@ async function homeNews(el) {
   posts = (posts || []).filter((p) => p?.slug && p?.title).sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 6);
   if (!posts.length) return;
   const rows = Math.min(3, posts.length), loop = posts.length > rows;
-  const row = (p, copy) => `<a class="hn-post" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"${copy ? ' aria-hidden="true" tabindex="-1"' : ''}><span class="hn-title">${esc(p.short || p.title)}</span></a>`;
+  const row = (p, copy) => `<a class="hn-post" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"${copy ? ' aria-hidden="true" tabindex="-1"' : ''}>${p.date ? `<span class="hn-date">${esc(p.date)}</span>` : ''}<span class="hn-title">${esc(p.short || p.title)}</span></a>`;
   el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts" style="--rows:${rows}"><span class="hn-track">${posts.map((p) => row(p)).join('')}${loop ? posts.slice(0, rows).map((p) => row(p, true)).join('') : ''}</span></span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
   if (!loop || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const track = $('.hn-track', el), first = $('.hn-post', el);
