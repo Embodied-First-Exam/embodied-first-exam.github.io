@@ -330,7 +330,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           "name": "花费更多能帮助 coding agent 完成机器人任务吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "单靠花费并不能。对每个 agent 而言，失败尝试的花费中位数都高于成功尝试的花费中位数；在推理强度对比运行的 456 个 Standard 测试上，GPT-6.1 Sol 在中、高和最高推理强度下分别解决了 30.7%、32.2% 和 30.9%，差异在多次运行之间的波动范围之内。"
+            "text": "单靠花费并不能。对每个 agent 而言，失败尝试的花费中位数都高于成功尝试的花费中位数；在推理强度对比运行的 456 个 Standard 测试上，GPT-6.1 Sol 在中等推理强度下解决了 30.7%，在最高推理强度下解决了 30.9%，都落在它三次高推理强度运行的 27.9% 到 32.2% 之间。"
           }
         },
         {
@@ -1174,18 +1174,18 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>另一种投入更多的方式，是让模型在每次行动前思考更久。所有排行榜 agent 都以高推理强度运行；论文还在 Codex 中让 GPT-6.1 Sol 以中等和最高推理强度运行了 456 个核心 Standard 测试，其余条件与排行榜运行相同。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
-    <p class="fig-cap"><span class="fc-t">推理强度越高，输出 tokens 越多、请求越少、会话越长，而成功率和成本不变。</span>GPT-6.1 Sol 在 Codex 中运行 456 个核心 Standard 测试：成功率及每次尝试的均值，按图 21 中的标价计算。</p>
+    <p class="fig-cap"><span class="fc-t">推理强度越高，输出 tokens 越多、请求越少、会话越长，而成功率和成本不变。</span>GPT-6.1 Sol 在 Codex 中运行 456 个核心 Standard 测试：成功率及每次尝试的均值，按图 21 中的标价计算。中等和最高推理强度各运行一次。高推理强度的成功率是三次运行的均值，括号内为范围；成本、tokens、请求数和时间来自排行榜运行。</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>推理强度</th><th>成功率</th><th>每次尝试成本</th><th>输出 tokens</th><th>请求数</th><th>时间</th></tr></thead>
       <tbody>
         <tr><th scope="row">中等</th><td>30.7%</td><td>$4.05</td><td>82k</td><td>201</td><td>69 min</td></tr>
-        <tr><th scope="row">高（排行榜运行）</th><td>32.2%</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
+        <tr><th scope="row">高（三次运行）</th><td>30.8%（27.9% 至 32.2%）</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
         <tr><th scope="row">最高</th><td>30.9%</td><td>$3.91</td><td>111k</td><td>157</td><td>79 min</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等、高和最高推理强度分别完成 30.7%、32.2% 和 30.9%，相差 1.5 个百分点。这小于 Sol 在相同测试上三次高推理强度运行之间的差异（分别完成 147、147 和 127 个；均值 30.8%，标准差 2.5 个百分点；见<a href="#run-variance">运行方差</a>）。没有迹象表明其他推理强度的得分会与排行榜所用的高推理强度有实质差异。</p>
+<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等和最高推理强度各运行一次，分别完成 30.7% 和 30.9%。三次高推理强度运行在相同测试上分别完成 32.2%、32.2% 和 27.9%（均值 30.8%，标准差 2.5 个百分点；见<a href="#run-variance">运行方差</a>），两次单独运行都落在这一范围内。没有迹象表明其他推理强度的得分会与排行榜所用的高推理强度有实质差异。</p>
 <p><b>改变的是 agent 的工作方式。</b>推理强度更高时，Sol 输出更多 tokens、发送更少请求、运行更久：它在每一步之前思考更多，步数更少、每步更慢。两种风格在这些物理任务上完成的比例大致相同。</p>
 <p><b>成本基本不变，</b>每次尝试 $3.91 到 $4.10，可能是因为请求减少抵消了额外的输出 tokens。</p>
 
@@ -1206,7 +1206,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p>三次运行的成功率相差不超过五个百分点，均值为 30.8%，标准差为 2.5 个百分点；其中任何一次运行单独来看，都会在排行榜的 Standard 列中排名第四，位于 GPT-6.2 Astra、Claude Fable 5.2 和 GPT-6 Astra 之后，Claude Opus 5.5 之前。</p>
-<p>推理强度对结果的影响小于重复运行：Sol 在中、高和最高推理强度下分别完成 Standard 测试的 30.7%、32.2% 和 30.9%，差距为 1.5 个百分点（<a href="#spend-effort">详情</a>）。</p>
+<p>推理强度对结果的影响小于重复运行：Sol 在中等和最高推理强度下分别完成 Standard 测试的 30.7% 和 30.9%，都落在三次高推理强度运行的范围内（<a href="#spend-effort">详情</a>）。</p>
 
 
     <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：agent 能做到 continual learning 吗？</h2>

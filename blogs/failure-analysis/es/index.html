@@ -330,7 +330,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           "name": "¿Gastar más ayuda a los agentes de programación en tareas robóticas?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No por sí solo. Para todos los agentes, la mediana de los intentos fallidos cuesta más que la de los resueltos, y GPT-6.1 Sol con esfuerzo de razonamiento medio, alto y máximo resuelve el 30.7%, el 32.2% y el 30.9% de las 456 pruebas Standard de las ejecuciones de esfuerzo, dentro de la variación entre ejecuciones."
+            "text": "No por sí solo. Para todos los agentes, la mediana de los intentos fallidos cuesta más que la de los resueltos, y GPT-6.1 Sol resuelve el 30.7% de las 456 pruebas Standard de las ejecuciones de esfuerzo con esfuerzo de razonamiento medio y el 30.9% con esfuerzo máximo, dentro del rango del 27.9% al 32.2% de sus tres ejecuciones con esfuerzo alto."
           }
         },
         {
@@ -1174,18 +1174,18 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>Otra forma de gastar más es dejar que el modelo piense más tiempo antes de cada acción. Todos los agentes de la clasificación funcionan con un esfuerzo de razonamiento alto; el artículo también ejecutó GPT-6.1 Sol en Codex en las 456 pruebas Standard principales con esfuerzo medio y con esfuerzo máximo, con todo lo demás como en la ejecución de la clasificación.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
-    <p class="fig-cap"><span class="fc-t">Más esfuerzo significa más tokens de salida, menos solicitudes y sesiones más largas, con la misma tasa de éxito y el mismo coste.</span> GPT-6.1 Sol en Codex en las 456 pruebas Standard principales: tasa de éxito y medias por intento, a precios de lista como en la Figura 21.</p>
+    <p class="fig-cap"><span class="fc-t">Más esfuerzo significa más tokens de salida, menos solicitudes y sesiones más largas, con la misma tasa de éxito y el mismo coste.</span> GPT-6.1 Sol en Codex en las 456 pruebas Standard principales: tasa de éxito y medias por intento, a precios de lista como en la Figura 21. Los esfuerzos medio y máximo se ejecutaron una vez cada uno. Para el esfuerzo alto, la tasa de éxito es la media de tres ejecuciones, con el rango entre paréntesis; el coste, los tokens, las solicitudes y el tiempo proceden de la ejecución de la clasificación.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>Esfuerzo</th><th>Tasa de éxito</th><th>Coste por intento</th><th>Tokens de salida</th><th>Solicitudes</th><th>Tiempo</th></tr></thead>
       <tbody>
         <tr><th scope="row">Medio</th><td>30.7%</td><td>$4.05</td><td>82k</td><td>201</td><td>69 min</td></tr>
-        <tr><th scope="row">Alto (ejecución de la clasificación)</th><td>32.2%</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
+        <tr><th scope="row">Alto (tres ejecuciones)</th><td>30.8% (27.9 a 32.2%)</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
         <tr><th scope="row">Máximo</th><td>30.9%</td><td>$3.91</td><td>111k</td><td>157</td><td>79 min</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p><b>Los tres esfuerzos quedan dentro del ruido entre ejecuciones.</b> El esfuerzo medio, el alto y el máximo resuelven el 30.7%, el 32.2% y el 30.9%, una dispersión de 1.5 puntos. Eso es menos que la dispersión entre tres ejecuciones de Sol con esfuerzo alto en las mismas pruebas (147, 147 y 127 resueltas; media del 30.8%, desviación estándar de 2.5 puntos; véase <a href="#run-variance">variación entre ejecuciones</a>). Nada sugiere que otro esfuerzo hubiera obtenido una puntuación significativamente distinta de la del esfuerzo alto de la clasificación.</p>
+<p><b>Los tres esfuerzos quedan dentro del ruido entre ejecuciones.</b> Los esfuerzos medio y máximo resuelven el 30.7% y el 30.9% en una ejecución cada uno. Las tres ejecuciones con esfuerzo alto resuelven el 32.2%, el 32.2% y el 27.9% de las mismas pruebas (media del 30.8%, desviación estándar de 2.5 puntos; véase <a href="#run-variance">variación entre ejecuciones</a>), y ambas ejecuciones únicas quedan dentro de ese rango. Nada sugiere que otro esfuerzo hubiera obtenido una puntuación significativamente distinta de la del esfuerzo alto de la clasificación.</p>
 <p><b>Lo que cambia es la forma en que trabaja el agente.</b> Con más esfuerzo, Sol escribe más tokens de salida, envía menos solicitudes y se ejecuta durante más tiempo: piensa más antes de cada paso y da menos pasos, más lentos. Ambos estilos resuelven aproximadamente la misma proporción de estas tareas físicas.</p>
 <p><b>El coste se mantiene más o menos igual,</b> de $3.91 a $4.10 por intento, probablemente porque las menos solicitudes compensan los tokens de salida adicionales.</p>
 
@@ -1206,7 +1206,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p>Las tasas de éxito de las tres ejecuciones difieren en menos de cinco puntos porcentuales, con una media de 30.8% y una desviación estándar de 2.5 puntos, y cada ejecución por sí sola quedaría cuarta en la columna Standard de la clasificación, detrás de GPT-6.2 Astra, Claude Fable 5.2 y GPT-6 Astra y por delante de Claude Opus 5.5.</p>
-<p>El esfuerzo de razonamiento cambia el resultado menos que repetir la ejecución: Sol con esfuerzo medio, alto y máximo resuelve el 30.7%, 32.2% y 30.9% de las pruebas Standard, una dispersión de 1.5 puntos (<a href="#spend-effort">detalles</a>).</p>
+<p>El esfuerzo de razonamiento cambia el resultado menos que repetir la ejecución: Sol con esfuerzo medio y máximo resuelve el 30.7% y el 30.9% de las pruebas Standard, dentro del rango de las tres ejecuciones con esfuerzo alto (<a href="#spend-effort">detalles</a>).</p>
 
 
     <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics: ¿pueden los agentes hacer continual learning?</h2>

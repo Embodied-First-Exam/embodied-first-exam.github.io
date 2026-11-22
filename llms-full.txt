@@ -76,7 +76,7 @@ Yes, by up to 7.5 percentage points for the same model: GPT-6 Astra solves 34.4%
 
 ## Does spending more help coding agents on robot tasks?
 
-Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol at medium, high and maximum reasoning effort solves 30.7%, 32.2% and 30.9% of the Standard tests, within run-to-run variation. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.7% of the Standard tests at medium and 30.9% at maximum reasoning effort, inside the 27.9% to 32.2% range of its three high-effort runs. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## How do coding agents control robots?
 

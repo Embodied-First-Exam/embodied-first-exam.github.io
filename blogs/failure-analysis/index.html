@@ -328,7 +328,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           "name": "Does spending more help coding agents on robot tasks?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol at medium, high and maximum reasoning effort solves 30.7%, 32.2% and 30.9% of the 456 Standard tests of the effort runs, within run-to-run variation."
+            "text": "Not by itself. For every agent, the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.7% of the 456 Standard tests of the effort runs at medium and 30.9% at maximum reasoning effort, inside the 27.9% to 32.2% range of its three runs at high effort."
           }
         },
         {
@@ -1176,18 +1176,18 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>Another way to spend more is to let the model think longer before each action. Every leaderboard agent runs at high reasoning effort; the paper also ran GPT-6.1 Sol in Codex on the 456 core Standard tests at medium and at maximum effort, with everything else as in the leaderboard run.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
-    <p class="fig-cap"><span class="fc-t">More effort means more output tokens, fewer requests and longer sessions, at the same success rate and cost.</span> GPT-6.1 Sol in Codex on the 456 core Standard tests: success rate and means per attempt, at list prices as in Figure 21.</p>
+    <p class="fig-cap"><span class="fc-t">More effort means more output tokens, fewer requests and longer sessions, at the same success rate and cost.</span> GPT-6.1 Sol in Codex on the 456 core Standard tests: success rate and means per attempt, at list prices as in Figure 21. Medium and maximum effort were run once each. For high effort, the success rate is the mean of three runs, with the range in parentheses; cost, tokens, requests and time come from the leaderboard run.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>Effort</th><th>Success rate</th><th>Cost per attempt</th><th>Output tokens</th><th>Requests</th><th>Time</th></tr></thead>
       <tbody>
         <tr><th scope="row">Medium</th><td>30.7%</td><td>$4.05</td><td>82k</td><td>201</td><td>69 min</td></tr>
-        <tr><th scope="row">High (leaderboard run)</th><td>32.2%</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
+        <tr><th scope="row">High (three runs)</th><td>30.8% (27.9 to 32.2%)</td><td>$4.10</td><td>92k</td><td>185</td><td>71 min</td></tr>
         <tr><th scope="row">Maximum</th><td>30.9%</td><td>$3.91</td><td>111k</td><td>157</td><td>79 min</td></tr>
       </tbody>
     </table></div>
   </div>
 </figure>
-<p><b>The three efforts are within run noise of each other.</b> Medium, high and maximum effort solve 30.7%, 32.2% and 30.9%, a spread of 1.5 points. That is smaller than the spread between three high-effort runs of Sol on the same tests (147, 147 and 127 solved; mean 30.8%, standard deviation 2.5 points; see <a href="#run-variance">run variance</a>). Nothing suggests that another effort would have scored meaningfully differently from the leaderboard’s high effort.</p>
+<p><b>The three efforts are within run noise of each other.</b> Medium and maximum effort solve 30.7% and 30.9% in one run each. The three high-effort runs solve 32.2%, 32.2% and 27.9% of the same tests (mean 30.8%, standard deviation 2.5 points; see <a href="#run-variance">run variance</a>), and both single runs fall inside that range. Nothing suggests that another effort would have scored meaningfully differently from the leaderboard’s high effort.</p>
 <p><b>What changes is the way the agent works.</b> With more effort, Sol writes more output tokens, sends fewer requests and runs longer: it thinks more before each step and takes fewer, slower steps. Both styles solve about the same share of these physical tasks.</p>
 <p><b>The cost stays about the same,</b> $3.91 to $4.10 per attempt, probably because fewer requests offset the extra output tokens.</p>
 
@@ -1208,7 +1208,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p>The three runs’ success rates are within five percentage points of each other, with a mean of 30.8% and a standard deviation of 2.5 points, and each run by itself would rank fourth in the Standard column of the leaderboard, behind GPT-6.2 Astra, Claude Fable 5.2 and GPT-6 Astra and ahead of Claude Opus 5.5.</p>
-<p>Reasoning effort moves the result less than repeating the run: Sol at medium, high and maximum effort solves 30.7%, 32.2% and 30.9% of the Standard tests, a spread of 1.5 points (<a href="#spend-effort">details</a>).</p>
+<p>Reasoning effort moves the result less than repeating the run: Sol at medium and maximum effort solves 30.7% and 30.9% of the Standard tests, inside the range of the three high-effort runs (<a href="#spend-effort">details</a>).</p>
 
 
     <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics: Can agents do continual learning?</h2>
