@@ -437,7 +437,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
         <li><details open><summary><a href="#conditions">结果对 harness、任务指令和推理强度有多敏感？</a></summary><ol>
           <li><a href="#harness-gap">Harness：同一模型最多相差 7.5 个百分点</a></li>
           <li><a href="#robodojo">任务指令：RoboDojo 得分上升</a></li>
-          <li><a href="#spend-effort">推理强度：Sol 的成功率几乎不变</a></li>
+          <li><a href="#spend-effort">推理强度：Sol 的成功率没有可测出的变化</a></li>
           <li><a href="#run-variance">重复运行：Sol 的成功率波动不到 5 个百分点</a></li>
         </ol></details></li>
         <li><a href="#closing-olympics">Embodied Olympics：agent 能做到 continual learning 吗？</a></li>
@@ -979,7 +979,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
  <h3 id="spend-price" data-short="成本与成功">成本与成功只有松散关联</h3>
 <p><b>价格相差很大，成功率却相近。</b>按标价计算，GPT-6.1 Sol 每次 Standard 尝试花费 $3.9，约为 GPT-6 Astra（$26.0）的七分之一，在 481 个 Standard 测试中完成 163 个，GPT-6 Astra 为 175 个。它完成的测试也多于 Claude Opus 5.5（130）和 Gemini 4 Argon（127），而后两者每次尝试的成本约为 GPT-6 Astra 的四分之一。</p>
 <p><b>价格高并不保证成功。</b>Kimi 3.1 Pro 和 Gemini 3.8 Flash 每次尝试的花费高于 Claude Opus 5.5 和 Gemini 4 Argon，完成的 Standard 测试却不到它们的一半，分别为 55 和 32 个。完成 Standard 测试最多的 agent 是 GPT-6.2 Astra（279 个），但它并不是最贵的：其每次尝试平均花费 $7.2。</p>
-<p><b>价格与成功为何脱节。</b>一次尝试的成本主要反映两件事：模型每个 token 的价格，以及 agent 持续工作了多久。两者都不能衡量 agent 规划得好不好。如上所示，耗时长的尝试更常是失败的尝试；而提高 GPT-6.1 Sol 的推理强度，既不改变其成功率，也不改变其成本（见<a href="#spend-effort">推理强度：Sol 的成功率几乎不变</a>）。每次尝试的账单更高，只是 agent 更好的一个弱信号。</p>
+<p><b>价格与成功为何脱节。</b>一次尝试的成本主要反映两件事：模型每个 token 的价格，以及 agent 持续工作了多久。两者都不能衡量 agent 规划得好不好。如上所示，耗时长的尝试更常是失败的尝试；而提高 GPT-6.1 Sol 的推理强度，既不改变其成功率，也不改变其成本（见<a href="#spend-effort">推理强度：Sol 的成功率没有可测出的变化</a>）。每次尝试的账单更高，只是 agent 更好的一个弱信号。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="cost">
     <p class="fig-cap"><span class="fc-t">成本与成功只有松散关联：价格差异很大的 agent 达到相近的成功率。</span>论文图 21。各 agent 的成功率与单次尝试平均标价成本（对数坐标）的关系，分别为 Standard Setting（实心圆，481 个测试）和 Privileged Setting（空心圆，416 个测试）。连线连接同一 agent 的两个设定。</p>
@@ -1170,11 +1170,11 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 <p><b>在完整目标下，RoboDojo 仍能区分 agent。</b>在 Standard Setting 下的 37 个核心 RoboDojo 测试中，Claude Fable 5.2 完成 28 个，GPT-6.2 Astra 22 个，GPT-6 Astra 和 Gemini 4 Argon 各 21 个，Claude Opus 5.5 18 个，GPT-6.1 Sol 16 个，Kimi 3.1 Pro 10 个；其余三个较弱的 agent 完成 1 到 3 个，另有 6 个测试没有任何 agent 完成。有四个测试在 Standard 中只有一个 agent 完成：蛋盒和吐司由 Fable 完成，整理桌面由 GPT-6 Astra 完成，交换方块由 Kimi 3.1 Pro 完成，而六个强 agent 都没有完成交换方块。只有 Argon、Fable 和 GPT-6.2 Astra 在 Standard 中完成了随机化的清扫任务（Sweep Blocks Random：把扫帚递给另一只机械臂，再把小物体扫进簸箕）。在 Privileged 中，每个核心 RoboDojo 测试都至少被一个 agent 完成：GPT-6.2 Astra 完成全部 37 个，Fable 36 个，GPT-6 Astra 35 个，Sol 29 个，Opus 27 个，Argon 24 个。</p>
 <p>在完整目标下，剩下的是真实的物理难度。在一次插入钥匙的 Standard 尝试中，Claude Opus 5.5 通过深度图像定位了钥匙和锁，但在交接和大幅关节运动中至少掉落钥匙九次；它最准确的一次插入发生在第 36 分钟，偏差约 9 mm，撞在了锁的表面上。在 Standard 中没有 agent 完成该测试，而 Fable、GPT-6.2 Astra、GPT-6 Astra 和 Argon 在 Privileged 中完成了它。</p>
-    <h3 id="spend-effort" data-short="推理强度">推理强度：Sol 的成功率变化很小</h3>
+    <h3 id="spend-effort" data-short="推理强度">推理强度：Sol 的成功率没有可测出的变化</h3>
 <p>另一种投入更多的方式，是让模型在每次行动前思考更久。所有排行榜 agent 都以高推理强度运行；论文还在 Codex 中让 GPT-6.1 Sol 以中等和最高推理强度运行了 456 个核心 Standard 测试，其余条件与排行榜运行相同。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
-    <p class="fig-cap"><span class="fc-t">推理强度越高，输出 tokens 越多、请求越少、会话越长，而成功率和成本不变。</span>GPT-6.1 Sol 在 Codex 中运行 456 个核心 Standard 测试：成功率及每次尝试的均值，按图 21 中的标价计算。中等和最高推理强度各运行一次。高推理强度的成功率是三次运行的均值，括号内为范围；成本、tokens、请求数和时间来自排行榜运行。</p>
+    <p class="fig-cap"><span class="fc-t">推理强度越高，输出 tokens 越多、请求越少、会话越长，成功率没有可测出的变化，成本也基本不变。</span>GPT-6.1 Sol 在 Codex 中运行 456 个核心 Standard 测试：成功率及每次尝试的均值，按图 21 中的标价计算。中等和最高推理强度各运行一次。高推理强度的成功率是三次运行的均值，括号内为范围；成本、tokens、请求数和时间来自排行榜运行。</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>推理强度</th><th>成功率</th><th>每次尝试成本</th><th>输出 tokens</th><th>请求数</th><th>时间</th></tr></thead>
       <tbody>
@@ -1185,7 +1185,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     </table></div>
   </div>
 </figure>
-<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等和最高推理强度各运行一次，分别完成 30.7% 和 30.9%。三次高推理强度运行在相同测试上分别完成 32.2%、32.2% 和 27.9%（均值 30.8%，标准差 2.5 个百分点；见<a href="#run-variance">运行方差</a>），两次单独运行都落在这一范围内。没有迹象表明其他推理强度的得分会与排行榜所用的高推理强度有实质差异。</p>
+<p><b>三种推理强度的差异都在运行噪声范围之内。</b>中等和最高推理强度各运行一次，分别完成 30.7% 和 30.9%。三次高推理强度运行在相同测试上分别完成 32.2%、32.2% 和 27.9%（均值 30.8%，标准差 2.5 个百分点；见<a href="#run-variance">运行方差</a>），两次单独运行都落在这一范围内。我们只测试了一个模型，中等和最高推理强度各只运行一次，因此几个百分点以内的差异无法显现。</p>
 <p><b>改变的是 agent 的工作方式。</b>推理强度更高时，Sol 输出更多 tokens、发送更少请求、运行更久：它在每一步之前思考更多，步数更少、每步更慢。两种风格在这些物理任务上完成的比例大致相同。</p>
 <p><b>成本基本不变，</b>每次尝试 $3.91 到 $4.10，可能是因为请求减少抵消了额外的输出 tokens。</p>
 

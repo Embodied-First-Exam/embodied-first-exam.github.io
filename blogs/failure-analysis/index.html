@@ -435,7 +435,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
         <li><details open><summary><a href="#conditions">How sensitive are the results to the harness, task instruction and reasoning effort?</a></summary><ol>
           <li><a href="#harness-gap">Harness: the same model, up to 7.5 points apart</a></li>
           <li><a href="#robodojo">Task instruction: RoboDojo scores rise</a></li>
-          <li><a href="#spend-effort">Reasoning effort: little change in Sol’s success rate</a></li>
+          <li><a href="#spend-effort">Reasoning effort: no measurable change in Sol’s success</a></li>
           <li><a href="#run-variance">Repeated runs: Sol’s success rate varies by less than 5 points</a></li>
         </ol></details></li>
         <li><a href="#closing-olympics">Embodied Olympics: Can agents do continual learning?</a></li>
@@ -981,7 +981,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
  <h3 id="spend-price" data-short="Cost and success">Cost and success are only loosely tied</h3>
 <p><b>Similar success at very different prices.</b> GPT-6.1 Sol costs $3.9 per Standard attempt at list prices, about a seventh of GPT-6 Astra’s $26.0, and solves 163 of the 481 Standard tests against GPT-6 Astra’s 175. It also solves more than Claude Opus 5.5 (130) and Gemini 4 Argon (127), whose attempts cost about a quarter of GPT-6 Astra’s.</p>
 <p><b>A high price does not guarantee success.</b> Kimi 3.1 Pro and Gemini 3.8 Flash spend more per attempt than Claude Opus 5.5 and Gemini 4 Argon, yet solve less than half as many Standard tests, 55 and 32. The agent that solves the most Standard tests, GPT-6.2 Astra (279), is not the most expensive one: its attempts cost $7.2 on average.</p>
-<p><b>Why price and success come apart.</b> The cost of an attempt mostly reflects two things: the model’s price per token and how long the agent keeps working. Neither measures how well the agent plans. As shown above, a long attempt is more often a failed one, and raising GPT-6.1 Sol’s reasoning effort changes neither its success rate nor its cost (see <a href="#spend-effort">Reasoning effort: little change in Sol’s success rate</a>). A higher bill per attempt is a weak sign of a better agent.</p>
+<p><b>Why price and success come apart.</b> The cost of an attempt mostly reflects two things: the model’s price per token and how long the agent keeps working. Neither measures how well the agent plans. As shown above, a long attempt is more often a failed one, and raising GPT-6.1 Sol’s reasoning effort changes neither its success rate nor its cost (see <a href="#spend-effort">Reasoning effort: no measurable change in Sol’s success</a>). A higher bill per attempt is a weak sign of a better agent.</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="cost">
     <p class="fig-cap"><span class="fc-t">Cost and success are only loosely tied: agents at very different prices reach similar success rates.</span> Paper Figure 21. Success rate of each agent against the mean list-price cost of one attempt (log scale), in the Standard Setting (filled circles, 481 tests) and the Privileged Setting (hollow circles, 416 tests). The line joins each agent’s two settings.</p>
@@ -1172,11 +1172,11 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 <p><b>With the full goal, RoboDojo still separates agents.</b> On the 37 core RoboDojo tests in the Standard Setting, Claude Fable 5.2 solves 28, GPT-6.2 Astra 22, GPT-6 Astra and Gemini 4 Argon 21 each, Claude Opus 5.5 18, GPT-6.1 Sol 16 and Kimi 3.1 Pro 10; the other three weaker agents solve 1 to 3, and 6 tests are solved by no agent. Four tests have a single Standard solver: Fable for the egg holder and the toast, GPT-6 Astra for organizing a table, and Kimi 3.1 Pro for swapping blocks, which none of the six strong agents solves. Only Argon, Fable and GPT-6.2 Astra solve the randomized sweeping task in Standard (Sweep Blocks Random: hand a broom to the other arm and sweep small objects into a dustpan). In Privileged every core RoboDojo test is solved by some agent: GPT-6.2 Astra solves all 37, Fable 36, GPT-6 Astra 35, Sol 29, Opus 27 and Argon 24.</p>
 <p>With the full goal, what remains is real physical difficulty. In one Standard attempt at inserting a key, Claude Opus 5.5 located the key and the lock from depth images but dropped the key at least nine times during hand-overs and large joint moves; its most accurate insertion, at minute 36, was about 9 mm off and hit the face of the lock. No agent solves that test in Standard, while Fable, GPT-6.2 Astra, GPT-6 Astra and Argon solve it in Privileged.</p>
-    <h3 id="spend-effort" data-short="Reasoning effort">Reasoning effort: little change in Sol’s success rate</h3>
+    <h3 id="spend-effort" data-short="Reasoning effort">Reasoning effort: no measurable change in Sol’s success</h3>
 <p>Another way to spend more is to let the model think longer before each action. Every leaderboard agent runs at high reasoning effort; the paper also ran GPT-6.1 Sol in Codex on the 456 core Standard tests at medium and at maximum effort, with everything else as in the leaderboard run.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="sol-effort">
-    <p class="fig-cap"><span class="fc-t">More effort means more output tokens, fewer requests and longer sessions, at the same success rate and cost.</span> GPT-6.1 Sol in Codex on the 456 core Standard tests: success rate and means per attempt, at list prices as in Figure 21. Medium and maximum effort were run once each. For high effort, the success rate is the mean of three runs, with the range in parentheses; cost, tokens, requests and time come from the leaderboard run.</p>
+    <p class="fig-cap"><span class="fc-t">More effort means more output tokens, fewer requests and longer sessions, with no measurable change in success rate and about the same cost.</span> GPT-6.1 Sol in Codex on the 456 core Standard tests: success rate and means per attempt, at list prices as in Figure 21. Medium and maximum effort were run once each. For high effort, the success rate is the mean of three runs, with the range in parentheses; cost, tokens, requests and time come from the leaderboard run.</p>
     <div class="tscroll"><table class="fst">
       <thead><tr><th>Effort</th><th>Success rate</th><th>Cost per attempt</th><th>Output tokens</th><th>Requests</th><th>Time</th></tr></thead>
       <tbody>
@@ -1187,7 +1187,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     </table></div>
   </div>
 </figure>
-<p><b>The three efforts are within run noise of each other.</b> Medium and maximum effort solve 30.7% and 30.9% in one run each. The three high-effort runs solve 32.2%, 32.2% and 27.9% of the same tests (mean 30.8%, standard deviation 2.5 points; see <a href="#run-variance">run variance</a>), and both single runs fall inside that range. Nothing suggests that another effort would have scored meaningfully differently from the leaderboard’s high effort.</p>
+<p><b>The three efforts are within run noise of each other.</b> Medium and maximum effort solve 30.7% and 30.9% in one run each. The three high-effort runs solve 32.2%, 32.2% and 27.9% of the same tests (mean 30.8%, standard deviation 2.5 points; see <a href="#run-variance">run variance</a>), and both single runs fall inside that range. We tested one model, with one run at medium and one at maximum effort, so differences of a few points would not show.</p>
 <p><b>What changes is the way the agent works.</b> With more effort, Sol writes more output tokens, sends fewer requests and runs longer: it thinks more before each step and takes fewer, slower steps. Both styles solve about the same share of these physical tasks.</p>
 <p><b>The cost stays about the same,</b> $3.91 to $4.10 per attempt, probably because fewer requests offset the extra output tokens.</p>
 
