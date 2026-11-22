@@ -1139,19 +1139,19 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>因此，当一个 agent 完成了另一个 agent 失败的测试时，差异有一部分可能来自 harness。论文因此把每个结果都报告为某个模型在特定 harness 中的结果：harness 如何暴露工具、管理上下文以及结束会话，本身就是 Embodied First Exam 所衡量内容的一部分。</p>
 
     <h3 id="robodojo" data-short="任务指令">任务指令：RoboDojo 得分上升</h3>
-<p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> 用一句话描述每个任务（即其 VLA 提示词），其自己的 agent 评测还加入了任务的评分方案，以及机械臂必须回到初始姿态的说明（即其 agent 提示词）。两者都没有写明成功判定的全部条件。我们的指令写明了所有条件，同样的 agent 完成了更多任务：在 37 个核心任务中，GPT-6 Astra 从 6 个增至 21 个，Claude Fable 5.2 从 21 个增至 28 个。差别在于 agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
+<p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> 用一句话描述每个任务（即其 VLA 提示词），其自己的 agent 评测还加入了任务的评分方案，以及机械臂必须回到初始姿态的说明（即其 agent 提示词）。在 RoboDojo 的 agent 提示词基础上，我们的任务指令完整写明了成功判定，同样的 agent 完成了更多任务：在 37 个核心任务中，GPT-6 Astra 从 6 个增至 21 个，Claude Fable 5.2 从 21 个增至 28 个。差别在于 agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
 <p><b>Embodied First Exam 如何使用 RoboDojo。</b>RoboDojo 的仿真基准共有 42 个任务。其中 12 个测试泛化能力，并且各有一个随机化版本，换用其他物体模型、光照、背景和杂物，因此共有 54 个任务。RoboDojo 在多个评测 episode 上为每个任务打分，每个 episode 是场景的一种不同随机布局：泛化任务及其随机化版本各 25 个，其余 30 个任务各 50 个。Embodied First Exam 为这 54 个任务各固定一种布局，保留 RoboDojo 的场景、机器人和成功判定，并编写了一条指令，写明 agent 无法通过观察推断出的所有约定。这 54 个任务中有 37 个在核心集中：我们排除了 GPT-6 Luna 已能完成的 17 个。每个核心任务限时 60 分钟，各有一个 Standard 测试和一个 Privileged 测试（没有 Realtime 测试）。</p>
 <p><b>三种任务指令。</b>我们让 GPT-6 Astra 和 Claude Fable 5.2 在 Standard Setting 下使用三种任务指令完成 RoboDojo 任务，场景、步数上限和成功判定保持不变。排行榜使用的是我们的任务指令。</p>
 <div class="note suite-prompts" data-fig="robodojo-prompts"><p><b>Standard Setting 下按任务指令划分的已完成核心 RoboDojo 任务（37 个）。</b></p>
   <ul class="sp-list"><li class="sp-head"><span></span><em class="sp-n">GPT-6 Astra</em><em class="sp-n">Claude Fable 5.2</em></li>
     <li><span><b>RoboDojo VLA 提示词：</b>RoboDojo 的一句话任务描述。</span><em class="sp-n">16% (6/37)</em><em class="sp-n">57% (21/37)</em></li>
     <li><span><b>RoboDojo agent 提示词：</b>同一句话，加上 RoboDojo 自己的 agent 评测中的任务方案和回到初始姿态的说明。</span><em class="sp-n">46% (17/37)</em><em class="sp-n">65% (24/37)</em></li>
-    <li><span><b>我们的任务指令：</b>写明任务，并写明 RoboDojo 成功判定检查的每一个条件，包括两只机械臂最终都要回到初始姿态附近。</span><em class="sp-n">57% (21/37)</em><em class="sp-n">76% (28/37)</em></li>
+    <li><span><b>我们的任务指令：</b>在 RoboDojo 的 agent 提示词基础上，写明成功判定的每一个条件，包括两只机械臂最终都要回到初始姿态附近。</span><em class="sp-n">57% (21/37)</em><em class="sp-n">76% (28/37)</em></li>
   </ul>
   <p>在全部 54 个 RoboDojo 任务上，顺序相同：GPT-6 Astra 分别完成 12、33 和 37 个，Claude Fable 5.2 分别完成 34、40 和 44 个。</p>
 </div>
 <p><b>对 GPT-6 Astra 而言，RoboDojo 的 agent 提示词起了大部分作用。</b>其中回到初始姿态的说明在 54 个任务中的 47 个里都很关键：一个完美完成可见任务、却让一只机械臂悬在桌面上方的 agent 会被判失败。有了这一说明，GPT-6 Astra 在 37 个核心任务中从 6 个增至 17 个。Claude Fable 5.2 使用一句话的 VLA 提示词时就已完成 21 个，agent 提示词又增加了 3 个。我们的任务指令让每个模型再多完成 4 个。在全部 54 个任务上，GPT-6 Astra 使用 VLA 提示词完成 12 个（22%），接近 <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo 排行榜</a>为它列出的 22.48% 成功率。三个版本中机器人、场景和 agent 都相同，因此它们之间的差距来自任务指令写明了多少成功判定的内容。</p>
-<p><b>我们的任务指令补充的是：成功判定的确切条件。</b>在 Fill Egg Holder 中，RoboDojo 的 agent 提示词要求鸡蛋“正确放置”、盖子“完全关闭”。我们的任务指令写明了成功判定所测量的内容。所有条件必须在同一时刻成立。每个鸡蛋的中心必须高于蛋盒底部 0.01 到 0.04 m，因此放在关闭的盖子上、放在边缘上或被举在蛋盒上方的鸡蛋都不合格。盖子的铰链必须转过关闭方向行程的 90% 以上。每只机械臂在 x、y、z 三个方向上都必须分别处于其起始位置 0.15 m 以内，且朝向与起始朝向相差不超过 20 度。夹爪不必张开，尽管 RoboDojo 的 agent 提示词在其 10 分阶段中提到了张开的夹爪。</p>
+<p><b>我们的任务指令补充的是：成功判定的确切条件。</b>在 Fill Egg Holder 中，RoboDojo 的 agent 提示词要求鸡蛋“正确放置”、盖子“完全关闭”。在此基础上，我们的任务指令给出了成功判定所测量的具体数值。所有条件必须在同一时刻成立。每个鸡蛋的中心必须高于蛋盒底部 0.01 到 0.04 m，因此放在关闭的盖子上、放在边缘上或被举在蛋盒上方的鸡蛋都不合格。盖子的铰链必须转过关闭方向行程的 90% 以上。每只机械臂在 x、y、z 三个方向上都必须分别处于其起始位置 0.15 m 以内，且朝向与起始朝向相差不超过 20 度。夹爪不必张开。</p>
 <div class="note suite-prompts">
   <details class="sp-ex"><summary>Fill Egg Holder：三种任务指令</summary>
     <div class="sp-box"><b class="sp-name">RoboDojo VLA 提示词</b><p><b>Task:</b> Place the four eggs from the basket into the egg holder, then close the lid.</p></div>
