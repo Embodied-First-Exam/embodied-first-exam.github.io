@@ -434,7 +434,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <li><a href="#spend-price">花费与成功之间只有松散的关联</a></li>
           <li><a href="#spend-how">Agent 如何使用时间和 token？</a></li>
         </ol></details></li>
-        <li><details open><summary><a href="#conditions">结果对 harness、任务指令和推理强度有多敏感？</a></summary><ol>
+        <li><details open><summary><a href="#conditions">结果对 harness、任务指令、推理强度和重复运行有多敏感？</a></summary><ol>
           <li><a href="#harness-gap">Harness：同一模型最多相差 7.5 个百分点</a></li>
           <li><a href="#robodojo">任务指令：RoboDojo 得分上升</a></li>
           <li><a href="#spend-effort">推理强度：同一个模型思考更久会更好吗？</a></li>
@@ -1095,7 +1095,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>每种习惯都有代价。Fable 未用完的时间往往帮不上忙，因为它已经用完了所有重置、把工具弄到了够不着的地方，或者把笔画用在了无法去除的颜料上。但在它估计出错的地方，这些时间本可能起作用：楷书临摹只差 0.004，锅铲只差 0.6 mm。GPT-6 Astra 的检查恰恰在这些测试上发挥了作用，但它的 306 次失败 Standard 尝试中也有 157 次运行到时间限制的 95% 或更多，而不是以一个结果结束。只有当 agent 能依据自身传感器判断离目标还有多远时，更多的时间才有帮助。</p>
 
 
-    <h2 id="conditions" data-short="结果的敏感程度">结果对 harness、任务指令和推理强度有多敏感？</h2>
+    <h2 id="conditions" data-short="结果的敏感程度">结果对 harness、任务指令、推理强度和重复运行有多敏感？</h2>
     <h3 id="harness-gap" data-short="Harness">Harness：同一模型，最多相差 7.5 个百分点</h3>
 <p>Embodied First Exam 中的每个 agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及两个较弱的模型（Kimi 3.1 Pro 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6.2 Astra、GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
 <p><b>GPT-6 Astra 离开 Codex 后下降 7.5 个百分点。</b>在其自带的 harness Codex 中，它完成了 456 个测试中的 157 个（34.4%），在 Claude Code 中完成了 123 个（27.0%）。单个测试的变化是双向的：75 个仅在 Codex 中完成，41 个仅在 Claude Code 中完成。论文认为这一差异显著（p = 0.002）。差异的大部分在第一个 episode、任何重置之前就已出现：Codex 中成功 119 次，Claude Code 中为 95 次（p = 0.015）。因此，这一差距并不只来自各 harness 处理多次重试的长会话的方式。</p>
