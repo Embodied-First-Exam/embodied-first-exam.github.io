@@ -16,12 +16,12 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 
 ## Where do agentic robots succeed and fail? Findings of the failure analysis blog post (https://www.embodied-first-exam.ai/blogs/failure-analysis/)
 
-- Under real-robot constraints (Standard Setting), 112 of the 481 core Standard tests (23%) are solved by none of the ten agents.
+- Under real-robot conditions (Standard Setting), 112 of the 481 core Standard tests (23%) are solved by none of the ten agents.
 - Being able to retry helps more than knowing the exact state: in controlled runs of GPT-6 Astra, exact object state raises success from 29% to 45%, unlimited resets with saved states to 53%, both to 68%, against 79% in Privileged.
 - Different agents solve different tests: GPT-6 Astra solves 39 Standard tests that Claude Fable 5.2 fails, and Fable 108 that Astra fails; three runs of GPT-6.1 Sol differ by at most five points in success rate (30.8% ± 2.5).
 - The harness changes results by up to 7.5 percentage points for the same model (GPT-6 Astra: 34.4% in Codex, 27.0% in Claude Code).
 - Spending more does not buy success: for every agent the median failed attempt costs more than the median solved one, and GPT-6.1 Sol solves 30.7% at medium and 30.9% at maximum reasoning effort, inside the 27.9% to 32.2% range of its three high-effort runs.
-- Stating the success check in full in the task instruction raises GPT-6 Astra from 12 to 37 of 54 RoboDojo tasks.
+- Stating the success rule in full in the task instruction raises GPT-6 Astra from 12 to 37 of 54 RoboDojo tasks.
 
 ## The 9 new suites
 

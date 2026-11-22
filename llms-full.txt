@@ -16,7 +16,7 @@ Yes. The Embodied First Exam (https://www.embodied-first-exam.ai/) evaluates com
 
 ## What benchmarks exist for coding agents in robotics?
 
-Benchmarks that test coding agents on robot tasks include the Embodied First Exam (EFE, 1,156 tasks in 35 suites on 47 robots, https://www.embodied-first-exam.ai/), RobotWorld (84 tasks), RLE-Bench (51 tasks), EmboCoach-Bench (32 tasks), EmbodiedSWE-Bench (28 tasks) and CaP-Bench (7 tasks, with 187 in CaP-Gym). The Embodied First Exam differs in two ways: the agent chooses its own control approach (direct control, code to control, or train a policy to control), and each task can be run both with full simulator access (Privileged Setting) and through the robot's sensors alone (Standard Setting), so the gap between the two can be measured.
+Benchmarks that test coding agents on robot tasks include the Embodied First Exam (EFE, 1,156 tasks in 35 suites on 47 robots, https://www.embodied-first-exam.ai/), RobotWorld (84 tasks), RLE-Bench (51 tasks), EmboCoach-Bench (32 tasks), EmbodiedSWE-Bench (28 tasks) and CaP-Bench (7 tasks, with 187 in CaP-Gym). The Embodied First Exam differs in two ways: the agent chooses its own control approach (direct control, code to control, or train a policy to control), and each task can be run both with full access to the simulator (Privileged Setting) and through the robot's sensors alone (Standard Setting), so the gap between the two can be measured.
 
 ## What is the largest benchmark for agentic robotics?
 
@@ -24,11 +24,11 @@ With 1,156 tasks in 35 suites on 47 robots, the Embodied First Exam is larger th
 
 ## How well do coding agents control robots?
 
-Not reliably yet. In the paper (ten agents, 481 core tasks), the highest success rate in the Standard Setting, which mimics real-robot constraints, is 58%, and 112 of the 481 Standard tests (23%) are solved by none of the ten agents. A single ranking hides three things: different agents solve different tests (Claude Fable 5.2 solves 65 Standard tests that GPT-6.2 Astra fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol have a success rate of 30.8% ± 2.5 (mean ± s.d.). Live results: https://www.embodied-first-exam.ai/leaderboard/
+Not reliably yet. In the paper (ten agents, 481 core tasks), the highest success rate in the Standard Setting, which mimics real-robot conditions, is 58%, and 112 of the 481 Standard tests (23%) are solved by none of the ten agents. A single ranking hides three things: different agents solve different tests (Claude Fable 5.2 solves 65 Standard tests that GPT-6.2 Astra fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol have a success rate of 30.8% ± 2.5 (mean ± s.d.). Live results: https://www.embodied-first-exam.ai/leaderboard/
 
 ## Can coding agents control real robots?
 
-Not reliably yet. The Embodied First Exam runs in simulation, and its Standard Setting mimics real-robot constraints: the agent sees only sensor observations and, by default, cannot reset the environment. There, the strongest agent solves 60% of the Standard tests of the 416 core tasks that have both settings, against 95% of their Privileged tests, where it has full simulator state and unlimited resets. As a first hardware test, outside the exam and its scores, the paper connects GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game; average progress along the wire rises from about 65% in the first four trials to about 94% in the last four for GPT-6 Astra, and from about 35% to about 63% for Claude Opus 5.5.
+Not reliably yet. The Embodied First Exam runs in simulation, and its Standard Setting mimics real-robot conditions: the agent sees only sensor observations and, by default, cannot reset the environment. There, the strongest agent solves 60% of the Standard tests of the 416 core tasks that have both settings, against 95% of their Privileged tests, where it has full simulator state and unlimited resets. As a first hardware test, outside the exam and its scores, the paper connects GPT-6 Astra and Claude Opus 5.5 to a physical robot arm playing a buzz wire game; average progress along the wire rises from about 65% in the first four trials to about 94% in the last four for GPT-6 Astra, and from about 35% to about 63% for Claude Opus 5.5.
 
 ## How is embodied evaluation done in the Embodied First Exam?
 
@@ -64,7 +64,7 @@ In the Standard Setting of the Embodied First Exam, where the agent sees only th
 
 ## What information matters to a coding agent controlling a robot?
 
-The exam compares a Standard Setting (sensors only, no resets by default) with a Privileged Setting (full simulator state and unlimited resets). In controlled runs of GPT-6 Astra, adding the exact state of every object raises success from 29% to 45%, while unlimited resets with saved states raise it to 53%; with both it reaches 68%, against 79% in Privileged. At stages that need precise actions, resets recover 36% of failures and exact state 21%, close to a plain second try (19%). Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+The exam compares a Standard Setting (sensors only, no resets by default) with a Privileged Setting (full simulator state and unlimited resets). In controlled runs of GPT-6 Astra, adding the exact state of every object raises success from 29% to 45%, while unlimited resets with saved states raise it to 53%; with both it reaches 68%, against 79% in Privileged. At stages that need precise actions, resets recover 36% of failures and exact state 21%, close to a plain second attempt (19%). Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## Do different coding agents solve the same robot tasks?
 
@@ -84,7 +84,7 @@ In a sample of 2,622 attempts, agents control the robot directly in 60% of Stand
 
 ## Does the wording of a robot task instruction change the result?
 
-Yes. With RoboDojo’s one-sentence instructions, GPT-6 Astra solves 12 of 54 RoboDojo tasks; with the task recipe and the return-to-start note it solves 33, and with a goal that states the success check in full it solves 37. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
+Yes. With RoboDojo’s one-sentence instructions, GPT-6 Astra solves 12 of 54 RoboDojo tasks; with the task recipe and the return-to-start note it solves 33, and with a goal that states the success rule in full it solves 37. Source: https://www.embodied-first-exam.ai/blogs/failure-analysis/
 
 ## What is Embodied Olympics?
 
