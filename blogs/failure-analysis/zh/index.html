@@ -973,6 +973,12 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>在不同 agent 之间，一次尝试的成本与成功概率只有松散的关联。在同一 agent 内部，昂贵的尝试大多是失败的：失败中的 agent 会持续工作，账单也随之增长。对于六个强 agent，Privileged Setting 在大幅提高成功率的同时降低了每次尝试的成本。花费主要反映 agent 尝试了多久，并不能换来成功。</p>
 <p><b>成本如何计算。</b>论文按各次尝试 API 请求的 token 数，以服务商的标价为每次尝试定价（图 21），而非任何人实际被收取的费用。十个 agent 在所有设定下共有 9,440 次定价尝试（计入统计的尝试共 9,510 次），总计约 $69,100。</p>
 <p><b>对每个 agent 而言，失败才是昂贵的结果。</b>在 Standard 和 Privileged 中，十个 agent 失败尝试的中位成本都高于成功尝试的中位成本。Standard 下成功与失败的中位成本分别为：GPT-6.2 Astra $2.76 与 $5.75，Fable $7.88 与 $12.76，GPT-6 Astra $7.55 与 $25.59，Sol $1.01 与 $3.06，Opus $2.96 与 $4.62，Argon $2.68 与 $5.55。这并非由成本更高的 Suite 造成：在同一 Suite 内，失败的 Standard 尝试的成本通常是成功尝试的 1.28 倍（GLM 5.3 Flash）至 1.92 倍（Gemini 3.8 Flash）。</p>
+<figure class="fig fig-wide">
+  <div class="fig-body" data-fig="fail-cost">
+    <p class="fig-cap">六个强 agent 在 Standard 下成功和失败各一次尝试的标价成本中位数，数据与论文图 21 使用的计价尝试相同。在十个 agent 中，失败的尝试占 Standard 尝试的 74%，却花掉了 Standard 总花费的 79%。</p>
+    <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig_fail_cost.png?v=5bd3ed82" alt="失败的尝试花费更多：Standard 下成功与失败尝试的标价成本中位数。GPT-6 Astra $7.55 对 $25.59，Claude Fable 5.2 $7.88 对 $12.76，GPT-6.2 Astra $2.76 对 $5.75，Gemini 4 Argon $2.68 对 $5.55，Claude Opus 5.5 $2.96 对 $4.62，GPT-6.1 Sol $1.01 对 $3.06。" width="2880" height="1527"></div>
+  </div>
+</figure>
 <p><b>对部分 agent 而言，额外成本主要来自额外时间。</b>GPT-6 Astra 失败的 Standard 尝试中有 51.3%、Sol 有 53.1%、Argon 有 78.0% 运行到了时限的 95% 以上，而它们成功的尝试中这一比例分别为 2.3%、3.7% 和 8.7%。GPT-6.2 Astra 的这两个比例分别为 36.6% 和 1.4%。Fable 和 Opus 失败的 Standard 尝试中只有 8.8% 和 6.4% 运行这么久，但它们的失败同样比成功花费更多。</p>
 <p><b>更好的信息胜过更多的投入。</b>对于六个强 agent，Privileged 尝试的平均成本低于 Standard 尝试，成功率却高得多：GPT-6.2 Astra 为 $6.55 对 $7.24，Fable 为 $11.01 对 $13.05，GPT-6 Astra 为 $22.28 对 $26.04，Sol 为 $3.82 对 $3.94，Opus 为 $4.64 对 $6.42，Argon 为 $4.14 对 $6.08。在那里提升成功率的，是 agent 能知道和能撤销的东西（精确的物体状态、可保存状态的无限次重置、私有仿真器），而不是它的花费。</p>
 
