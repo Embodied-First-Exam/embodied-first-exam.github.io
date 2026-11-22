@@ -982,7 +982,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>价格与成功为何脱节。</b>一次尝试的成本主要反映两件事：模型每个 token 的价格，以及 agent 持续工作了多久。两者都不能衡量 agent 规划得好不好。如上所示，耗时长的尝试更常是失败的尝试；而提高 GPT-6.1 Sol 的推理强度，既不改变其成功率，也不改变其成本（见<a href="#spend-effort">推理强度：同一个模型思考更久会更好吗？</a>）。每次尝试的账单更高，只是 agent 更好的一个弱信号。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="cost">
-    <p class="fig-cap"><span class="fc-t">成本与成功只有松散关联：价格差异很大的 agent 达到相近的成功率。</span>论文图 21。各 agent 的成功率与单次尝试平均标价成本（对数坐标）的关系，分别为 Standard Setting（实心圆，481 个测试）和 Privileged Setting（空心圆，416 个测试）。连线连接同一 agent 的两个设定。</p>
+    <p class="fig-cap"><span class="fc-t">成本与成功只有松散关联：价格差异很大的 agent 达到相近的成功率。</span>论文图 21。各 agent 的成功率与单次尝试平均标价成本（对数坐标）的关系。连线连接同一 agent 在 Standard 和 Privileged 下的两个点。</p>
     <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig_cost_vs_success.png?v=844a599d" alt="论文图 21：十个 agent 在 Standard（481 个测试）和 Privileged（416 个测试）设定下的成功率与单次尝试平均标价成本。GPT-6 Astra 每次 Standard 尝试约花费 $26，完成 36%；GPT-6.1 Sol 约花费 $4，完成 34%；GPT-6.2 Astra 约花费 $7，完成最多，为 58%。Kimi 3.1 Pro 和 Gemini 3.8 Flash 的花费高于 Claude Opus 5.5 和 Gemini 4 Argon，完成的测试却更少。对大多数 agent 而言，Privileged 点位于 Standard 点的左上方；对 Kimi 3.1 Pro、Gemini 3.8 Flash 和 DeepSeek V4.1 Flash 而言，它位于上方并略微偏右。" width="5000" height="1875"></div>
   </div>
 </figure>
