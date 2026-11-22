@@ -2059,7 +2059,7 @@ async function homeNews(el) {
   if (!posts.length) return;
   const rows = Math.min(3, posts.length), loop = posts.length > rows;
   const row = (p, copy) => `<a class="hn-post" href="${exam(`blogs/${encodeURIComponent(p.slug)}/`)}"${copy ? ' aria-hidden="true" tabindex="-1"' : ''}>${p.date ? `<span class="hn-date">${esc(p.date)}</span>` : ''}<span class="hn-title">${esc(p.short || p.title)}</span></a>`;
-  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts" style="--rows:${rows}"><span class="hn-track">${posts.map((p) => row(p)).join('')}${loop ? posts.slice(0, rows).map((p) => row(p, true)).join('') : ''}</span></span><a class="hn-all" href="${exam('blogs/')}">All posts <span class="arr">→</span></a>`;
+  el.innerHTML = `<span class="hn-tag">What\u2019s new</span><span class="hn-posts" style="--rows:${rows}"><span class="hn-track">${posts.map((p) => row(p)).join('')}${loop ? posts.slice(0, rows).map((p) => row(p, true)).join('') : ''}</span></span><a class="hn-all" href="${exam('blogs/')}">All blogs <span class="arr">→</span></a>`;
   if (!loop || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const track = $('.hn-track', el), first = $('.hn-post', el);
   let at = 0, hold = false;
