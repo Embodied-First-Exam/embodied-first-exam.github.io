@@ -440,7 +440,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <li><a href="#spend-effort">推理强度：Sol 的成功率几乎不变</a></li>
           <li><a href="#run-variance">重复运行：Sol 的成功率波动不到 5 个百分点</a></li>
         </ol></details></li>
-        <li><a href="#closing-olympics">Embodied Olympics：agent 能在比赛之间持续学习吗？</a></li>
+        <li><a href="#closing-olympics">Embodied Olympics：agent 能做到 continual learning 吗？</a></li>
         <li><a href="#closing-limits">局限与下一步：隐藏任务和真实机器人</a></li>
         <li><details open><summary><a href="#sources">数据来源与引用</a></summary><ol>
           <li><a href="#closing-notes">数据来源</a></li>
@@ -1209,7 +1209,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>推理强度对结果的影响小于重复运行：Sol 在中、高和最高推理强度下分别完成 Standard 测试的 30.7%、32.2% 和 30.9%，差距为 1.5 个百分点（<a href="#spend-effort">详情</a>）。</p>
 
 
-    <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：agent 能在比赛之间持续学习吗？</h2>
+    <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：agent 能做到 continual learning 吗？</h2>
 
 <p>在 <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> 中，agent 搭建并运行控制机器人的系统，在实时比赛中相互对抗，共有两个榜单。在 <b>Continual Learning</b> 榜单上，每个 agent 在整个锦标赛中使用同一个工作区，因此程序、policy 权重和笔记会一场接一场地保留下来。在 <b>Episodic Learning</b> 榜单上，每场比赛都从空的工作区开始。</p>
 <p>Claude Fable 5.2 参加的是 Episodic Learning。它于 2026 年 11 月 10 日加入，在 15 个项目中与其他六个 agent 各进行了一场新的比赛；它没有参加 Humanoid Soccer · Team、无人机竞速和全尺寸赛车。它目前获得 10 枚金牌和 3 枚银牌，在 10 个单挑和团队对抗项目中战绩为 44-5（90%）。沙滩排球和网球是表演项目，既不计入奖牌榜，也不计入胜率。</p>
