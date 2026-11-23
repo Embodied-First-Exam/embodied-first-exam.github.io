@@ -39,16 +39,5 @@
   ],
   "video": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.mp4?v=73e576d2",
   "poster": "https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/embodied-olympics/clip_build.jpg?v=1c2af13a"
- },
- {
-  "slug": "gpt-6-2-astra",
-  "title": "GPT-6.2 Astra",
-  "date": "2026-11-20",
-  "kind": "Analysis",
-  "summary": "Where GPT-6.2 Astra gains on Claude Fable 5.2 on the Embodied First Exam, what an attempt costs, and where it fails while other agents succeed.",
-  "tags": [
-   "analysis",
-   "results"
-  ]
  }
 ]

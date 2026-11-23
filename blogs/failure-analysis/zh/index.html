@@ -392,7 +392,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
   <article class="post">
     <div class="rq"><p class="rq-label">研究问题</p><p class="rq-text">通用 coding agent 能够完成哪些机器人任务？在怎样的物理世界约束下能够完成？又在哪些地方失败？</p></div>
-    <p><a href="../../agentic-robotics-benchmark/">第一篇报告</a>介绍了 Embodied First Exam；本文关注的是它的结果对控制机器人的 coding agent 意味着什么，这一方法通常被称为 agentic robotics。Embodied First Exam 的独特之处在于，它精确控制了 agent 能看到什么、能做什么。每个任务在至多三种设定下运行，场景、成功判定和时间限制完全相同：在 <b>Standard</b> 设定下，agent 只能看到机器人自身的传感器数据，且默认无法重置，与真实机器人的情形一致；<b>Realtime</b> 设定与之相同，但 agent 思考时世界仍在持续运行；<b>Privileged</b> 设定则提供完整的仿真器状态，并允许无限次重置。通过对比这三种设定，可以看出 agent 依赖哪些信息和能力。十个 agent 在 481 个高难度核心任务上，对每个测试各尝试一次。</p>
+    <p><a href="../../agentic-robotics-benchmark/">第一篇报告</a>介绍了 Embodied First Exam；本文关注的是它的结果对控制机器人的 coding agent 意味着什么，这一方法通常被称为 agentic robotics。Embodied First Exam 的独特之处在于，它精确控制了 agent 能看到什么、能做什么。每个任务在至多三种设定下运行，各设定的场景、成功判定和时间限制完全相同。在 <b>Standard</b> 设定下，agent 只能看到机器人自身的传感器数据，且默认无法重置场景，与真实机器人的情形一致。<b>Realtime</b> 设定与之相同，区别仅在于 agent 思考时世界仍在持续运行。<b>Privileged</b> 设定则向 agent 提供完整的仿真器状态，并允许无限次重置。通过对比这三种设定，可以看出 agent 依赖哪些信息和能力。十个 agent 在 481 个高难度核心任务上，对每个测试各尝试一次。</p>
 
     <h2 id="found" data-short="主要发现">主要发现</h2>
     <nav class="toc-top" aria-label="目录">
@@ -479,7 +479,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </div>
     <h2 id="fail-why" data-short="哪些测试失败">每个 agent 在哪些测试上失败？</h2>
     <h3 id="cross-solve" data-short="谁完成了什么">较弱的 agent 有时能完成强 agent 失败的测试</h3>
-<p><b>每个成功次数较少的 agent，仍能完成一些成功次数更多的 agent 失败的测试。</b>Gemini 4 Argon 是 Standard 成功次数最少的强 agent，它完成了 23 个 GPT-6.2 Astra 失败的测试和 14 个 Claude Fable 5.2 失败的测试；较弱的 agent Kimi 3.1 Pro 则在 Astra 和 Fable 各自失败的测试中分别完成了 8 个。没有任何一个强 agent 完成的测试集合是另一个强 agent 的子集：在 Standard 设定下，六个强 agent 中任意两两之间、在两个方向上都是如此。图 9 逐个测试展示了这一点（每一列是一个测试，每一行是一个 agent，填充的格子表示一次成功的尝试）。无论按哪个 agent 对测试排序，在它最后一次成功的右侧，其他 agent 仍然有填充的格子。</p>
+<p><b>每个成功次数较少的 agent，仍能完成一些成功次数更多的 agent 失败的测试。</b>Gemini 4 Argon 是 Standard 成功次数最少的强 agent，它完成了 23 个 GPT-6.2 Astra 失败的测试和 14 个 Claude Fable 5.2 失败的测试；Kimi 3.1 Pro 则在 Astra 和 Fable 各自失败的测试中分别完成了 8 个。没有任何一个强 agent 完成的测试集合是另一个强 agent 的子集：在 Standard 设定下，六个强 agent 中任意两两之间、在两个方向上都是如此。图 9 逐个测试展示了这一点（每一列是一个测试，每一行是一个 agent，填充的格子表示一次成功的尝试）。无论按哪个 agent 对测试排序，在它最后一次成功的右侧，其他 agent 仍然有填充的格子。</p>
 <p>GPT-6.2 Astra 和 Claude Fable 5.2 将 481 个 Standard 测试分成四类：两者都完成的有 183 个，Astra 完成而 Fable 失败的有 96 个，Fable 完成而 Astra 失败的有 65 个，两者都未完成的有 137 个。Astra 还完成了 58 个其他任何 agent 都未完成的 Standard 测试，其中大多数属于 BEHAVIOR-1K（13 个）、RoboPaint（11 个）和 RoboARC（8 个）；Fable 完成了 21 个这样的测试，大多数属于 BEHAVIOR-1K 和 RoboARC（各 4 个）。</p>
 <p>在 Fable 失败的 233 个 Standard 测试中，GPT-6.2 Astra 完成了 96 个，GPT-6 Astra 完成了 40 个，GPT-6.1 Sol 完成了 30 个，Claude Opus 5.5 完成了 23 个，Gemini 4 Argon 完成了 14 个；由于这些集合相互重叠，五者合计完成 120 个。较弱的 agent 完成了少数几个（Kimi 3.1 Pro 8 个，Gemini 3.8 Flash 6 个，DeepSeek V4.1 Flash 3 个，GLM 5.3 Flash 0 个），其中除一个以外都同样被某个强 agent 完成。在 Fable 失败的测试中，有 73 个恰好只有一个其他完成者：GPT-6.2 Astra 58 个，GPT-6 Astra 9 个，Sol 3 个，Opus 2 个，Kimi 1 个。</p>
 <p>反方向的数量较少，但并非为零。在 GPT-6.2 Astra 失败的 202 个 Standard 测试中，Fable 完成了 65 个，GPT-6 Astra 完成了 35 个，Sol 完成了 30 个，Opus 完成了 25 个，Argon 完成了 23 个；强 agent 合计完成其中 89 个，一个较弱的 agent 又多完成一个，其余 112 个没有任何 agent 完成。</p>
@@ -512,7 +512,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
     <h3 id="shared-boundary" data-short="无人完成">112 个 Standard 测试没有任何 agent 完成</h3>
 <p><b>有 112 个 Standard 测试没有任何 agent 完成，并且在 3 个 Suite 中，大多数测试无人完成。</b>汇总全部十个 agent，481 个 Standard 测试中有 369 个至少被一个 agent 完成，112 个（23%）无人完成。六个强 agent 合计完成 368 个（77%），四个较弱的 agent 只额外增加了一个测试。这 112 个无人完成的测试是 Embodied First Exam 中对“当前 coding agent 在真实机器人约束下尚无法做到什么”最清晰的度量。</p>
-<p>仅 Astra 一个 agent 就完成了 58 个其他 agent 都未完成的测试：如果没有它，其余九个 agent 会留下 170 个无人完成的 Standard 测试。一个 agent 失败的测试，大多数是所有 agent 都失败的：同样这 112 个无人完成的测试，约占 Fable 233 次失败的一半，并占 Astra 202 次失败的一半以上。</p>
+<p>仅 Astra 一个 agent 就完成了 58 个其他 agent 都未完成的测试：如果没有它，其余九个 agent 会留下 170 个无人完成的 Standard 测试。一个 agent 失败的测试中，有许多是所有 agent 都失败的：这 112 个无人完成的测试，约占 Fable 233 次失败的一半，并占 Astra 202 次失败的一半以上。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="8">
     <p class="fig-cap">论文图 8。十个 agent 在核心集上的成功率，括号中为完成的测试或任务数。列的顺序为：Overall，然后是 Standard、Realtime、Privileged。在 Overall 中，每个核心任务计一次，只有当该任务的所有核心测试都被完成时才算完成。在拥有完整仿真器访问权限时，同样的任务被完成的频率要高得多。</p>
@@ -525,12 +525,12 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
 <p id="suites-out-of-reach">在至少有五个 Standard 测试的 22 个 Suite 中，有 3 个 Suite 至少一半的测试未被六个强 agent 中的任何一个完成。在拥有完整仿真器访问权限时，没有任何 Suite 仍然如此难以企及。</p>
 <p>这三个 Standard Suite 及其中没有任何强 agent 完成的测试数分别为：HumanoidBench（8 个中 6 个）、IKEA 组装任务（8 个中 6 个）和 DexToolBench（20 个中 13 个），分别对应人形机器人全身控制、家具组装，以及用灵巧手使用工具。在这三个 Suite 中，没有强 agent 完成超过四个测试：DexToolBench 中最多的是 Astra 的 4 个，而在 HumanoidBench 和 IKEA 组装任务中，没有 agent 完成超过一个。在 RoboDynamicExam（10 个中 4 个）、RoboCasa365（5 个中 2 个）、MyoSuite（13 个中 5 个）、Embodied Olympics - Fun（56 个中 21 个）和 RoboEngineer（15 个中 5 个）中，也有三分之一或更多的测试无人完成。</p>
-<p>在 Privileged 下，没有强 agent 完成的测试比例下降为：DexToolBench 20 个中 2 个，HumanoidBench 8 个中 3 个，IKEA 组装任务 8 个中 0 个。精确的状态信息和不限次数的重置 让强 agent 找到了解法；而在 Standard 下阻碍它们的，是要在只有少量重置或无法重置的条件下，通过相机和传感器完成同样的工作。</p>
-<p>从 70% 这条线来看，结论也一样，只是视角相反。按六个强 agent 平均，没有任何 Standard Suite 的成功率达到 70%（最接近的是 ManiGuard，为 69%）；而在至少有五个 Privileged 测试的 20 个 Suite 中，有 14 个达到这一水平：ManiGuard、RoboDynamicExam、Embodied Olympics - Match、EmbodiedSWE、RoboCasa365、MuJoCo Playground、RoboWits、BiGym 2.0、RoboDojo、RoboPaint、Embodied Olympics - Fun、DexHandExam、iSpatialGym 和 RoboARC。</p>
+<p>在 Privileged 下，没有强 agent 完成的测试比例下降为：DexToolBench 20 个中 2 个，HumanoidBench 8 个中 3 个，IKEA 组装任务 8 个中 0 个。借助精确的状态信息和不限次数的重置，强 agent 能够找到解法。在 Standard 下，主要困难似乎在于：要在只有少量重置或无法重置的条件下，通过相机和传感器完成同样的工作。</p>
+<p>以 70% 为阈值，也能看到同样的规律。按六个强 agent 平均，没有任何 Standard Suite 的成功率达到 70%（最接近的是 ManiGuard，为 69%）；而在至少有五个 Privileged 测试的 20 个 Suite 中，有 14 个达到这一水平：ManiGuard、RoboDynamicExam、Embodied Olympics - Match、EmbodiedSWE、RoboCasa365、MuJoCo Playground、RoboWits、BiGym 2.0、RoboDojo、RoboPaint、Embodied Olympics - Fun、DexHandExam、iSpatialGym 和 RoboARC。</p>
 <p>在最难的三个 Suite 中，四个较弱的 agent 没有完成任何 Standard 测试。</p>
 
 <h3 id="where-each-leads" data-short="各 Suite 领先者">不同 Suite 的领先者不同</h3>
-<p><b>较新的 agent 通常表现更好，但并非在每个 Suite 上都是如此。</b>按 Suite 拆分来看，成功次数最多的 agent 多次易位。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
+<p><b>较新的 agent 通常表现更好，但并非在每个 Suite 上都是如此。</b>按 Suite 拆分来看，成功次数最多的 agent 因 Suite 而异。RoboARC 的 IKEA 组装任务单独计为一个 Suite。</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="suite-diff">
         <p class="fig-cap">图中数值为 Astra 完成的测试数减去 Claude Fable 5.2 完成的测试数，涵盖所有核心 Standard 测试不少于五个的 Suite（RoboARC 的 IKEA 组装任务单独计为一个 Suite；括号内为各 Suite 的核心测试数）。在 Standard 下，Astra 在 10 个 Suite 中完成更多，差距最大的是 RoboPaint（+19）和 BEHAVIOR-1K（+14）；Fable 在 6 个 Suite 中完成更多，差距最大的是 Embodied Safety Exam（+8）、RoboDojo（+6）和 RoboEngineer（+4）；6 个 Suite 持平。</p>
@@ -539,7 +539,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     </figure>
 
 <p><b>没有任何 agent 在每个 Suite 上都领先。</b>在 Standard 下，GPT-6.2 Astra 在 22 个 Suite 中的 9 个独自拥有最多的成功，并在另外 6 个中并列领先。RoboPaint 是最明显的例子：GPT-6.2 Astra 完成了 22 个绘画与书法测试中的 21 个，GPT-6 Astra 为 7 个，GPT-6.1 Sol 为 6 个，Claude Fable 5.2 为 2 个。在长程家务活动 BEHAVIOR-1K 中，它完成了 71 个中的 40 个，Fable 为 26 个，其他任何 agent 最多 14 个；它还在 DexHandExam（23 个中 20 个）、MuJoCo Playground（7 个中 7 个）、MyoSuite（13 个中 7 个）和 DexToolBench（20 个中 4 个）上领先。在拥有完整仿真器访问权限时，GPT-6.2 Astra 在 20 个 Suite 中的 12 个拥有最多的成功，包括 BEHAVIOR-1K（71 个中 67 个，Sol 为 38 个，Fable 和 GPT-6 Astra 各 36 个）和 DexToolBench（20 个中 17 个，GPT-6 Astra 为 13 个）。在其余 8 个 Suite 中，有几个 agent 并列成功次数最多。Sol 在 Standard 下的 RoboLab 中与 GPT-6.2 Astra 和 Fable 并列（6 个中 2 个），并在 Privileged 下的 BEHAVIOR-1K 中拥有第二多的成功。</p>
-<p>RoboPaint 在 Standard 下的差距来自 agent 如何通过相机判断自己的临摹结果，而不是来自绘画本身。<a href="#check-vs-stop">Agent 如何使用时间和 token？</a>中对 GPT-6 Astra 和 Claude Fable 5.2 的比较展示了相关运行。</p>
+<p>RoboPaint 在 Standard 下的差距似乎来自 agent 如何通过相机判断自己的临摹结果，而非绘画本身。<a href="#check-vs-stop">Agent 如何使用时间和 token？</a>中对 GPT-6 Astra 和 Claude Fable 5.2 的比较展示了相关运行。</p>
 <p><b>谜题、安全测试和 RoboDojo 的情况则相反。</b>Fable 在以下 Suite 中拥有最多的 Standard 成功：精细操作谜题 RoboARC（50 个中 32 个，GPT-6.2 Astra 为 31 个，其他 agent 最多 15 个）、Embodied Safety Exam（50 个中 35 个，GPT-6 Astra 为 32 个，GPT-6.2 Astra 为 27 个）、RoboDojo（37 个中 28 个，其他 agent 最多 22 个）、RoboEngineer（15 个中 7 个，其他 agent 最多 5 个）以及 Embodied Olympics - Match（13 个中 10 个，GPT-6.2 Astra 为 9 个）。在这些 Suite 中有 Privileged 测试的三个里，GPT-6.2 Astra 在拥有完整仿真器访问权限时追平或超过了 Fable，因此 Fable 在这些 Suite 上的领先与在真实机器人约束下工作有关。</p>
 <p><b>总分较低，仍可能在某个完整 Suite 上取得最佳结果。</b>Opus 在 Standard 下完成了全部 7 个 ManiGuard 测试，是十个 agent 中唯一做到这一点的。ManiGuard 在指令中写明了安全规则，也是六个强 agent 平均成功率最接近 70% 的 Standard Suite。Opus 在 RoboWits 上也拥有最多的 Standard 成功（6 个中 4 个）。Opus 总共完成 130 个 Standard 测试，不到 GPT-6.2 Astra 279 个的一半。</p>
 <p><b>较新的 agent 仍可能在特定 Suite 上下降。</b>GPT-6.2 Astra 与 GPT-6 Astra 运行在同一个 harness（Codex）中，并在整体上大幅超过后者（Standard 测试 139 对 35），但它完成的 Embodied Safety Exam 测试（50 个中 27 对 32）和 RoboEngineer 测试（15 个中 3 对 5）更少。GPT-6.1 Sol 同样运行在 Codex 中，且比 GPT-6 Astra 更新，它完成了 163 个 Standard 测试，比 GPT-6 Astra 的 175 个少 12 个，且下降集中在少数 Suite：在 BiGym 2.0 中，GPT-6 Astra 完成 10 个 Standard 测试中的 4 个，Sol 为 0；在 RoboDojo 中，37 个中为 21 对 16；在 DexHandExam 中，23 个中为 13 对 9。反过来，Sol 在 ManiGuard（7 个中 5 对 3）、RoboLab（6 个中 2 对 0）、RoboWits（6 个中 3 对 2）、iSpatialGym（8 个中 5 对 4）和 RoboDynamicExam（10 个中 4 对 3）上领先于 GPT-6 Astra。</p>
@@ -581,7 +581,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>排序的中间部分因 agent 而异。GPT-6 Astra 在 Precision &amp; Contact 上（32%）好于 Articulated Mechanisms（24%），而 Fable 恰好相反（39% 对 48%），Sol 在两者上都是 26%。Argon 在 Dynamic Interaction（25%）和 Precision &amp; Contact（20%）上完成的测试多于 Opus（18% 和 15%），而 Opus 在 Navigation &amp; Search（18% 对 10%）、Articulated Mechanisms（24% 对 20%）和 Deformable &amp; Fluid（22% 对 13%）上领先。</p>
 <p>任务类型描述的是整个任务，而一种困难的类型可能出于多种原因而困难。阶段级失败标签为每个阶段分配一个类型，更适合用来分析具体哪一步出了问题（见 <a href="#where">Agent 在哪个阶段失败？</a>）。</p>
     <h3 id="eight-tests" data-short="普遍完成却失败">Agent 会在哪些别人能完成的测试上失败？</h3>
-<p><b>Fable 和 Astra 都会因为一次不该有的接触而输掉许多 agent 都能完成的测试；二者的区别在于失败的运行如何结束。</b>当许多 agent 都完成了某个 agent 失败的测试时，这次失败就揭示了该 agent 在能力范围之内的任务上会出什么问题。在 Claude Fable 5.2 失败的 233 个 Standard 测试中，有 18 个被其余九个 agent 中的四个或更多完成；在 Astra 失败的 202 个测试中，这一数字为 14 个。Fable 往往在做对关键部分之后才输掉这类测试，原因是一次接触、一次被跳过的检查或余量不足。Astra 则更常拒绝执行任务，或在场景出错后停止，此时距离时间限制还很远。</p>
+<p><b>Fable 和 Astra 都会因为一次不该有的接触而输掉许多 agent 都能完成的测试；二者的区别在于失败的运行如何结束。</b>当许多 agent 都完成了某个 agent 失败的测试时，这次失败就揭示了该 agent 在能力范围之内的任务上会出什么问题。在 Claude Fable 5.2 失败的 233 个 Standard 测试中，有 18 个被其余九个 agent 中的四个或更多完成；在 Astra 失败的 202 个测试中，这一数字为 14 个。Fable 往往在做对关键部分之后才输掉这类测试，原因是一次不应有的接触、一次被跳过的检查或余量过小。Astra 则更常拒绝执行任务，或在场景出错后停止，此时距离时间限制还很远。</p>
 <p>完成 Fable 这 18 个测试的 agent 构成各异。GPT-6.2 Astra 完成其中 16 个，Sol 完成 14 个，GPT-6 Astra 13 个，Opus 12 个，Argon 11 个，另有 10 个测试的完成者中包含较弱的 agent。其中 5 个是 Embodied Safety Exam 测试，而 Embodied Safety Exam 正是 Fable 在 Standard 下成功次数最多的 Suite。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="eight"><p class="fig-cap"><span class="fc-t">Fable 失败、但其余九个 agent 中至少四个完成的 18 个 Standard 测试。</span> 在 Standard Setting 下完成各测试的 agent。</p>
@@ -665,7 +665,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 
     <h3 id="realtime" data-short="Realtime">哪些任务在 Realtime 下仍能完成？</h3>
 <p>对每个强 agent 而言，Realtime 都比 Standard 更难。仿真不会在 agent 思考时暂停，因此决策迟缓就会耗费机器人上的时间。在同时具有 Standard 测试和 Realtime 测试的 54 个核心任务上，54 个 Realtime 测试中有 22 个（41%）没有任何 agent 完成，而 54 个 Standard 测试中这一数字为 15 个（28%）。</p>
-<p>在这 54 个任务上，GPT-6.2 Astra 完成 33 个 Standard 测试和 22 个 Realtime 测试，Claude Fable 5.2 分别为 27 和 22 个，GPT-6 Astra 为 23 和 17 个，GPT-6.1 Sol 为 17 和 13 个，Claude Opus 5.5 为 10 和 4 个，Gemini 4 Argon 为 15 和 5 个。在时钟持续运行时，GPT-6.2 Astra 在 Standard 下的领先优势消失：它和 Fable 各完成 22 个 Realtime 测试。Opus 和 Argon 下降最多，Realtime 也是 Argon 唯一一个完成数多于 Opus 的设置，多出一个测试。Kimi 3.1 Pro 完成 4 个 Realtime 测试，与 Opus 相同；Gemini 3.8 Flash 和 DeepSeek V4.1 Flash 各完成 1 个，GLM 5.3 Flash 一个也没有完成。</p>
+<p>在这 54 个任务上，GPT-6.2 Astra 完成 33 个 Standard 测试和 22 个 Realtime 测试，Claude Fable 5.2 分别为 27 和 22 个，GPT-6 Astra 为 23 和 17 个，GPT-6.1 Sol 为 17 和 13 个，Claude Opus 5.5 为 10 和 4 个，Gemini 4 Argon 为 15 和 5 个。在时钟持续运行时，GPT-6.2 Astra 完成的测试不再多于 Fable：二者各完成 22 个 Realtime 测试。Opus 和 Argon 下降最多，Realtime 也是 Argon 唯一一个完成数多于 Opus 的设置，多出一个测试。Kimi 3.1 Pro 完成 4 个 Realtime 测试，与 Opus 相同；Gemini 3.8 Flash 和 DeepSeek V4.1 Flash 各完成 1 个，GLM 5.3 Flash 一个也没有完成。</p>
 <p>下降并不均匀，有些任务在 Realtime 下表现反而更好。在 54 个任务中，有 11 个在 Standard 下有 agent 完成而在 Realtime 下无人完成，反过来的情况有 4 个。除 Argon 之外，每个强 agent 都完成了一些它在 Standard 下失败的 Realtime 测试：Fable 9 个，GPT-6.2 Astra 5 个，GPT-6 Astra 3 个，Sol 3 个，Opus 2 个。各 Suite 情况不同。在 BiGym 2.0 中，10 个 Realtime 测试中有 8 个无人完成，Standard 下为 10 个中的 2 个；在 Embodied Olympics - Match 中分别为 12 个中的 3 个和 12 个中的 1 个。在 RoboDynamicExam 中方向相反：8 个 Realtime 测试全部有 agent 完成，Standard 下为 8 个中的 5 个，且 Fable 和 GPT-6.2 Astra 在这里各完成 6 个 Realtime 测试，而 Standard 测试分别只有 3 个和 5 个。在 Realtime 下，95% 的抽样尝试通过程序控制机器人，其中大多数是运行控制回路的程序（<a href="#control-by-setting">控制方式</a>），因此奖励快速闭环的任务可以从这一设置中获益。</p>
 <p>Agent 之间的两两比较也随之变化。在 Realtime 下，有 6 个测试只有 Fable 完成，6 个只有 Astra 完成，16 个两者都完成，26 个两者都未完成。Sol 完成了 5 个 Fable 失败的 Realtime 测试，以及 3 个 Astra 失败的 Realtime 测试。</p>
 
@@ -697,7 +697,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>GPT-6 Astra 在未修改的接口下完成 29%，加入状态查询后为 45%，加入无限重置与状态保存后为 53%，二者兼具时为 68%，仍比它在相同任务的 Privileged 测试中达到的 79% 低 11 个百分点（图 12a）。在 50 个 Realtime 测试上，两种功能之间的差距更大：基线为 30%，加入状态查询为 38%，加入重置为 64%，二者兼具为 80%，Privileged 为 84%（论文表 5）。</p>
 <figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12"><p class="fig-cap">论文图 12。(a) GPT-6 Astra 在 Codex 中，在 391 个同时具有两种设置的核心任务的默认测试上，随各项功能加入的成功率变化。(b) 在至少两个 Suite 中进行比较的各类阶段，在 Standard 和 Privileged 中的失败率，覆盖九个有标注的 agent。子图 (b) 在下一节讨论。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12_settings_ablation.png?v=51eb27f8" alt="论文图 12：(a) GPT-6 Astra 在 Codex 中，在 391 个同时具有两种设置的核心任务的默认测试上，随着加入精确状态和重置的成功率：未修改的接口为 29%，加入状态查询为 45%，加入无限重置为 53%，二者兼具为 68%，Privileged 为 79%。(b) 九个有标注的 agent 在 Standard 与 Privileged 中各阶段类型的失败率，精细类型上升 20 到 53 个百分点，九个粗略类型中有七个上升 3 到 17 个百分点。(c) 每次运行挽回的 GPT-6 Astra 在精细阶段和粗略阶段失败的比例。" width="4000" height="2778"></div></div></figure>
 <p><b>重置被用来重试困难阶段，而不是从头再来。</b>在重置运行的 206 次成功中，只有 14% 出现在第一个回合，136 次（66%）出现在从保存的任务中途状态开始的回合。Agent 回到困难阶段之前，重新尝试该阶段，而无需重复整个任务。真实机器人在 Standard 设置下做不到这一点：在困难阶段一次失手，通常就会结束被评分的回合。</p>
-<p><b>精确状态在相机难以胜任的地方有帮助。</b>论文发现，在难以通过相机测量场景的情况下（如 iSpatialGym 和 BEHAVIOR-1K），状态查询的帮助最大，而在 Embodied Olympics (Fun) 和 DexHandExam 中变化不大。在部分 Suite 中，看清场景确实是个问题；但就整个任务集而言，它是两者中较小的问题。</p>
+<p><b>精确状态在相机难以胜任的地方有帮助。</b>论文发现，在难以通过相机测量场景的情况下（如 iSpatialGym 和 BEHAVIOR-1K），状态查询的帮助最大，而在 Embodied Olympics (Fun) 和 DexHandExam 中变化不大。在部分 Suite 中，感知场景确实是个问题。但就整个任务集而言，缺少精确状态的影响小于缺少重置的影响。</p>
 <p><b>局限。</b>两项新增功能都不允许 agent 像 Privileged 那样步进物理仿真或调用规划原语，论文指出，剩余的 11 个百分点可能部分来自这些能力。</p>
 
     <h3 id="precise-stages" data-short="精细阶段">精细阶段在 Standard 下难得多</h3>
@@ -710,7 +710,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>论文的标签将 Opus 的失败归因于对手中网罩位姿的估计错误。标签显示的是 Standard 设置让任务在<i>哪里</i>变难；下一节的受控运行将精确状态与重试的作用区分开来。</p>
 
     <h3 id="precise-resets" data-short="精细阶段的重置">在精细阶段，重置帮助更大</h3>
-<p>加入状态查询几乎无法挽回精细阶段的失败，因此看不到精确位姿并不是主要原因。在精细阶段，精确状态挽回了 GPT-6 Astra 21% 的失败，与简单的第二次尝试（19%）相当，而无限重置挽回了 36%。在粗略阶段，排序则反过来：精确状态挽回了 34% 的失败，而第二次尝试只有 14%。</p>
+<p>加入状态查询只挽回了少量精细阶段的失败，这表明看不到精确位姿并不是主要原因。在精细阶段，精确状态挽回了 GPT-6 Astra 21% 的失败，与简单的第二次尝试（19%）相当，而无限重置挽回了 36%。在粗略阶段，排序则反过来：精确状态挽回了 34% 的失败，而第二次尝试只有 14%。</p>
 <p>论文将受控运行与 GPT-6 Astra 在默认测试上已标注的失败结合起来。其中 256 个失败定位到了失败阶段：91 个在精细阶段，97 个在粗略阶段，36 个在材料类阶段，32 个在其他阶段。有些失败仅靠再试一次就会通过，因此每次运行都与一个第二次尝试基线进行比较：即既不加入任何功能、只隐藏成功信号的那次运行（见下一节）。它并非完全的重复运行，因为 agent 必须自行结束回合，但其总体成功率与原始运行相差不超过 4 个百分点。</p>
 <figure class="fig paper fig-wide"><div class="fig-body" data-fig="fig12c"><p class="fig-cap">论文图 12c。每次受控运行挽回的 GPT-6 Astra 在精细阶段（91 个）和粗略阶段（97 个）已标注失败的比例。精细阶段：不含成功信号的第二次尝试 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。粗略阶段：14%、34%、44%、67% 和 62%。</p><div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fig12c_precise_stages.png?v=5f101788" alt="论文图 12c：GPT-6 Astra 的失败被挽回的比例。精细阶段：无成功信号 19%，精确状态 21%，重置 36%，二者兼具 47%，Privileged 74%。粗略阶段：14%、34%、44%、67%、62%。" width="1920" height="1080"></div></div></figure>
 <p><b>在精细阶段，收益主要来自重置。</b>重置挽回了 91 个精细阶段失败中的 36%，几乎是第二次尝试的两倍，且这 33 次成功中有 31 次是在重置或恢复状态之后才出现的。它与精确状态的差异不太可能是偶然：在状态运行和重置运行中恰好只有一方挽回的 22 个精细阶段失败里，重置运行挽回了 18 个（精确 McNemar 检验，p = 0.004）。在可以重试的前提下，精确状态确实有帮助：二者兼具时，比例从 36% 升至 47%（在这两次运行中只有一方挽回的 16 个失败里，二者兼具的运行挽回了 13 个，p = 0.021）。</p>
@@ -745,10 +745,10 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 
     <h3 id="same-stage" data-short="同一阶段">不同 agent 常在同一阶段失败</h3>
-<p>每个任务被划分为若干阶段，每个阶段对应任务所要求的一次世界状态变化：冰箱被打开、番茄被放进去、冰箱重新关上。失败分析记录了每次失败尝试出错时所处的阶段，由此可以考察：两个在同一测试上失败的 agent，是否失败在同一处。答案是大多如此。</p>
+<p>每个任务被划分为若干阶段，每个阶段对应任务所要求的一次世界状态变化：冰箱被打开、番茄被放进去、冰箱重新关上。失败分析记录了每次失败尝试出错时所处的阶段，由此可以考察：两个在同一测试上失败的 agent，是否失败在同一处。答案是往往如此。</p>
 <p>论文用失败阶段的集中度来衡量这一点：在同一测试上随机抽取两次失败尝试，二者失败于同一阶段的概率（两次尝试总是来自不同 agent，因为每个 agent 在每个测试上只尝试一次）。在至少有两个 agent 于可定位阶段失败、且任务至少包含两个阶段的 Standard 测试上，九个已标注 agent 的平均集中度为 57%。若每次失败随机落在某一阶段（早期阶段被偏向的比例与其他任务上相同），这一数值将为 35%（图 14，子图 (a)）。在 Privileged Setting 下，对应数值为 49% 对 31%。</p>
 <p>这一数值并非由较弱的 agent 推高，尽管它们常常在达成任何阶段之前就已失败，而两次都在第一个阶段失败的结果自然一致。仅看五个已标注的强 agent，在其中至少有两个于可定位阶段失败的 Standard 测试上，集中度为 55%，而基于它们在其他 Standard 任务上自身失败所构建的随机基线为 30%。</p>
-<p>这种一致性也强于仅凭阶段类型所能预测的程度。在第二个基线中，每个 agent 在每个阶段失败的概率等于该阶段类型在其他任务上的失败率，因此难度较高的阶段类型（例如擦拭）无论出现在哪里都会吸引失败。该基线在 Standard 下给出 43%，仍远低于观测到的 57%：特定任务中的特定阶段对所有 agent 都很难。在至少有三个阶段且有四次及以上可定位失败的 Standard 测试中，187 个里有 38 个至少 80% 的失败集中在单一阶段。例如：清理树枝时把第一根树枝放进垃圾桶（BEHAVIOR-1K，9 次失败中占 9 次），把第二个调料罐放到托盘上（Embodied Safety Exam，8 次中占 8 次），以及装上风扇的前护罩（DexHandExam，8 次中占 8 次）。</p>
+<p>这种一致性也强于仅凭阶段类型所能预测的程度。在第二个基线中，每个 agent 在每个阶段失败的概率等于该阶段类型在其他任务上的失败率，因此难度较高的阶段类型（例如擦拭）无论出现在哪里都会吸引失败。该基线在 Standard 下给出 43%，仍远低于观测到的 57%：特定任务中的特定阶段对许多 agent 都很难。在至少有三个阶段且有四次及以上可定位失败的 Standard 测试中，187 个里有 38 个至少 80% 的失败集中在单一阶段。例如：清理树枝时把第一根树枝放进垃圾桶（BEHAVIOR-1K，9 次失败中占 9 次），把第二个调料罐放到托盘上（Embodied Safety Exam，8 次中占 8 次），以及装上风扇的前护罩（DexHandExam，8 次中占 8 次）。</p>
 <p>共同的失败阶段往往是第一个阶段。在失败有唯一最常见阶段的 255 个 Standard 测试中，该阶段是任务第一阶段的占 63%；在任务至少包含两类阶段的测试中占 53%。失败于同一阶段并不意味着以同样方式失败：在同一 Standard 阶段失败的两个 agent 中，仅 39% 的配对具有相同的失败现象（如抓握丢失或碰撞）。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="14">
@@ -757,7 +757,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p>两次接球（RoboDynamicExam）展示了一个并非第一阶段的共同失败阶段（图 15）。一台握着杯子的 Franka 机械臂需要接住抛来的球，把球倒进一个槽中，待球滚下并从斜坡弹回后再次接住，然后把球倒进一辆移动的小车。在 Standard Setting 下，十个 agent 全部失败。九个已标注 agent 中有七个接住了第一次的球，随后在再次接球时以不同方式失败。在三次尝试中（GPT-6 Astra、Gemini 4 Argon 和 Gemini 3.8 Flash），杯子在倒球或向下游移动时碰到了槽或回弹斜坡，这是任务所禁止的，会直接结束本回合。GPT-6.1 Sol 在约 10 s 时把球倒进了槽中，但在 16.7 s 调整杯子以迎接回弹的球时，机械臂碰到了场景。Claude Opus 5.5 的杯子在球离开斜坡时仍然过高；Opus 自己报告称，球离开杯子后只有约 1.3 至 1.6 s 可以接住，而仅在倒球后把杯子扶正就需要约 1.4 s。在 DeepSeek V4.1 Flash 和 GLM 5.3 Flash 的运行中，球始终没有离开倾斜的杯子。没有止步于再次接球的两次尝试走向了相反的方向：Kimi 3.1 Pro 没有移动机械臂，约 1 s 后在第一次接球时失败；而 Claude Fable 5.2 在 13.6 s 再次接住了球并到达最后一个阶段，球在 18.2 s 落在了移动小车旁边。</p>
-<p>这一瓶颈主要来自真实机器人约束下的时序与感知，而非对任务的理解。在 Realtime Setting（该任务的默认测试）下，GPT-6.2 Astra、Claude Fable 5.2 和 GPT-6.1 Sol 通过，其他已标注 agent 的全部六次可定位失败再次落在再次接球阶段。在 Privileged Setting 下，六个 agent 通过：GPT-6.2 Astra、Claude Fable 5.2、GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5，以及在 Standard 下没有移动机械臂的 Kimi 3.1 Pro。Gemini 4 Argon 和 Gemini 3.8 Flash 在该设置下没有提交答案，DeepSeek V4.1 Flash 和 GLM 5.3 Flash 分别在小车阶段和再次接球阶段失败。</p>
+<p>另外两种设定的结果表明，再次接球之所以困难，主要在于真实机器人约束下的时序与感知，而不是 agent 误解了任务。在 Realtime Setting（该任务的默认测试）下，GPT-6.2 Astra、Claude Fable 5.2 和 GPT-6.1 Sol 通过，其他已标注 agent 的全部六次可定位失败再次落在再次接球阶段。在 Privileged Setting 下，六个 agent 通过：GPT-6.2 Astra、Claude Fable 5.2、GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5，以及在 Standard 下没有移动机械臂的 Kimi 3.1 Pro。Gemini 4 Argon 和 Gemini 3.8 Flash 在该设置下没有提交答案，DeepSeek V4.1 Flash 和 GLM 5.3 Flash 分别在小车阶段和再次接球阶段失败。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="15">
     <p class="fig-cap"><span class="fc-t">在 Standard 下没有 agent 解决它，九个已标注 agent 中有七个在同一步骤失败：再次接住球。</span> 论文图 15。两次接球（RoboDynamicExam）：在 Standard 和 Privileged 设置下各 agent 的尝试到达的阶段及失败所在的阶段，以及三帧在再次接球时失败的 Standard 回放画面（GPT-6 Astra 的杯子撞到斜坡，Claude Opus 5.5 的杯子对球而言过高，Gemini 4 Argon 的杯子撞到槽）。</p>
@@ -768,20 +768,20 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <h3 id="same-across-settings" data-short="跨设置">失败阶段在不同设置下往往相同</h3>
 <p>Agent 在 Privileged Setting 下能完成多得多的测试，但一个任务中多数失败所在的阶段，在 Standard 与 Privileged 下通常相同。论文选取了在两种设置下失败都有唯一最常见阶段的 179 个任务。其中 134 个（75%）该阶段相同，而若每种设置的失败阶段独立随机抽取（同前，偏向早期阶段），这一比例为 44%。这种一致性很大程度上来自那些直接在第一阶段失败的任务：179 个任务中有 85 个，两种设置下的最常见阶段都是第一阶段。在其余 94 个任务上，最常见阶段仍有 52% 相同（95% 区间 42% 至 63%），而在不含两个最常见阶段均为第一阶段的抽样时，随机基线为 10%（图 14，子图 (a)，最下方条形）。</p>
 <p>当两个最常见阶段不同时，Standard 下的那个通常在任务中更靠前（35 个任务如此，另有 10 个任务更靠后）：在真实机器人约束下，agent 更早被卡住。</p>
-<p>两种设置在难点阶段之后差异显著。对每次尝试，论文取同一测试上其他 agent 最常失败的阶段，考察该尝试是否越过了这一阶段。在越过的尝试中，Standard 下有 42% 通过测试，Privileged 下为 74%；其余 Standard 尝试大多在更靠后的阶段失败。就全部尝试而言，通过率分别为 15% 和 43%。越过该阶段与通过测试之间的关联部分来自阶段顺序，因为这样的尝试本就更接近任务终点。即便如此，42% 与 74% 之间的差距表明，在 Standard 下，攻克最难的一步往往并不足够：那些在完整访问下变得容易的后续阶段仍可能失败。</p>
-<p>因此，从 Privileged 到 Standard 的性能下降，主要并不是因为 agent 在任务中走了不同的路线、遇到了新的障碍。同样的步骤在两种设置下都很难，而真实机器人约束让这些步骤更难，并在其后带来更多失败。这些统计描述的是失败落在何处，并不能说明 agent 在两种设置下遵循的是同一套计划。</p>
+<p>两种设置在难点阶段之后差异显著。对每次尝试，论文取同一测试上其他 agent 最常失败的阶段，考察该尝试是否越过了这一阶段。在越过的尝试中，Standard 下有 42% 通过测试，Privileged 下为 74%；其余 Standard 尝试大多在更靠后的阶段失败。就全部尝试而言，通过率分别为 15% 和 43%。越过该阶段与通过测试之间的关联部分来自阶段顺序，因为这样的尝试本就更接近任务终点。即便如此，42% 与 74% 之间的差距提示，在 Standard 下，越过最难的阶段往往并不足够。那些在完整访问下变得容易的后续阶段仍可能失败。</p>
+<p>因此，从 Privileged 到 Standard 的性能下降，主要并不是因为 agent 以不同的方式完成任务、并在新的步骤上失败。同样的步骤在两种设置下都很难，而真实机器人约束让这些步骤更难，并在其后带来更多失败。这些统计描述的是失败落在何处，并不能说明 agent 在两种设置下遵循的是同一套计划。</p>
 
     <h3 id="stage-kinds" data-short="阶段类型">材料阶段和身体阶段的失败率最高</h3>
 <p><b>改变材料或移动机器人身体的阶段最常失败，但哪类阶段最难并不能从一个 Suite 推广到另一个 Suite。</b>每个阶段都有一个类型，标明促成该阶段的机器人动作；这些类型归为若干类别：关系（relation，将一个物体相对于另一个物体放置或装配）、位姿（pose）、机构（mechanism，门、盖子、按钮）、材料（material，擦拭、倾倒、绘画）、身体（body，行走、保持平衡）、动态（dynamic，接、击打）以及竞技（competition）。某一类别的失败率，是指尝试所到达的该类阶段中随后失败的比例。合并 Standard 与 Privileged 后，各类别的失败率差异很大（图 14，子图 (b)）：材料阶段失败率为 54%（到达的 1,211 个中有 649 个），身体阶段为 36%（1,138 个中 410 个），竞技阶段为 30%，关系阶段为 27%，动态阶段为 25%，位姿阶段为 18%，机构阶段为 15%（2,231 个中 329 个）。</p>
 <p>两端的结果在每种设置下单独成立，且在真实机器人约束下每个类别都更常失败：材料阶段在 Standard 下为 73%、Privileged 下为 32%，身体阶段为 55% 和 21%，机构阶段为 20% 和 10%。位姿、关系和动态类别居于其间，其相对顺序在两种设置下不同，因此论文不对这三者进行相互排序。</p>
-<p>在同一类别内，机器人需要怎样动作与它作用于什么对象同样重要。在机构阶段中，打开门或盖子的失败率为 28%（851 个中 236 个），关闭门或盖子（初始时并非已关闭的情况下）为 12%，按压为 3%（432 个中 13 个）。以按压或擦拭完成的阶段，当机器人按压按钮等机构时失败率为 6%，当擦拭或按压材料时则为 58%。关系阶段在使用单手或单个夹爪时失败率为到达阶段的 28%，双臂协同时为 40%，由腿部或躯干承担机器人自重时为 56%（论文图 29）。借助工具作用则利弊皆有：当机器人通过杯子或球拍作用时，针对运动物体的阶段失败更少；而当其通过工具移动物体时，位姿阶段失败更多。</p>
-<p>在部分 Suite 上学到的难度排序，大多无法预测新 Suite 中的难度。论文每次留出一个 Suite，依据其余 Suite 上的失败率对每一对阶段类型排序，再在留出 Suite 中检验该排序。结果在 351 对阶段类型中有 55% 成立，仅略高于抛硬币的 50%；仅看接触方式时，159 对中为 47%；对于更粗粒度的阶段类别，79 对中为 63%。</p>
-<p>真正能预测某阶段失败的是由谁来执行。论文根据设置加上另一个属性，预测到达某阶段的尝试是否会在该阶段失败，采用按任务划分的交叉验证，并报告每个属性相对于仅用设置时的提升：agent 提升 13.5%，阶段类型 5.7%，接触（谁接触、如何接触）5.7%，阶段类别 4.6%，Suite 4.4%，机器人身体类型 3.2%。因此，特定任务中的特定阶段常常是共同瓶颈，但该阶段所属的一般类型对其他 Suite 中的难度只是一个较弱的指引。</p>
+<p>在同一类别内，机器人需要怎样动作与它作用于什么对象同样重要。在机构阶段中，打开门或盖子的失败率为 28%（851 个中 236 个），关闭门或盖子（初始时并非已关闭的情况下）为 12%，按压为 3%（432 个中 13 个）。以按压或擦拭完成的阶段，当机器人按压按钮等机构时失败率为 6%，当擦拭或按压材料时则为 58%。关系阶段在使用单手或单个夹爪时失败率为到达阶段的 28%，双臂协同时为 40%，由腿部或躯干承担机器人自重时为 56%（论文图 29）。借助工具作用的效果则因情况而异：当机器人通过杯子或球拍作用时，针对运动物体的阶段失败更少；而当其通过工具移动物体时，位姿阶段失败更多。</p>
+<p>在部分 Suite 上学到的难度排序，大多无法预测新 Suite 中的难度。论文每次留出一个 Suite，依据其余 Suite 上的失败率对每一对阶段类型排序，再在留出 Suite 中检验该排序。结果在 351 对阶段类型中有 55% 成立，仅略高于随机水平的 50%；仅看接触方式时，159 对中为 47%；对于更粗粒度的阶段类别，79 对中为 63%。</p>
+<p>agent 本身是预测某阶段失败的最强因素。论文根据设置加上另一个属性，预测到达某阶段的尝试是否会在该阶段失败，采用按任务划分的交叉验证，并报告每个属性相对于仅用设置时的提升：agent 提升 13.5%，阶段类型 5.7%，接触（谁接触、如何接触）5.7%，阶段类别 4.6%，Suite 4.4%，机器人身体类型 3.2%。因此，特定任务中的特定阶段常常对许多 agent 都很难，但该阶段所属的一般类型对其他 Suite 中的难度只是一个较弱的指引。</p>
 
     <h3 id="by-suite" data-short="按 Suite 看失败">每个 Suite 有自己的失败模式</h3>
 <p>按 Suite 拆分后，九个已标注 agent 的 4,866 次已分析失败表明，Suite 在很大程度上决定了 agent 在哪里、以何种方式失败（图 27）。</p>
 <p><b>失败阶段往往由 Suite 设计决定。</b>所有 RoboPaint 失败都发生在材料阶段，所有 Embodied Olympics - Match 失败都发生在竞技阶段，所有阶段可定位的 DexToolBench 失败都发生在位姿阶段。在 Embodied Olympics - Match 和 DexToolBench 中，这是由任务决定的，因为其中每个任务的每个阶段都属于该类别。在其他 Suite 中，某一类别占主导但并非唯一：动态阶段占 RoboDynamicExam 失败的 62%、Embodied Olympics - Fun 失败的 58%，身体阶段占 MuJoCo Playground 失败的 94%，位姿阶段占 MyoSuite 失败的 75%。关系阶段在家居和桌面类 Suite 中占主导：BEHAVIOR-1K 失败的 56%，RoboARC 和 BiGym 2.0 的 68%，RoboDojo 的 88%，KinDER 的 90%，RoboCasa365 的 91%，以及 RoboLab 的全部失败。在所有失败中，关系阶段最为常见，占 39%。</p>
-<p><b>失败尝试能推进多远，差异也很大。</b>在 DexToolBench 和 KinDER 中，大多数失败尝试从未达成任务的任何一个阶段（65% 和 75%），BiGym 2.0 中也有 49% 一个阶段都未达成：agent 始终没能建立第一次抓取或工具位姿。在 RoboPaint 中，95% 的失败尝试至少达成了一半的阶段，因为绘画的失败在于笔触匹配得好不好，而不在于机器人是否开始动作。在 Embodied Safety Exam 和 ManiGuard 中，部分失败尝试在某一时刻达成了所有阶段（14% 和 25%），却仍然失败；在 Embodied Safety Exam 中，这些尝试大多违反了安全约束。</p>
+<p><b>失败尝试能推进多远，差异也很大。</b>在 DexToolBench 和 KinDER 中，大多数失败尝试从未达成任务的任何一个阶段（65% 和 75%），BiGym 2.0 中也有 49% 一个阶段都未达成：agent 始终没能建立第一次抓取或工具位姿。在 RoboPaint 中，95% 的失败尝试至少达成了一半的阶段，因为绘画尝试的失败在于笔触与目标的吻合程度，而不在于机器人能否开始动作。在 Embodied Safety Exam 和 ManiGuard 中，部分失败尝试在某一时刻达成了所有阶段（14% 和 25%），却仍然失败；在 Embodied Safety Exam 中，这些尝试大多违反了安全约束。</p>
 <p><b>同一类阶段在不同 Suite 中可能因不同原因失败。</b>RoboLab 和 RoboCasa365 都主要在关系阶段失败，但 RoboLab 最常见的现象是抓握丢失（50%），而 RoboCasa365 则是未能建立该阶段所需的接触（36%）。在机器人需要承担自身重量的场景中，失去平衡或步态失败占主导：MuJoCo Playground 失败的 86%，HumanoidBench 的 48%，Embodied Olympics - Fun 的 34%。它也占 BEHAVIOR-1K 失败的近三分之一（30%），因为移动操作机器人在伸手或搬运时可能倾倒。Embodied Safety Exam 的突出特点是碰撞（34%）和约束违反（26%），而这正是安全类 Suite 所要捕捉的。在 RoboDynamicExam 中，位姿不准确（27%）、碰撞（22%）和时序错误（14%）都有出现，与上文杯子接球的失败相吻合。DexToolBench 最常见的现象是未能建立接触（41%）。</p>
 <p><b>根本原因主要指向控制，但只能支持较宽泛的结论。</b>在全部失败中，69% 带有控制类根本原因，11% 带有认知类根本原因。在失败数不少于 20 的 Suite 中，认知类原因在 Embodied Safety Exam（37%）、RoboPaint（32%）和 iSpatialGym（28%）中最为常见，这些 Suite 要求 agent 正确理解一条规则、一张目标图像或一条空间指令。在失败数不少于 20 的十一个 Suite 中（包括 HumanoidBench、MyoSuite 和 DexToolBench），这一比例低于 8%。</p>
 <figure class="fig paper fig-wide">
@@ -792,9 +792,9 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 
     <h3 id="by-robot" data-short="按机器人看失败">哪些机器人身体失败最多？</h3>
-<p><b>承担自身重量的机器人会摔倒，手部难以建立接触。</b>图 28 按机器人身体类型、agent 和设置对同样的 4,866 次失败进行了拆分。每种身体类型只来自少数几个 Suite（移动操作机器人的失败有四分之三来自 BEHAVIOR-1K，四足机器人的失败全部来自 MuJoCo Playground）。</p>
+<p><b>承担自身重量的机器人常常摔倒，手部也常常无法建立接触。</b>图 28 按机器人身体类型、agent 和设置对同样的 4,866 次失败进行了拆分。每种身体类型只来自少数几个 Suite（移动操作机器人的失败有四分之三来自 BEHAVIOR-1K，四足机器人的失败全部来自 MuJoCo Playground）。</p>
 <p><b>自身承重的机器人大多因摔倒而失败。</b>失去平衡或步态失败是四足机器人（其失败的 92%）、人形机器人（32%）和移动操作机器人（23%）最常见的现象。四足机器人的失败全部发生在身体阶段。人形机器人的失败分布更广，34% 发生在动态阶段，28% 发生在身体阶段，因为许多人形机器人任务来自 Embodied Olympics。</p>
-<p><b>手部常常还没开始就已失败。</b>未能建立阶段所需的接触，是灵巧手（30%）和 MyoSuite 肌肉骨骼模型（33%）最常见的现象。对灵巧手而言，53% 的失败尝试从未达成任务的任何阶段，69% 的失败发生在位姿阶段：手始终没能达到后续任务所依赖的抓取或工具位姿。</p>
+<p><b>手部常常在任务开始阶段就已失败。</b>未能建立阶段所需的接触，是灵巧手（30%）和 MyoSuite 肌肉骨骼模型（33%）最常见的现象。对灵巧手而言，53% 的失败尝试从未达成任务的任何阶段，69% 的失败发生在位姿阶段：手始终没能达到后续任务所依赖的抓取或工具位姿。</p>
 <p><b>机械臂的失败在于精度与避让空间。</b>对于单臂或双臂机器人，除任务特有的缺陷外，最常见的现象是位姿不准确（单臂 20%，双臂 25%）以及碰撞或受阻（均为 19%）。双臂机器人有 69% 的失败发生在关系阶段，此时两臂需要协同放置或穿引物体；单臂机器人有 37% 的失败发生在材料阶段，主要是绘画。</p>
 <p><b>各 agent 的差异在于推进多远以及出了什么问题，而不在于被哪类阶段卡住。</b>对每个已标注 agent 而言，关系阶段都占失败的最大份额，从 37%（GLM 5.3 Flash）到 43%（GPT-6.1 Sol），其他类别在 agent 之间的差异约为六个百分点或更小。较弱 agent 的失败更常未达成任务的任何阶段（26% 至 37%，五个已标注强 agent 为 15% 至 23%），也更常缺少所需接触（按到达的接触阶段计，见<a href="#weaker-early">较弱的 agent</a>）。抓握丢失在 Claude Fable 5.2、GPT-6 Astra 和 GPT-6.1 Sol 的失败中所占份额（三种设置合计为 16% 至 17%）高于任何较弱 agent（9% 至 12%），部分原因是到达更多抓取阶段的 agent 有更多机会丢失抓握：按到达的抓取阶段计，GPT-6 Astra 丢失抓握的比例为 5.4%，其余八个已标注 agent 合计为 6.7%（区间包含零）。在强 agent 中，进度无法读取的失败所占比例从 5%（Claude Fable 5.2）和 6%（GPT-6.1 Sol）到 10%（Claude Opus 5.5、Gemini 4 Argon）和 11%（GPT-6 Astra）不等，且 Gemini 4 Argon 的失败更常带有“未尝试”标签（15%，为九个已标注 agent 中最高）。Kimi 3.1 Pro（49%）和 Gemini 4 Argon（42%）有许多失败没有根本原因。</p>
 <p><b>各设置改变失败类型的方式，与每种设置允许 agent 观察和执行的内容相符。</b>Realtime 下的失败更常发生在竞技阶段（22%，Standard 和 Privileged 下均为 2%）和动态阶段（24%，对比 9% 和 7%），也更常涉及时序错误（15%，对比 2% 和 1%），因为在 Realtime 下，agent 思考时世界仍在持续运动。碰撞在 Standard 失败中更常见（14%，Realtime 下为 5%，Privileged 下为 7%）；失去平衡在 Standard（17%）和 Realtime（18%）中比在 Privileged（10%）中更常见；Privileged 下的失败更常带有“未尝试”标签（14%，Standard 下为 3%，Realtime 下为 7%）。</p>
@@ -806,7 +806,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 
     <h3 id="weaker-early" data-short="失败的早晚">较弱 agent 常在接触前失败，强 agent 通常在接触后失败</h3>
-<p>较弱 agent 并不是在与强 agent 相同的步骤上失败得更频繁，而是失败得更早。它们的尝试更常在任务尚未真正开始时就已结束；在需要接触的阶段，它们未能完成接触的频率要高出数倍。较弱 agent 能完成的测试，几乎都有某个强 agent 同样能够完成。</p>
+<p>较弱 agent 并不是在与强 agent 相同的步骤上失败得更频繁，而是失败得更早。它们的尝试更常在尚未达成任务的任何阶段时就已结束；在需要接触的阶段，它们未能完成接触的频率要高出数倍。较弱 agent 能完成的测试，几乎都有某个强 agent 同样能够完成。</p>
 <figure class="fig paper fig-wide">
   <div class="fig-body" data-fig="16">
     <p class="fig-cap">论文图 16。(a) 各 agent 的失败画像；零进展指该次尝试未达成任何阶段。(b) 在行 agent 已完成的 Standard 测试中，列 agent 同样完成的比例；最后一列给出图 8 中排名高于行 agent 的任一 agent 能够完成的比例。</p>
@@ -815,8 +815,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 <p><b>较弱 agent 的许多尝试根本没有达成任何阶段。</b> 在至少包含两个阶段的任务上，图 (a) 统计了失败的 Standard 尝试中未达成任何阶段的比例：四个已标注的较弱 agent 为 44%（Kimi 3.1 Pro，264 次中的 117 次）至 59%（DeepSeek V4.1 Flash 和 GLM 5.3 Flash），而五个已标注的强 agent 为 26% 至 36%。在这些尝试中，机器人从未打开柜子、从未拿起第一件物品，或在环顾四周时摔倒，如下文案例所示。</p>
 <p><b>一旦到达接触阶段，较弱 agent 未能完成接触的频率要高出数倍。</b> 未能完成所需接触占较弱 agent 失败尝试的 16.5% 至 24.2%，而强 agent 为 5.7% 至 12.5%。由于失败尝试中的占比取决于 agent 推进得多远，论文还以到达的接触阶段数为分母进行计算：较弱 agent 在这些阶段中因未接触而失败的比例为 9.0%（Kimi 3.1 Pro）至 18.5%（GLM 5.3 Flash），强 agent 为 1.0% 至 3.7%。合并后的差异为 11 个百分点，基于任务的 95% 区间为 9 至 13 个百分点；在每组至少有 20 个此类阶段的 21 个 Suite 中，较弱 agent 的比例在其中 20 个中更高。在相同测试上这一结论同样成立：在 GPT-6 Astra 与某个较弱 agent 组成的四个配对中，在两者都失败的测试上，GPT-6 Astra 的失败有 10% 缺少接触，而较弱 agent 为 19% 至 25%。</p>
-<p><b>较弱 agent 失去抓握看起来更少，只是因为它们获得的机会更少。</b> 失去抓握占较弱 agent 失败尝试的 9.4% 至 12.5%，低于大多数强 agent。若按到达的抓取阶段计算，顺序则发生反转：较弱 agent 在 8.1% 至 9.8% 的抓取阶段中失去抓握，强 agent 为 4.0% 至 7.0%。</p>
-<p><b>较弱 agent 在相同的早期阶段失败；强 agent 失败得更晚，方式也更多样。</b> 在 Standard 设置下，当四个已标注的较弱 agent 中的两个在同一测试上失败时，69% 的配对失败于同一阶段，而五个已标注强 agent 中的两个为 53%。在 1,009 对此类较弱 agent 配对中，共同失败阶段位于任务第一阶段之后的仅占 28%，而在 826 对强 agent 配对中占 50%。在 GPT-6 Astra 与某个较弱 agent 都失败的测试上，不含平局时，GPT-6 Astra 在其中 94% 至 99% 的测试上达成了更多阶段。</p>
+<p><b>较弱 agent 失去抓握看起来更少，主要是因为它们获得的机会更少。</b> 失去抓握占较弱 agent 失败尝试的 9.4% 至 12.5%，低于大多数强 agent。若按到达的抓取阶段计算，顺序则发生反转：较弱 agent 在 8.1% 至 9.8% 的抓取阶段中失去抓握，强 agent 为 4.0% 至 7.0%。</p>
+<p><b>较弱 agent 在相同的早期阶段失败；强 agent 失败得更晚，失败阶段也更分散。</b> 在 Standard 设置下，当四个已标注的较弱 agent 中的两个在同一测试上失败时，69% 的配对失败于同一阶段，而五个已标注强 agent 中的两个为 53%。在 1,009 对此类较弱 agent 配对中，共同失败阶段位于任务第一阶段之后的仅占 28%，而在 826 对强 agent 配对中占 50%。在 GPT-6 Astra 与某个较弱 agent 都失败的测试上，不含平局时，GPT-6 Astra 在其中 94% 至 99% 的测试上达成了更多阶段。</p>
 <p><b>较弱 agent 能完成的，强 agent 也能完成；但强 agent 之间只是部分相互覆盖。</b> 图 (b) 按行阅读。对于四个较弱 agent，最后一列（任一排名更高的 agent）为 98% 至 100%。在 Standard 设置下，唯一一个由较弱 agent 完成而没有任何强 agent 完成的测试，是 RoboDojo 的交换积木（swap-blocks）测试，由 Kimi 3.1 Pro 完成。在较弱 agent 之间，这种顺序关系并不成立：例如，GLM 5.3 Flash 完成的 12 个 Standard 测试中，Gemini 3.8 Flash 只完成了 2 个。在强 agent 之间，GPT-6 Astra 完成了 Fable 已完成的 248 个测试中的 54%，而 Fable 完成了 GPT-6 Astra 已完成的 175 个测试中的 77%。Fable 已完成的测试中只有 74% 也被 GPT-6.2 Astra（唯一排名高于它的 agent）完成。对于其他强 agent，已完成测试中同样被某个排名更高的 agent 完成的比例，GPT-6 Astra 为 91%，Sol 和 Opus 为 97%，Argon 为 100%。</p>
 <p></p>
 
@@ -844,7 +844,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </figure>
 <p><b>它几乎总能完成阶段所需的接触。</b> Fable 的失败尝试中只有 5.7% 未能完成所需接触，而 GPT-6 Astra 为 9.9%，GPT-6.1 Sol 为 12.5%。按到达的接触阶段计，Fable 因未接触而失败的比例为 1.0%，是九个已标注 agent 中最低的（其他强 agent 为 2.7% 至 3.7%）。阻挡或碰撞（11.8%，GPT-6 Astra 为 16.9%）和违反约束（3.7%，对比 6.7%）在其失败中所占份额也更小。</p>
 <p><b>失去抓握在它的失败中很常见，但按每次抓取计算则很少。</b> 失去抓握占 Fable 失败尝试的 17.1%，在九个已标注 agent 中仅次于 Sol（20.2%），GPT-6 Astra 为 16.9%，Claude Opus 5.5 为 12.6%。这一份额随 agent 到达的抓取阶段数而增长。按到达的抓取阶段计，Fable 在 4.0% 的情况下失去抓握，GPT-6 Astra 为 5.4%；只有 Fable 和 Gemini 4 Argon（4.4%）低于 GPT-6 Astra，而 Sol 在强 agent 中最高，为 7.0%。论文中的穿绳案例展示了一次抓握丢失。在让绳子穿过五个通道的任务中，Fable 在约 91 s 前穿过了前三个，但在为第二个环重新抓取绳头时，绳子在 99 s 从夹爪中滑出，并在 125 s 再次滑出。GPT-6 Astra 也在第二个环处丢失了绳子；GPT-6.1 Sol 在越过第二个环后重新抓取时，闭合夹爪却没有抓住绳子；Claude Opus 5.5 是十个 agent 中唯一解决这一 Standard 测试的。</p>
-<p><b>它的部分失败来自放弃或仍在探索，而 GPT-6 Astra 很少如此。</b> 在 Fable 3.7% 的失败尝试中，该步骤未被尝试，而 GPT-6 Astra 为 0.3%，Sol 为 0.6%；另有 6.1% 是在 agent 仍在探索场景时失败，GPT-6 Astra 为 3.2%。两者都符合<a href="#check-vs-stop">Agent 如何使用时间和 token？</a>中描述的习惯：当 Fable 的估计表明会失手时，它会停下；而 GPT-6 Astra 会一直行动到时间限制。两者的零进展比例大致相同，在至少包含两个阶段的任务上，分别占其失败 Standard 尝试的 27% 和 26%。</p>
+<p><b>Fable 的部分失败来自未尝试某一步骤或仍在探索场景，而 GPT-6 Astra 的失败很少属于这两类。</b> 在 Fable 3.7% 的失败尝试中，该步骤未被尝试，而 GPT-6 Astra 为 0.3%，Sol 为 0.6%；另有 6.1% 是在 agent 仍在探索场景时失败，GPT-6 Astra 为 3.2%。两者都符合<a href="#check-vs-stop">Agent 如何使用时间和 token？</a>中描述的习惯：当 Fable 的估计表明会失手时，它会停下；而 GPT-6 Astra 会一直行动到时间限制。两者的零进展比例大致相同，在至少包含两个阶段的任务上，分别占其失败 Standard 尝试的 27% 和 26%。</p>
 <p><b>当两者都失败时，GPT-6 Astra 和 Fable 推进得大致一样远。</b> 在两者都失败且至少包含三个阶段的测试中，不含平局，GPT-6 Astra 在 70 个测试中的 39 个（56%）上比 Fable 达成了更多阶段，而对其他每个已标注 agent，这一比例为此类测试的 73% 至 99%。Fable 在 77 个此类测试中的 75% 上比 Opus 达成了更多阶段。因此，Fable 的失败并不比 GPT-6 Astra 更早；差别主要在于它们在阶段中的哪个环节出错。</p>
 
 
@@ -866,7 +866,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_fa_case_batteries.png?v=e9725f10" alt="论文图 33：丢弃电池的四个阶段、九个已标注 agent 在 Standard 设置下各自到达的阶段，以及 GPT-6 Astra、Claude Opus 5.5、Gemini 4 Argon 和 DeepSeek V4.1 Flash 使机器人翻倒时的头部相机画面。" width="4000" height="1700"></div>
   </div>
 </figure>
-<p>GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5 和 Gemini 4 Argon 都把柜子里的电池放进了废纸篓，随后在取第二节电池时因机器人翻倒而失败。GPT-6 Astra 在 90 s 投入第一节电池；在 359 s 驶入办公室时，底座卡到门框，机器人侧翻。它在 542 s 前把机器人扶正，在 592 s 拿起第二节电池，直到回合结束时仍握在手中。Sol 在 47 s 投入第一节电池，空手驶到办公室门口，机器人在 60 s 倾斜，又恢复直立，在 66 s 后退转向时翻倒。Opus 在 102 s 投入第一节电池，机器人在 486 s 于办公室门口转向时翻倒。Argon 在 23 s 投入第一节电池，在 90 s 于办公室内转向时使机器人翻倒。Kimi 3.1 Pro 也把柜子里的电池投入了废纸篓，随后在办公室中搜寻，直到回合结束也没有找到另一节。其余三个较弱 agent 在第一节电池上就已失败：Gemini 3.8 Flash 始终没有把它从柜子里拿起，DeepSeek V4.1 Flash 在寻找它时使机器人翻倒，GLM 5.3 Flash 在寻找时使机器人失去平衡。</p>
+<p>GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5 和 Gemini 4 Argon 都把柜子里的电池放进了废纸篓，随后在取第二节电池时因机器人翻倒而失败。GPT-6 Astra 在 90 s 投入第一节电池；在 359 s 驶入办公室时，底座卡到门框，机器人侧翻。它在 542 s 前把机器人扶正，在 592 s 拿起第二节电池，直到回合结束时仍握在手中。Sol 在 47 s 投入第一节电池，空手驶到办公室门口，机器人在 60 s 倾斜，又恢复直立，在 66 s 后退转向时翻倒。Opus 在 102 s 投入第一节电池，机器人在 486 s 于办公室门口转向时翻倒。Argon 在 23 s 投入第一节电池，在 90 s 于办公室内转向时使机器人翻倒。Kimi 3.1 Pro 也把柜子里的电池投入了废纸篓，随后在办公室中搜寻，直到回合结束也没有找到另一节。其余三个 agent 在第一节电池上就已失败：Gemini 3.8 Flash 始终没有把它从柜子里拿起，DeepSeek V4.1 Flash 在寻找它时使机器人翻倒，GLM 5.3 Flash 在寻找时使机器人失去平衡。</p>
 <p>在 Privileged 设置下，Fable、GPT-6.2 Astra、GPT-6 Astra、Sol 和 Opus 都解决了电池测试，因此拿起电池并投入废纸篓对这五个 agent 来说都力所能及。在 Standard 设置下失败的，是驱动底座穿过门口并在转向时不让机器人翻倒：失败的四个强 agent 共享这一失败阶段，而它并非第一个阶段。</p>
 
     <h3 id="cereal" data-short="麦片与碗">取麦片和碗：强 agent 能把碗拿到手边，较弱 agent 仍难在抓取</h3>
@@ -877,10 +877,10 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_fa_case_cereal.png?v=18eb4b24" alt="论文图 32(b)：取麦片和碗的四个阶段、九个已标注 agent 在 Standard 设置下各自到达的阶段，以及以下画面：GPT-6 Astra 在 22.6 s 捏住碗沿，碗在 24.6 s 从捏取中倾翻滑出，GLM 5.3 Flash 在 17 s 位于把手处而柜门仍关闭。" width="4000" height="1697"></div>
   </div>
 </figure>
-<p><b>只有 Fable 和 GPT-6.2 Astra 通过，而且 Fable 并不干净利落。</b> Fable 带有一些运气成分：碗在 23 s 从夹爪中滑落，但恰好落在台面上。</p>
+<p><b>只有 Fable 和 GPT-6.2 Astra 通过。</b> Fable 的通过在一定程度上得益于偶然因素：碗在 23 s 从夹爪中滑落，但恰好落在台面上。</p>
 <p><b>三个强 agent 都在持握碗之后失败，方式各不相同。</b> GPT-6 Astra 和 Claude Opus 5.5 打开了柜子，把麦片放到台面上，然后在碗上失败。GPT-6 Astra 从 16 s 开始尝试捏住碗沿将其拿起；在 23 s，碗从捏取中滑出并留在搁板上，之后的捏取又把它碰得侧翻。Opus 把碗从柜子里拿了出来，在 30 s 手臂将其放低时，碗从手指间滑落，掉到了够不着的地方。GPT-6.1 Sol 在同一阶段以另一种方式失败：它打开柜子，在 17 s 把碗放在了相邻的台面上，与任务指定的台面隔着一道接缝。随后它把麦片盒推到那块台面上，在 30 s 前推上两扇柜门，报告碗已就位，之后再也没有移动它。Gemini 4 Argon 把麦片放到了台面上，也把碗拿出了柜子，但没有把碗放到台面上，而且没有关上右侧柜门。</p>
 <p><b>四个较弱 agent 全部在完成其阶段所需的接触之前就已失败。</b> Kimi 3.1 Pro 打开了柜子，但始终没有抓住麦片盒。Gemini 3.8 Flash 在 2 s 时在碗的位置闭合夹爪，却抓了个空。GLM 5.3 Flash 始终没有抓住柜门把手，DeepSeek V4.1 Flash 打开了一扇柜门，但始终没有够到麦片盒。</p>
-<p>在拥有精确状态时，碗是可以处理的：在 Privileged 设置下，Fable、GPT-6.2 Astra、GPT-6 Astra、Sol 和 Opus 都完成了该测试。</p>
+<p>在拥有精确状态和无限次重置时，碗变得可以处理：在 Privileged 设置下，Fable、GPT-6.2 Astra、GPT-6 Astra、Sol 和 Opus 都完成了该测试。</p>
 
 
     <h2 id="act" data-short="控制方式">Agent 使用哪些控制方式？</h2>
@@ -892,7 +892,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
         <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_approaches.png?v=aaa5cc19" alt="论文图 2，共四个面板。RoboTwin 2.0 上的直接控制：模型发出 move、grip 和 look 命令，并记下可乐瓶倒了。RoboLab 上的用代码控制：函数 line 和 pick 通过逆运动学移动关节。HumanoidBench 上的训练 policy：一个训练了五轮的小型神经网络 actor，画面中人形机器人在奔跑。Embodied Olympics - Fun 上的混合：代码求解最小二乘拟合并进行参数搜索，其中一行调用 policy 执行一步。" width="2400" height="899"></div>
       </div>
     </figure>
-    <p>在九个已标注 agent 的随机抽样尝试中，agent 在 61% 的 Standard 尝试中直接控制机器人，而在 95% 的 Realtime 尝试和 83% 的 Privileged 尝试中编写程序来控制机器人。原因在于时钟。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，agent 掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
+    <p>在九个已标注 agent 的随机抽样尝试中，agent 在 61% 的 Standard 尝试中直接控制机器人，而在 95% 的 Realtime 尝试和 83% 的 Privileged 尝试中编写程序来控制机器人。一个可能的原因是仿真处理时间的方式。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，agent 掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="18">
         <p class="fig-cap"><span class="fc-t">有 GPU 时，26 个足球测试中有 25 个训练了 policy，8 个获胜；仅有 CPU 时，1 个训练了 policy，1 个获胜。</span> 论文图 18。（a）从九个已标注 agent 的运行中随机抽取的 2,359 次尝试（1,137 次 Standard、161 次 Realtime、1,061 次 Privileged）。“混合”尝试指中途切换了方式，或两种方式使用程度相当。（b）Standard 和 Realtime 下的足球测试中，训练了 policy、取得进球或赢得比赛的数量，分为配备 GPU 和强化学习库、以及仅有 CPU 两种情况。</p>
@@ -933,7 +933,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <p>一次尝试是否训练了 policy，依据三种信号判断，而这三种信号在每个 Standard 和 Realtime GPU 尝试上都一致：agent 代码中对强化学习库的调用或梯度更新、资源监视器记录的 GPU 显存，以及该尝试的最终报告。</p>
 
     <h3 id="success-methods" data-short="成功的运行">成功的运行如何完成任务？从失败中学习</h3>
-    <p>在成功的运行中，有四种方法反复出现，它们关乎对物理世界的测量，而非巧妙的代码。<b>Agent 根据深度为场景建模：</b>把深度图像转换为点云，并拟合需要操作的物体，例如绳索赛道上的圆环或书柜的格子。<b>它为机器人构建本地模型，</b>依据机器人的公开模型或自己对机器人运动方式的拟合，先在本地调好动作，再在机器人上尝试。<b>它离线规划，长段执行，</b>发送已经验证过的动作，而不是一步步摸索前进。<b>它把失败的回合当作一次测量：</b>在允许多个回合的测试中，它利用失败来了解自己看不到的信息，例如需要深按才能打开的卡扣，或被抛起的球的飞行轨迹。</p>
+    <p>在成功的运行中，有四种方法反复出现，它们都关乎对物理世界的测量，而非代码本身。<b>Agent 根据深度为场景建模：</b>把深度图像转换为点云，并拟合需要操作的物体，例如绳索赛道上的圆环或书柜的格子。<b>它为机器人构建本地模型，</b>依据机器人的公开模型或自己对机器人运动方式的拟合，先在本地调好动作，再在机器人上尝试。<b>它离线规划，长段执行，</b>发送已经验证过的动作，而不是一步步调整动作。<b>它把失败的回合当作一次测量：</b>在允许多个回合的测试中，它利用失败来了解自己看不到的信息，例如需要深按才能打开的卡扣，或被抛起的球的飞行轨迹。</p>
     <p>根据论文中的运行描述，其他 agent 在其成功的测试中也使用了同样的方法。Gemini 4 Argon 在 RoboLab 中从三台已标定深度相机的点云中定位了一张桌子和一只白色马克杯，发现这只 9 cm 的杯子比夹爪的最大开口更宽，于是将一根手指伸入杯内，在杯口处夹住杯壁。Claude Opus 5.5 在 ManiGuard 中根据深度点云估计了一个玻璃罐的形状及其铰链位置，绕铰链将盖子合上，并把罐子抬起 1 cm 以检查抓取，然后才将其运送到目标位置；GPT-6 Astra 则把同一个罐子碰倒了。</p>
     <p><b>安全测试同样奖励先测量再行动。</b>在 Embodied Safety Exam 中，有三个 Standard 测试十个 agent 里最多只有三个通过，通过的 agent 都是先测量再行动。Claude Opus 5.5 关掉一个通电的插线板时，每次把夹爪降低 4 毫米，直到力传感器读数突然跳变。Gemini 4 Argon 发现通往托盘的直线路径穿过一支点燃的蜡烛，放弃了一条离蜡烛只有 0.157 米的弧线，改走一条始终保持至少 0.39 米距离的路径。Gemini 3.8 Flash 测得通道宽 0.51 米，而机器人底座宽 0.482 米，于是报告任务不可行，这正是正确答案。</p>
     <p>这些方法并不能保证抓取或接触一定稳固；它们同样出现在失败的运行中。GPT-6 Astra 在下文的接球投篮测试中构建了本地模型，但时间耗尽。Claude Fable 5.2 根据深度为一对互锁的爪件建模，并离线规划了分离过程，但部件在 47 个路径点中的第 33 个处卡住，而其规划中没有无碰撞的下一步（<a href="../../../run/?r=roboarc-interlocked-claws-12-i01-standard--pldyexo">运行</a>）；其他九个 agent 中有六个完成了这个 Standard 测试（GPT-6.2 Astra、GPT-6 Astra、GPT-6.1 Sol、Claude Opus 5.5、Gemini 4 Argon 和 DeepSeek V4.1 Flash）。在另一个绳索测试中，Claude Opus 5.5 根据深度点云绘制了一面墙、墙上的六个孔和一卷盘绕的绳索，但每当手腕转动，绳索就从夹爪中滑脱，最终一个孔也没有穿过。</p>
@@ -945,14 +945,14 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
       <a class="case s" href="../../../run/?r=roboarc-rope-threading-07-i01-standard--kness36"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/79/roboarc-rope-threading-07-i01-standard--kness36/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/79/roboarc-rope-threading-07-i01-standard--kness36/replay.mp4"></video>
               <span class="case-k">卡在第二个索环</span><b>GPT-6 Astra · 失败</b><span class="case-m">Standard · 达到 180 分钟时限</span><span class="case-t">它分离出绳头，在第 76 分钟将其穿过第一个开口，随后穿过第二个，其间因手指卡在圆环上而多次重新抓取。到第三个开口时，从一只手臂到另一只手臂的交接失败：靠近墙边的拾取被夹爪和一根立柱挡住，时限到达时五个开口中仍有三个未穿过。</span></a>
     </div>
-    <p><b>接球投篮：机器人的本地模型，用真实抛球加以校正。</b>在 Embodied Olympics - Fun 中，一台人形机器人必须在 Realtime Setting 下接住抛来的球，并将其投进圆环。下面两个 agent 都构建了机器人的本地模型；区别在于时间耗尽前各自的校正落实得如何。Claude Fable 5.2 是十个 agent 中唯一完成这个 Realtime 测试的，GPT-6.2 Astra 是唯一完成其 Standard 测试的，六个强 agent 在 Privileged Setting 下全部完成了它。</p>
+    <p><b>接球投篮：机器人的本地模型，用真实抛球加以校正。</b>在 Embodied Olympics - Fun 中，一台人形机器人必须在 Realtime Setting 下接住抛来的球，并将其投进圆环。下面两个 agent 都构建了机器人的本地模型；二者的区别在于时间耗尽前各次校正的效果如何。Claude Fable 5.2 是十个 agent 中唯一完成这个 Realtime 测试的，GPT-6.2 Astra 是唯一完成其 Standard 测试的，六个强 agent 在 Privileged Setting 下全部完成了它。</p>
     <div class="pair">
       <a class="case t" href="../../../run/?r=embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/93/embodied-olympics-fun-catch-and-shoot-i00-realtime--zchzcq5/replay.mp4"></video>
               <span class="case-k">根据真实抛球校正</span><b>Claude Fable 5.2 · 成功</b><span class="case-m">Realtime · 第 93 分钟（共 120 分钟）</span><span class="case-t">它安装了 MuJoCo，依据 Unitree 的公开模型构建了 H1-2 的本地副本，并在其中调好接球动作。从第四次尝试起，接球在真实机器人上稳定成功。它在场馆相机中跟踪球，拟合其飞行轨迹，发现本地副本对球速的预测偏低约 10%，于是相对真实抛球校正了挥臂动作。第六次也是最后一次尝试穿过了圆环。</span></a>
       <a class="case t" href="../../../run/?r=embodied-olympics-fun-catch-and-shoot-i00-realtime--lrxseia"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/ac/embodied-olympics-fun-catch-and-shoot-i00-realtime--lrxseia/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/ac/embodied-olympics-fun-catch-and-shoot-i00-realtime--lrxseia/replay.mp4"></video>
               <span class="case-k">最后一投前时间耗尽</span><b>GPT-6 Astra · 失败</b><span class="case-m">Realtime · 达到 120 分钟时限</span><span class="case-t">它同样构建了本地模型，并发现和修正了模型中手指闭合速度的偏差。第 3 到 5 次尝试都接住了球，但没有一次投进：一次因腰部转动带动骨盆旋转而向右偏出，一次球在出手前滑落，一次投篮距离不足。它在时限到达时才开始第六次尝试。</span></a>
     </div>
-    <p><b>书籍：根据深度绘制书架和格子。</b>在两项 BEHAVIOR-1K 家务活动中，一台双臂移动机器人必须借助相机找到书籍，并将其装箱或在书架上整理好。书籍装箱在 Standard Setting 下只有 Claude Fable 5.2 和 GPT-6.2 Astra 完成，在 Privileged Setting 下还有 GPT-6.1 Sol 和较弱 agent 之一 Kimi 3.1 Pro 完成。书籍整理在 Standard Setting 下由 Claude Fable 5.2、GPT-6.1 Sol 和 GPT-6.2 Astra 完成，在 Privileged Setting 下由这三者和 GPT-6 Astra 完成。</p>
+    <p><b>书籍：根据深度绘制书架和格子。</b>在两项 BEHAVIOR-1K 家务活动中，一台双臂移动机器人必须借助相机找到书籍，并将其装箱或在书架上整理好。书籍装箱在 Standard Setting 下只有 Claude Fable 5.2 和 GPT-6.2 Astra 完成，在 Privileged Setting 下还有 GPT-6.1 Sol 和 Kimi 3.1 Pro 完成。书籍整理在 Standard Setting 下由 Claude Fable 5.2、GPT-6.1 Sol 和 GPT-6.2 Astra 完成，在 Privileged Setting 下由这三者和 GPT-6 Astra 完成。</p>
     <div class="pair">
       <a class="case s" href="../../../run/?r=behavior-boxing-books-up-for-storage-i00-standard--u6faz9u"><video data-auto data-rate="4" preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/49/behavior-boxing-books-up-for-storage-i00-standard--u6faz9u/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/49/behavior-boxing-books-up-for-storage-i00-standard--u6faz9u/replay.mp4"></video>
               <span class="case-k">两个 Standard 完成之一</span><b>BEHAVIOR-1K · 装箱收纳书籍</b><span class="case-m">Claude Fable 5.2 · Standard · 成功</span><span class="case-t">它让机器人原地转动，用相机绘制房间地图，根据深度在书柜的格子中找到书籍，并用楔入式和捏取式抓取将其取出。它把书运到箱子处，常常两只手各拿一本，并降低躯干以够到中间一层。第 62 分钟（共 120 分钟）时，六本书全部放入箱中。</span></a>
@@ -973,13 +973,13 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   <a class="case s" href="../../../run/?r=behavior-boxing-food-after-dinner-i00-standard--cmbwnob"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/50/behavior-boxing-food-after-dinner-i00-standard--cmbwnob/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/50/behavior-boxing-food-after-dinner-i00-standard--cmbwnob/replay.mp4"></video>
           <span class="case-k">没有时间放进冰箱</span><b>Claude Fable 5.2 · 失败</b><span class="case-m">Standard · 在第 110 分钟停止（共 120 分钟）</span><span class="case-t">它把盘子移到水槽，并把两个塔可都装进了盒子，但在把第二个塔可运到盒子上方时，手臂碰到了盒子，把第一个塔可撞到了地上。把它捡起并重新装盒耗掉了放入冰箱所需的时间：还剩约 11 分钟时，它判断把保鲜盒放上冰箱隔板需要 12 到 15 分钟，于是停止，保鲜盒留在了台面上。</span></a>
 </div>
-    <p><b>相邻的绳索测试结果相反。</b>论文附录中的绳索案例（图 32a）是 rope threading 06，需按顺序穿过五个通道：墙上的索环、圆环、第二个索环、第二个圆环和第三个索环。在 Standard Setting 下，Claude Opus 5.5 通过了该测试，是十个 agent 中唯一通过的。Claude Fable 5.2 在约 91 s 时穿过了前三个通道，但在为第二个圆环重新抓取绳头时，绳子在 99 s 和 125 s 两次从夹爪中滑脱，回合在到达第二个圆环前结束。GPT-6 Astra 也在 100 s 时穿过了三个通道，随后手指卡在第二个圆环的边缘，绳子滑脱。在失败的 agent 中，GPT-6.1 Sol 走得最远，约 84 s 时穿过四个通道，随后其夹爪在 86.5 s 闭合时未能抓住绳子。Gemini 4 Argon 约 55 s 时穿过三个通道，但绳子始终没有穿过第二个圆环。四个较弱的 agent 中有三个未能让绳子穿过第一个索环；Kimi 3.1 Pro 在 395 s 时穿过了第一个索环和第一个圆环。</p>
+    <p><b>一个相似的绳索测试给出了相反的结果。</b>论文附录中的绳索案例（图 32a）是 rope threading 06，需按顺序穿过五个通道：墙上的索环、圆环、第二个索环、第二个圆环和第三个索环。在 Standard Setting 下，Claude Opus 5.5 通过了该测试，是十个 agent 中唯一通过的。Claude Fable 5.2 在约 91 s 时穿过了前三个通道，但在为第二个圆环重新抓取绳头时，绳子在 99 s 和 125 s 两次从夹爪中滑脱，回合在到达第二个圆环前结束。GPT-6 Astra 也在 100 s 时穿过了三个通道，随后手指卡在第二个圆环的边缘，绳子滑脱。在失败的 agent 中，GPT-6.1 Sol 走得最远，约 84 s 时穿过四个通道，随后其夹爪在 86.5 s 闭合时未能抓住绳子。Gemini 4 Argon 约 55 s 时穿过三个通道，但绳子始终没有穿过第二个圆环。四个较弱的 agent 中有三个未能让绳子穿过第一个索环；Kimi 3.1 Pro 在 395 s 时穿过了第一个索环和第一个圆环。</p>
     <p>这两个绳索测试对 agent 的区分并不相同。在 rope threading 07 上，Claude Fable 5.2 和 GPT-6.1 Sol 通过，Claude Opus 5.5 失败；在 rope threading 06 这条同样有五个通道的类似赛道上，Claude Opus 5.5 通过，另外两者都失败了，且都是在重新抓取绳头时绳子滑脱或未抓住。</p>
 
 
     <h2 id="spend" data-short="投入更多">投入更多有用吗？</h2>
     <h3 id="spend-cost" data-short="失败尝试花费更高">失败尝试花费更高</h3>
-<p>在不同 agent 之间，一次尝试的成本与成功概率只有松散的关联。在同一 agent 内部，昂贵的尝试大多是失败的：失败中的 agent 会持续工作，账单也随之增长。对于六个强 agent，Privileged Setting 在大幅提高成功率的同时降低了每次尝试的成本。花费主要反映 agent 尝试了多久，并不能换来成功。</p>
+<p>在不同 agent 之间，一次尝试的成本与成功概率只有松散的关联。在同一 agent 内部，昂贵的尝试大多是失败的尝试。失败中的 agent 往往会持续工作，因此成本不断上升。对于六个强 agent，Privileged Setting 在大幅提高成功率的同时降低了每次尝试的成本。成本主要反映 agent 工作了多长时间，更高的成本本身并不会带来成功。</p>
 <p><b>成本如何计算。</b>论文按各次尝试 API 请求的 token 数，以服务商的标价为每次尝试定价（图 21），而非任何人实际被收取的费用。十个 agent 在所有设定下共有 9,440 次有成本记录的尝试（计入统计的尝试共 9,510 次），总计约 $69,100。</p>
 <p><b>对每个 agent 而言，失败才是昂贵的结果。</b>在 Standard 和 Privileged 中，十个 agent 失败尝试的中位成本都高于成功尝试的中位成本。Standard 下成功与失败的中位成本分别为：GPT-6.2 Astra $2.76 与 $5.75，Fable $7.88 与 $12.76，GPT-6 Astra $7.55 与 $25.59，Sol $1.01 与 $3.06，Opus $2.96 与 $4.62，Argon $2.68 与 $5.55。这并非由成本更高的 Suite 造成：在同一 Suite 内，失败的 Standard 尝试的成本通常是成功尝试的 1.28 倍（GLM 5.3 Flash）至 1.92 倍（Gemini 3.8 Flash）。</p>
 <figure class="fig fig-wide">
@@ -989,7 +989,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p><b>对部分 agent 而言，额外成本主要来自额外时间。</b>GPT-6 Astra 失败的 Standard 尝试中有 51.3%、Sol 有 53.1%、Argon 有 78.0% 运行到了时限的 95% 以上，而它们成功的尝试中这一比例分别为 2.3%、3.7% 和 8.7%。GPT-6.2 Astra 的这两个比例分别为 36.6% 和 1.4%。Fable 和 Opus 失败的 Standard 尝试中只有 8.8% 和 6.4% 运行这么久，但它们的失败同样比成功花费更多。</p>
-<p><b>更好的信息胜过更多的投入。</b>对于六个强 agent，Privileged 尝试的平均成本低于 Standard 尝试，成功率却高得多：GPT-6.2 Astra 为 $6.55 对 $7.24，Fable 为 $11.01 对 $13.05，GPT-6 Astra 为 $22.28 对 $26.04，Sol 为 $3.82 对 $3.94，Opus 为 $4.64 对 $6.42，Argon 为 $4.14 对 $6.08。在那里提升成功率的，是 agent 能知道和能撤销的东西（精确的物体状态、可保存状态的无限次重置、私有仿真器），而不是它的花费。</p>
+<p><b>信息比花费更重要。</b>对于六个强 agent，Privileged 尝试的平均成本低于 Standard 尝试，成功率却高得多：GPT-6.2 Astra 为 $6.55 对 $7.24，Fable 为 $11.01 对 $13.05，GPT-6 Astra 为 $22.28 对 $26.04，Sol 为 $3.82 对 $3.94，Opus 为 $4.64 对 $6.42，Argon 为 $4.14 对 $6.08。在那里提升成功率的，是 agent 能知道和能撤销的东西（精确的物体状态、可保存状态的无限次重置、私有仿真器），而不是它的花费。</p>
 
  <h3 id="spend-price" data-short="成本与成功">成本与成功只有松散关联</h3>
 <p><b>价格相差很大，成功率却相近。</b>按标价计算，GPT-6.1 Sol 每次 Standard 尝试花费 $3.9，约为 GPT-6 Astra（$26.0）的七分之一，在 481 个 Standard 测试中完成 163 个，GPT-6 Astra 为 175 个。它完成的测试也多于 Claude Opus 5.5（130）和 Gemini 4 Argon（127），而后两者每次尝试的成本约为 GPT-6 Astra 的四分之一。</p>
@@ -1061,7 +1061,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
       </tbody></table></div>
   </div>
 </figure>
-<p><b>HumanoidBench：难点在于基于相机闭合控制回路。</b>GPT-6 Astra 在这个 Suite 上的全部领先来自一个测试，即方块操作：人形机器人需要把每只手掌上方的方块旋转到目标朝向，且两个方块都不能掉落。在 Standard Setting 下，GPT-6 Astra 是十个 agent 中唯一完成该测试的。这一动作本身在 Fable 的能力范围之内：在 Realtime Setting 下 Fable、GPT-6 Astra 和 GPT-6.2 Astra 都完成了它，在 Privileged Setting 下有七个 agent 完成，Fable 也在其中。Standard Setting 额外要求的是，方块的位姿必须从相机中获取。</p>
+<p><b>HumanoidBench：难点在于基于相机闭合控制回路。</b>GPT-6 Astra 在这个 Suite 上相对 Fable 的全部优势都来自一个测试，即方块操作：人形机器人需要把每只手掌上方的方块旋转到目标朝向，且两个方块都不能掉落。在 Standard Setting 下，GPT-6 Astra 是十个 agent 中唯一完成该测试的。这一动作本身在 Fable 的能力范围之内：在 Realtime Setting 下 Fable、GPT-6 Astra 和 GPT-6.2 Astra 都完成了它，在 Privileged Setting 下有七个 agent 完成，Fable 也在其中。Standard Setting 额外要求的是，方块的位姿必须从相机中获取。</p>
 <div class="pair">
   <a class="case s" href="../../../run/?r=humanoidbench-manip-cube-i00-standard--5uz2mv2"><video data-auto preload="none" muted loop playsinline poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c3/humanoidbench-manip-cube-i00-standard--5uz2mv2/poster.jpg" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-runs/resolve/main/runs/c3/humanoidbench-manip-cube-i00-standard--5uz2mv2/replay.mp4"></video>
           <span class="case-k">基于视觉闭合回路</span><b>GPT-6 Astra · 成功</b><span class="case-m">Standard · 第 40 分钟（共 60 分钟）</span><span class="case-t">它利用 IMU 反馈稳定站姿，用倾斜的手掌抓取，把右手移入头部相机的视野，并依据立体视觉修正动作。测试在第 477 步通过，此前共重置 20 次。</span></a>
@@ -1083,7 +1083,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
           <span class="case-k">笔画用尽</span><b>Claude Fable 5.2 · 失败</b><span class="case-m">Standard · 第 29 分钟（共 60 分钟）</span><span class="case-t">一个贪心规划器用四种宽度的直线笔画拟合图像；它在没有反馈的情况下画了 285 笔，随后拍摄画纸三次，并根据纸上的实际情况重新规划剩余笔画。在用完全部 376 笔后，它自己估计的颜色误差约为 3.1，高于限值。验证器测得的值为 2.74。</span></a>
 </div>
 <p>书法测试显示了差距可以有多么微小。在一份楷书临摹中，Fable 用完了全部 71 笔，最后三笔用于修补，验证器测得与目标的重合度为 0.796，而要求为 0.80（<a href="../../../run/?r=robopaint-kaishu-linfengguilong-i00-standard--pf67vqf">运行记录</a>）；GPT-6 Astra 达到 0.90（<a href="../../../run/?r=robopaint-kaishu-linfengguilong-i00-standard--2aowg7m">运行记录</a>），GPT-6.2 Astra 也完成了该测试；在 Privileged Setting 下，有六个 agent 完成。</p>
-    <p>RoboPaint 中哪些测试能被完成，很大程度上取决于画的种类。在 Standard 中，10 幅丙烯画全部至少被一个 agent 完成（GPT-6.2 Astra 完成 9 幅，Sol 5 幅，GPT-6 Astra 3 幅，Fable 和 Opus 各 1 幅），两幅油画都被多个 agent 完成。毛笔书法是最新的 agent 带来最大变化的地方。在 10 个书法测试中，较早的 agent 在 Standard 下只完成 2 个，都由 GPT-6 Astra 完成，6 个行书（xingshu）测试它们一个也没有完成；GPT-6.2 Astra 则完成了全部 10 个。在能看到分数的 Privileged 中，每个书法测试都有 6 到 9 个 agent 完成。对较早的 agent 而言，写出这些字在能力范围之内，而在没有分数时仅凭相机画面判断笔画质量，正是它们止步的地方；GPT-6.2 Astra 做到了这种判断。</p>
+    <p>RoboPaint 中哪些测试能被完成，很大程度上取决于画的种类。在 Standard 中，10 幅丙烯画全部至少被一个 agent 完成（GPT-6.2 Astra 完成 9 幅，Sol 5 幅，GPT-6 Astra 3 幅，Fable 和 Opus 各 1 幅），两幅油画都被多个 agent 完成。最新的 agent 在毛笔书法上带来的差异最大。在 10 个书法测试中，较早的 agent 在 Standard 下只完成 2 个，都由 GPT-6 Astra 完成，6 个行书（xingshu）测试它们一个也没有完成；GPT-6.2 Astra 则完成了全部 10 个。在能看到分数的 Privileged 中，每个书法测试都有 6 到 9 个 agent 完成。对较早的 agent 而言，写出这些字在能力范围之内，但在没有分数时仅凭相机画面判断笔画质量，似乎正是它们的不足之处。GPT-6.2 Astra 成功做出了这种判断。</p>
     <figure class="fig">
       <div class="fig-body" data-fig="robopaint-types">
         <p class="fig-cap"><span class="fc-t">在 RoboPaint 中，能看到分数时多数 agent 都能完成书法测试，但在真实机器人约束下，GPT-6.2 Astra 完成了全部 10 个测试，而其余九个 agent 合计只完成 2 个。</span>按画的种类划分的 22 个 RoboPaint 核心测试：每一类在 Standard 下由哪些 agent 完成，以及在 Privileged 下每个测试有几个 agent（共十个）完成。</p>
@@ -1107,12 +1107,12 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 </div>
 <p><b>即使拥有特权信息，Fable 也会提前停止。</b>在 Privileged Setting 下的一个锅铲上菜测试中，Fable 在第 40 分钟停止于 48 个目标中的第 15 个，距该目标 0.0156 m，而容差为 0.015 m（<a href="../../../run/?r=dextoolbench_spatula_spoon_spatula_serve_plate-privileged--4ytpxhk">运行记录</a>）；GPT-6 Astra 坚持下去，在第 47 分钟到达全部 48 个目标（<a href="../../../run/?r=dextoolbench_spatula_spoon_spatula_serve_plate-privileged--zpkxzvw">运行记录</a>）；只有 GPT-6 Astra 和 GPT-6.2 Astra 完成了这个 Privileged 测试。在长螺丝刀的竖直旋转测试中，Fable 在到达 100 个目标中的 21 个时停止，当时还剩约 23 分钟，而 GPT-6 Astra 到达了全部 100 个。在四个 Privileged 螺丝刀测试中，Fable 一个也没有完成，GPT-6.2 Astra 完成全部 4 个，GPT-6 Astra 完成 3 个，Sol 完成 2 个。</p>
 <p><b>在整个核心集上，Fable 提前停止，GPT-6 Astra 则一直运行到时间限制。</b>在 Fable 失败的 233 个 Standard 测试中，它结束会话时所用时间的中位数为时间限制的 66%，其 205 次有计时记录的失败尝试中有 160 次结束时还剩十分钟或更多；GPT-6 Astra 的中位数为 97%，不过它在 306 次失败尝试中也有 140 次结束时还剩十分钟或更多，而 Opus 停得更早，中位数为 45%（<a href="#spend-how">全部三个设定</a>）。Fable 的 Standard 尝试中位数为 63 步、38 分钟，GPT-6 Astra 为 147 步、48 分钟；Fable 有 19 次 Standard 尝试用掉了时间限制的 95% 或更多，GPT-6 Astra 有 161 次。</p>
-<p>每种习惯都有代价。Fable 未用完的时间往往帮不上忙，因为它已经用完了所有重置、把工具弄到了够不着的地方，或者把笔画用在了无法去除的颜料上。但在它估计出错的地方，这些时间本可能起作用：楷书临摹只差 0.004，锅铲只差 0.6 mm。GPT-6 Astra 的检查恰恰在这些测试上发挥了作用，但它的 306 次失败 Standard 尝试中也有 157 次运行到时间限制的 95% 或更多，而不是以一个结果结束。只有当 agent 能依据自身传感器判断离目标还有多远时，更多的时间才有帮助。</p>
+<p>每种习惯都有代价。Fable 未用完的时间往往帮不上忙，因为它已经用完了所有重置、把工具弄到了够不着的地方，或者把笔画用在了无法去除的颜料上。但在它估计出错的地方，这些时间本可能起作用：楷书临摹只差 0.004，锅铲只差 0.6 mm。GPT-6 Astra 的检查恰恰在这些测试上发挥了作用，但它的 306 次失败 Standard 尝试中也有 157 次运行到时间限制的 95% 或更多，而不是以一个结果结束。更多的时间似乎主要在 agent 能依据自身传感器判断离目标还有多远时才有帮助。</p>
 
 
     <h2 id="conditions" data-short="结果的敏感程度">结果对 harness、任务指令、推理强度和重复运行有多敏感？</h2>
     <h3 id="harness-gap" data-short="Harness">Harness：同一模型，最多相差 7.5 个百分点</h3>
-<p>Embodied First Exam 中的每个 agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及两个较弱的模型（Kimi 3.1 Pro 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6.2 Astra、GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
+<p>Embodied First Exam 中的每个 agent 都是运行在某个 harness 中的模型。harness 是为模型提供工具、维护对话并决定会话何时结束的程序。Claude Fable 5.2、Claude Opus 5.5 以及另外两个模型（Kimi 3.1 Pro 和 GLM 5.3 Flash）运行在 Claude Code 中，GPT-6.2 Astra、GPT-6 Astra 和 GPT-6.1 Sol 运行在 Codex 中，两个 Gemini 模型运行在 Antigravity CLI 中，DeepSeek V4.1 Flash 则运行在 DeepSeek 自己的 DeepSeek Harness 中。为了衡量 harness 所起的作用，论文让三个模型在其他 harness 中运行 456 个核心 Standard 测试，时间限制和推理强度与排行榜一致（图 16c）。影响幅度从 7.5 个百分点到几乎为零不等，而且模型自带的 harness 并不总是它表现最好的那个。</p>
 <p><b>GPT-6 Astra 离开 Codex 后下降 7.5 个百分点。</b>在其自带的 harness Codex 中，它完成了 456 个测试中的 157 个（34.4%），在 Claude Code 中完成了 123 个（27.0%）。单个测试的变化是双向的：75 个仅在 Codex 中完成，41 个仅在 Claude Code 中完成。论文认为这一差异显著（p = 0.002）。差异的大部分在第一个 episode、任何重置之前就已出现：Codex 中成功 119 次，Claude Code 中为 95 次（p = 0.015）。因此，这一差距并不只来自各 harness 处理多次重试的长会话的方式。</p>
 <p><b>Claude Opus 5.5 在两个 harness 中表现相近。</b>它在 Codex 中完成了 456 个中的 119 个，在其自带的 Claude Code 中完成了 114 个；第一个 episode 中分别为 97 和 96。细看之下，35 个测试仅在 Codex 中完成，30 个仅在 Claude Code 中完成。两项计数的差异均不显著。</p>
 <p><b>Gemini 4 Argon 在其他 harness 中表现最好。</b>它在 Codex 中完成了 456 个中的 132 个，在 Claude Code 中完成了 116 个，在其自带的 Antigravity CLI 中完成了 110 个。与其自带 harness 相比，Codex 多赢 47 个测试、少赢 25 个，净多 22 个（p = 0.013），其中 BEHAVIOR-1K 贡献了 22 个中的 10 个，是所有 Suite 中最多的。Claude Code 与 Antigravity CLI 相差不大（p = 0.61）。第一个 episode 的排序相同，分别为 114、109 和 96，Codex 在这里同样领先（p = 0.036）。</p>
@@ -1139,34 +1139,37 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p>因此，当一个 agent 完成了另一个 agent 失败的测试时，差异有一部分可能来自 harness。论文因此把每个结果都报告为某个模型在特定 harness 中的结果：harness 如何暴露工具、管理上下文以及结束会话，本身就是 Embodied First Exam 所衡量内容的一部分。</p>
 
     <h3 id="robodojo" data-short="任务指令">任务指令：RoboDojo 得分上升</h3>
-<p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> 用一句话描述每个任务（即其 VLA 提示词），其自己的 agent 评测还加入了任务的评分方案，以及机械臂必须回到初始姿态的说明（即其 agent 提示词）。在 RoboDojo 的 agent 提示词基础上，我们的任务指令完整写明了成功判定，同样的 agent 完成了更多任务：在 37 个核心任务中，GPT-6 Astra 从 6 个增至 21 个，Claude Fable 5.2 从 21 个增至 28 个。差别在于 agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
+<p><a href="https://robodojo-benchmark.com/" target="_blank" rel="noopener">RoboDojo</a> 用一句话描述每个任务（即其 VLA 提示词），其自己的 agent 评测还加入了更完整的任务描述，以及机械臂必须回到初始姿态的说明（即其 agent 提示词）。成功条件 prompt（EFE）在 RoboDojo 的 agent 提示词基础上写明了成功判定所检查的条件，同样的 agent 完成了更多任务：在 37 个核心任务中，GPT-6 Astra 从 6 个增至 21 个，Claude Fable 5.2 从 21 个增至 28 个。差别在于 agent 是否知道会被评判什么，而不在于所测试的机器人技能。</p>
 <p><b>Embodied First Exam 如何使用 RoboDojo。</b>RoboDojo 的仿真基准共有 42 个任务。其中 12 个测试泛化能力，并且各有一个随机化版本，换用其他物体模型、光照、背景和杂物，因此共有 54 个任务。RoboDojo 在多个评测 episode 上为每个任务打分，每个 episode 是场景的一种不同随机布局：泛化任务及其随机化版本各 25 个，其余 30 个任务各 50 个。Embodied First Exam 为这 54 个任务各固定一种布局，保留 RoboDojo 的场景、机器人和成功判定，并编写了一条指令，写明 agent 无法通过观察推断出的所有约定。这 54 个任务中有 37 个在核心集中：我们排除了 GPT-6 Luna 已能完成的 17 个。每个核心任务限时 60 分钟，各有一个 Standard 测试和一个 Privileged 测试（没有 Realtime 测试）。</p>
-<p><b>三种任务指令。</b>我们让 GPT-6 Astra 和 Claude Fable 5.2 在 Standard Setting 下使用三种任务指令完成 RoboDojo 任务，场景、步数上限和成功判定保持不变。排行榜使用的是我们的任务指令。</p>
+<p><b>三种任务指令。</b>我们让 GPT-6 Astra 和 Claude Fable 5.2 在 Standard Setting 下使用三种任务指令完成 RoboDojo 任务，场景、步数上限和成功判定保持不变。排行榜使用的是成功条件 prompt。</p>
 <div class="note suite-prompts" data-fig="robodojo-prompts"><p><b>Standard Setting 下按任务指令划分的已完成核心 RoboDojo 任务（37 个）。</b></p>
   <ul class="sp-list"><li class="sp-head"><span></span><em class="sp-n">GPT-6 Astra</em><em class="sp-n">Claude Fable 5.2</em></li>
-    <li><span><b>RoboDojo VLA 提示词：</b>RoboDojo 的一句话任务描述。</span><em class="sp-n">16% (6/37)</em><em class="sp-n">57% (21/37)</em></li>
-    <li><span><b>RoboDojo agent 提示词：</b>同一句话，加上 RoboDojo 自己的 agent 评测中的任务方案和回到初始姿态的说明。</span><em class="sp-n">46% (17/37)</em><em class="sp-n">65% (24/37)</em></li>
-    <li><span><b>我们的任务指令：</b>在 RoboDojo 的 agent 提示词基础上，写明成功判定的每一个条件，包括两只机械臂最终都要回到初始姿态附近。</span><em class="sp-n">57% (21/37)</em><em class="sp-n">76% (28/37)</em></li>
+    <li><span><b>RoboDojo VLA prompt：</b>RoboDojo 的一句话任务描述。</span><em class="sp-n">16% (6/37)</em><em class="sp-n">57% (21/37)</em></li>
+    <li><span><b>RoboDojo agent prompt：</b>同一句话，加上 RoboDojo 自己的 agent 评测中更完整的任务描述和回到初始姿态的说明。</span><em class="sp-n">46% (17/37)</em><em class="sp-n">65% (24/37)</em></li>
+    <li><span><b>成功条件 prompt（EFE）：</b>agent prompt 加上成功判定所检查的条件，例如两只机械臂最终都要回到初始姿态附近。</span><em class="sp-n">57% (21/37)</em><em class="sp-n">76% (28/37)</em></li>
   </ul>
   <p>在全部 54 个 RoboDojo 任务上，顺序相同：GPT-6 Astra 分别完成 12、33 和 37 个，Claude Fable 5.2 分别完成 34、40 和 44 个。</p>
 </div>
-<p><b>对 GPT-6 Astra 而言，RoboDojo 的 agent 提示词起了大部分作用。</b>其中回到初始姿态的说明在 54 个任务中的 47 个里都很关键：一个完美完成可见任务、却让一只机械臂悬在桌面上方的 agent 会被判失败。有了这一说明，GPT-6 Astra 在 37 个核心任务中从 6 个增至 17 个。Claude Fable 5.2 使用一句话的 VLA 提示词时就已完成 21 个，agent 提示词又增加了 3 个。我们的任务指令让每个模型再多完成 4 个。在全部 54 个任务上，GPT-6 Astra 使用 VLA 提示词完成 12 个（22%），接近 <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo 排行榜</a>为它列出的 22.48% 成功率。三个版本中机器人、场景和 agent 都相同，因此它们之间的差距来自任务指令写明了多少成功判定的内容。</p>
-<p><b>我们的任务指令补充的是：成功判定的确切条件。</b>在 Fill Egg Holder 中，RoboDojo 的 agent 提示词要求鸡蛋“正确放置”、盖子“完全关闭”。在此基础上，我们的任务指令给出了成功判定所测量的具体数值。所有条件必须在同一时刻成立。每个鸡蛋的中心必须高于蛋盒底部 0.01 到 0.04 m，因此放在关闭的盖子上、放在边缘上或被举在蛋盒上方的鸡蛋都不合格。盖子的铰链必须转过关闭方向行程的 90% 以上。每只机械臂在 x、y、z 三个方向上都必须分别处于其起始位置 0.15 m 以内，且朝向与起始朝向相差不超过 20 度。夹爪不必张开。</p>
+<p><b>对 GPT-6 Astra 而言，RoboDojo 的 agent 提示词贡献了大部分提升。</b>其中回到初始姿态的说明在 54 个任务中的 47 个里都很关键：一个完美完成可见任务、却让一只机械臂悬在桌面上方的 agent 会被判失败。有了这一说明，GPT-6 Astra 在 37 个核心任务中从 6 个增至 17 个。Claude Fable 5.2 使用一句话的 VLA 提示词时就已完成 21 个，agent 提示词又增加了 3 个。成功条件 prompt 让每个模型再多完成 4 个。在全部 54 个任务上，GPT-6 Astra 使用 VLA 提示词完成 12 个（22%），接近 <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo 排行榜</a>为它列出的 22.48% 成功率。三个版本中机器人、场景和 agent 都相同，因此它们之间的差距来自任务指令写明了多少成功判定的内容。</p>
+<p><b>成功条件 prompt 补充的是：成功判定的确切条件。</b>在 Fill Egg Holder 中，RoboDojo 的 agent 提示词要求鸡蛋 “placed correctly”（译：正确放置）、盖子 “correctly and fully closed”（译：正确且完全关闭）。在此基础上，成功条件 prompt 给出了成功判定所测量的具体数值。所有条件必须在同一时刻成立。每个鸡蛋的中心必须高于蛋盒底部 0.01 到 0.04 m，因此放在关闭的盖子上、放在边缘上或被举在蛋盒上方的鸡蛋都不合格。盖子的铰链必须转过关闭方向行程的 90% 以上。每只机械臂在 x、y、z 三个方向上都必须分别处于其起始位置 0.15 m 以内，且朝向与起始朝向相差不超过 20 度。夹爪不必张开。</p>
+<figure class="fig">
+  <div class="fig-body" data-fig="robodojo-prompt-compare">
+    <p class="fig-cap"><span class="fc-t">两个 RoboDojo 任务的三种任务指令，均为原文引用。</span> Hang Mugs 与 Fill Egg Holder：RoboDojo 的 VLA prompt、RoboDojo 的 agent prompt 和成功条件 prompt（EFE），决定任务成败的部分以粗体标出（图中为英文原文）。</p>
+    <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/robodojo_prompt_compare_v5.png?v=69d1fff3" alt="Prompt comparison for two RoboDojo tasks, Hang Mugs and Fill Egg Holder: verbatim excerpts of RoboDojo’s VLA prompt, RoboDojo’s agent prompt and the success-condition prompt (EFE), with a line on why each condition matters." width="2880" height="1748"></div>
+  </div>
+</figure>
 <div class="note suite-prompts">
   <details class="sp-ex"><summary>Fill Egg Holder：三种任务指令</summary>
-    <div class="sp-box"><b class="sp-name">RoboDojo VLA 提示词</b><p><b>Task:</b> Place the four eggs from the basket into the egg holder, then close the lid.</p></div>
-    <div class="sp-box"><b class="sp-name">RoboDojo agent 提示词</b><p><b>Task:</b> Place the four eggs from the basket into the egg holder, then close the lid.</p><p><b>Description.</b> There is a woven basket containing four eggs and an egg holder. The robot needs to pick up the eggs one by one, place all four into the egg holder, and then close the lid.</p><p><b>Scoring.</b></p><ul><li>0: No egg is placed into the egg holder.</li><li>10: Any one egg is inside the egg holder and close to the holder bottom, with the gripper open.</li><li>25: Any two eggs are placed correctly into the egg holder.</li><li>40: Any three eggs are placed correctly into the egg holder.</li><li>90: All four eggs are placed in the holder, but the lid is not fully closed yet.</li><li>100: All four eggs are in the holder, the holder lid is correctly and fully closed, and the robot returns to origin.</li></ul><p>Most of these tasks also score the arms themselves: the work does not score until both arms are back within 0.15 m and 20 degrees of the pose they began the episode in, with the objects left as the task asked. Getting home is the last step of the task rather than tidying up afterwards, so keep enough env steps in hand to make it.</p></div>
-    <div class="sp-box"><b class="sp-name">我们的任务指令（节选）</b><p><b>Task:</b> Move the four eggs from the egg basket into the egg holder (an articulated tray with a lid), close the lid, and return the arm home.</p><p><b>Success.</b> All of these must hold at the same action boundary, for each of the four eggs (any egg in any cup):</p><ul><li><b>In the holder:</b> the egg’s centre … seen from above, inside the holder’s outline … and higher than that outline’s lowest point.</li><li><b>Seated in a cup:</b> the egg’s centre strictly between 0.01 and 0.04 m higher than the carton’s floor point … An egg resting in a cup passes; an egg on top of the closed lid, on the rim or held above the carton fails.</li><li><b>Lid closed:</b> the lid’s hinge more than 90 % of the way along its range toward closed …</li><li><b>Both arms back:</b> each arm’s end-effector within 0.15 m of its start position on each of x, y and z separately, and within 20 deg of its start orientation. The grippers need not be open.</li></ul></div>
+    <div class="sp-box"><b class="sp-name">RoboDojo VLA prompt</b><p><b>Task:</b> Place the four eggs from the basket into the egg holder, then close the lid.</p></div>
+    <div class="sp-box"><b class="sp-name">RoboDojo agent prompt</b><p><b>Task:</b> Place the four eggs from the basket into the egg holder, then close the lid.</p><p><b>Description.</b> There is a woven basket containing four eggs and an egg holder. The robot needs to pick up the eggs one by one, place all four into the egg holder, and then close the lid.</p><p><b>Scoring.</b></p><ul><li>0: No egg is placed into the egg holder.</li><li>10: Any one egg is inside the egg holder and close to the holder bottom, with the gripper open.</li><li>25: Any two eggs are placed correctly into the egg holder.</li><li>40: Any three eggs are placed correctly into the egg holder.</li><li>90: All four eggs are placed in the holder, but the lid is not fully closed yet.</li><li>100: All four eggs are in the holder, the holder lid is correctly and fully closed, and the robot returns to origin.</li></ul><p>Most of these tasks also score the arms themselves: the work does not score until both arms are back within 0.15 m and 20 degrees of the pose they began the episode in, with the objects left as the task asked. Getting home is the last step of the task rather than tidying up afterwards, so keep enough env steps in hand to make it.</p></div>
+    <div class="sp-box"><b class="sp-name">成功条件 prompt（EFE，节选）</b><p><b>Task:</b> Move the four eggs from the egg basket into the egg holder (an articulated tray with a lid), close the lid, and return the arm home.</p><p><b>Success.</b> All of these must hold at the same action boundary, for each of the four eggs (any egg in any cup):</p><ul><li><b>In the holder:</b> the egg’s centre … seen from above, inside the holder’s outline … and higher than that outline’s lowest point.</li><li><b>Seated in a cup:</b> the egg’s centre strictly between 0.01 and 0.04 m higher than the carton’s floor point … An egg resting in a cup passes; an egg on top of the closed lid, on the rim or held above the carton fails.</li><li><b>Lid closed:</b> the lid’s hinge more than 90 % of the way along its range toward closed …</li><li><b>Both arms back:</b> each arm’s end-effector within 0.15 m of its start position on each of x, y and z separately, and within 20 deg of its start orientation. The grippers need not be open.</li></ul></div>
     <p class="sp-after">完整的任务指令还包括机器人客户端、规则和时间限制，三个版本中均相同。</p>
   </details>
-  <details class="sp-ex"><summary>Hang Mugs：哪些挂钩算数</summary>
-    <p>RoboDojo 的提示词要求把所有杯子挂到架子上。判定还会检查每个把手的角度，因此挂在中间挂钩上的杯子仍可能不合格。我们的任务指令为 agent 指明了朝左或朝右的四个挂钩。</p>
-  </details>
-  <details class="sp-ex"><summary>Pack Objects into Box：哪一端是前端</summary>
-    <p>RoboDojo 的提示词要求把每个物体装箱时前端朝左。判定使用的是仿真器对每个物体前端的定义。对于玩具车，我们的任务指令指明了要转向左边的那一端：开始时朝右的那一端。</p>
+  <details class="sp-ex"><summary>Hang Mugs：哪些挂臂算数</summary>
+    <p>RoboDojo 的 prompt 原文为 “Hang all the mugs on the mug rack.”（译：把所有杯子挂到杯架上）。杯架有六根挂臂，分布在三个高度；判定把每个把手与其中一根挂臂（下层朝右的那根）比较，允许 60° 偏差。中层两根挂臂分别相差 80° 和 82°，因此挂在这两根上的杯子不能通过判定。场景中看不出这一点，agent 若未被告知，只能猜测哪些挂臂算数。成功条件 prompt 写明了这一点：“A mug hanging through its handle on one of the four arms that point left or right passes; on the middle arms that point toward or away from you its cross direction is about 80 deg off and it fails.”（译：通过把手挂在朝左或朝右的四根挂臂之一上的杯子通过；挂在朝前或朝后的中层挂臂上，横向方向相差约 80°，不通过。）</p>
   </details>
 </div>
-<p><b>使用 Embodied First Exam 的指令，agent 能完成大部分 RoboDojo 任务。</b></p>
+<p><b>使用成功条件 prompt，最强的几个 agent 能完成大部分 RoboDojo 任务。</b></p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-all">
     <p class="fig-cap"><span class="fc-t">Embodied First Exam 在这 54 个 RoboDojo 任务上的成功率，与 <a href="https://robodojo-benchmark.com/leaderboard?mountain=agent" target="_blank" rel="noopener">RoboDojo 自己的排行榜</a>对照。</span></p>
@@ -1184,7 +1187,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   </div>
 </figure>
 <p><b>在完整目标下，RoboDojo 仍能区分 agent。</b>在 Standard Setting 下的 37 个核心 RoboDojo 测试中，Claude Fable 5.2 完成 28 个，GPT-6.2 Astra 22 个，GPT-6 Astra 和 Gemini 4 Argon 各 21 个，Claude Opus 5.5 18 个，GPT-6.1 Sol 16 个，Kimi 3.1 Pro 10 个；其余三个较弱的 agent 完成 1 到 3 个，另有 6 个测试没有任何 agent 完成。有四个测试在 Standard 中只有一个 agent 完成：蛋盒和吐司由 Fable 完成，整理桌面由 GPT-6 Astra 完成，交换方块由 Kimi 3.1 Pro 完成，而六个强 agent 都没有完成交换方块。只有 Argon、Fable 和 GPT-6.2 Astra 在 Standard 中完成了随机化的清扫任务（Sweep Blocks Random：把扫帚递给另一只机械臂，再把小物体扫进簸箕）。在 Privileged 中，每个核心 RoboDojo 测试都至少被一个 agent 完成：GPT-6.2 Astra 完成全部 37 个，Fable 36 个，GPT-6 Astra 35 个，Sol 29 个，Opus 27 个，Argon 24 个。</p>
-<p>在完整目标下，剩下的是真实的物理难度。在一次插入钥匙的 Standard 尝试中，Claude Opus 5.5 通过深度图像定位了钥匙和锁，但在交接和大幅关节运动中至少掉落钥匙九次；它最准确的一次插入发生在第 36 分钟，偏差约 9 mm，撞在了锁的表面上。在 Standard 中没有 agent 完成该测试，而 Fable、GPT-6.2 Astra、GPT-6 Astra 和 Argon 在 Privileged 中完成了它。</p>
+<p>在明确给出完整目标后，剩余的失败似乎来自物理层面的难度。在一次插入钥匙的 Standard 尝试中，Claude Opus 5.5 通过深度图像定位了钥匙和锁，但在交接和大幅关节运动中至少掉落钥匙九次；它最准确的一次插入发生在第 36 分钟，偏差约 9 mm，撞在了锁的表面上。在 Standard 中没有 agent 完成该测试，而 Fable、GPT-6.2 Astra、GPT-6 Astra 和 Argon 在 Privileged 中完成了它。</p>
     <h3 id="spend-effort" data-short="推理强度">推理强度：同一个模型思考更久会更好吗？</h3>
 <p>另一种投入更多的方式，是让模型在每次行动前思考更久。所有排行榜 agent 都以高推理强度运行；论文还在 Codex 中让 GPT-6.1 Sol 以中等和最高推理强度运行了 456 个核心 Standard 测试，其余条件与排行榜运行相同。</p>
 <figure class="fig">
@@ -1227,7 +1230,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <h2 id="closing-olympics" data-short="Olympics">Embodied Olympics：agent 能做到 continual learning 吗？</h2>
 
 <p>在 <a href="https://olympics.embodied-first-exam.ai/" target="_blank" rel="noopener">Embodied Olympics</a> 中，agent 搭建并运行控制机器人的系统，在实时比赛中相互对抗，共有两个榜单。在 <b>Continual Learning</b> 榜单上，每个 agent 在整个锦标赛中使用同一个工作区，因此程序、policy 权重和笔记会一场接一场地保留下来。在 <b>Episodic Learning</b> 榜单上，每场比赛都从空的工作区开始。</p>
-<p>agent 很少能把观察到的东西变成更好的程序。在 515 场 Episodic 席位比赛中，agent 在 75% 的比赛里注意到对手的打法，在 66% 的比赛里正确分析了对手，但只有 26% 换上了修改后的程序，只有 4% 换上的修改赢得了更多分数。第一版程序更好的一方赢下了 98 场分出胜负的比赛中的 89 场，六个 agent 中有三个在一个 Continual 赛季中有所提高。</p>
+<p>agent 很少能把观察到的东西变成更好的程序。在 515 个 Episodic agent 参赛记录中，agent 在 75% 的记录里注意到对手的打法，在 66% 的记录里正确分析了对手。但据此行动的要少得多：只有 26% 修改了程序，只有 4% 做出的修改赢得了更多分数。第一版程序更好的一方赢下了 98 场分出胜负的比赛中的 89 场，六个 agent 中有三个在一个 Continual 赛季中有所提高。</p>
 <p>完整分析见 <a href="../../embodied-olympics/">Embodied Olympics 报告</a>。</p>
 
     <h2 id="closing-limits" data-short="局限与下一步">局限与下一步：隐藏任务和真实机器人</h2>
@@ -1250,7 +1253,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_real_robot_progress.png?v=e5897dd9" alt="论文图 35b：每次试验的进度。GPT-6 Astra 依次为 60、60、80、60、85、90、100、100 百分比；Claude Opus 5.5 依次为 0、50、50、40、50、80、40、80 百分比。" width="1708" height="1299"></div>
   </div>
 </figure>
-<p>它表明 coding agent 能够在这个游戏中控制实体机械臂。</p>
+<p>这一演示表明 coding agent 能够在这个游戏中控制实体机械臂。</p>
 
 
     <h2 id="sources" data-short="数据来源与引用">数据来源与引用</h2>
