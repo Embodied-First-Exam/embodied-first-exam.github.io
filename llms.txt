@@ -26,7 +26,7 @@ What is the Embodied First Exam? It is the first exam for coding agents before t
 ## The 9 new suites
 
 - RoboPaint (fine tool control: a robot arm reproduces a picture with a brush or pen, from Chinese calligraphy to oil painting): https://www.embodied-first-exam.ai/suite/robopaint/
-- RoboARC (tangled, deformable and multi-part objects: wire puzzles, ropes, cloth, IKEA furniture): https://www.embodied-first-exam.ai/suite/roboarc/
+- RoboARC (tangled, deformable and multi-part objects: wire puzzles, ropes, cloth, IKEA furniture): https://www.embodied-first-exam.ai/suite/roboarc/ (project page: https://roboarc.embodied-first-exam.ai/)
 - RoboDynamicExam (moving objects: catching, striking, carrying and handing over objects in motion): https://www.embodied-first-exam.ai/suite/pandadyn/
 - Embodied Olympics - Fun (humanoid motor skills from sports): https://www.embodied-first-exam.ai/suite/embodied-olympics-fun/
 - Embodied Olympics - Match (full matches of table tennis, badminton, soccer, foosball and fencing against an opponent): https://www.embodied-first-exam.ai/suite/embodied-olympics-match/
