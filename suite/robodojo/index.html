@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../../assets/exam.css?v=ab296270">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=b66d13cc"></script>
+<script type="module" src="../../assets/app.js?v=26731a34"></script>
 <!-- search-meta:start -->
 <link rel="canonical" href="https://www.embodied-first-exam.ai/suite/robodojo/">
 <meta property="og:type" content="website">
@@ -20,6 +20,8 @@
 <meta property="og:title" content="RoboDojo · Embodied First Exam">
 <meta property="og:description" content="RoboDojo, a suite of the Embodied First Exam, an agentic robotics benchmark for coding agents. Bimanual manipulation over five capabilities: generalization…">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@ManlingLi_">
+<meta name="twitter:creator" content="@ManlingLi_">
 <meta name="keywords" content="Embodied First Exam, EFE, Agentic Robotics, Embodied Evaluation, Embodied Agent Evaluation, Embodied AI Benchmark, Robotics Benchmark, Coding Agents for Robotics, Code Agents Controlling Robots, Agent-Native Evaluation, Physical AI, Robot Manipulation, Dexterous Manipulation, Whole-Body Control, Humanoid Robots, Multi-Robot Interaction, Sim-to-Sim, Robot Learning Benchmark">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "isPartOf": {"@id": "https://www.embodied-first-exam.ai/#website"}, "about": [{"@id": "https://www.embodied-first-exam.ai/#dataset"}, "Agentic robotics", "Embodied evaluation"]}</script>
 <!-- search-meta:end -->
@@ -65,10 +67,8 @@
         <h2>Example task instructions</h2>
       </div>
     </div>
-    <p style="margin:0 0 14px">We appreciate RoboDojo’s effort in evaluating agents alongside VLAs, with its own agent prompt: RoboDojo’s one-sentence VLA prompt plus a fuller task description and a note to return to the start pose. In Embodied First Exam, the task prompts for other suites describe in detail what the finished task looks like, so we wrote a fully specified prompt (EFE) for RoboDojo in the same way. With only the task instruction changed, and the robot, scenes, step limits and 60-minute limit per core task kept the same, GPT-6 Astra rises from 22% with the VLA prompt and 61% with the agent prompt to 69% with the fully specified prompt, and Claude Fable 5.2 from 63% and 74% to 81%. For example:</p>
     <figure style="margin:0">
       <img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/robodojo_prompt_compare_v20.png?v=d2a2c37e" alt="VLA prompt, agent prompt and fully specified prompt for three RoboDojo tasks, Hang Mugs, Insert Key and Fill Egg Holder: verbatim excerpts of each prompt, with a line on why each detail matters." width="3498" height="1836" style="display:block;width:100%;height:auto;border-radius:12px">
-      <figcaption style="margin-top:10px;font-size:14px;color:var(--ink-2)">Three RoboDojo tasks, Hang Mugs, Insert Key and Fill Egg Holder, with the VLA prompt, the agent prompt and the fully specified prompt (EFE) quoted verbatim; the part that decides each task is in bold.</figcaption>
     </figure>
     <p style="margin:14px 0 0">A fair concern is whether spelling out the finished state amounts to handing the agent the grading rubric. In part, it does: the agent learns what done looks like, and the verification code itself stays hidden. But the agent still has to perceive the scene, plan, and act to get there, and that is what matters most: turning a coding agent’s skills into manipulation in the physical world is the main bottleneck. Following <a href="https://arxiv.org/abs/2601.11868" target="_blank" rel="noopener">Terminal-Bench</a>’s <a href="https://github.com/harbor-framework/terminal-bench/blob/main/docs/task-guidelines.md" target="_blank" rel="noopener">task guidelines</a>, the description “completely describes what the verification algorithm will look for”, and, as its <a href="https://github.com/harbor-framework/terminal-bench/blob/main/docs/prompts/task-implementation.toml" target="_blank" rel="noopener">review criteria</a> put it, states “what to achieve, not how”. One reading is that spelling out the finished state makes the task easier than it should be, since inferring what done means is part of the challenge. Another is that without it the task is under-defined, since some requirements, such as which arms of the rack a mug may hang on, cannot be seen in the scene, and a person given the same task would likely ask. Both readings are reasonable, and the line is least clear for exact thresholds such as 60° or a lid 90% closed. Where a clear task description ends and a hint begins is an open question, and the score gap shows how much that line matters.</p>
   </section>

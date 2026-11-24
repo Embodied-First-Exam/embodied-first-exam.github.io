@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/exam.css?v=ab296270">
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="assets/app.js?v=b66d13cc"></script>
+<script type="module" src="assets/app.js?v=26731a34"></script>
 <!-- search-meta:start -->
 <link rel="canonical" href="https://www.embodied-first-exam.ai/">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -27,6 +27,8 @@
 <meta property="og:image:height" content="1080">
 <meta property="og:image:alt" content="Embodied First Exam title over a grid of simulated robot scenes from its benchmark suites">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ManlingLi_">
+<meta name="twitter:creator" content="@ManlingLi_">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.jpg?v=eb698885">
 <meta name="twitter:title" content="Embodied First Exam: An Agentic Robotics Benchmark for Coding Agents, 1,156 Tasks on 47 Robots">
 <meta name="twitter:description" content="The Embodied First Exam (EFE) is an agentic robotics benchmark that tests coding agents on 1,156 robot tasks in 35 suites with 47 robots, where the agent chooses to control the robot directly, write code to control it, or train a policy to control it. A verifier outside the agent's control grades each result.">
@@ -81,7 +83,6 @@
       <div class="hero-copy">
         <p class="hero-q"><span>Coding agents have passed many exams in the digital world.</span> <em>What is their first exam before entering the physical world?</em></p>
         <h1><span>Embodied</span><span>First Exam</span></h1>
-        <p class="summary" id="hero-lead">A Terminal-Bench for coding agents in robotics.</p>
         <div class="hero-run" id="hero-run" data-pre><!--pre:hero-run--><div class="hr-bar"><span class="pr" aria-hidden="true">$</span><code class="hr-cmd" aria-label="harbor run -d embodied-first-exam -a codex -m openai/gpt-6-astra">harbor run <span class="f">-d</span> embodied-first-exam <span class="f">-a</span> codex <span class="f">-m</span> openai/gpt-6-astra</code><span class="caret" aria-hidden="true"></span>
       <button type="button" class="hr-copy" aria-label="Copy the command" title="Copy">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"></rect><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"></path></svg></button></div>
@@ -98,15 +99,15 @@
         <div class="home-news" id="home-news" data-pre><!--pre:home-news--><span class="hn-tag">What’s new</span><span class="hn-posts" style="--rows:3"><span class="hn-track"><a class="hn-post" href="/blogs/embodied-olympics/"><span class="hn-date">2026-11-19</span><span class="hn-title">Embodied Olympics: Can Agentic Robots Continually Improve Through Competition?</span></a><a class="hn-post" href="/blogs/failure-analysis/"><span class="hn-date">2026-11-12</span><span class="hn-title">Where Do Today’s Agentic Robots Succeed and Fail?</span></a><a class="hn-post" href="/blogs/agentic-robotics-benchmark/"><span class="hn-date">2026-10-19</span><span class="hn-title">Embodied First Exam: An Agentic Robotics Benchmark</span></a></span></span><a class="hn-all" href="/blogs/">All blogs <span class="arr">→</span></a><!--/pre:home-news--></div>
       </div>
     </div>
-    <a class="scroll-cue" href="#video" aria-label="Scroll down">↓</a>
-  </section>
-
-  <section class="section intro">
-    <figure class="intro-video reveal" id="video"><video src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.mp4?v=8b9dbae6" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.jpg?v=eb698885" controls muted loop playsinline preload="metadata" data-inview></video></figure>
+    <a class="scroll-cue" href="#statement" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="section numbers" id="statement">
     <dl class="bignums reveal" id="bignums"><div><dt>1,156</dt><dd>tasks</dd></div><div><dt>35</dt><dd>benchmark suites</dd></div><div><dt>47</dt><dd>robots</dd></div></dl>
+  </section>
+
+  <section class="section intro">
+    <figure class="intro-video reveal" id="video"><video src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.mp4?v=8b9dbae6" poster="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/efe-intro.jpg?v=eb698885" controls muted loop playsinline preload="metadata" data-inview></video></figure>
   </section>
 
   <section class="section" id="leaderboard">

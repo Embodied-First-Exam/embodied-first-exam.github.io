@@ -66,7 +66,8 @@ def suite_page(template: str, sid: str) -> str:
     t = t.replace("<!-- search-meta:start -->", f'<!-- search-meta:start -->\n<link rel="canonical" href="{url}">\n'
                   f'<meta property="og:type" content="website">\n<meta property="og:url" content="{url}">\n'
                   '<meta property="og:title" content="">\n<meta property="og:description" content="">\n'
-                  '<meta name="twitter:card" content="summary">', 1)
+                  '<meta name="twitter:card" content="summary">\n'
+                  '<meta name="twitter:site" content="@ManlingLi_">\n<meta name="twitter:creator" content="@ManlingLi_">', 1)
     return t.replace("<!doctype html>", f"<!doctype html>\n{GENERATED}", 1)
 
 

@@ -169,7 +169,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 .fig .fig-cap, .fig figcaption { font-style: italic !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../../assets/app.js?v=b66d13cc"></script>
+<script type="module" src="../../../assets/app.js?v=26731a34"></script>
 <script type="module" src="../../../assets/blog-post.js?v=5f4231e3"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
@@ -180,6 +180,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <meta property="og:image:width" content="3000">
 <meta property="og:image:height" content="1200">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ManlingLi_">
+<meta name="twitter:creator" content="@ManlingLi_">
 <meta name="twitter:title" content="¿Dónde aciertan y dónde fallan los robots agénticos actuales? Hacia una comprensión de los límites de capacidad de los agentes de programación en robótica">
 <meta name="twitter:description" content="Dónde aciertan y dónde fallan los agentes de programación actuales en robótica: diez agentes en el Embodied First Exam. Qué tareas robóticas falla cada agente y por qué, qué información importa (Privileged frente a Standard), en qué parte de una tarea fallan los agentes, cómo controlan los robots y cómo cambian el resultado el harness, el gasto y la instrucción de la tarea.">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_og_cover.png?v=a718efaa">
@@ -386,7 +388,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   <header class="page-head post-head">
     <p class="kicker"><a href="../../">Blogs</a> · Embodied First Exam</p>
     <h1 class="post-title">¿Dónde aciertan y dónde fallan los robots agénticos actuales?<span class="post-sub">Hacia una comprensión de los límites de capacidad de los agentes de programación en robótica</span></h1>
-    <p class="byline"><span>Noviembre de 2026</span> · <a href="../../agentic-robotics-benchmark/">EFE Blog</a> · <a href="../../../leaderboard/">Clasificación</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Artículo</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Código</a></p>
+    <p class="byline"><span>Noviembre de 2026</span> · <a href="../../agentic-robotics-benchmark/">EFE Blog</a> · <a href="../../../leaderboard/">Clasificación</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Artículo</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Código</a> · <a href="https://x.com/ManlingLi_/status/2125300304648470767" target="_blank" rel="noopener">Publicación en X</a></p>
     <p class="lang-switch"><a href="../" hreflang="en" lang="en">English</a><a href="../zh/" hreflang="zh-Hans" lang="zh-Hans">中文</a><span aria-current="true">Español</span></p>
   </header>
 
@@ -1154,7 +1156,6 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>Lo que añade el prompt totalmente especificado: el estado final, enunciado con exactitud.</b> En Fill Egg Holder, la puntuación de RoboDojo pide huevos “placed correctly” (colocados correctamente) y una tapa “correctly and fully closed” (correcta y completamente cerrada). El prompt totalmente especificado detalla cómo se ve eso, todo en el mismo momento: el centro de cada huevo entre 0.01 y 0.04 m por encima del fondo de la huevera, así que un huevo apoyado sobre la tapa cerrada, sobre el borde o sostenido por encima de la huevera falla. La bisagra de la tapa debe haber recorrido más del 90% del camino hasta cerrarse. Cada brazo debe estar a menos de 0.15 m de su posición inicial en x, y y z por separado, y a menos de 20 grados de su orientación inicial. No hace falta que las pinzas estén abiertas.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-prompt-compare">
-    <p class="fig-cap"><span class="fc-t">Prompt VLA, prompt de agente y prompt totalmente especificado de tres tareas de RoboDojo, citados textualmente.</span> Hang Mugs, Insert Key y Fill Egg Holder, con la parte que decide cada tarea en negrita (en la figura, en el inglés original).</p>
     <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/robodojo_prompt_compare_v20.png?v=d2a2c37e" alt="Prompt VLA, prompt de agente y prompt totalmente especificado de tres tareas de RoboDojo, Hang Mugs, Insert Key y Fill Egg Holder: fragmentos textuales de cada prompt, con una línea sobre por qué importa cada detalle." width="3498" height="1836"></div>
   </div>
 </figure>

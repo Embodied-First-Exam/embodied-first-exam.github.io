@@ -2076,7 +2076,8 @@ async function homeNews(el) {
 
 async function home(ex) {
   const t = ex.totals || {};
-  $('#hero-lead').textContent = ex.hero?.lead || ex.summary || '';
+  const heroLead = $('#hero-lead');
+  if (heroLead) heroLead.textContent = ex.hero?.lead || ex.summary || '';
   heroWall(ex);
   bigNumbers($('#bignums'), ex);
   flowDiagram($('#flowfig'), ex);

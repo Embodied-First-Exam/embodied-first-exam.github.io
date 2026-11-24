@@ -169,7 +169,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 .fig .fig-cap, .fig figcaption { font-style: italic !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../assets/app.js?v=b66d13cc"></script>
+<script type="module" src="../../assets/app.js?v=26731a34"></script>
 <script type="module" src="../../assets/blog-post.js?v=5f4231e3"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
@@ -180,6 +180,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <meta property="og:image:width" content="3000">
 <meta property="og:image:height" content="1200">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ManlingLi_">
+<meta name="twitter:creator" content="@ManlingLi_">
 <meta name="twitter:title" content="Where Do Today’s Agentic Robots Succeed and Fail? Towards Understanding the Capability Boundary of Coding Agents in Robotics">
 <meta name="twitter:description" content="Where do today’s agentic robots succeed and fail? Towards understanding the capability boundary of coding agents in robotics, on the Embodied First Exam. Which robot tasks each agent fails and why, what information matters (Privileged versus Standard), where in a task agents fail, how they control robots, and how the harness, spending and the task instruction change the result.">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_og_cover.png?v=a718efaa">
@@ -384,7 +386,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   <header class="page-head post-head">
     <p class="kicker"><a href="../">Blogs</a> · <a href="../../">Embodied First Exam</a></p>
     <h1 class="post-title">Where Do Today’s Agentic Robots Succeed and Fail?<span class="post-sub">Towards Understanding the Capability Boundary of Coding Agents in Robotics</span></h1>
-    <p class="byline"><span>November 2026</span> · <a href="../agentic-robotics-benchmark/">EFE Blog</a> · <a href="../../leaderboard/">Leaderboard</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Paper</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Code</a></p>
+    <p class="byline"><span>November 2026</span> · <a href="../agentic-robotics-benchmark/">EFE Blog</a> · <a href="../../leaderboard/">Leaderboard</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">Paper</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">Code</a> · <a href="https://x.com/ManlingLi_/status/2125300304648470767" target="_blank" rel="noopener">X post</a></p>
     <p class="lang-switch"><span aria-current="true">English</span><a href="zh/" hreflang="zh-Hans" lang="zh-Hans">中文</a><a href="es/" hreflang="es" lang="es">Español</a></p>
   </header>
 
@@ -1156,7 +1158,6 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>What the fully specified prompt adds: the finished state, stated exactly.</b> In Fill Egg Holder, RoboDojo’s scoring asks for eggs “placed correctly” and a lid “correctly and fully closed”. The fully specified prompt spells out what that looks like, all at the same moment: each egg’s centre 0.01 to 0.04 m above the carton’s floor, so an egg resting on the closed lid, on the rim or held above the carton fails. The lid’s hinge must be more than 90% of the way to closed. Each arm must be within 0.15 m of its start position on x, y and z separately, and within 20 degrees of its start orientation. The grippers need not be open.</p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-prompt-compare">
-    <p class="fig-cap"><span class="fc-t">VLA prompt, agent prompt and fully specified prompt for three RoboDojo tasks, quoted verbatim.</span> Hang Mugs, Insert Key and Fill Egg Holder, with the part that decides each task in bold.</p>
     <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/robodojo_prompt_compare_v20.png?v=d2a2c37e" alt="VLA prompt, agent prompt and fully specified prompt for three RoboDojo tasks, Hang Mugs, Insert Key and Fill Egg Holder: verbatim excerpts of each prompt, with a line on why each detail matters." width="3498" height="1836"></div>
   </div>
 </figure>

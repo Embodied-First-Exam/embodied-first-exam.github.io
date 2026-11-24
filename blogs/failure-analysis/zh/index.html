@@ -169,7 +169,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 .fig .fig-cap, .fig figcaption { font-style: italic !important; }
 </style>
 <script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('exam-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
-<script type="module" src="../../../assets/app.js?v=b66d13cc"></script>
+<script type="module" src="../../../assets/app.js?v=26731a34"></script>
 <script type="module" src="../../../assets/blog-post.js?v=5f4231e3"></script>
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Embodied First Exam">
@@ -180,6 +180,8 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <meta property="og:image:width" content="3000">
 <meta property="og:image:height" content="1200">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ManlingLi_">
+<meta name="twitter:creator" content="@ManlingLi_">
 <meta name="twitter:title" content="如今的 Agentic Robots 在哪里成功，又在哪里失败？初探 coding agent 在机器人任务上的能力边界">
 <meta name="twitter:description" content="当今 coding agent 在机器人任务中的失败与成功模式：十个 agent 在 Embodied First Exam 上的表现。每个 agent 在哪些机器人任务上失败及其原因，哪些信息是关键（Privileged 与 Standard 对比），agent 在任务的哪个阶段失败，它们如何控制机器人，以及 harness、花费和任务指令如何改变结果。">
 <meta name="twitter:image" content="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/fa_og_cover.png?v=a718efaa">
@@ -386,7 +388,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
   <header class="page-head post-head">
     <p class="kicker"><a href="../../">博客</a> · Embodied First Exam</p>
     <h1 class="post-title">如今的 Agentic Robots 在哪里成功，又在哪里失败？<span class="post-sub">初探 coding agent 在机器人任务上的能力边界</span></h1>
-    <p class="byline"><span>2026年11月</span> · <a href="../../agentic-robotics-benchmark/">EFE 博客</a> · <a href="../../../leaderboard/">排行榜</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">代码</a></p>
+    <p class="byline"><span>2026年11月</span> · <a href="../../agentic-robotics-benchmark/">EFE 博客</a> · <a href="../../../leaderboard/">排行榜</a> · <a href="https://arxiv.org/abs/2611.12177" target="_blank" rel="noopener">论文</a> · <a href="https://github.com/mll-lab-nu/embodied-first-exam" target="_blank" rel="noopener">代码</a> · <a href="https://x.com/ManlingLi_/status/2125300304648470767" target="_blank" rel="noopener">X 帖子</a></p>
     <p class="lang-switch"><a href="../" hreflang="en" lang="en">English</a><span aria-current="true">中文</span><a href="../es/" hreflang="es" lang="es">Español</a></p>
   </header>
 
@@ -1154,7 +1156,6 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
 <p><b>Fully specified prompt 补充的是：确切写明的完成状态。</b>在 Fill Egg Holder 中，RoboDojo 的评分要求鸡蛋 “placed correctly”（译：正确放置）、盖子 “correctly and fully closed”（译：正确且完全关闭）。Fully specified prompt 写明了完成时的样子，以下各项须在同一时刻成立：每个鸡蛋的中心高于蛋盒底部 0.01 到 0.04 m，因此放在关闭的盖子上、放在边缘上或被举在蛋盒上方的鸡蛋都不通过。盖子的铰链必须转过关闭方向行程的 90% 以上。每只机械臂在 x、y、z 三个方向上都必须分别处于其起始位置 0.15 m 以内，且朝向与起始朝向相差不超过 20 度。夹爪不必张开。</p>
 <figure class="fig">
   <div class="fig-body" data-fig="robodojo-prompt-compare">
-    <p class="fig-cap"><span class="fc-t">三个 RoboDojo 任务的 VLA prompt、agent prompt 和 fully specified prompt，均为原文引用。</span> Hang Mugs、Insert Key 与 Fill Egg Holder，决定任务成败的部分以粗体标出（图中为英文原文）。</p>
     <div class="pimg"><img loading="lazy" decoding="async" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/robodojo_prompt_compare_v20.png?v=d2a2c37e" alt="三个 RoboDojo 任务（Hang Mugs、Insert Key 和 Fill Egg Holder）的 VLA prompt、agent prompt 和 fully specified prompt：各 prompt 的原文节选，并附一行说明每个细节为何重要。" width="3498" height="1836"></div>
   </div>
 </figure>
