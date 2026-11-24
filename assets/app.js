@@ -2152,7 +2152,7 @@ function suiteResults(el, ex, tasks, s = {}) {
     const shown = set.all ? groupAll.filter((r) => g.scores[r.id].v[1]) : group;
     const order = [...shown].sort((a, b) => P(b) - P(a) || a.model.localeCompare(b.model));
     const best = Math.max(0, P(order[0]));
-    $('[data-read]', el).textContent = set.all ? `Different models were evaluated on different tasks, so the results are not fully comparable.` : '';   // owner, 2026-11-20
+    $('[data-read]', el).textContent = (set.all && tasks[0]?.suite !== 'robodojo') ? `Different models were evaluated on different tasks, so the results are not fully comparable.` : '';   // owner, 2026-11-20
     let rank = 0, prev = null;
     const sid = tasks[0]?.suite;
     const ready = set.all ? order : order.filter((r) => !updatingOn(r.id, sid));
