@@ -24,7 +24,7 @@ With 1,156 tasks in 35 suites on 47 robots, the Embodied First Exam is larger th
 
 ## How well do coding agents control robots?
 
-Not reliably yet. In the paper (ten agents, 481 core tasks), the highest success rate in the Standard Setting, which mimics real-robot constraints, is 58%, and 112 of the 481 Standard tests (23%) are solved by none of the ten agents. A single ranking hides three things: different agents solve different tests (Claude Fable 5.2 solves 65 Standard tests that GPT-6.2 Astra fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol have a success rate of 30.8% ± 2.5 (mean ± s.d.). Live results: https://www.embodied-first-exam.ai/leaderboard/
+Not reliably yet. In the paper (eleven agents, 481 core tasks), the highest success rate in the Standard Setting, which mimics real-robot constraints, is 58%, and 111 of the 481 Standard tests (23%) are solved by none of the eleven agents. A single ranking hides three things: different agents solve different tests (Claude Fable 5.2 solves 65 Standard tests that GPT-6.2 Astra fails), the same model can change by up to 7.5 percentage points between harnesses, and three runs of GPT-6.1 Sol have a success rate of 30.8% ± 2.5 (mean ± s.d.). Live results: https://www.embodied-first-exam.ai/leaderboard/
 
 ## Can coding agents control real robots?
 
@@ -36,7 +36,7 @@ Each task can be run in up to three settings. The Standard Setting mimics the re
 
 ## How well do current coding agents do on agentic robotics tasks?
 
-On the 481 core tasks, the strongest of ten agents evaluated in the paper, GPT-6.2 Astra in Codex, reaches a 58% success rate in the Standard Setting. This leaves much room for improvement.
+On the 481 core tasks, the strongest of eleven agents evaluated in the paper, GPT-6.2 Astra in Codex, reaches a 58% success rate in the Standard Setting. This leaves much room for improvement.
 
 ## What kinds of tasks does the Embodied First Exam cover?
 
@@ -104,4 +104,4 @@ The strongest agent's programs win 43% of their games against the strongest scri
 - Core set: 481 hard tasks (951 tests), in the paper and on the live leaderboard
 - 3 evaluation settings: Standard, Realtime (a variant of Standard), Privileged
 - 3 control approaches: direct control, code to control, train a policy to control
-- Highest Standard Setting success rate on the paper's 481 core tasks: 58% (GPT-6.2 Astra; ten agents)
+- Highest Standard Setting success rate on the paper's 481 core tasks: 58% (GPT-6.2 Astra; eleven agents)
