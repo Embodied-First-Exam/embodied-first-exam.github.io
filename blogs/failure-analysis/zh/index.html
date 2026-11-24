@@ -889,7 +889,7 @@ table.fst td.lead, table.fst th.lead { font-weight: 650; }
     <figure class="fig paper fig-wide">
       <div class="fig-body" data-fig="approaches">
         <p class="fig-cap"><span class="fc-t">Agent 直接控制机器人、编写代码、训练 policy，或混合使用这些方式。</span> 论文图 2。每个面板上方是 agent 命令或代码的节选，下方是该回合的一帧画面；深色标签表示所用的方式（<i>model</i> 即直接控制）。依次为 RoboTwin 2.0 上的直接控制，RoboLab 上的用代码控制，HumanoidBench 上训练出的 policy，以及 Embodied Olympics - Fun 上代码与 policy 的混合，其中带框的一行就是 policy。</p>
-        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_approaches.png?v=aaa5cc19" alt="论文图 2，共四个面板。RoboTwin 2.0 上的直接控制：模型发出 move、grip 和 look 命令，并记下可乐瓶倒了。RoboLab 上的用代码控制：函数 line 和 pick 通过逆运动学移动关节。HumanoidBench 上的训练 policy：一个训练了五轮的小型神经网络 actor，画面中人形机器人在奔跑。Embodied Olympics - Fun 上的混合：代码求解最小二乘拟合并进行参数搜索，其中一行调用 policy 执行一步。" width="2400" height="899"></div>
+        <div class="pimg"><img loading="lazy" decoding="async" class="natural" src="https://huggingface.co/datasets/MLL-Lab/embodied-exam-data/resolve/main/site/blog/fable-5-2/paper_approaches_v2.png?v=84f09809" alt="论文图 2，共四个面板。RoboTwin 2.0 上的直接控制：模型发出 move、grip 和 look 命令，并记下可乐瓶倒了。RoboLab 上的用代码控制：函数 line 和 pick 通过逆运动学移动关节。HumanoidBench 上的训练 policy 来控制：一个训练了五轮的小型神经网络 actor，画面中人形机器人在奔跑。Embodied Olympics - Fun 上的混合：代码求解最小二乘拟合并进行参数搜索，其中一行调用 policy 执行一步。" width="2880" height="1418"></div>
       </div>
     </figure>
     <p>在九个已标注 agent 的随机抽样尝试中，agent 在 61% 的 Standard 尝试中直接控制机器人，而在 95% 的 Realtime 尝试和 83% 的 Privileged 尝试中编写程序来控制机器人。一个可能的原因是仿真处理时间的方式。在 Standard 中，模型思考时仿真会暂停等待，因此模型可以置身于控制回路之中，先观察再决定每一步动作。在 Realtime 中，仿真持续运行，因此必须由程序来执行控制回路。在 Privileged 中，agent 掌握完整的仿真器状态，可以在提交之前先计算或搜索出一段动作。</p>
