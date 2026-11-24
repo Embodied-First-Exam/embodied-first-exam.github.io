@@ -59,6 +59,46 @@ REWORD = [
 ]
 
 
+# RoboDojo's prompt versions (suites[].prompts) as the owner named them on 2026-11-24: the source may still write the
+# older names, so they are set here, inside the prompt versions only (plain REWORD would touch every string)
+PROMPT_NAMES = {
+    "Agent prompt": "RoboDojo agent prompt for GPT-6 Astra",
+    "RoboDojo agent prompt": "RoboDojo agent prompt for GPT-6 Astra",
+    "Our prompt": "Fully specified prompt (EFE)",
+}
+PROMPT_AFTER_FIRST = "The agent prompt is the one RoboDojo used for its GPT-6 Astra evaluation."
+PROMPT_AFTER_FIX = [("The leaderboard uses our prompt.", "The leaderboard uses the fully specified prompt.")]
+PROMPT_AFTER_FIX.append(("used for its own GPT-6 Astra evaluation.", "used for its GPT-6 Astra evaluation."))
+PROMPT_TEXT_FIX = [("from RoboDojo's own agent evaluation.", "from RoboDojo's GPT-6 Astra evaluation.")]
+PROMPT_NO_EXAMPLE = {"robodojo"}    # the suite page shows the prompt comparison figure instead of the example
+
+
+def prompt_names(exam):
+    """Set the prompt versions' names, the note under them, and drop the example where PROMPT_NO_EXAMPLE says."""
+    for s in exam.get("suites") or []:
+        p = s.get("prompts")
+        if not isinstance(p, dict):
+            continue
+        for q in p.get("items") or []:
+            q["name"] = PROMPT_NAMES.get(q.get("name"), q.get("name"))
+            if isinstance(q.get("text"), str):
+                for x, y in PROMPT_TEXT_FIX:
+                    q["text"] = q["text"].replace(x, y)
+        if s.get("id") == "robodojo":
+            after = p.get("after") or ""
+            for a, b in PROMPT_AFTER_FIX:
+                after = after.replace(a, b)
+            if PROMPT_AFTER_FIRST not in after:
+                after = (PROMPT_AFTER_FIRST + " " + after).strip()
+            p["after"] = after
+        if s.get("id") in PROMPT_NO_EXAMPLE:
+            p.pop("example", None)
+        else:
+            for q in (p.get("example") or {}).get("prompts") or []:
+                q["name"] = PROMPT_NAMES.get(q.get("name"), q.get("name"))
+    return exam
+
+
 def reword(node):
     """Rename the suites in SUITE_IDS (as keys and as whole values) and reword the text (REWORD)."""
     if isinstance(node, dict):
@@ -176,6 +216,7 @@ def main() -> int:
 
     rw = Rewriter()
     exam, tasks = reword(rw.walk(exam)), reword(rw.walk(tasks))
+    exam = prompt_names(exam)
     ids = [x["id"] for x in exam.get("suites") or []]
     if len(ids) != len(set(ids)):
         raise SystemExit(f"two suites share an id after renaming: {sorted(i for i in ids if ids.count(i) > 1)}")
