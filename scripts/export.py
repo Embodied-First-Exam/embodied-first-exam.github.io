@@ -67,10 +67,24 @@ PROMPT_NAMES = {
     "Our prompt": "Fully specified prompt (EFE)",
 }
 PROMPT_AFTER_FIRST = "The agent prompt is the one RoboDojo used for its GPT-6 Astra evaluation."
-PROMPT_AFTER_FIX = [("The leaderboard uses our prompt.", "The leaderboard uses the fully specified prompt.")]
+# owner, 2026-11-25: no sentence on which prompt the leaderboard uses
+PROMPT_AFTER_FIX = [("The leaderboard uses our prompt.", ""), ("The leaderboard uses the fully specified prompt.", "")]
 PROMPT_AFTER_FIX.append(("used for its own GPT-6 Astra evaluation.", "used for its GPT-6 Astra evaluation."))
 PROMPT_TEXT_FIX = [("from RoboDojo's own agent evaluation.", "from RoboDojo's GPT-6 Astra evaluation.")]
-PROMPT_NO_EXAMPLE = {"robodojo"}    # the suite page shows the prompt comparison figure instead of the example
+PROMPT_NO_EXAMPLE = {"robodojo"}    # the suite page shows its own static example section (#prompt-compare) instead
+# owner, 2026-11-25: RoboDojo's fully specified prompt gives way to the EFE prompt and the EFE prompt with exact numbers
+# (54 tasks, Standard Setting; each score the mean of three runs, shown with one decimal: `mean`)
+PROMPT_TITLE = {"robodojo": "Four prompt versions and RoboDojo's own harness."}
+PROMPT_INTRO = {"robodojo": "RoboDojo's 54 tasks in the Standard Setting, run by GPT-6 Astra and Claude Fable 5.2 with four "
+                "prompts, and with the agent prompt in RoboDojo's own agent harness; scenes, step limits and success "
+                "checkers are the same. For the two EFE prompts, each score is the mean of three runs."}
+PROMPT_REPLACE = {("robodojo", "Fully specified prompt (EFE)"): [
+    {"name": "EFE prompt", "text": "the task and its finished state in plain words, with the robot interface and limits.",
+     "solved": [[34.0, 54], [44.0, 54]], "mean": True},
+    {"name": "EFE prompt with exact numbers",
+     "text": "the same prompt plus the sizes, positions and thresholds the success checker uses.",
+     "solved": [[36.0, 54], [44.3, 54]], "mean": True},
+]}
 
 
 def prompt_names(exam):
@@ -84,13 +98,19 @@ def prompt_names(exam):
             if isinstance(q.get("text"), str):
                 for x, y in PROMPT_TEXT_FIX:
                     q["text"] = q["text"].replace(x, y)
+        items = []
+        for q in p.get("items") or []:
+            items += PROMPT_REPLACE.get((s.get("id"), q.get("name")), [q])
+        p["items"] = items
+        p["title"] = PROMPT_TITLE.get(s.get("id"), p.get("title"))
+        p["text"] = PROMPT_INTRO.get(s.get("id"), p.get("text"))
         if s.get("id") == "robodojo":
             after = p.get("after") or ""
             for a, b in PROMPT_AFTER_FIX:
                 after = after.replace(a, b)
             if PROMPT_AFTER_FIRST not in after:
                 after = (PROMPT_AFTER_FIRST + " " + after).strip()
-            p["after"] = after
+            p["after"] = " ".join(after.split())
         if s.get("id") in PROMPT_NO_EXAMPLE:
             p.pop("example", None)
         else:
