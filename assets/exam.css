@@ -1869,6 +1869,17 @@ html { overflow-x: clip; }
 .suite-prompts .sp-box p + p, .suite-prompts .sp-box ul + p, .suite-prompts .sp-box p + ul { margin-top: 6px; }
 .suite-prompts .sp-box ul { margin: 4px 0 0; padding-left: 18px; }
 .suite-prompts .sp-after { margin-top: 10px; }
+/* one prompt version's example under its row (app.js promptExample), collapsed; the instruction as the agent read it */
+.suite-prompts .sp-list > li:has(> .sp-ix) { flex-wrap: wrap; row-gap: 0; }
+.suite-prompts .sp-list > li:has(> .sp-ix) > span { flex: 1 1 0; min-width: 0; }
+.suite-prompts .sp-ix { flex: 1 0 100%; margin: 2px 0 1px; }
+.suite-prompts .sp-ix summary { cursor: pointer; width: max-content; max-width: 100%; color: var(--ink-2); font-size: 13px; font-weight: 600; }
+.suite-prompts .sp-ix summary:hover, .suite-prompts .sp-ix[open] summary { color: var(--ink); }
+.suite-prompts .sp-instr { margin-top: 6px; padding: 10px 12px; border-radius: 10px; background: var(--bg-2); color: var(--ink); font: 12.5px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 340px; overflow: auto; }
+.suite-prompts .sp-instr .sp-h { font-weight: 700; }
+.suite-prompts .sp-instr code { font: inherit; padding: 0 4px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.suite-prompts .sp-omit { margin: 4px 0 2px; font-size: 12.5px; color: var(--ink-2); }
+@media (max-width: 560px) { .suite-prompts .sp-instr { font-size: 12px; max-height: 300px; padding: 9px 10px; } }
 /* Suite by suite and a suite's Results: success rate, then solved / tested (owner, 2026-11-19) */
 .sx-frac .sx-row .sd-name { height: 46px; }
 .sx-frac .sx-cell { height: 46px; }

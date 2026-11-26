@@ -2212,9 +2212,16 @@ async function suitePage(ex) {
 
 /** A suite's prompt versions under its description (exam.json suites[].prompts; owner, 2026-11-20: RoboDojo): a short
  *  note, one line per version with each model's share and solved / tasks (p.models; `solved` one [solved, tasks] per
- *  model, or one pair for a single model; `mean`: a mean over runs, solved shown with one decimal), then one task's
- *  three prompts, collapsed. */
+ *  model, or one pair for a single model; `mean`: a mean over runs, solved shown with one decimal), each with its own
+ *  example if it has one (`example`: {title, text, note}; owner, 2026-11-26: RoboDojo's Hang Mugs instruction under each
+ *  version), then one task's three prompts, collapsed. */
 const promptText = (t) => prose(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+/** An instruction as the agent read it, line by line (white-space: pre-wrap): `#` headings in bold without their marks,
+ *  **bold**, `code`; everything else as it is. */
+const instrText = (t) => String(t || '').split('\n').map((l) => /^#+ /.test(l) ? `<b class="sp-h">${esc(l.replace(/^#+ /, ''))}</b>`
+  : esc(l).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>')).join('\n');
+const promptExample = (e) => (!e?.text ? '' : `<details class="sp-ix"><summary>${esc(e.title || 'Example')}</summary>
+      <div class="sp-instr">${instrText(e.text)}</div>${e.note ? `<p class="sp-omit">${esc(e.note)}</p>` : ''}</details>`);
 function suitePrompts(p) {
   if (!p?.items?.length) return '';
   const pct = (v) => `${Math.round(100 * v[0] / v[1])}%`;
@@ -2230,7 +2237,7 @@ function suitePrompts(p) {
   };
   const ex = p.example;
   return `<div class="note suite-prompts"><p><b>${esc(p.title || '')}</b> ${esc(p.text || '')}</p>
-    <ul class="sp-list">${head}${p.items.map((it) => `<li><span><b>${esc(it.name)}:</b> ${esc(it.text)}</span>${pairs(it.solved).map((v) => cell(v, it.mean)).join('')}</li>`).join('')}</ul>
+    <ul class="sp-list">${head}${p.items.map((it) => `<li><span><b>${esc(it.name)}:</b> ${esc(it.text)}</span>${pairs(it.solved).map((v) => cell(v, it.mean)).join('')}${promptExample(it.example)}</li>`).join('')}</ul>
     ${p.after ? `<p>${esc(p.after)}</p>` : ''}
     ${ex?.prompts?.length ? `<details class="sp-ex"><summary>${esc(ex.title || 'Example')}</summary>${ex.prompts.map((q) => `<div class="sp-box"><b class="sp-name">${esc(q.name)}</b>${blocks(q.blocks)}</div>`).join('')}${ex.after ? `<p class="sp-after">${esc(ex.after)}</p>` : ''}</details>` : ''}</div>`;
 }

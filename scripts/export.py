@@ -65,15 +65,23 @@ PROMPT_NAMES = {
     "Agent prompt": "RoboDojo agent prompt for GPT-6 Astra",
     "RoboDojo agent prompt": "RoboDojo agent prompt for GPT-6 Astra",
     "Our prompt": "Fully specified prompt (EFE)",
+    "EFE prompt with exact numbers": "EFE prompt with detailed success criteria",    # owner, 2026-11-26
 }
 PROMPT_AFTER_FIRST = "The agent prompt is the one RoboDojo used for its GPT-6 Astra evaluation."
 # owner, 2026-11-25: no sentence on which prompt the leaderboard uses
 PROMPT_AFTER_FIX = [("The leaderboard uses our prompt.", ""), ("The leaderboard uses the fully specified prompt.", "")]
 PROMPT_AFTER_FIX.append(("used for its own GPT-6 Astra evaluation.", "used for its GPT-6 Astra evaluation."))
-PROMPT_TEXT_FIX = [("from RoboDojo's own agent evaluation.", "from RoboDojo's GPT-6 Astra evaluation.")]
-PROMPT_NO_EXAMPLE = {"robodojo"}    # the suite page shows its own static example section (#prompt-compare) instead
-# owner, 2026-11-25: RoboDojo's fully specified prompt gives way to the EFE prompt and the EFE prompt with exact numbers
-# (54 tasks, Standard Setting; each score the mean of three runs, shown with one decimal: `mean`)
+DETAILED = ("the same prompt, with the sizes, positions and thresholds the success checker uses added to the Goal "
+            "section.")
+PROMPT_TEXT_FIX = [("from RoboDojo's own agent evaluation.", "from RoboDojo's GPT-6 Astra evaluation."),
+                   ("the same prompt plus the sizes, positions and thresholds the success checker uses.", DETAILED)]
+PROMPT_NO_EXAMPLE = {"robodojo"}    # the suite page shows one example per prompt version instead (PROMPT_EXAMPLES)
+# owner, 2026-11-26: under each of RoboDojo's prompt versions, that version's Hang Mugs instruction, collapsed
+# (scripts/prompt_examples.json: {suite: {version name: {title, text, note}}}, the texts as the runs gave them)
+PROMPT_EXAMPLES = json.loads((Path(__file__).resolve().parent / "prompt_examples.json").read_text())
+# owner, 2026-11-25: RoboDojo's fully specified prompt gives way to the EFE prompt and the EFE prompt with detailed
+# success criteria (owner, 2026-11-26: the name; 54 tasks, Standard Setting; each score the mean of three runs, shown
+# with one decimal: `mean`)
 PROMPT_TITLE = {"robodojo": "Four prompt versions and RoboDojo's own harness."}
 PROMPT_INTRO = {"robodojo": "RoboDojo's 54 tasks in the Standard Setting, run by GPT-6 Astra and Claude Fable 5.2 with four "
                 "prompts, and with the agent prompt in RoboDojo's own agent harness; scenes, step limits and success "
@@ -81,14 +89,14 @@ PROMPT_INTRO = {"robodojo": "RoboDojo's 54 tasks in the Standard Setting, run by
 PROMPT_REPLACE = {("robodojo", "Fully specified prompt (EFE)"): [
     {"name": "EFE prompt", "text": "the task and its finished state in plain words, with the robot interface and limits.",
      "solved": [[34.0, 54], [44.0, 54]], "mean": True},
-    {"name": "EFE prompt with exact numbers",
-     "text": "the same prompt plus the sizes, positions and thresholds the success checker uses.",
+    {"name": "EFE prompt with detailed success criteria", "text": DETAILED,
      "solved": [[36.0, 54], [44.3, 54]], "mean": True},
 ]}
 
 
 def prompt_names(exam):
-    """Set the prompt versions' names, the note under them, and drop the example where PROMPT_NO_EXAMPLE says."""
+    """Set the prompt versions' names, the note under them and each version's example (PROMPT_EXAMPLES), and drop the
+    suite's own example where PROMPT_NO_EXAMPLE says."""
     for s in exam.get("suites") or []:
         p = s.get("prompts")
         if not isinstance(p, dict):
@@ -101,6 +109,9 @@ def prompt_names(exam):
         items = []
         for q in p.get("items") or []:
             items += PROMPT_REPLACE.get((s.get("id"), q.get("name")), [q])
+        for q in items:
+            if q.get("name") in PROMPT_EXAMPLES.get(s.get("id"), {}):
+                q["example"] = PROMPT_EXAMPLES[s["id"]][q["name"]]
         p["items"] = items
         p["title"] = PROMPT_TITLE.get(s.get("id"), p.get("title"))
         p["text"] = PROMPT_INTRO.get(s.get("id"), p.get("text"))
